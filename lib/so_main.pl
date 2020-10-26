@@ -1,0 +1,340 @@
+#----------------#
+#   メイン画面   #
+#----------------#
+
+sub file_load
+{
+   our %USER = ();
+   open(FH, "<", $chara_file);
+   while(<FH>)
+   {
+     my $line = $_;
+     chomp $line;
+     my @tmp = split(/<>/, $line);
+     $USER{$tmp[0]} = \@tmp;
+   }
+   close(FH);
+}
+
+sub log_in {
+	$chara_flag=1;
+
+        &file_load;
+
+	$esex = "女";
+	unless ( exists $USER{ $in{'id'} } && $USER{ $in{'id'} }->[1] eq $in{'pass'} ) {
+		&error("入力されたIDは登録されていません。又はパスワードが違います。");
+	} else {
+		($kid,$kpass,$kname,$ksex,$kchara,$kn_0,$kn_1,$kn_2,$kn_3,$kn_4,$kn_5,$kn_6,$khp,$kmaxhp,$kex,$klv,$kap,$kgold,$klp,$ktotal,$kkati,$khost,$kdate,$karea,$kspot,$kpst,$kitem) = @{ $USER{ $in{'id'} } };
+		$esex = "男" if($ksex);
+	}
+
+	$pc = $USER{ $in{'id'} };
+
+	# ファイルロック
+	if ($lockkey == 1) { &lock1; }
+	elsif ($lockkey == 2) { &lock2; }
+	elsif ($lockkey == 3) { &file'lock; }
+
+	# load-char-data start
+
+	open(IN,"$chara_file");
+	@log_in = <IN>;
+	close(IN);
+
+	# load-char-data end
+
+	$ltime = time();
+	$ltime = $ltime - $kdate;
+	$vtime = $b_time - $ltime;
+	$mtime = $m_time - $ltime;
+
+	$next_ex = $lv_up;
+
+	&town_load;
+
+	&header;
+
+	if($kspot == 0 && $kpst == 1){
+		print "$movemsg<p>$knameは$town_name[$karea]郊外にいます。\n";
+		$spot = "$town_name[$karea]郊外";
+	} elsif($kspot == 1){
+		print "$movemsg<p>$knameは$area_name[$karea]を探索中です。\n";
+		$spot = "$area_name[$karea]最深部まで残り $kpst";
+	} elsif($kspot == 2  && $kpst > 0){
+		print "$movemsg<p>$knameは$town_name[$karea]から$town_name[$farea]に移動しています。\n";
+		$spot = "$town_name[$farea]まで残り $kpst";
+	} elsif($kspot == 3  && $kpst > 0){
+		print "$movemsg<p>$knameは$town_name[$karea]から$town_name[$rarea]に移動しています。\n";
+		$spot = "$town_name[$rarea]まで残り $kpst";
+	} else {
+		print "$movemsg<p>$knameは$town_name[$karea]にいます。\n";
+		$spot = "町の中";
+	}
+	$rid = $kid;
+	&read_battle;
+
+	&read_bank;
+	if($krgold > 0){
+		$ggold = $krgold;
+		$bflag = 0;
+		&money_get;
+		if($kmsg ne ""){
+			print "<BR>シマダ国営銀行より <b>$ggold</b> G が振り込まれました。明細は以下の通りです。<br>$kmsg";
+		} else {
+			print "<BR>シマダ国営銀行より <b>$ggold</b> G が振り込まれました。";
+		}
+		$kgold = $tgold;
+		&regist_bank;
+	}
+	&read_buff;
+	if($rrsk > 100) {
+		print "<BR>動くのも苦痛なほど疲れてきました・・。\n";
+	} elsif($rrsk > 75) {
+		print "<BR>かなり疲れてきました・・。\n";
+	} elsif($rrsk > 50) {
+		print "<BR>少し疲れてきました・・。\n";
+	}
+	print <<"EOM";
+<hr size=0>
+<B><FONT COLOR="#FF9933">$error</FONT></B>
+EOM
+	$error="";
+	if($ltime < $b_time or !$ktotal){
+	print <<"EOM";
+<FORM NAME="form1">
+行動可能になるまで残り<INPUT TYPE="text" NAME="clock" SIZE="3" VALUE="$vtime">秒です。0になると、自動的に更新します。
+</FORM>
+EOM
+	}
+
+	my %per = ();
+	@per{qw|hp  exp risk|} = ( ( ( $khp / $kmaxhp ) * 100 ), $kex, $rrsk );
+	map{ $per{$_} = $per{$_} < 0 ? 0 : $per{$_} } keys %per;
+
+	print <<"EOM";
+<table border=0>
+<tr>
+<td>
+<table border="1" style="width: 100%">
+<tr><td rowspan="3" class="b2">$kname<br />LV$klv<br />LP $klp\/$max_lp</td><td colspan="2" class="b2" align="center">HP:<div style="float: right; background-color: #000; padding: 2px; width: 160px;"><div style="background-color: red; width: $per{hp}%; text-align: right;">&nbsp;</div></div></td></tr>
+<tr><td colspan="2" class="b2" align="center">EXP:<div style="float: right; background-color: #000; padding: 2px; width: 160px;"><div style="background-color: orange; width: $per{exp}%; text-align: right;">&nbsp;</div></div></td></tr>
+<tr><td colspan="2" class="b2" align="center">Risk:<div style="float: right; background-color: #000; padding: 2px; width: 160px;"><div style="background-color: yellow; width: $per{risk}%; text-align: right;">&nbsp;</div></div></td></tr>
+<tr><td colspan="2" class="b2" align="center">現在地</td></tr>
+<tr>
+<td class="b1" width='25%'>地名</td>
+<td width='75%'>$town_name[$karea]</td>
+</tr>
+<tr>
+<td class="b1">場所</td>
+<td>$spot</td>
+</tr>
+<tr>
+<td colspan="2" class="b2" align="center">状態</td>
+</tr>
+<tr>
+<td class="b1">所持金</td>
+<td>$kgold</td>
+</tr>
+<tr>
+<td colspan="2" align="center">
+<button id="item_check" class="mode" type="button">アイテム一覧</button>
+<button id="status_check" class="mode" type="button">ステータス詳細</button>
+</td>
+</tr>
+</table>
+</td>
+</tr><tr>
+<td valign="top">
+<form name="town" action="$script" method="post">
+<input type="hidden" name="id" value="$kid" />
+<input type="hidden" name="pass" value="$kpass" />
+<input type="hidden" name="area" value="$karea" />
+EOM
+
+	if($kspot == 0 && $kpst == 0){
+		print <<"EOM";
+【$town_name[$karea]の施設】<br>
+<select name="mode" onchange="javascript:selectTown(this);">
+<option value="yado">宿屋：$t_inn</option>
+<option value="item_shop">ショップ：$t_shop</option>
+<option value="user_shop">市場：チュパフリマ $town_name[$karea]</option>
+<option value="bank">銀行：シマダ国営銀行（$town_name[$karea]店）</option>
+</select>
+<input type="submit" value="入店" /><br>
+EOM
+	} else {
+		print <<"EOM";
+【キャンプ】<br>
+<input type="hidden" name="spot" value="2" />
+EOM
+
+		if($ltime >= $m_time or !$ktotal) {
+			print <<"EOM";
+&nbsp;
+<select name="mode" onchange="javascript:selectTown(this);">
+<option value="rest">休憩する</option>
+<option value="monster">キャンピング</option>
+</select>
+<input type="submit" value="休む" />
+EOM
+		}
+	}
+	print <<"EOM";
+</form>
+<div id="town_text" class="text_detail">&nbsp;</div>
+<form name="move" action="$script" method="post">
+<input type="hidden" name="id" value="$kid" />
+<input type="hidden" name="pass" value="$kpass" />
+<input type="hidden" name="area" value="$karea" />
+<input type="hidden" name="mode" value="monster" />
+EOM
+	if($ltime >= $m_time or !$ktotal) {
+		my ( $label, $optionHTML ) = ( "", "" );
+		my @options;
+
+		if( $kspot == 0 && $kpst == 0 ) {
+			$label = "【$town_name[$karea]周辺】";
+			push( @options, [ 0, sprintf( "%s郊外を探索する", $town_name[$karea] ) ] );
+		} elsif( $kspot == 0 && $kpst == 1 ){
+			$label = "【行動】";
+			push( @options, [ 0, "探索する" ] );
+		} else {
+			$label = "【行動】";
+			push( @options, [ 0, "先へ進む" ] );
+		}
+
+		if( $kspot == 0 && $kpst == 0 ){
+			push( @options, [ 1, sprintf( "%sへ向かう", $area_name[$karea] ) ] );
+			push( @options, [ 3, sprintf( "%s方面へ(距離 %s)", $town_name[$rarea], $town_move[$karea][3] ) ] );
+			push( @options, [ 2, sprintf( "%s方面へ(距離 %s)", $town_name[$farea], $town_move[$karea][2] ) ] );
+		} elsif( $kspot == 0 && $kpst == 1 ){
+			push( @options, [ 1, sprintf( "%sへ帰還する", $town_name[$karea] ) ] );
+		} else {
+			push( @options, [ 1, "引き返す" ] );
+		}
+
+		$optionHTML .= sprintf( "<option value=\"%s\">%s</option>\n", @$_ ) for @options;
+
+		print <<"EOM";
+$label<br>
+&nbsp;<select name="spot" onchange="javascript:selectMove(this);">
+$optionHTML
+</select>
+<input type="submit" value="行動" />
+<div id="move_text" class="text_detail">&nbsp;</div>
+EOM
+	}else{
+			print "$mtime秒後に行動できます。<br>\n";
+	}
+	print <<"EOM";
+</form>
+EOM
+	if($kspot == 0 && $kpst == 0){
+		if($ltime >= $b_time or !$ktotal) {
+		print <<"EOM";
+<form action="$script" method="post">
+【Shadow Duel 管理局】<br>
+<input type="hidden" name="mode" value="battle" />
+<input type="hidden" name="id" value="$kid" />
+<input type="hidden" name="pass" value="$kpass" />
+&nbsp;<select name="rid">
+<option value="">挑戦相手を選択(強さ)</option>
+EOM
+	$rid = $kid;
+	&read_battle;
+	$rank = $krank;
+
+	$todd=0;
+	foreach(@log_in) {
+		($tid,$tpass,$tname,$tsex,$tchara,$tn_0,$tn_1,$tn_2,$tn_3,$tn_4,$tn_5,$tn_6,$thp,$tmaxhp,$tex,$tlv,$tap,$tgold,$tlp,$ttotal,$tkati,$thost,$tdate,$tarea,$tspot,$tpst,$titem) = split(/<>/);
+		if($kid eq $tid) { next; }
+		$rid = $tid;
+		&read_battle;
+		if($rank >= $krank){
+			print "<option value=$tid>$tname Lv$tlv（$sdrank[$krank]）</option>\n";
+		}
+	}
+
+	print <<"EOM";
+</select>
+<input type="submit" value="決闘" />
+<div class="text_detail">自分の分身と他人の分身を戦わせることができます。</div>
+</form>
+EOM
+		}
+	}
+
+	print <<"EOM";
+<form action="$script" method="post">
+【メッセージ送信】<br>
+<input type="hidden" name="id" value="$kid" />
+<input type="hidden" name="name" value="$kname" />
+<input type="hidden" name="pass" value="$kpass" />
+<input type="hidden" name="mode" value="message" />
+&nbsp;
+<select name="mesid">
+<option value="">送る相手を選択</option>
+EOM
+
+	foreach( @log_in ) {
+		my ( $did, $dpass, $dname, $dmy ) = split /<>/, $_, 4;
+		next if($kid eq $did);
+		print "<option value=\"$did\">$dname</option>\n";
+	}
+	print "<option value=\"Ａ\">全員に送信（迷惑注意）</option>\n";
+	print <<"EOM";
+</select>
+<input type="submit" value="送信" /><br>
+<input type="text" name="mes" size="25" />
+<div class="text_detail">他のキャラクターへメッセージを送ることができます。</div>
+</form>
+</td>
+</tr>
+</table>
+【届いているメッセージ】表示数<b>$max_gyo</b>件まで<br>
+EOM
+
+	open(IN,"$message_file");
+	@MESSAGE_LOG = <IN>;
+	close(IN);
+
+	$hit=0;$i=1;
+	foreach(@MESSAGE_LOG){
+		($pid,$hid,$hname,$hmessage,$hhname,$htime) = split(/<>/);
+		if($kid eq $pid){
+			if($max_gyo < $i) { last; }
+			print "<hr size=0><small><b>$hname</b>　＞ 「<b>$hmessage</b>」($htime)</small><br>\n";
+			$hit=1;$i++;
+		}elsif($kid eq $hid){
+			print "<hr size=0><small>$knameから$hhnameへ　＞ 「$hmessage」($htime)</small><br>\n";
+		}elsif("Ａ" eq "$pid"){
+			if($max_gyo < $i) { last; }
+			print "<hr size=0><small><b>$hname(全員へ)</b>　＞ 「<b>$hmessage</b>」($htime)</small><br>\n";
+			$hit=1;$i++;
+		}
+	}
+	if(!$hit){ print "<hr size=0>$kname宛てのメッセージはありません。<p>\n"; }
+	print "<hr size=0><p>";
+
+print <<EOF;
+<form id="check_form" action="$script" method="post">
+<input type="hidden" id="check_mode" name="mode" value="" />
+<input type="hidden" name="id" value="$kid" />
+<input type="hidden" name="pass" value="$kpass" />
+</form>
+<script>
+jQuery(document).ready(function() {
+    jQuery("button.mode").click(function() {
+        jQuery("#check_mode").val( jQuery(this).attr("id") ).parent().submit();
+    });
+});
+</script>
+EOF
+
+	&footer;
+
+	exit;
+}
+
+1;

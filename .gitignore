@@ -1,0 +1,15 @@
+/file.lock*
+/save/*.cgi
+/save/chara.db
+/save/*.dat
+!/save/.gitkeep
+/save/town/*
+!/save/town/.gitkeep
+/save/bank/*
+!/save/bank/.gitkeep
+/save/item/*
+!/save/item/.gitkeep
+/save/skill/*
+!/save/skill/.gitkeep
+/log/*.log
+!/log/.gitkeep

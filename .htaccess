@@ -1,0 +1,3 @@
+RewriteEngine on
+RewriteBase /~timomo/so/
+# RewriteRule ^(.*)$ so_index.cgi?mode=$1 [L]

@@ -1,0 +1,70 @@
+
+#------------------#
+#  buffデータ読込  #
+#------------------#
+sub read_buff {
+	open(IN,"$buff_file");
+	@buff = <IN>;
+	close(IN);
+
+	$hit=0;@buff_new=();@rbuf=();
+	foreach(@buff){
+		($bid,$brsk,$batc,$bdef,$bspd) = split(/<>/);
+		if($rid eq "$bid") {
+			$rrsk = $brsk;
+			$rbuf[0] = $batc / 100;
+			$rbuf[1] = $bdef / 100;
+			$rbuf[2] = $bspd / 100;
+			$hit=1;
+			last;
+		}
+	}
+
+	if(!$hit){@rbuf = (1,1,1);}
+}
+
+#------------------#
+#  buffデータ書込  #
+#------------------#
+sub regist_buff {
+
+	# ファイルロック
+	if ($lockkey == 1) { &lock1; }
+	elsif ($lockkey == 2) { &lock2; }
+	elsif ($lockkey == 3) { &file'lock; }
+
+	open(IN,"$buff_file");
+	@buff = <IN>;
+	close(IN);
+
+	$hit=0;@buff_new=();
+	foreach(@buff){
+		($bid,$brsk,$batc,$bdef,$bspd) = split(/<>/);
+		if($kid eq "$bid") {
+			$brsk = $krsk;
+			if($buff_flg == 1){
+				$batc = $kbuf[0];
+				$bdef = $kbuf[1];
+				$bspd = $kbuf[2];
+			}
+			unshift(@buff_new,"$bid<>$brsk<>$batc<>$bdef<>$bspd<>\n");
+			$hit=1;
+		}else{
+			push(@buff_new,"$_");
+		}
+	}
+
+	if(!$hit){
+		unshift(@buff_new,"$kid<>$krsk<>$kbuf[0]<>$kbuf[1]<>$kbuf[2]<>\n");
+	}
+
+	open(OUT,">$buff_file");
+	print OUT @buff_new;
+	close(OUT);
+
+	# ロック解除
+	if ($lockkey == 3) { &file'unlock; }
+	else { if(-e $lockfile) { unlink($lockfile); } }
+}
+
+1;
