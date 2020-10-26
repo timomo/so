@@ -50,9 +50,20 @@ Content-type: text/html
 <meta name="apple-mobile-web-app-status-bar-style" content="black" />
 $refresh
 <title>$main_title</title>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.1.3/howler.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue\@2.6.12"></script>
+<script type="text/javascript" src="/public/js/third-party/jquery.jgrowl.js"></script>
+<script type="text/javascript" src="/public/js/sound.js"></script>
 <script type="text/javascript">
 <!--
+chara_config = {};
+chara_config["楽曲"] = "あり";
+chara_config["戦闘楽曲"] = "あり";
+chara_config["戦闘効果音"] = "あり";
+chara_config["音声"] = "あり";
+
+
 	var info = new Array();
 EOM
 
@@ -121,8 +132,15 @@ $css_backgif = "    background-image: url($backgif);" if ( $backgif ne "" );
 	info[7] = "$r_info";
 //-->
 </script>
-<script type="text/javascript" src="so_town.js"></script>
-<script type="text/javascript" src="so_battle.js"></script>
+<script>
+master_sound = [
+    {"id":1,"ファイル名":"NES-RPG-A02-2(Town1-Loop130).mp3","名称":"town1","ユニークid":"1","サウンド種別":"1"},
+    {"id":2,"ファイル名":"NES-RPG-B10-2(Dungeon2-Loop170).mp3","名称":"dungeon1","ユニークid":"2","サウンド種別":"1"}
+];
+</script>
+<script type="text/javascript" src="/public/js/so_town.js"></script>
+<script type="text/javascript" src="/public/js/so_battle.js"></script>
+<script type="text/javascript" src="/public/js/so_app.js"></script>
 <style type="text/css">
 <!--
 body {
@@ -142,9 +160,10 @@ a:visited {
 }
 -->
 </style>
-<link rel="stylesheet" href="so_common.css" type="text/css" />
+<link rel="stylesheet" href="/public/css/so_common.css" type="text/css" />
 </head>
 <body $onload>
+<div id="stage"></div>
 EOM
 }
 

@@ -1,0 +1,39 @@
+.small {
+    font-size: 10pt;
+}
+.b1 {
+    background: #9ac;
+    border-color: #ccf #669 #669 #ccf;
+    color: #fff;
+    border-style: solid;
+    border-width: 1px;
+}
+.b2 {
+    background: #669;
+    border-color: #99c #336 #336 #99c;
+    color:#fff;
+    border-style: solid;
+    border-width: 1px;
+    text-align: center;
+}
+.b3 {
+    background: #fff;
+    border-color: #ccf #669 #669 #ccf;
+}
+.dmg {
+    color: #880000;
+    font-size: 12pt;
+}
+.clit {
+    color: #880000;
+    font-size: 12pt;
+}
+form {
+    margin-bottom: 0px;
+}
+input {
+    font-family:Arial,Helvetica,sans-serif;
+}
+div.text_detail {
+    font-size: 9pt;
+}
