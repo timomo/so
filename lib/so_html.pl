@@ -39,7 +39,7 @@ if ( $vtime > 0 ) {
 	print <<"EOM";
 Cache-Control: no-cache
 Pragma: no-cache
-Content-type: text/html
+Content-Type: text/html; charset=UTF-8
 
 <html>
 <head>
@@ -140,7 +140,15 @@ master_sound = [
 </script>
 <script type="text/javascript" src="/public/js/so_town.js"></script>
 <script type="text/javascript" src="/public/js/so_battle.js"></script>
+EOM
+
+
+	if ($kid && $mode eq "log_in") { 
+	print <<"EOM";
 <script type="text/javascript" src="/public/js/so_app.js"></script>
+EOM
+	}
+	print <<"EOM";
 <style type="text/css">
 <!--
 body {

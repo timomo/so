@@ -1,6 +1,6 @@
 jQuery(document).ready(() => {
     jQuery(":submit").on("click", function () {
-        /*
+/*
         const formObj = jQuery(this).closest("form");
         const data = formObj.serializeArray();
         const param = {};
@@ -18,7 +18,6 @@ jQuery(document).ready(() => {
         });
 
         return false;
-
-         */
+*/
     });
 });
