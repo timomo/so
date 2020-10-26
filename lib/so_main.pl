@@ -22,11 +22,14 @@ sub log_in {
         &file_load;
 
 	$esex = "女";
-	unless ( exists $USER{ $in{'id'} } && $USER{ $in{'id'} }->[1] eq $in{'pass'} ) {
-		&error("入力されたIDは登録されていません。又はパスワードが違います。");
-	} else {
-		($kid,$kpass,$kname,$ksex,$kchara,$kn_0,$kn_1,$kn_2,$kn_3,$kn_4,$kn_5,$kn_6,$khp,$kmaxhp,$kex,$klv,$kap,$kgold,$klp,$ktotal,$kkati,$khost,$kdate,$karea,$kspot,$kpst,$kitem) = @{ $USER{ $in{'id'} } };
-		$esex = "男" if($ksex);
+
+	if ( exists $in{'id'} ) {
+		unless ( exists $USER{ $in{'id'} } && $USER{ $in{'id'} }->[1] eq $in{'pass'} ) {
+			&error("入力されたIDは登録されていません。又はパスワードが違います。");
+		} else {
+			($kid,$kpass,$kname,$ksex,$kchara,$kn_0,$kn_1,$kn_2,$kn_3,$kn_4,$kn_5,$kn_6,$khp,$kmaxhp,$kex,$klv,$kap,$kgold,$klp,$ktotal,$kkati,$khost,$kdate,$karea,$kspot,$kpst,$kitem) = @{ $USER{ $in{'id'} } };
+			$esex = "男" if($ksex);
+		}
 	}
 
 	$pc = $USER{ $in{'id'} };
