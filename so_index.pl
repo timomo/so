@@ -4,6 +4,8 @@ use File::Spec;
 use FindBin;
 use lib File::Spec->catdir($FindBin::RealBin, 'lib');
 use Template;
+use YAML::XS;
+use CGI;
 
 # 初期設定ファイルの読み込み
 require './so_system.dat';

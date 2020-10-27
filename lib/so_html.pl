@@ -37,10 +37,6 @@ if ( $vtime > 0 ) {
 }
 
 	print <<"EOM";
-Cache-Control: no-cache
-Pragma: no-cache
-Content-Type: text/html; charset=UTF-8
-
 <html>
 <head>
 <meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
@@ -53,8 +49,8 @@ $refresh
 <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.1.3/howler.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vue\@2.6.12"></script>
-<script type="text/javascript" src="/public/js/third-party/jquery.jgrowl.js"></script>
-<script type="text/javascript" src="/public/js/sound.js"></script>
+<script type="text/javascript" src="/js/third-party/jquery.jgrowl.js"></script>
+<script type="text/javascript" src="/js/sound.js"></script>
 <script type="text/javascript">
 <!--
 chara_config = {};
@@ -138,14 +134,14 @@ master_sound = [
     {"id":2,"ファイル名":"NES-RPG-B10-2(Dungeon2-Loop170).mp3","名称":"dungeon1","ユニークid":"2","サウンド種別":"1"}
 ];
 </script>
-<script type="text/javascript" src="/public/js/so_town.js"></script>
-<script type="text/javascript" src="/public/js/so_battle.js"></script>
+<script type="text/javascript" src="/js/so_town.js"></script>
+<script type="text/javascript" src="/js/so_battle.js"></script>
 EOM
 
 
 	if ($kid && $mode eq "log_in") { 
 	print <<"EOM";
-<script type="text/javascript" src="/public/js/so_app.js"></script>
+<script type="text/javascript" src="/js/so_app.js"></script>
 EOM
 	}
 	print <<"EOM";
@@ -168,7 +164,7 @@ a:visited {
 }
 -->
 </style>
-<link rel="stylesheet" href="/public/css/so_common.css" type="text/css" />
+<link rel="stylesheet" href="/css/so_common.css" type="text/css" />
 </head>
 <body $onload>
 <div id="stage"></div>

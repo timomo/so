@@ -81,7 +81,7 @@ function play_sound(option)
     {
         opts.volume = 0.6;
     }
-    opts.src = ["/public/sound/" + conf["ファイル名"]];
+    opts.src = ["/sound/" + conf["ファイル名"]];
     const se = new Howl(opts);
     se.play();
 
