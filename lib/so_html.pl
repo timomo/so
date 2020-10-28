@@ -164,7 +164,9 @@ a:visited {
 }
 -->
 </style>
+<link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/so_common.css" type="text/css" />
+<link rel="stylesheet" href="/css/blackboard.css" type="text/css" />
 </head>
 <body $onload>
 <div id="stage"></div>

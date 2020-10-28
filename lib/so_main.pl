@@ -58,20 +58,24 @@ sub log_in {
 
 	&header;
 
+	print <<"EOM";
+	<div class="blackboard question">
+EOM
+
 	if($kspot == 0 && $kpst == 1){
-		print "$movemsg<p>$knameは$town_name[$karea]郊外にいます。\n";
+		print "<p>$movemsg</p><p>$knameは$town_name[$karea]郊外にいます。</p>\n";
 		$spot = "$town_name[$karea]郊外";
 	} elsif($kspot == 1){
-		print "$movemsg<p>$knameは$area_name[$karea]を探索中です。\n";
+		print "<p>$movemsg</p><p>$knameは$area_name[$karea]を探索中です。</p>\n";
 		$spot = "$area_name[$karea]最深部まで残り $kpst";
 	} elsif($kspot == 2  && $kpst > 0){
-		print "$movemsg<p>$knameは$town_name[$karea]から$town_name[$farea]に移動しています。\n";
+		print "<p>$movemsg</p><p>$knameは$town_name[$karea]から$town_name[$farea]に移動しています。</p>\n";
 		$spot = "$town_name[$farea]まで残り $kpst";
 	} elsif($kspot == 3  && $kpst > 0){
-		print "$movemsg<p>$knameは$town_name[$karea]から$town_name[$rarea]に移動しています。\n";
+		print "<p>$movemsg</p><p>$knameは$town_name[$karea]から$town_name[$rarea]に移動しています。</p>\n";
 		$spot = "$town_name[$rarea]まで残り $kpst";
 	} else {
-		print "$movemsg<p>$knameは$town_name[$karea]にいます。\n";
+		print "<p>$movemsg</p><p>$knameは$town_name[$karea]にいます。</p>\n";
 		$spot = "町の中";
 	}
 	$rid = $kid;
@@ -83,23 +87,23 @@ sub log_in {
 		$bflag = 0;
 		&money_get;
 		if($kmsg ne ""){
-			print "<BR>シマダ国営銀行より <b>$ggold</b> G が振り込まれました。明細は以下の通りです。<br>$kmsg";
+			print "<p>シマダ国営銀行より <b>$ggold</b> G が振り込まれました。明細は以下の通りです。<br>$kmsg</p>";
 		} else {
-			print "<BR>シマダ国営銀行より <b>$ggold</b> G が振り込まれました。";
+			print "<p>シマダ国営銀行より <b>$ggold</b> G が振り込まれました。</p>";
 		}
 		$kgold = $tgold;
 		&regist_bank;
 	}
 	&read_buff;
 	if($rrsk > 100) {
-		print "<BR>動くのも苦痛なほど疲れてきました・・。\n";
+		print "<p>動くのも苦痛なほど疲れてきました・・。</p>\n";
 	} elsif($rrsk > 75) {
-		print "<BR>かなり疲れてきました・・。\n";
+		print "<p>かなり疲れてきました・・。</p>\n";
 	} elsif($rrsk > 50) {
-		print "<BR>少し疲れてきました・・。\n";
+		print "<p>少し疲れてきました・・。</p>\n";
 	}
 	print <<"EOM";
-<hr size=0>
+</div>
 <B><FONT COLOR="#FF9933">$error</FONT></B>
 EOM
 	$error="";

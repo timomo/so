@@ -1,3 +1,7 @@
+body, pre {
+    font-family: 'Kosugi Maru';
+}
+
 .small {
     font-size: 10pt;
 }
