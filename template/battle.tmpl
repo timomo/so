@@ -1,27 +1,52 @@
-<DIV id="sel0" style="display: block">
+<a href="javascript:page(1)"><<最初</a>&nbsp;&nbsp;<a href="javascript:page(2)"><戻る</a>
+<a href="javascript:page(3)">次へ></a>&nbsp;&nbsp;<a href="javascript:page(4)">最後>></a>
+
+<DIV id="sel0">
+<div class="blackboard question">
 [% FOREACH log IN battle_header %]
 [% log %]
 [% END %]
-
-<TABLE BORDER=0>
-<TR>
-	<TD ALIGN="right">
-	<br><a href="javascript:page(3)">次へ></a>
-
-	</TD>
-</TR>
-</TABLE>
+</div>
 </DIV>
 
 [% FOREACH log IN battle_date %]
 [% log %]
 [% END %]
 
+[% IF is_finished == 1 %]
+
+<DIV id="sel[% battle_date.size %]">
+<div class="blackboard question">
 [% FOREACH log IN battle_footer %]
 [% log %]
 [% END %]
-
-</TD>
-</TR>
-</TABLE>
+</div>
 </DIV>
+
+[% ELSE %]
+
+<div class="clearfix">
+	<div class="blackboard answer float-l">
+	    <p class="blink-before select-command">戦う</p>
+	    <p class="select-command">逃げる</p>
+	</div>
+</div>
+
+[% END %]
+
+<form name="command" method="post">
+<input type="hidden" name="mode" value="monster" />
+<input type="hidden" name="id" value="[% kid %]" />
+<input type="hidden" name="pass" value="[% kpass %]" />
+<input type="hidden" name="sel" value="[% turn %]" />
+</form>
+
+<form name="data">
+<input type="hidden" name="backid" value="0" />
+<input type="hidden" name="nextid" value="1" />
+<input type="hidden" name="lastid" value="[% j + 1 %]" />
+</form>
+<script>
+const spot = "モンスター";
+const sel = [% sel %];
+</script>

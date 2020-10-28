@@ -11,5 +11,9 @@
 !/save/item/.gitkeep
 /save/skill/*
 !/save/skill/.gitkeep
+/save/archive/*
+!/save/archive/.gitkeep
+/save/battle/*
+!/save/battle/.gitkeep
 /log/*.log
 !/log/.gitkeep

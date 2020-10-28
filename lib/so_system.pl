@@ -6,9 +6,9 @@ sub decode {
 		if ($ENV{'CONTENT_LENGTH'} > 51200) { &error("投稿量が大きすぎます。"); }
 		read(STDIN, $buffer, $ENV{'CONTENT_LENGTH'});
 	} else { $buffer = $ENV{'QUERY_STRING'}; }
-	@pairs = split(/&/, $buffer);
+	my @pairs = split(/&/, $buffer);
 	foreach (@pairs) {
-		($name,$value) = split(/=/, $_);
+		my ($name, $value) = split(/=/, $_);
 		$value =~ tr/+/ /;
 		$value =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
 
@@ -29,6 +29,7 @@ sub decode {
 
 		$in{$name} = $value;
 	}
+
 	$mode = $in{'mode'};
 	$cookie_pass = $in{'pass'};
 	$cookie_id = $in{'id'};

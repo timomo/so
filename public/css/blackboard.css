@@ -69,7 +69,8 @@ see https://fantastech.net/dragon-quest-text
     margin-left: unset !important;
 }
 
-.select-menu
+.select-menu,
+.select-command
 {
     cursor: pointer;
 }

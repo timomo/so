@@ -291,4 +291,24 @@ sub regist {
 	if($in{'new'}) { &make_end; }
 }
 
+sub chara_load
+{
+	open(IN,"$chara_file");
+	@battle = <IN>;
+	close(IN);
+
+	my $id = shift;
+	$hit=0;
+	foreach(@battle){
+		($kid,$kpass,$kname,$ksex,$kchara,$kn_0,$kn_1,$kn_2,$kn_3,$kn_4,$kn_5,$kn_6,$khp,$kmaxhp,$kex,$klv,$kap,$kgold,$klp,$ktotal,$kkati,$khost,$kdate,$karea,$kspot,$kpst,$kitem) = split(/<>/);
+		if($id eq "$kid") {
+			$hit=1;
+			last;
+		}
+	}
+	if ($hit == 0) {
+		($kid,$kpass,$kname,$ksex,$kchara,$kn_0,$kn_1,$kn_2,$kn_3,$kn_4,$kn_5,$kn_6,$khp,$kmaxhp,$kex,$klv,$kap,$kgold,$klp,$ktotal,$kkati,$khost,$kdate,$karea,$kspot,$kpst,$kitem) = ();
+	}
+}
+
 1;

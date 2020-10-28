@@ -6,6 +6,8 @@ use lib File::Spec->catdir($FindBin::RealBin, 'lib');
 use Template;
 use YAML::XS;
 use CGI;
+use utf8;
+use JSON;
 
 # 初期設定ファイルの読み込み
 require './so_system.dat';
@@ -36,6 +38,7 @@ require './lib/so_town.pl';
 require './lib/so_config.pl';
 
 our $tt = new Template (
+	ENCODING => 'utf8',
 	INCLUDE_PATH => File::Spec->catdir($FindBin::RealBin, 'template'),
 );
 
@@ -46,6 +49,17 @@ if($mente) { &error("メンテナンス中です。しばらくお待ちくだ�
 &decode;
 srand();
 &access_ctrl;
+
+if ($in{'id'})
+{
+	&chara_load($in{'id'});
+
+	if (&is_continue_monster) {
+		&monster;
+		exit;
+	}
+}
+
 if($mode eq "") { &html_top; }
 elsif($mode eq 'log_in') { &log_in; }
 elsif($mode eq 'chara_make') { &chara_make; }
