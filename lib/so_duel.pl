@@ -919,6 +919,9 @@ EOM
 <input type="hidden" name=nextid value="1">
 <input type="hidden" name=lastid value="$j">
 </form>
+<script>
+const spot = "デュエル";
+</script>
 EOM
 
 	&footer;

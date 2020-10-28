@@ -38,7 +38,7 @@ jQuery(document).ready(() => {
 	if (spot === "町の中") {
 		music.request = "town1";
 	}
-	else if (spot === "モンスター") {
+	else if (spot === "モンスター" || spot === "デュエル") {
 		music.request = "battle1";
 	}
 	else {
