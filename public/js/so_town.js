@@ -51,6 +51,7 @@ jQuery(document).ready(() => {
 	jQuery("#monster-select-submit").hide();
 	jQuery("#town-select").hide();
 	jQuery("#town_text").hide();
+	jQuery("#move_text").hide();
 	jQuery("#town-select-submit").hide();
 
 	jQuery(".select-menu").bind("mouseenter", (event) =>

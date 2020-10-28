@@ -14,7 +14,8 @@ print <<EOF;
 <div align="right" class="small">
 $ver by <a href="http://www.interq.or.jp/sun/cumro/">D.Takamiya(CUMRO)</a><br>
 Character Image by <a href="http://www.aas.mtci.ne.jp/~hiji/9ff/9ff.html">9-FFいっしょにTALK</a><br>
-cooperation site by <a href="http://webooo.csidenet.com/asvyweb/">FFADV推奨委員会</a>
+cooperation site by <a href="http://webooo.csidenet.com/asvyweb/">FFADV推奨委員会</a><br>
+Music by <a href="https://otologic.jp/">OtoLogic</a>
 </div>
 EOF
 

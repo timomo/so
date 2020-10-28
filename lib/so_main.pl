@@ -258,14 +258,34 @@ $optionHTML
 <div id="move_text" class="text_detail">&nbsp;</div>
 EOM
 	}else{
-			print "$mtime秒後に行動できます。<br>\n";
+			# print "$mtime秒後に行動できます。<br>\n";
 	}
 	print <<"EOM";
 </form>
 EOM
+	print <<"EOM";
+<div class="clearfix">
+	<div class="blackboard answer float-l">
+EOM
+	print join("\n", @select_menu);
+
+	if (scalar @select_menu == 0)
+	{
+		print "&nbsp;";
+	}
+
+	print <<"EOM";
+	</div>
+</div>
+
+<div class="blackboard question" id="select-description">
+&nbsp;
+</div>
+EOM
+
 	if($kspot == 0 && $kpst == 0){
 		if($ltime >= $b_time or !$ktotal) {
-		print <<"EOM";
+			print <<"EOM";
 <form action="$script" method="post">
 【Shadow Duel 管理局】<br>
 <input type="hidden" name="mode" value="battle" />
@@ -274,22 +294,22 @@ EOM
 &nbsp;<select name="rid">
 <option value="">挑戦相手を選択(強さ)</option>
 EOM
-	$rid = $kid;
-	&read_battle;
-	$rank = $krank;
+			$rid = $kid;
+			&read_battle;
+			$rank = $krank;
 
-	$todd=0;
-	foreach(@log_in) {
-		($tid,$tpass,$tname,$tsex,$tchara,$tn_0,$tn_1,$tn_2,$tn_3,$tn_4,$tn_5,$tn_6,$thp,$tmaxhp,$tex,$tlv,$tap,$tgold,$tlp,$ttotal,$tkati,$thost,$tdate,$tarea,$tspot,$tpst,$titem) = split(/<>/);
-		if($kid eq $tid) { next; }
-		$rid = $tid;
-		&read_battle;
-		if($rank >= $krank){
-			print "<option value=$tid>$tname Lv$tlv（$sdrank[$krank]）</option>\n";
-		}
-	}
+			$todd=0;
+			foreach(@log_in) {
+				($tid,$tpass,$tname,$tsex,$tchara,$tn_0,$tn_1,$tn_2,$tn_3,$tn_4,$tn_5,$tn_6,$thp,$tmaxhp,$tex,$tlv,$tap,$tgold,$tlp,$ttotal,$tkati,$thost,$tdate,$tarea,$tspot,$tpst,$titem) = split(/<>/);
+				if($kid eq $tid) { next; }
+				$rid = $tid;
+				&read_battle;
+				if($rank >= $krank){
+					print "<option value=$tid>$tname Lv$tlv（$sdrank[$krank]）</option>\n";
+				}
+			}
 
-	print <<"EOM";
+			print <<"EOM";
 </select>
 <input type="submit" value="決闘" />
 <div class="text_detail">自分の分身と他人の分身を戦わせることができます。</div>
@@ -299,18 +319,6 @@ EOM
 	}
 
 	print <<"EOM";
-<div class="clearfix">
-	<div class="blackboard answer float-l">
-EOM
-	print join("\n", @select_menu);
-
-	print <<"EOM";
-	</div>
-</div>
-
-<div class="blackboard question" id="select-description">
-</div>
-
 <form action="$script" method="post">
 【メッセージ送信】<br>
 <input type="hidden" name="id" value="$kid" />
