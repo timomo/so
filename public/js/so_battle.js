@@ -15,16 +15,16 @@ function page(type){
 
 	maxsel = document.data.lastid.value;
 
-	/* ŠeƒIƒuƒWƒFƒNƒg‚É•\¦E”ñ•\¦‚ğ”½‰f */
+	/* ï¿½eï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½É•\ï¿½ï¿½ï¿½Eï¿½ï¿½\ï¿½ï¿½ï¿½ğ”½‰f */
 	for (i=0; i<=maxsel; i++) {
 		layer = "sel" + i;
 		if (sel == i ) {
-			/* ƒIƒuƒWƒFƒNƒg‚ğ•\¦‚·‚é */
+			/* ï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½ï¿½\ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
 			document.getElementById(layer).style.display = 'block';
 			document.data.backid.value = i-1;
 			document.data.nextid.value = i+1;
 		} else {
-			/* ƒIƒuƒWƒFƒNƒg‚ğ•\¦‚µ‚È‚¢ */
+			/* ï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½ï¿½\ï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½ */
 			document.getElementById(layer).style.display = 'none';
 		}
 	}

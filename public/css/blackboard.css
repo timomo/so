@@ -21,7 +21,10 @@ see https://fantastech.net/dragon-quest-text
     margin-left: 1.7rem;
 }
 .blackboard .blink-before {
+    /*
     font-size: 1.2rem;
+
+     */
 }
 .blackboard a {
     text-decoration: none;
@@ -40,6 +43,9 @@ see https://fantastech.net/dragon-quest-text
 .float-r {
     float: right;
 }
+.float-l {
+    float: left;
+}
 /* 回り込み解除 */
 .clearfix {
     zoom: 1;
@@ -55,4 +61,15 @@ see https://fantastech.net/dragon-quest-text
 }
 @-webkit-keyframes blink {
     50% { opacity: 0; }
+}
+
+/* ここからカスタマイズ */
+.answer-menu
+{
+    margin-left: unset !important;
+}
+
+.select-menu
+{
+    cursor: pointer;
 }

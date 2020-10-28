@@ -49,9 +49,9 @@ $refresh
 <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.1.3/howler.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vue\@2.6.12"></script>
-<script type="text/javascript" src="/js/third-party/jquery.jgrowl.js"></script>
-<script type="text/javascript" src="/js/sound.js"></script>
-<script type="text/javascript">
+<script src="/js/third-party/jquery.jgrowl.js"></script>
+<script src="/js/sound.js"></script>
+<script>
 <!--
 chara_config = {};
 chara_config["楽曲"] = "あり";
@@ -131,17 +131,18 @@ $css_backgif = "    background-image: url($backgif);" if ( $backgif ne "" );
 <script>
 master_sound = [
     {"id":1,"ファイル名":"NES-RPG-A02-2(Town1-Loop130).mp3","名称":"town1","ユニークid":"1","サウンド種別":"1"},
-    {"id":2,"ファイル名":"NES-RPG-B10-2(Dungeon2-Loop170).mp3","名称":"dungeon1","ユニークid":"2","サウンド種別":"1"}
+    {"id":2,"ファイル名":"NES-RPG-B10-2(Dungeon2-Loop170).mp3","名称":"dungeon1","ユニークid":"2","サウンド種別":"1"},
+    {"id":3,"ファイル名":"GB-RPG-A12-2(Battle1-Loop157).mp3","名称":"battle1","ユニークid":"3","サウンド種別":"1"},
 ];
 </script>
-<script type="text/javascript" src="/js/so_town.js"></script>
-<script type="text/javascript" src="/js/so_battle.js"></script>
+<script src="/js/so_town.js"></script>
+<script src="/js/so_battle.js"></script>
 EOM
 
 
 	if ($kid && $mode eq "log_in") { 
 	print <<"EOM";
-<script type="text/javascript" src="/js/so_app.js"></script>
+<script src="/js/so_app.js"></script>
 EOM
 	}
 	print <<"EOM";
@@ -167,6 +168,7 @@ a:visited {
 <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/so_common.css" type="text/css" />
 <link rel="stylesheet" href="/css/blackboard.css" type="text/css" />
+<link rel="stylesheet" href="/css/third-party/jquery.jgrowl.css" type="text/css" />
 </head>
 <body $onload>
 <div id="stage"></div>

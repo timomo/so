@@ -32,6 +32,8 @@ sub log_in {
 		}
 	}
 
+	my @select_menu = ();
+
 	$pc = $USER{ $in{'id'} };
 
 	# ファイルロック
@@ -151,8 +153,12 @@ EOM
 </tr>
 </table>
 </td>
-</tr><tr>
+</tr>
+</table>
+<!--
+<tr>
 <td valign="top">
+-->
 <form name="town" action="$script" method="post">
 <input type="hidden" name="id" value="$kid" />
 <input type="hidden" name="pass" value="$kpass" />
@@ -160,30 +166,43 @@ EOM
 EOM
 
 	if($kspot == 0 && $kpst == 0){
+
+		push(@select_menu, sprintf('<p class="answer-menu">【%sの施設】</p>', $town_name[$karea]));
+		push(@select_menu, sprintf('<p id="mode_town-select_%s" class="select-menu">%s</p>', "yado", "宿屋：".$t_inn));
+		push(@select_menu, sprintf('<p id="mode_town-select_%s" class="select-menu">%s</p>', "item_shop", "ショップ：".$t_inn));
+		push(@select_menu, sprintf('<p id="mode_town-select_%s" class="select-menu">%s</p>', "user_shop", "市場：チュパフリマ：". $town_name[$karea]));
+		push(@select_menu, sprintf('<p id="mode_town-select_%s" class="select-menu">%s</p>', "bank", "銀行：シマダ国営銀行（". $town_name[$karea]. "店）"));
+
 		print <<"EOM";
+<!--
 【$town_name[$karea]の施設】<br>
-<select name="mode" onchange="javascript:selectTown(this);">
+-->
+<select id="town-select" name="mode" onchange="javascript:selectTown(this);">
 <option value="yado">宿屋：$t_inn</option>
 <option value="item_shop">ショップ：$t_shop</option>
 <option value="user_shop">市場：チュパフリマ $town_name[$karea]</option>
 <option value="bank">銀行：シマダ国営銀行（$town_name[$karea]店）</option>
 </select>
-<input type="submit" value="入店" /><br>
+<input id="town-select-submit" type="submit" value="入店" /><br>
 EOM
 	} else {
 		print <<"EOM";
+		<!--
 【キャンプ】<br>
+-->
 <input type="hidden" name="spot" value="2" />
 EOM
 
 		if($ltime >= $m_time or !$ktotal) {
+			push(@select_menu, qw|<p class="answer-menu">【キャンプ】</p>|);
+			push(@select_menu, qw|<p id="mode_camp-select_rest" class="blink-before select-menu">休憩する</p>|);
+			push(@select_menu, qw|<p id="mode_camp-select_monster" class="select-menu">キャンピング</p>|);
 			print <<"EOM";
-&nbsp;
-<select name="mode" onchange="javascript:selectTown(this);">
+<select id="camp-select" name="mode" onchange="javascript:selectTown(this);">
 <option value="rest">休憩する</option>
 <option value="monster">キャンピング</option>
 </select>
-<input type="submit" value="休む" />
+<input id="camp-select-submit" type="submit" value="休む" />
 EOM
 		}
 	}
@@ -211,6 +230,8 @@ EOM
 			push( @options, [ 0, "先へ進む" ] );
 		}
 
+		push(@select_menu, qq|<p class="answer-menu">|. $label. qq|</p>|);
+
 		if( $kspot == 0 && $kpst == 0 ){
 			push( @options, [ 1, sprintf( "%sへ向かう", $area_name[$karea] ) ] );
 			push( @options, [ 3, sprintf( "%s方面へ(距離 %s)", $town_name[$rarea], $town_move[$karea][3] ) ] );
@@ -221,14 +242,19 @@ EOM
 			push( @options, [ 1, "引き返す" ] );
 		}
 
-		$optionHTML .= sprintf( "<option value=\"%s\">%s</option>\n", @$_ ) for @options;
+		for (@options) {
+			push(@select_menu, sprintf('<p id="mode_monster-select_%s" class="select-menu">%s</p>', @$_));
+			$optionHTML .= sprintf( "<option value=\"%s\">%s</option>\n", @$_);
+		}
 
 		print <<"EOM";
+<!--
 $label<br>
-&nbsp;<select name="spot" onchange="javascript:selectMove(this);">
+-->
+&nbsp;<select id="monster-select" name="spot" onchange="javascript:selectMove(this);">
 $optionHTML
 </select>
-<input type="submit" value="行動" />
+<input id="monster-select-submit" type="submit" value="行動" />
 <div id="move_text" class="text_detail">&nbsp;</div>
 EOM
 	}else{
@@ -273,6 +299,18 @@ EOM
 	}
 
 	print <<"EOM";
+<div class="clearfix">
+	<div class="blackboard answer float-l">
+EOM
+	print join("\n", @select_menu);
+
+	print <<"EOM";
+	</div>
+</div>
+
+<div class="blackboard question" id="select-description">
+</div>
+
 <form action="$script" method="post">
 【メッセージ送信】<br>
 <input type="hidden" name="id" value="$kid" />
@@ -296,9 +334,11 @@ EOM
 <input type="text" name="mes" size="25" />
 <div class="text_detail">他のキャラクターへメッセージを送ることができます。</div>
 </form>
+<!--
 </td>
 </tr>
 </table>
+-->
 【届いているメッセージ】表示数<b>$max_gyo</b>件まで<br>
 EOM
 
@@ -336,6 +376,8 @@ jQuery(document).ready(function() {
         jQuery("#check_mode").val( jQuery(this).attr("id") ).parent().submit();
     });
 });
+
+const spot = "$spot";
 </script>
 EOF
 
