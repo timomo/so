@@ -1,3 +1,5 @@
+use utf8;
+
 #-----------------#
 #  TOPページ表示  #
 #-----------------#
@@ -43,10 +45,7 @@ sub html_top {
 $kanri_message
 <BR>
 EOM
-	open(IN,"$battle_file");
-	@battle = <IN>;
-	close(IN);
-
+	@battle = &load_ini($battle_file);
 	$sousu = @battle;
 
 	@tmp1 = @tmp2 = ();
@@ -132,9 +131,7 @@ sub access_ctrl {
 		$user = $in{'id'};
 	}
 
-	open(IN,"$ban_file");
-	@BAN_USER = <IN>;
-	close(IN);
+	@BAN_USER = &load_ini($ban_file);
 
 	foreach(@BAN_USER) {
 		($bid,$bmess) = split(/<>/);
@@ -145,9 +142,7 @@ sub access_ctrl {
 
 	&get_host;
 
-	open(IN,"$log_path$log_time");
-	@access_log = <IN>;
-	close(IN);
+	@access_log = &load_ini($log_path. $log_time);
 
 	unshift(@access_log,"$time<>$host<>$user<>$mode<>\n");
 

@@ -1,3 +1,21 @@
+use utf8;
+
+sub load_ini
+{
+	my $path = shift;
+	my @ret;
+
+	open(IN, "<", $path);
+	while(<IN>)
+	{
+		my $str = Encode::decode_utf8($_);
+		push(@ret, $str);
+	}
+	close(IN);
+
+	return @ret;
+}
+
 #----------------#
 #  デコード処理  #
 #----------------#
@@ -7,6 +25,9 @@ sub decode {
 		read(STDIN, $buffer, $ENV{'CONTENT_LENGTH'});
 	} else { $buffer = $ENV{'QUERY_STRING'}; }
 	my @pairs = split(/&/, $buffer);
+
+	%in = ();
+
 	foreach (@pairs) {
 		my ($name, $value) = split(/=/, $_);
 		$value =~ tr/+/ /;

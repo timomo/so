@@ -1,12 +1,11 @@
+use utf8;
 #------------------#
 #  ステータス画面  #
 #------------------#
 sub status_check {
 	$chara_flag=1;
 
-	open(IN,"$chara_file");
-	@log_in = <IN>;
-	close(IN);
+	@log_in = &load_ini($chara_file);
 
 	$hit=0;
 	foreach(@log_in){
@@ -371,9 +370,7 @@ sub status_up {
 	elsif ($lockkey == 2) { &lock2; }
 	elsif ($lockkey == 3) { &file'lock; }
 
-	open(IN,"$chara_file");
-	@status = <IN>;
-	close(IN);
+	@status = &load_ini($chara_file);
 
 	$hit=0;@status_new=();@sn=();
 	foreach(@status){
@@ -393,7 +390,11 @@ sub status_up {
 			}
 			else { $sap -= $reqap; }
 			$sn[$in{'up'}]++;
-			unshift(@status_new,"$sid<>$spass<>$sname<>$ssex<>$schara<>$sn[0]<>$sn[1]<>$sn[2]<>$sn[3]<>$sn[4]<>$sn[5]<>$sn[6]<>$shp<>$smaxhp<>$sex<>$slv<>$sap<>$sgold<>$slp<>$stotal<>$skati<>$shost<>$sdate<>$sarea<>$sspot<>$spst<>$sitem<>\n");
+
+			my $mes = "$sid<>$spass<>$sname<>$ssex<>$schara<>$sn[0]<>$sn[1]<>$sn[2]<>$sn[3]<>$sn[4]<>$sn[5]<>$sn[6]<>$shp<>$smaxhp<>$sex<>$slv<>$sap<>$sgold<>$slp<>$stotal<>$skati<>$shost<>$sdate<>$sarea<>$sspot<>$spst<>$sitem<>\n";
+			my $utf8 = Encode::encode_utf8($mes);
+
+			unshift(@status_new,$utf8);
 		}else{
 			push(@status_new,"$_");
 		}

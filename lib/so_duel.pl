@@ -1,3 +1,4 @@
+use utf8;
 #------------#
 #  戦闘画面  #
 #------------#
@@ -11,9 +12,7 @@ sub battle {
 	if($battle_flag) { &error("現在行動中です。お待ち下さい。"); }
 
 	##１Ｐデータ
-	open(IN,"$chara_file");
-	@battle_k1 = <IN>;
-	close(IN);
+	@battle_k1 = &load_ini($chara_file);
 
 	$hit=0;
 	foreach(@battle_k1){
@@ -37,9 +36,7 @@ sub battle {
 	$bonus1 = 0;
 
 	##２Ｐデータ
-	open(IN,"$chara_file");
-	@battle_k2 = <IN>;
-	close(IN);
+	@battle_k2 = &load_ini($chara_file);
 
 	foreach(@battle_k2){
 		($k2id,$k2pass,$k2name,$k2sex,$k2chara,$k2n_0,$k2n_1,$k2n_2,$k2n_3,$k2n_4,$k2n_5,$k2n_6,$k2hp,$k2maxhp,$k2ex,$k2lv,$k2ap,$k2gold,$k2lp,$k2total,$k2kati,$k2host,$k2date,$k2area,$k2spot,$k2pst,$k2item) = split(/<>/);
@@ -937,9 +934,7 @@ EOM
 #  対戦データ読込  #
 #------------------#
 sub read_battle {
-	open(IN,"$battle_file");
-	@battle = <IN>;
-	close(IN);
+	@battle = &load_ini($battle_file);
 
 	$hit=0;@battle_new=();
 	foreach(@battle){
@@ -966,9 +961,7 @@ sub regist_battle {
 	elsif ($lockkey == 2) { &lock2; }
 	elsif ($lockkey == 3) { &file'lock; }
 
-	open(IN,"$battle_file");
-	@battle = <IN>;
-	close(IN);
+	@battle = &load_ini($battle_file);
 
 	$hit=0;@battle_new=();
 	foreach(@battle){
@@ -986,7 +979,11 @@ sub regist_battle {
 			} else {
 				$brank = 0;
 			}
-			unshift(@battle_new,"$bid<>$bname<>$bpoint<>$btotal<>$bwin<>$brank<>\n");
+
+			my $mes = "$bid<>$bname<>$bpoint<>$btotal<>$bwin<>$brank<>\n";
+			my $utf8 = Encode::encode_utf8($mes);
+
+			unshift(@battle_new,$utf8);
 		$hit=1;
 		}else{
 			push(@battle_new,"$_");
@@ -994,7 +991,10 @@ sub regist_battle {
 	}
 
 	if(!$hit){
-		unshift(@battle_new,"$kid<>$kname<>$kpoint<>$btotal<>$bwin<>$brank<>\n");
+		my $mes = "$kid<>$kname<>$kpoint<>$btotal<>$bwin<>$brank<>\n";
+		my $utf8 = Encode::encode_utf8($mes);
+
+		unshift(@battle_new,$utf8);
 	}
 
 	open(OUT,">$battle_file");

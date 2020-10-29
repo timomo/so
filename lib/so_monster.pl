@@ -1,4 +1,4 @@
-# use utf8;
+use utf8;
 #----------------------#
 #  モンスターとの戦闘  #
 #----------------------#
@@ -60,7 +60,7 @@ sub monster_step_run
 
 	}
 
-	$com1 .= "<font color=$elmcolor[$k_welm]>$knameは$k_wnam$sklmsg</font>";
+	$com1 .= "<font color=$elmcolor[$k_welm]>$kname は$k_wnam $sklmsg</font>";
 
 	#防具
 	$k_eqp = 2;
@@ -204,7 +204,7 @@ EOM
 
 	if($k_btype eq "60" && $dhp > 0){
 		&skill_up(13,$mlv);
-		$battle_date[$j] .= "<font color=$elmcolor[6]>$knameはHPを$dhp消費し、黒いオーラを噴き出した・・</font><p>$kskm";
+		$battle_date[$j] .= "<font color=$elmcolor[6]>$kname はHPを$dhp 消費し、黒いオーラを噴き出した・・</font><p>$kskm";
 		$kskm = "";
 		$khp_flg -= $dhp;
 		if($khp_flg < 1){
@@ -217,7 +217,7 @@ EOM
 	if($k_btype eq "61" && $kbuff[3] == 0){
 		if(($ksk[15] / 50 + $k_batc) > rand(100)){
 			&skill_up(14,$mlv);
-			$battle_date[$j] .= "$knameは相手を見据えて身構えた！<p>$kskm";
+			$battle_date[$j] .= "$kname は相手を見据えて身構えた！<p>$kskm";
 			$kskm = "";
 			$dcut = 1;
 		}
@@ -228,7 +228,7 @@ EOM
 		if(($ksk[15] / 50 + $k_batc) > rand(100)){
 			&skill_up(15,$mlv);
 			$dup1 = int(rand($ksk[15] / 100) + 1);
-			$battle_date[$j] .= "$knameは印を結んだ・・・影分身が$dup1体現れた！<p>$kskm";
+			$battle_date[$j] .= "$kname は印を結んだ・・・影分身が$dup1 体現れた！<p>$kskm";
 			$kskm = "";
 		}
 
@@ -239,7 +239,7 @@ EOM
 		$fst_flg = 0;
 	}elsif($efct1[0]){
 		$fst_flg = 30;
-		$com1 = "$knameの先制攻撃！<br>$com1";
+		$com1 = "$kname の先制攻撃！<br>$com1";
 	}
 	$turnflg = 0;
 	foreach(1..2) {
@@ -278,7 +278,7 @@ EOM
 			}
 
 			if($k_btype eq "62" && $dup1 > 0 && $atc_skill1 <= 5){
-				$com1 .= "影分身が$dup1体攻撃に参加した！<br>";
+				$com1 .= "影分身が$dup1 体攻撃に参加した！<br>";
 				$swg1 += $dup1;
 			}
 
@@ -295,11 +295,11 @@ EOM
 
 			if($kbuff[3] < 0 ){
 				$dmg1 = 0;
-				$com1 = "$knameは動けない！<br>";
+				$com1 = "$kname は動けない！<br>";
 				$kbuff[3]+= 1;
 			} elsif($m_esc > 0 && $clit1 eq "" && $dmg1 > 0) {
 				$dmg1 = 0;
-				$com1 .= "$mnameはかわした！<br>";
+				$com1 .= "$mname はかわした！<br>";
 			}
 
 			$btl_flg = 0;
@@ -359,13 +359,13 @@ EOM
 			}
 
 			if($efct1[7] * 5 + $kn_4 / 16 + $ksk[$atc_skill1] / 80 - $mlv / 4 > int(rand(100)) && $dmg1 > 0 && $efct1[7] > 0){
-				$clit1 .= "<br><b class=\"clit\">$mname$death_msg[$atc_skill1][$k_welm]</b><br>";
+				$clit1 .= "<br><b class=\"clit\">$mname $death_msg[$atc_skill1][$k_welm]</b><br>";
 				$md_flg=1;
 			}
 
 			$kskm = "";
 			if($dmg1 > 0){
-				$battle_date[$j] .= "$com1そして<b>$swg1</b>回 ヒットし、 $mname に <font class=\"dmg\"><b>$dmg1</b></font> のダメージ！$efcmsg$clit1<p>";
+				$battle_date[$j] .= "$com1 そして<b>$swg1</b>回 ヒットし、 $mname に <font class=\"dmg\"><b>$dmg1</b></font> のダメージ！$efcmsg $clit1<p>";
 				&skill_up($atc_skill1,$mlv);
 				if($kskm ne ""){
 					$battle_date[$j] .= $kskm;
@@ -377,7 +377,7 @@ EOM
 					$k_id = $k_bid;
 					&item_sell;
 					$kitem = $item_count;
-					$battle_date[$j] .= "$knameは素早く次の$k_bnameを準備した！<p>";
+					$battle_date[$j] .= "$kname は素早く次の$k_bname を準備した！<p>";
 				}
 
 
@@ -400,7 +400,7 @@ EOM
 
 		} else {
 			($mwatc,$mwclt,$mwelm,$mwefct,$mwmsg) = split(/<>/,$enemy_msg[$mtype][int(rand(3))]);
-			$com2 = "<font color=$elmcolor[$mwelm]>$mnameは$mwmsg</font><br>";
+			$com2 = "<font color=$elmcolor[$mwelm]>$mname は$mwmsg</font><br>";
 
 			#属性計算
 			$aelm = $mwelm;
@@ -434,10 +434,10 @@ EOM
 
 			if($mbuff[3] < 0 ){
 				$dmg2 = 0;
-				$com2 = "$mnameは動けない！<br>";
+				$com2 = "$mname は動けない！<br>";
 				$mbuff[3]+= 1;
 			} elsif($k_blc > 0 && $dmg2 > 0 && $k_btype eq "61" && $dcut == 1 && ($atc_skill1 <= 2 || $atc_skill1 == 5)){
-				$com2 .= "$knameは$k_anamで弾くと同時に踏み込んだ！<br>$kskm";
+				$com2 .= "$kname は$k_anam で弾くと同時に踏み込んだ！<br>$kskm";
 				$dcut = 2;
 				$drtn = $dmg2;
 				$dmg2 = 0;
@@ -449,20 +449,20 @@ EOM
 					$dmg2 -= $duphp;
 					if($dmg2 <= 0) {$dmg2=0;last; }
 				}
-				$com2 .= "影分身が$dupd人身代わりになった！<br>";
+				$com2 .= "影分身が$dupd 人身代わりになった！<br>";
 				$dup1 -= $dupd;
 				if($dup1 < 1) {$dup1=0;}
 			} elsif($k_par > 0 && $dmg2 > 0){
-				$com2 .= "$knameは$k_wnamで受け流した！<br>";
+				$com2 .= "$kname は$k_wnam で受け流した！<br>";
 				$dmg2 = 0;
 			} elsif($k_blc > 0 && $dmg2 > 0) {
 				$kskm = "";
 				&skill_up(21,$mlv);
 				if($kskm ne ""){ $kskm = "<p>$kskm"; }
-				$com2 .= "$knameは$k_anamで防いだ！<br>$kskm";
+				$com2 .= "$kname は$k_anam で防いだ！<br>$kskm";
 				$dmg2 = 0;
 			} elsif($k_esc > 0 && $dmg2 > 0) {
-				$com2 .= "$knameはかわした！<br>";
+				$com2 .= "$kname はかわした！<br>";
 				$dmg2 = 0;
 			}
 
@@ -506,12 +506,12 @@ EOM
 			}
 
 			if($mtec / 2 - $ksk[$atc_skill1] / 80 > int(rand(100)) && $dmg2 > 0 && $clit2 ne "") {
-				$clit3 = "<br><b class=\"clit\">$knameは気絶した・・</b>";
+				$clit3 = "<br><b class=\"clit\">$kname は気絶した・・</b>";
 				$kd_flg=1;
 			}
 
 			if($dmg2 > 0){
-				$battle_date[$j] .= "$com2 $clit2  $kname は <font class=\"dmg\"><b>$dmg2</b></font> のダメージ！$mefcmsg$clit3<p>";
+				$battle_date[$j] .= "$com2 $clit2 $kname は <font class=\"dmg\"><b>$dmg2</b></font> のダメージ！$mefcmsg$clit3<p>";
 			} else {
 				$battle_date[$j] .= "$com2<p>";
 			}
@@ -549,6 +549,7 @@ sub monster_initialize
 	# キャラ読み出し
 
 	$turn = 1;
+	$win = 0;
 
 	&skill_load;
 
@@ -604,15 +605,11 @@ sub monster_initialize
 		}
 	}
 
-	open(IN,"$pop_enemy");
-	@MONSTERNO = <IN>;
-	close(IN);
+	@MONSTERNO = &load_ini($pop_enemy);
 
 	$r_no = int(rand(@MONSTERNO));
 
-	open(IN,"$monster_file");
-	@MONSTER = <IN>;
-	close(IN);
+	@MONSTER = &load_ini($monster_file);
 
 	foreach(@MONSTER){
 		($mno,$mname,$mlv,$mex,$mgold,$mhp,$msp,$mdmg,$mdef,$mspd,$mtec,$melm,$mtype,$mdrop) = split(/<>/);
@@ -630,22 +627,26 @@ sub monster_initialize
 	$md_flg = 0;
 
 	$i=1;$j=1;@battle_date=();
+
+	push @battle_header, "$movemsg<br>";
+	push @battle_header, "$kname は、$mname に遭遇した！" if (! $bossflg);
+	push @battle_header, "$kname は、$area_name[$karea] の支配者、$mname に遭遇した！" if ($bossflg);
+
+	# $battle_header[$_] = Encode::decode_utf8($battle_header[$_]) for 0 .. $#battle_header;
 }
 
 sub monster_finalize
 {
 	&monster_stage_save;
 
-	my $battle = File::Spec->catfile($FindBin::Bin, "save", "battle", $kid. ".yaml");
+	my $battle = File::Spec->catfile($FindBin::Bin, "save", "battle", $kid. ".monster.yaml");
 	my $file = Mojo::File->new($battle);
-	my $move = File::Spec->catfile($FindBin::Bin, "save", "archive", &gettimeofday. ".yaml");
+	my $move = File::Spec->catfile($FindBin::Bin, "save", "archive", &gettimeofday. ".monster.yaml");
 	$file->move_to($move);
-	# unlink($battle);
 }
 
 sub gettimeofday
 {
-	my ($self) = @_;
 	my @tmp = Time::HiRes::gettimeofday;
 	return join(".", @tmp);
 }
@@ -662,6 +663,8 @@ sub monster_stage_save
 			vtime   => $vtime,
 			mtime   => $mtime,
 			"ターン"   => $turn,
+			header => \@battle_header,
+			footer => \@battle_footer,
 			"ログ"    => \@battle_date,
 			"フラグ"   => $win,
 			i       => $i,
@@ -717,47 +720,13 @@ sub monster_stage_save
 		},
 	};
 
-	my $battle = File::Spec->catfile($FindBin::Bin, "save", "battle", $kid. ".yaml");
+	my $battle = File::Spec->catfile($FindBin::Bin, "save", "battle", $kid. ".monster.yaml");
 	my $file = Mojo::File->new($battle);
 	my $newData = {};
 
 	for my $key1 (keys %$data)
 	{
-		my $newKey1 = Encode::decode_utf8($key1);
-		for my $key2 (keys %{ $data->{$key1} })
-		{
-			my $newKey2 = Encode::decode_utf8($key2);
-			$newData->{$newKey1} ||= {};
-			if ($key2 eq "名前")
-			{
-				$data->{$key1}->{$key2} = Encode::decode_utf8($data->{$key1}->{$key2});
-			}
-			elsif ($key2 eq "ログ")
-			{
-				my $log = $data->{$key1}->{$key2};
-				$log->[$_] = Encode::decode_utf8($log->[$_]) for 0 .. $#$log;
-			}
-			$newData->{$newKey1}->{$newKey2} = $data->{$key1}->{$key2};
-		}
-	}
-
-	my $str =  YAML::XS::Dump($newData);
-
-	$file->spurt($str);
-}
-
-sub monster_stage_load
-{
-	my $battle = File::Spec->catfile($FindBin::Bin, "save", "battle", $kid. ".yaml");
-	my $file = Mojo::File->new($battle);
-	my $str = $file->slurp;
-	my $data = YAML::XS::Load($str);
-
-	my $newData = {};
-
-	for my $key1 (keys %$data)
-	{
-		my $newKey1 = Encode::encode_utf8($key1);
+		my $newKey1 = $key1;
 		for my $key2 (keys %{ $data->{$key1} })
 		{
 			my $newKey2 = Encode::encode_utf8($key2);
@@ -766,21 +735,38 @@ sub monster_stage_load
 			{
 				$data->{$key1}->{$key2} = Encode::encode_utf8($data->{$key1}->{$key2});
 			}
-			elsif ($newKey2 eq "ログ")
+			elsif ($newKey2 eq "ログ" || $newKey2 eq "header" || $newKey2 eq "footer")
 			{
 				my $log = $data->{$key1}->{$key2};
-				$log->[$_] = Encode::encode_utf8($log->[$_]) for 0 .. $#$log;
+
+				for my $no (0 .. $#$log)
+				{
+					my @strings = split(//, $log->[$no]);
+					$strings[$_] = utf8::is_utf8($strings[$_]) ? Encode::encode_utf8($strings[$_]) : $strings[$_] for 0 .. $#string;
+					# $log->[$no] = join("", @strings);
+
+					# warn $log->[$no];
+				}
 			}
-			$newData->{$newKey1}->{$newKey2} = $data->{$key1}->{$key2};
+			$newData->{$key1}->{$key2} = $data->{$key1}->{$key2};
 		}
 	}
 
-	$data = $newData;
+	my $str =  YAML::XS::Dump($newData);
+
+	$file->spurt($str);
+}
+
+sub monster_stage_apply
+{
+	my $data = shift;
 
 	$i = $data->{"ステージデータ"}->{i};
 	$j = $data->{"ステージデータ"}->{j};
 	$win = $data->{"ステージデータ"}->{"フラグ"};
 	@battle_date = @{$data->{"ステージデータ"}->{"ログ"}};
+	@battle_header = @{$data->{"ステージデータ"}->{header}};
+	@battle_fotter = @{$data->{"ステージデータ"}->{footer}};
 
 	$turn = $data->{"ステージデータ"}->{"ターン"};
 	$khp_flg = $data->{"ステージデータ"}->{khp_flg};
@@ -838,9 +824,42 @@ sub monster_stage_load
 	@kbuff = @{$data->{"プレイヤー"}->{"バフ"}};
 }
 
+sub monster_stage_load
+{
+	my $battle = File::Spec->catfile($FindBin::Bin, "save", "battle", $kid. ".monster.yaml");
+	my $file = Mojo::File->new($battle);
+	my $str = $file->slurp;
+	my $data = YAML::XS::Load($str);
+
+	my $newData = {};
+
+	for my $key1 (keys %$data)
+	{
+		$newData->{$key1} ||= {};
+
+		for my $key2 (keys %{ $data->{$key1} })
+		{
+			if ($key2 eq "名前")
+			{
+				# $data->{$key1}->{$key2} = Encode::encode_utf8($data->{$key1}->{$key2});
+			}
+			elsif ($key2 eq "ログ" || $key2 eq "header" || $key2 eq "footer")
+			{
+				my $log = $data->{$key1}->{$key2};
+				# $log->[$_] = Encode::encode_utf8($log->[$_]) for 0 .. $#$log;
+			}
+			$newData->{$key1}->{$key2} = $data->{$key1}->{$key2};
+		}
+	}
+
+	$data = $newData;
+
+	return $data;
+}
+
 sub is_continue_monster
 {
-	my $battle = File::Spec->catfile($FindBin::Bin, "save", "battle", $kid. ".yaml");
+	my $battle = File::Spec->catfile($FindBin::Bin, "save", "battle", $kid. ".monster.yaml");
 	return -f $battle;
 }
 
@@ -855,13 +874,18 @@ sub monster
 	$battle_flag=1;
 
 	# 途中データ確認
+	my $data;
 	if (&is_continue_monster)
 	{
-		&monster_stage_load;
+		$data = &monster_stage_load;
+		&monster_stage_apply($data);
 	}
 	else
 	{
 		&monster_initialize;
+		&monster_stage_save;
+		&display_monster_battle;
+		exit;
 	}
 
 	my $res = &monster_step_run; # 1...終了,0...継続
@@ -904,16 +928,16 @@ sub monster
 		$kex = $kex + $mex;
 		$gold = $mgold;
 		$kgold = $kgold + $gold;
-		$comment = "<b>$mnameは倒れた・・。</b><p>";
+		$comment = "<b>$mname は倒れた・・。</b><p>";
 
 		if(int(rand(20)) == 1){
 			if($kitem < $max_item) {
 				&stone_drop;
 				$kitem = $u_cnt;
-				$dmsg = "<b>$knameは不思議な輝きを放つ石を見つけた！</b><p>";
+				$dmsg = "<b>$kname は不思議な輝きを放つ石を見つけた！</b><p>";
 				$drop_flag = 1;
 			} else {
-				$dmsg = "<b>$knameは不思議な輝きを放つ石を見つけたが、持ちきれなかった！</b><p>";
+				$dmsg = "<b>$kname は不思議な輝きを放つ石を見つけたが、持ちきれなかった！</b><p>";
 			}
 		}
 
@@ -921,10 +945,10 @@ sub monster
 			if($kitem < $max_item) {
 				&item_drop;
 				$kitem = $u_cnt;
-				$dmsg .= "<b>$knameは使えそうなものを拾った！</b><p>";
+				$dmsg .= "<b>$kname は使えそうなものを拾った！</b><p>";
 				$drop_flag = 1;
 			} else {
-				$dmsg .= "<b>$knameは使えそうなものを見つけたが、持ちきれなかった！</b><p>";
+				$dmsg .= "<b>$kname は使えそうなものを見つけたが、持ちきれなかった！</b><p>";
 			}
 		}
 
@@ -942,8 +966,8 @@ sub monster
 		}
 
 		if($klp < 1){
-			$comment = "<b>$knameは力尽きた・・。</b><p>";
-			$comment .= "<b>$town_name[$karea]の警備隊に救助され、$town_name[$karea]に運ばれた・・。</b><p>";
+			$comment = "<b>$kname は力尽きた・・。</b><p>";
+			$comment .= "<b>$town_name[$karea] の警備隊に救助され、$town_name[$karea] に運ばれた・・。</b><p>";
 			if($kgold) { $kgold = int($kgold / 2); }
 			else { $kgold = 0; }
 			$comment .= "手数料として、<b>$kgold</b>G支払い、";
@@ -959,13 +983,13 @@ sub monster
 				$kitem = $item_count;
 				$tmp++;
 			}
-			$comment = "<b>$knameが起き上がれない隙に、$mnameが何かを持ち去っていった・・。</b><p>";
+			$comment = "<b>$kname が起き上がれない隙に、$mname が何かを持ち去っていった・・。</b><p>";
 			$move_flag = 1;
 			if($kspot > 0){
 				$kpst++;
 			}
 		} else {
-			$comment = "<b>$knameは傷を負ったが、何とか逃げ延びた・・。</b><p>";
+			$comment = "<b>$kname は傷を負ったが、何とか逃げ延びた・・。</b><p>";
 			$move_flag = 1;
 			if($kspot > 0){
 				$kpst++;
@@ -978,7 +1002,7 @@ sub monster
 		$k_id = $k_wid;
 		&item_sell;
 		$kitem = $item_count;
-		$dmsg .= "<b>$k_wnamが使い物にならなくなった！</b><p>";
+		$dmsg .= "<b>$k_wnam が使い物にならなくなった！</b><p>";
 	}
 
 	if($k_sdef > 0 && $wrsk > $k_sdef * 25 && int(rand(100)) < $wrsk - $k_sdef * 25){
@@ -986,7 +1010,7 @@ sub monster
 		$k_id = $k_sid;
 		&item_sell;
 		$kitem = $item_count;
-		$dmsg .= "<b>$k_anamが使い物にならなくなった！</b><p>";
+		$dmsg .= "<b>$k_anam が使い物にならなくなった！</b><p>";
 	}
 
 	if($kex > ($lv_up)) {
@@ -1014,9 +1038,9 @@ sub monster
 				if($kitem < $max_item) {
 					&item_drop;
 					$kitem = $u_cnt;
-					$dmsg .= "<b>$knameは宝箱を発見した！$bgold</b>Gとアイテムを入手した！<p>";
+					$dmsg .= "<b>$kname は宝箱を発見した！$bgold</b>Gとアイテムを入手した！<p>";
 				} else {
-					$dmsg .= "<b>$knameは宝箱を発見した！$bgold</b>Gを入手した！<p>";
+					$dmsg .= "<b>$kname は宝箱を発見した！$bgold</b>Gを入手した！<p>";
 				}
 
 				$get_area=$karea;$get_id="06";$get_cnt="1";
@@ -1032,7 +1056,7 @@ sub monster
 			if($move_flag > 0){
 				$get_area=$farea;$get_id="01";$get_cnt="0";
 				&get_msg;
-				$lastmsg = "$town_name[$farea]に到着しました。<p>$get_msg";
+				$lastmsg = "$town_name[$farea] に到着しました。<p>$get_msg";
 				$karea = $farea;
 				$kspot = 0;
 				$kpst = 0;
@@ -1041,7 +1065,7 @@ sub monster
 			if($move_flag > 0){
 				$get_area=$rarea;$get_id="01";$get_cnt="0";
 				&get_msg;
-				$lastmsg = "$town_name[$rarea]に到着しました。<p>$get_msg";
+				$lastmsg = "$town_name[$rarea] に到着しました。<p>$get_msg";
 				$karea = $rarea;
 				$kspot = 0;
 				$kpst = 0;
@@ -1050,13 +1074,17 @@ sub monster
 	} elsif($kpst > $town_move[$karea][$kspot]) {
 		if($kspot > 0){
 			if($move_flag > 0){
-				$lastmsg = "$town_name[$karea]に到着しました。";
+				$lastmsg = "$town_name[$karea] に到着しました。";
 				$karea = $karea;
 				$kspot = 0;
 				$kpst = 0;
 			}
 		}
 	}
+
+	push @battle_footer, "$comment<b>$mex%</b>の経験値を失った。<p>$dmsg\n" if ($win == 2);
+	push @battle_footer, "$comment<p><b>$mex%</b>の経験値を取得！<b>$gold</b>G入手！<p>$dmsg\n" if($win == 1);
+	push @battle_footer, $lastmsg if ($lastmsg);
 
 	&regist;
 	&monster_finalize;
@@ -1071,18 +1099,8 @@ sub display_monster_battle
 {
 	&header;
 
-	my @battle_header;
-	my @battle_footer;
-
-	push @battle_header, "$movemsg<br>";
-	push @battle_header, "$knameは、$mnameに遭遇した！";
-	push @battle_header, "$knameは、$area_name[$karea]の支配者、$mnameに遭遇した！" if ($bossflg);
-	push @battle_footer, "$comment<b>$mex%</b>の経験値を失った。<p>$dmsg\n" if ($win == 2);
-	push @battle_footer, "$comment<p><b>$mex%</b>の経験値を取得！<b>$gold</b>G入手！<p>$dmsg\n" if($win == 1);
-	push @battle_footer, $lastmsg if ($lastmsg);
-
-	$battle_header[$_] = Encode::decode_utf8($battle_header[$_]) for 0 .. $#battle_header;
-	$battle_footer[$_] = Encode::decode_utf8($battle_footer[$_]) for 0 .. $#battle_footer;
+	# $battle_header[$_] = Encode::decode_utf8($battle_header[$_]) for 0 .. $#battle_header;
+	# $battle_footer[$_] = Encode::decode_utf8($battle_footer[$_]) for 0 .. $#battle_footer;
 
 	$tt->process(
 		'battle.tmpl',
@@ -1095,7 +1113,7 @@ sub display_monster_battle
 			is_finished     => $win == 0 ? 0 : 1,
 			kid             => $kid,
 			kpass           => $kpass,
-			sel            => $in{sel} || 0,
+			sel            => $in{sel} || -1,
 		},
 		\my $out,
 		binmode => ':encoding(utf8)'

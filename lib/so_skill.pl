@@ -1,11 +1,10 @@
+use utf8;
 #--------------#
 #  スキル書込  #
 #--------------#
 sub skill_regist
 {
-	open(IN,"$skill_path$kid");
-	@skill = <IN>;
-	close(IN);
+	@skill = &load_ini($skill_path. $kid);
 
 	@skill_new=();
 	unshift(@skill_new,"$kmx[0]<>$kmx[1]<>$kmx[2]<>$kmx[3]<>$kmx[4]<>$kmx[5]<>$kmx[6]<>$kmx[7]<>$kmx[8]<>$kmx[9]<>$kmx[10]<>$kmx[11]<>$kmx[12]<>$kmx[13]<>$kmx[14]<>$kmx[15]<>$kmx[16]<>$kmx[17]<>$kmx[18]<>$kmx[19]<>$kmx[20]<>$kmx[21]<>$kmax<>\n");
@@ -42,9 +41,8 @@ sub skill_regist
 #--------------#
 sub skill_load
 {
-	open(IN,"$skill_path$kid");
-	@kskill = <IN>;
-	close(IN);
+	@kskill = &load_ini($skill_path. $kid);
+
 	@ksk=();@kmg=();@kmx=();
 	($ksk[0],$ksk[1],$ksk[2],$ksk[3],$ksk[4],$ksk[5],$ksk[6],$ksk[7],$ksk[8],$ksk[9],$ksk[10],$ksk[11],$ksk[12],$ksk[13],$ksk[14],$ksk[15],$ksk[16],$ksk[17],$ksk[18],$ksk[19],$ksk[20],$ksk[21]) = split(/<>/,$kskill[0]);
 	($kmg[0],$kmg[1],$kmg[2],$kmg[3],$kmg[4],$kmg[5],$kmg[6],$kmg[7],$kmg[8],$kmg[9],$kmg[10],$kmg[11],$kmg[12],$kmg[13],$kmg[14],$kmg[15],$kmg[16],$kmg[17],$kmg[18],$kmg[19],$kmg[20],$kmg[21]) = split(/<>/,$kskill[1]);
@@ -156,9 +154,7 @@ sub skill_grow
 
 sub skill_manage
 {
-	open(IN,"$chara_file");
-	@skill_chara = <IN>;
-	close(IN);
+	@skill_chara = &load_ini($chara_file);
 
 	$hit=0;
 	foreach(@skill_chara){

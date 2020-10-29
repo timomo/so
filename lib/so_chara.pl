@@ -1,3 +1,4 @@
+use utf8;
 #----------------------#
 #  キャラクタ作成画面  #
 #----------------------#
@@ -225,9 +226,7 @@ sub regist {
 	elsif ($lockkey == 2) { &lock2; }
 	elsif ($lockkey == 3) { &file'lock; }
 
-	open(IN,"$chara_file");
-	@regist = <IN>;
-	close(IN);
+	@regist = &load_ini($chara_file);
 
 	$hit=0;@new=();
 	foreach(@regist){
@@ -239,7 +238,10 @@ sub regist {
 #		}elsif($host eq "$chost" and $in{'new'} eq 'new'){
 #			&error("一人一キャラクターです。");
 		}elsif($cid eq "$kid"){
-			unshift(@new,"$kid<>$kpass<>$kname<>$ksex<>$kchara<>$kn_0<>$kn_1<>$kn_2<>$kn_3<>$kn_4<>$kn_5<>$kn_6<>$khp<>$kmaxhp<>$kex<>$klv<>$kap<>$kgold<>$klp<>$ktotal<>$kkati<>$host<>$date<>$karea<>$kspot<>$kpst<>$kitem<>\n");
+			my $mes = "$kid<>$kpass<>$name<>$ksex<>$kchara<>$kn_0<>$kn_1<>$kn_2<>$kn_3<>$kn_4<>$kn_5<>$kn_6<>$khp<>$kmaxhp<>$kex<>$klv<>$kap<>$kgold<>$klp<>$ktotal<>$kkati<>$host<>$date<>$karea<>$kspot<>$kpst<>$kitem<>\n";
+			my $utf8 = Encode::encode_utf8($mes);
+
+			unshift(@new,$utf8);
 			$hit=1;
 		}else{
 			push(@new,"$_");
@@ -266,7 +268,10 @@ sub regist {
 		$item=2;
 		$kid = $in{'id'};
 		$kpass = $in{'pass'};
-		unshift(@new,"$in{'id'}<>$in{'pass'}<>$in{'c_name'}<>$in{'sex'}<>$in{'chara'}<>$n_0<>$n_1<>$n_2<>$n_3<>$n_4<>$n_5<>$n_6<>$hp<>$hp<>$ex<>$lv<>$ap<>$gold<>$lp<>$total<>$kati<>$host<>$date<>$area<>$spot<>$pst<>$item<>\n");
+		my $mes = "$in{'id'}<>$in{'pass'}<>$name<>$in{'sex'}<>$in{'chara'}<>$n_0<>$n_1<>$n_2<>$n_3<>$n_4<>$n_5<>$n_6<>$hp<>$hp<>$ex<>$lv<>$ap<>$gold<>$lp<>$total<>$kati<>$host<>$date<>$area<>$spot<>$pst<>$item<>\n";
+		my $utf8 = Encode::encode_utf8($mes);
+
+		unshift(@new,$utf8);
 
 		@kbuf = (100,100,100);
 		$krsk    = 0;
@@ -293,9 +298,7 @@ sub regist {
 
 sub chara_load
 {
-	open(IN,"$chara_file");
-	@battle = <IN>;
-	close(IN);
+	@battle = &load_ini($chara_file);
 
 	my $id = shift;
 	$hit=0;

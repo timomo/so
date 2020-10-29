@@ -1,14 +1,11 @@
+use utf8;
 #----------------#
 #  ショップ表示  #
 #----------------#
 sub item_shop {
-	open(IN,"$town_shop[$in{'area'}]");
-	@shop_array = <IN>;
-	close(IN);
 
-	open(IN,"$chara_file");
-	@item_chara = <IN>;
-	close(IN);
+	@shop_array = &load_ini($town_shop[$in{'area'}]);
+	@item_chara = &load_ini($chara_file);
 
 	$hit=0;
 	foreach(@item_chara){
@@ -57,12 +54,10 @@ EOM
 <th></th><th>種別</th><th>名前</th><th>効果</th><th>価値</th><th>使用</th><th>装備条件</th><th>属性</th><th>耐久</th><th>品質</th><th>作成者</th>
 EOM
 	$i=0;
+
+	@item_array = &load_ini($item_file);
+
 	foreach(@shop_array){
-
-		open(IN,"$item_file");
-		@item_array = <IN>;
-		close(IN);
-
 		$hit=0;
 		foreach(@item_array){
 			($ino,$iname,$idmg,$igold,$imode,$iuelm,$ieelm,$ihand,$idef,$ireq,$iqlt,$imake,$irest) = split(/<>/);
@@ -159,13 +154,9 @@ EOM
 #  自由市場表示  #
 #----------------#
 sub user_shop {
-	open(IN,"$user_shop[$in{'area'}]");
-	@item_array = <IN>;
-	close(IN);
 
-	open(IN,"$chara_file");
-	@item_chara = <IN>;
-	close(IN);
+	@item_array = &load_ini($user_shop[$in{'area'}]);
+	@item_chara = &load_ini($chara_file);
 
 	$hit=0;
 	foreach(@item_chara){
@@ -252,9 +243,6 @@ EOM
 			$idmg = "&nbsp";
 			$ireq = "&nbsp;";
 		}
-		open(IN,"$chara_file");
-		@item_chara = <IN>;
-		close(IN);
 	
 		foreach(@item_chara){
 			($bid,$bpass,$bname) = split(/<>/);
@@ -305,13 +293,8 @@ EOM
 #  銀行表示  #
 #------------#
 sub bank {
-	open(IN,"$bank_path$in{'id'}");
-	@bank_item = <IN>;
-	close(IN);
-
-	open(IN,"$chara_file");
-	@item_chara = <IN>;
-	close(IN);
+	@bank_item = &load_ini($bank_path. $in{'id'});
+	@item_chara = &load_ini($chara_file);
 
 	$hit=0;
 	foreach(@item_chara){
@@ -460,15 +443,16 @@ sub item_buy {
 		&item_shop;
 	}
 
-	open(IN,"$item_file");
-	@item_array = <IN>;
-	close(IN);
-
+	@item_array = &load_ini($item_file);
 	$hit=0;
+
+	my $item_no_id = Encode::decode_utf8($in{'item_no'});
+
 	foreach(@item_array){
 		($i_no,$i_name,$i_dmg,$i_gold,$i_mode,$i_uelm,$i_eelm,$i_hand,$i_def,$i_req,$i_qlt,$i_make,$i_rest) = split(/<>/);
-		if($in{'item_no'} eq "$i_no$i_qlt$i_make") { $hit=1;last; }
+		if($item_no_id eq "$i_no$i_qlt$i_make") { $hit=1;last; }
 	}
+
 	if(!$hit) { &error("アイテムが存在しません。"); }
 
 	&get_host;
@@ -480,13 +464,8 @@ sub item_buy {
 	elsif ($lockkey == 2) { &lock2; }
 	elsif ($lockkey == 3) { &file'lock; }
 
-	open(IN,"$chara_file");
-	@item_chara = <IN>;
-	close(IN);
-
-	open(IN,"$town_shop[$item_area]");
-	@item_array = <IN>;
-	close(IN);
+	@item_chara = &load_ini($chara_file);
+	@item_array = &load_ini($town_shop[$item_area]);
 
 	$buy_gold = 0;
 	$buy_name = "";
@@ -515,7 +494,10 @@ sub item_buy {
 			&item_regist;
 			$iitem = $u_cnt;
 
-			unshift(@item_new,"$iid<>$ipass<>$iname<>$isex<>$ichara<>$in_0<>$in_1<>$in_2<>$in_3<>$in_4<>$in_5<>$in_6<>$ihp<>$imaxhp<>$iex<>$ilv<>$iap<>$igold<>$ilp<>$itotal<>$ikati<>$host<>$idate<>$iarea<>$ispot<>$ipst<>$iitem<>\n");
+			my $mes = "$iid<>$ipass<>$iname<>$isex<>$ichara<>$in_0<>$in_1<>$in_2<>$in_3<>$in_4<>$in_5<>$in_6<>$ihp<>$imaxhp<>$iex<>$ilv<>$iap<>$igold<>$ilp<>$itotal<>$ikati<>$host<>$idate<>$iarea<>$ispot<>$ipst<>$iitem<>\n";
+			my $utf8 = Encode::encode_utf8($mes);
+
+			unshift(@item_new,$utf8);
 			$hit=1;
 		}else{
 			push(@item_new,"$_");
@@ -557,14 +539,14 @@ sub user_buy {
 		&user_shop;
 	}
 
-	open(IN,"$user_shop[$item_area]");
-	@item_array = <IN>;
-	close(IN);
+	@item_array = &load_ini($user_shop[$item_area]);
+
+	my $item_no_id = Encode::decode_utf8($in{'item_no'});
 
 	$hit=0;
 	foreach(@item_array){
 		($i_no,$i_name,$i_dmg,$i_gold,$i_mode,$i_uelm,$i_eelm,$i_hand,$i_def,$i_req,$i_qlt,$i_make,$i_rest,$i_id) = split(/<>/);
-		if($in{'item_no'} eq "$i_no$i_qlt$i_make$i_id") { $hit=1;last; }
+		if($item_no_id eq "$i_no$i_qlt$i_make$i_id") { $hit=1;last; }
 	}
 	if(!$hit) { &error("アイテムが存在しません。"); }
 
@@ -577,13 +559,7 @@ sub user_buy {
 	elsif ($lockkey == 2) { &lock2; }
 	elsif ($lockkey == 3) { &file'lock; }
 
-	open(IN,"$chara_file");
-	@item_chara = <IN>;
-	close(IN);
-
-	open(IN,"$user_shop[$item_area]");
-	@item_array = <IN>;
-	close(IN);
+	@item_chara = &load_ini($chara_file);
 
 	$buy_gold = 0;
 	$buy_name = "";
@@ -609,7 +585,7 @@ sub user_buy {
 			@buy_item=();
 			foreach(@item_array){
 				($i_no,$i_name,$i_dmg,$i_gold,$i_mode,$i_uelm,$i_eelm,$i_hand,$i_def,$i_req,$i_qlt,$i_make,$i_rest,$i_id) = split(/<>/);
-				if($in{'item_no'} eq "$i_no$i_qlt$i_make$i_id") {
+				if($item_no_id eq "$i_no$i_qlt$i_make$i_id") {
 					if($i_rest < $item_cnt) {
 						$error = "在庫が足りません。";
 						&user_shop;
@@ -639,13 +615,24 @@ sub user_buy {
 
 					if($i_rest > $item_cnt) {
 						$i_rest -= $item_cnt;
-						unshift(@buy_item,"$i_no<>$i_name<>$i_dmg<>$i_gold<>$i_mode<>$i_uelm<>$i_eelm<>$i_hand<>$i_def<>$i_req<>$i_qlt<>$i_make<>$i_rest<>$i_id<>\n");
+
+						my $mes = "$i_no<>$i_name<>$i_dmg<>$i_gold<>$i_mode<>$i_uelm<>$i_eelm<>$i_hand<>$i_def<>$i_req<>$i_qlt<>$i_make<>$i_rest<>$i_id<>\n";
+						my $utf8 = Encode::encode_utf8($mes);
+
+						unshift(@buy_item,$utf8);
 					}
 				}else{
-					unshift(@buy_item,"$i_no<>$i_name<>$i_dmg<>$i_gold<>$i_mode<>$i_uelm<>$i_eelm<>$i_hand<>$i_def<>$i_req<>$i_qlt<>$i_make<>$i_rest<>$i_id<>\n");
+					my $mes = "$i_no<>$i_name<>$i_dmg<>$i_gold<>$i_mode<>$i_uelm<>$i_eelm<>$i_hand<>$i_def<>$i_req<>$i_qlt<>$i_make<>$i_rest<>$i_id<>\n";
+					my $utf8 = Encode::encode_utf8($mes);
+
+					unshift(@buy_item,$utf8);
 				}
 			}
-			unshift(@item_new,"$iid<>$ipass<>$iname<>$isex<>$ichara<>$in_0<>$in_1<>$in_2<>$in_3<>$in_4<>$in_5<>$in_6<>$ihp<>$imaxhp<>$iex<>$ilv<>$iap<>$igold<>$ilp<>$itotal<>$ikati<>$host<>$idate<>$iarea<>$ispot<>$ipst<>$iitem<>\n");
+
+			my $mes = "$iid<>$ipass<>$iname<>$isex<>$ichara<>$in_0<>$in_1<>$in_2<>$in_3<>$in_4<>$in_5<>$in_6<>$ihp<>$imaxhp<>$iex<>$ilv<>$iap<>$igold<>$ilp<>$itotal<>$ikati<>$host<>$idate<>$iarea<>$ispot<>$ipst<>$iitem<>\n";
+			my $utf8 = Encode::encode_utf8($mes);
+
+			unshift(@item_new,$utf8);
 			$hit=1;
 		}else{
 			push(@item_new,"$_");
@@ -692,14 +679,14 @@ sub bank_out {
 		&bank;
 	}
 
-	open(IN,"$bank_path$item_id");
-	@item_array = <IN>;
-	close(IN);
+	@item_array = &load_ini($bank_path. $item_id);
+
+	my $item_no_id = Encode::decode_utf8($in{'item_no'});
 
 	$hit=0;
 	foreach(@item_array){
 		($i_id,$i_no,$i_name,$i_dmg,$i_gold,$i_mode,$i_uelm,$i_eelm,$i_hand,$i_def,$i_req,$i_qlt,$i_make,$i_rest) = split(/<>/);
-		if($in{'item_no'} eq "$i_id") { $hit=1;last; }
+		if($item_no_id eq "$i_id") { $hit=1;last; }
 	}
 	if(!$hit) { &error("アイテムが存在しません。"); }
 
@@ -712,13 +699,7 @@ sub bank_out {
 	elsif ($lockkey == 2) { &lock2; }
 	elsif ($lockkey == 3) { &file'lock; }
 
-	open(IN,"$chara_file");
-	@item_chara = <IN>;
-	close(IN);
-
-	open(IN,"$bank_path$item_id");
-	@item_array = <IN>;
-	close(IN);
+	@item_chara = &load_ini($chara_file);
 
 	$buy_gold = 0;
 	$buy_name = "";
@@ -734,7 +715,7 @@ sub bank_out {
 			@bank_item=();
 			foreach(@item_array){
 				($i_id,$i_no,$i_name,$i_dmg,$i_gold,$i_mode,$i_uelm,$i_eelm,$i_hand,$i_def,$i_req,$i_qlt,$i_make,$i_rest) = split(/<>/);
-				if($in{'item_no'} eq "$i_id") {
+				if($item_no_id eq "$i_id") {
 					if($i_rest < $item_cnt) {
 						$error = "在庫が足りません。";
 						&bank;
@@ -752,13 +733,24 @@ sub bank_out {
 
 					if($i_rest > $item_cnt) {
 						$i_rest -= $item_cnt;
-						unshift(@bank_item,"$i_id<>$i_no<>$i_name<>$i_dmg<>$i_gold<>$i_mode<>$i_uelm<>$i_eelm<>$i_hand<>$i_def<>$i_req<>$i_qlt<>$i_make<>$i_rest<>\n");
+
+						my $mes = "$i_id<>$i_no<>$i_name<>$i_dmg<>$i_gold<>$i_mode<>$i_uelm<>$i_eelm<>$i_hand<>$i_def<>$i_req<>$i_qlt<>$i_make<>$i_rest<>\n";
+						my $utf8 = Encode::encode_utf8($mes);
+
+						unshift(@bank_item,$utf8);
 					}
 				}else{
-					unshift(@bank_item,"$i_id<>$i_no<>$i_name<>$i_dmg<>$i_gold<>$i_mode<>$i_uelm<>$i_eelm<>$i_hand<>$i_def<>$i_req<>$i_qlt<>$i_make<>$i_rest<>\n");
+					my $mes = "$i_id<>$i_no<>$i_name<>$i_dmg<>$i_gold<>$i_mode<>$i_uelm<>$i_eelm<>$i_hand<>$i_def<>$i_req<>$i_qlt<>$i_make<>$i_rest<>\n";
+					my $utf8 = Encode::encode_utf8($mes);
+
+					unshift(@bank_item,$utf8);
 				}
 			}
-			unshift(@item_new,"$iid<>$ipass<>$iname<>$isex<>$ichara<>$in_0<>$in_1<>$in_2<>$in_3<>$in_4<>$in_5<>$in_6<>$ihp<>$imaxhp<>$iex<>$ilv<>$iap<>$igold<>$ilp<>$itotal<>$ikati<>$host<>$idate<>$iarea<>$ispot<>$ipst<>$iitem<>\n");
+
+			my $mes = "$iid<>$ipass<>$iname<>$isex<>$ichara<>$in_0<>$in_1<>$in_2<>$in_3<>$in_4<>$in_5<>$in_6<>$ihp<>$imaxhp<>$iex<>$ilv<>$iap<>$igold<>$ilp<>$itotal<>$ikati<>$host<>$idate<>$iarea<>$ispot<>$ipst<>$iitem<>\n";
+			my $utf8 = Encode::encode_utf8($mes);
+
+			unshift(@item_new,$utf8);
 			$hit=1;
 		}else{
 			push(@item_new,"$_");
@@ -797,9 +789,7 @@ sub bank_out {
 sub shop_sort
 {
 	#ソートし直す
-	open(IN,"$user_shop[$iarea]");
-	@sort_shop = <IN>;
-	close(IN);
+	@sort_shop = &load_ini($user_shop[$iarea]);
 
 	@tmp1 = @tmp2 = @tmp3 = ();
 	foreach(@sort_shop){
@@ -815,7 +805,11 @@ sub shop_sort
 	@new_sort_shop=();
 	foreach(@sort_shop){
 		($i_no,$i_name,$i_dmg,$i_gold,$i_mode,$i_uelm,$i_eelm,$i_hand,$i_def,$i_req,$i_qlt,$i_make,$i_rest,$i_id) = split(/<>/);
-		unshift(@new_sort_shop,"$i_no<>$i_name<>$i_dmg<>$i_gold<>$i_mode<>$i_uelm<>$i_eelm<>$i_hand<>$i_def<>$i_req<>$i_qlt<>$i_make<>$i_rest<>$i_id<>\n");
+
+		my $mes = "$i_no<>$i_name<>$i_dmg<>$i_gold<>$i_mode<>$i_uelm<>$i_eelm<>$i_hand<>$i_def<>$i_req<>$i_qlt<>$i_make<>$i_rest<>$i_id<>\n";
+		my $utf8 = Encode::encode_utf8($mes);
+
+		unshift(@new_sort_shop,$utf8);
 	}
 	open(OUT,">$user_shop[$iarea]");
 	print OUT @new_sort_shop;
@@ -828,9 +822,7 @@ sub shop_sort
 sub bank_sort
 {
 	#ソートし直す
-	open(IN,"$bank_path$iid");
-	@sort_bank = <IN>;
-	close(IN);
+	@sort_bank = &load_ini($bank_path. $iid);
 
 	@tmp1 = @tmp2 = @tmp3 = ();
 	foreach(@sort_bank){
@@ -846,7 +838,11 @@ sub bank_sort
 	@new_sort_bank=();$cnt = @sort_bank;
 	foreach(@sort_bank){
 		($i_id,$i_no,$i_name,$i_dmg,$i_gold,$i_mode,$i_uelm,$i_eelm,$i_hand,$i_def,$i_req,$i_qlt,$i_make,$i_rest) = split(/<>/);
-		unshift(@new_sort_bank,"$cnt<>$i_no<>$i_name<>$i_dmg<>$i_gold<>$i_mode<>$i_uelm<>$i_eelm<>$i_hand<>$i_def<>$i_req<>$i_qlt<>$i_make<>$i_rest<>\n");
+
+		my $mes = "$cnt<>$i_no<>$i_name<>$i_dmg<>$i_gold<>$i_mode<>$i_uelm<>$i_eelm<>$i_hand<>$i_def<>$i_req<>$i_qlt<>$i_make<>$i_rest<>\n";
+		my $utf8 = Encode::encode_utf8($mes);
+
+		unshift(@new_sort_bank,$utf8);
 		$cnt -= 1;
 	}
 

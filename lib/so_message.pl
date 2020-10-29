@@ -1,3 +1,4 @@
+use utf8;
 #--------------#
 #  メッセージ  #
 #--------------#
@@ -12,13 +13,8 @@ sub message {
 	elsif ($lockkey == 2) { &lock2; }
 	elsif ($lockkey == 3) { &file'lock; }
 
-	open(IN,"$message_file");
-	@mes_regist = <IN>;
-	close(IN);
-
-	open(IN,"$chara_file");
-	@MESSAGE = <IN>;
-	close(IN);
+	@mes_regist = &load_ini($message_file);
+	@MESSAGE = &load_ini($chara_file);
 
 	if($in{'mesid'} eq "Ａ"){
 		$dname = "全員";
@@ -32,7 +28,10 @@ sub message {
 
 	if($mes_max > $max) { pop(@mes_regist); }
 
-	unshift(@mes_regist,"$in{'mesid'}<>$in{'id'}<>$in{'name'}<>$in{'mes'}<>$dname<>$gettime<>\n");
+	my $mes = "$in{'mesid'}<>$in{'id'}<>$in{'name'}<>$in{'mes'}<>$dname<>$gettime<>\n";
+	my $utf8 = Encode::encode_utf8($mes);
+
+	unshift(@mes_regist,$utf8);
 
 	open(OUT,">$message_file");
 	print OUT @mes_regist;

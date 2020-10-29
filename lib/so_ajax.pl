@@ -1,3 +1,5 @@
+use utf8;
+
 sub footer_ajax_use
 {
 

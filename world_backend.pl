@@ -45,6 +45,8 @@ my $myTx;
 my $active = [];
 my $archive = [];
 
+app->log->level('debug');
+
 app->helper(
     manage => sub {
         my ($self) = @_;

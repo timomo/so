@@ -1,12 +1,12 @@
+use utf8;
+
 #--------#
 #  休憩  #
 #--------#
 sub rest {
 	if($battle_flag) { &error("現在行動中です。お待ち下さい。"); }
 
-	open(IN,"$chara_file");
-	@battle = <IN>;
-	close(IN);
+	@battle = &load_ini($chara_file);
 
 	$hit=0;
 	foreach(@battle){

@@ -1,3 +1,4 @@
+use utf8;
 #------------------#
 #    金額計算      #
 #------------------#
@@ -11,9 +12,7 @@ sub money_get {
 	elsif ($lockkey == 2) { &lock2; }
 	elsif ($lockkey == 3) { &file'lock; }
 
-	open(IN,"$chara_file");
-	@money = <IN>;
-	close(IN);
+	@money = &load_ini($chara_file);
 
 	@money_new=();@sn=();
 	foreach(@money){
@@ -26,7 +25,11 @@ sub money_get {
 				&log_in;
 			}
 			if($bflag == 1){$sdate = $date}
-			unshift(@money_new,"$sid<>$spass<>$sname<>$ssex<>$schara<>$sn[0]<>$sn[1]<>$sn[2]<>$sn[3]<>$sn[4]<>$sn[5]<>$sn[6]<>$shp<>$smaxhp<>$sex<>$slv<>$sap<>$tgold<>$slp<>$stotal<>$skati<>$host<>$sdate<>$sarea<>$sspot<>$spst<>$sitem<>\n");
+
+			my $mes = "$sid<>$spass<>$sname<>$ssex<>$schara<>$sn[0]<>$sn[1]<>$sn[2]<>$sn[3]<>$sn[4]<>$sn[5]<>$sn[6]<>$shp<>$smaxhp<>$sex<>$slv<>$sap<>$tgold<>$slp<>$stotal<>$skati<>$host<>$sdate<>$sarea<>$sspot<>$spst<>$sitem<>\n";
+			my $utf8 = Encode::encode_utf8($mes);
+
+			unshift(@money_new,$utf8);
 		}else{
 			push(@money_new,"$_");
 		}
@@ -45,9 +48,8 @@ sub money_get {
 #  銀行データ読込  #
 #------------------#
 sub read_bank {
-	open(IN,"$bank_file");
-	@bank = <IN>;
-	close(IN);
+
+	@bank = &load_ini($bank_file);
 
 	$hit=0;@bank_new=();
 	foreach(@bank){
@@ -74,9 +76,7 @@ sub regist_bank {
 	elsif ($lockkey == 2) { &lock2; }
 	elsif ($lockkey == 3) { &file'lock; }
 
-	open(IN,"$bank_file");
-	@bank = <IN>;
-	close(IN);
+	@bank = &load_ini($bank_file);
 
 	$hit=0;@bank_new=();
 	foreach(@bank){
@@ -96,7 +96,11 @@ sub regist_bank {
 					$bmsg = $kmsg;
 				}
 			}
-			unshift(@bank_new,"$bid<>$bpgold<>$brgold<>$bpitem<>$bmsg<>\n");
+
+			my $mes = "$bid<>$bpgold<>$brgold<>$bpitem<>$bmsg<>\n";
+			my $utf8 = Encode::encode_utf8($mes);
+
+			unshift(@bank_new,$utf8);
 		$hit=1;
 		}else{
 			push(@bank_new,"$_");
@@ -104,7 +108,10 @@ sub regist_bank {
 	}
 
 	if(!$hit){
-		unshift(@bank_new,"$kid<>$kpgold<>$krgold<>$kpitem<>$kmsg<>\n");
+		my $mes = "$kid<>$kpgold<>$krgold<>$kpitem<>$kmsg<>\n";
+		my $utf8 = Encode::encode_utf8($mes);
+
+		unshift(@bank_new,$utf8);
 	}
 
 	open(OUT,">$bank_file");
@@ -126,15 +133,16 @@ sub in_bank {
 	elsif ($lockkey == 2) { &lock2; }
 	elsif ($lockkey == 3) { &file'lock; }
 
-	open(IN,"$bank_file");
-	@bank = <IN>;
-	close(IN);
+	@bank = &load_ini($bank_file);
 
 	$hit=0;@bank_new=();
 	foreach(@bank){
 		($bid,$bpgold,$brgold,$bpitem,$bmsg) = split(/<>/);
 		if($kid eq "$bid") {
-			unshift(@bank_new,"$bid<>$bpgold<>$brgold<>$kpitem<>$bmsg<>\n");
+			my $mes = "$bid<>$bpgold<>$brgold<>$kpitem<>$bmsg<>\n";
+			my $utf8 = Encode::encode_utf8($mes);
+
+			unshift(@bank_new,$utf8);
 		$hit=1;
 		}else{
 			push(@bank_new,"$_");
@@ -142,7 +150,10 @@ sub in_bank {
 	}
 
 	if(!$hit){
-		unshift(@bank_new,"$kid<>0<>0<>$kpitem<><>\n");
+		my $mes = "$kid<>0<>0<>$kpitem<><>\n";
+		my $utf8 = Encode::encode_utf8($mes);
+
+		unshift(@bank_new,$utf8);
 	}
 
 	open(OUT,">$bank_file");

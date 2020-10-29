@@ -1,14 +1,10 @@
+use utf8;
 #----------------#
 #  所持アイテム  #
 #----------------#
 sub item_check {
-	open(IN,"$item_path$in{'id'}");
-	@user_item = <IN>;
-	close(IN);
-
-	open(IN,"$chara_file");
-	@item_chara = <IN>;
-	close(IN);
+	@user_item = &load_ini($item_path. $in{'id'});
+	@item_chara = &load_ini($chara_file);
 
 	$hit=0;
 	foreach(@item_chara){
@@ -123,9 +119,7 @@ if($kspot == 0 && $kpst == 0){
 <option value="">送る相手を選択
 EOM
 
-	open(IN,"$chara_file");
-	@MESSAGE = <IN>;
-	close(IN);
+	@MESSAGE = &load_ini($chara_file);
 
 	foreach(@MESSAGE) {
 		($did,$dpass,$dname,$dsex,$dchara,$dn_0,$dn_1,$dn_2,$dn_3,$dn_4,$dn_5,$dn_6,$dhp,$dmaxhp,$dex,$dlv,$dap,$dgold,$dlp,$dtotal,$dkati,$dhost,$ddate,$darea,$dspot,$dpst,$ditem) = split(/<>/);
@@ -168,9 +162,7 @@ sub item_drop
 {
 	$mrand = int(rand(5));
 
-	open(IN,"$drop_file");
-	@drop = <IN>;
-	close(IN);
+	@drop = &load_ini($drop_file);
 
 	$hit=0;
 	foreach(@drop){
@@ -183,9 +175,7 @@ sub item_drop
 
 	if(!$hit) { &error("アイテム取得エラー"); }
 
-	open(IN,"$item_file");
-	@get = <IN>;
-	close(IN);
+	@get = &load_ini($item_file);
 
 	$hit=0;
 	foreach(@get){
@@ -208,9 +198,7 @@ sub stone_drop
 {
 	$srand = int(rand(@chara_skill));
 
-	open(IN,"$item_file");
-	@get = <IN>;
-	close(IN);
+	@get = &load_ini($item_file);
 
 	$hit=0;
 	foreach(@get){
@@ -247,13 +235,13 @@ sub stone_drop
 #----------------#
 sub item_regist
 {
-	open(IN,"$item_path$kid");
-	@user_item = <IN>;
-	close(IN);
+	@user_item = &load_ini($item_path. $kid);
 
 	$u_flag = 0;$u_cnt = 0;$i_eqp = 0;$over = 0;
 	@new_user_item=();
-	foreach(@user_item){
+
+	foreach(@user_item)
+	{
 		($u_id,$u_no,$u_name,$u_dmg,$u_gold,$u_mode,$u_uelm,$u_eelm,$u_hand,$u_def,$u_req,$u_qlt,$u_make,$u_rest,$u_eqp) = split(/<>/);
 		if("$u_no$u_qlt$u_make" eq "$i_no$i_qlt$i_make") {
 			$u_rest += $kcnt;
@@ -269,13 +257,19 @@ sub item_regist
 			}
 			$u_flag = 1;
 		}
-		unshift(@new_user_item,"$u_id<>$u_no<>$u_name<>$u_dmg<>$u_gold<>$u_mode<>$u_uelm<>$u_eelm<>$u_hand<>$u_def<>$u_req<>$u_qlt<>$u_make<>$u_rest<>$u_eqp<>\n");
+
+		my $mes = "$u_id<>$u_no<>$u_name<>$u_dmg<>$u_gold<>$u_mode<>$u_uelm<>$u_eelm<>$u_hand<>$u_def<>$u_req<>$u_qlt<>$u_make<>$u_rest<>$u_eqp<>\n";
+		my $utf8 = Encode::encode_utf8($mes);
+
+		unshift(@new_user_item, $utf8);
 
 		$u_cnt++;
 	}
 
 	if($u_flag eq 0 && $in{'new'} ne 'new'){
-		unshift(@new_user_item,"$u_cnt<>$i_no<>$i_name<>$i_dmg<>$i_gold<>$i_mode<>$i_uelm<>$i_eelm<>$i_hand<>$i_def<>$i_req<>$i_qlt<>$i_make<>$kcnt<>$i_eqp<>\n");
+		my $mes = "$u_cnt<>$i_no<>$i_name<>$i_dmg<>$i_gold<>$i_mode<>$i_uelm<>$i_eelm<>$i_hand<>$i_def<>$i_req<>$i_qlt<>$i_make<>$kcnt<>$i_eqp<>\n";
+		my $utf8 = Encode::encode_utf8($mes);
+		unshift(@new_user_item,$mes);
 		$u_cnt++;
 	}
 
@@ -298,18 +292,14 @@ sub item_regist
 #----------------#
 sub item_use
 {
-	open(IN,"$item_path$in{'id'}");
-	@user_item = <IN>;
-	close(IN);
+	@user_item = &load_ini($item_path. $in{'id'});
 
 	if($in{'item_no'} eq ""){
 		$error = "アイテムを選んでください。";
 		&item_check;
 	}
 
-	open(IN,"$chara_file");
-	@item_chara = <IN>;
-	close(IN);
+	@item_chara = &load_ini($chara_file);
 
 	$hit=0;
 	foreach(@item_chara){
@@ -417,9 +407,7 @@ sub item_equip
 	elsif ($lockkey == 2) { &lock2; }
 	elsif ($lockkey == 3) { &file'lock; }
 
-	open(IN,"$chara_file");
-	@item_chara = <IN>;
-	close(IN);
+	@item_chara = &load_ini($chara_file);
 
 	$hit=0;
 	foreach(@item_chara){
@@ -432,9 +420,8 @@ sub item_equip
 
 	if(!$hit) { &error("入力されたIDは登録されていません。又はパスワードが違います。"); }
 
-	open(IN,"$item_path$kid");
-	@equip_item = <IN>;
-	close(IN);
+	@equip_item = &load_ini($item_path. $kid);
+
 	$d_eqp = 0;
 	$eqp_flag = 0;
 	$eqp_name = "";
@@ -480,9 +467,8 @@ sub item_equip
 #----------------#
 sub equip_check
 {
-	open(IN,"$item_path$kid");
-	@check_equip = <IN>;
-	close(IN);
+	@check_equip = &load_ini($item_path. $kid);
+
 	$over_flag = 0;
 	$wep_hand = 0;
 	$def_hand = 0;
@@ -585,9 +571,7 @@ sub item_sell
 	elsif ($lockkey == 2) { &lock2; }
 	elsif ($lockkey == 3) { &file'lock; }
 
-	open(IN,"$item_path$kid");
-	@delete_item = <IN>;
-	close(IN);
+	@delete_item = &load_ini($item_path. $kid);
 
 	$item_count = 0;
 	$sell_flag = 0;
@@ -610,18 +594,23 @@ sub item_sell
 			}
 			if($u_rest > $use_item){
 				$u_rest -= $use_item;
-				unshift(@new_delete_item,"$item_count<>$u_no<>$u_name<>$u_dmg<>$u_gold<>$u_mode<>$u_uelm<>$u_eelm<>$u_hand<>$u_def<>$u_req<>$u_qlt<>$u_make<>$u_rest<>$u_eqp<>\n");
+
+				my $mes = "$item_count<>$u_no<>$u_name<>$u_dmg<>$u_gold<>$u_mode<>$u_uelm<>$u_eelm<>$u_hand<>$u_def<>$u_req<>$u_qlt<>$u_make<>$u_rest<>$u_eqp<>\n";
+				my $utf8 = Encode::encode_utf8($mes);
+
+				unshift(@new_delete_item,$utf8);
 				$item_count++;
 			}
 		} else {
-			unshift(@new_delete_item,"$item_count<>$u_no<>$u_name<>$u_dmg<>$u_gold<>$u_mode<>$u_uelm<>$u_eelm<>$u_hand<>$u_def<>$u_req<>$u_qlt<>$u_make<>$u_rest<>$u_eqp<>\n");
+			my $mes = "$item_count<>$u_no<>$u_name<>$u_dmg<>$u_gold<>$u_mode<>$u_uelm<>$u_eelm<>$u_hand<>$u_def<>$u_req<>$u_qlt<>$u_make<>$u_rest<>$u_eqp<>\n";
+			my $utf8 = Encode::encode_utf8($mes);
+
+			unshift(@new_delete_item,$utf8);
 			$item_count++;
 		}
 	}
 
-	open(IN,"$chara_file");
-	@item_chara = <IN>;
-	close(IN);
+	@item_chara = &load_ini($chara_file);
 
 	$hit=0;@item_new=();
 	foreach(@item_chara){
@@ -638,7 +627,11 @@ sub item_sell
 				}
 			}
 			$iitem = $item_count;
-			unshift(@item_new,"$iid<>$ipass<>$iname<>$isex<>$ichara<>$in_0<>$in_1<>$in_2<>$in_3<>$in_4<>$in_5<>$in_6<>$ihp<>$imaxhp<>$iex<>$ilv<>$iap<>$igold<>$ilp<>$itotal<>$ikati<>$ihost<>$idate<>$iarea<>$ispot<>$ipst<>$iitem<>\n");
+
+			my $mes = "$iid<>$ipass<>$iname<>$isex<>$ichara<>$in_0<>$in_1<>$in_2<>$in_3<>$in_4<>$in_5<>$in_6<>$ihp<>$imaxhp<>$iex<>$ilv<>$iap<>$igold<>$ilp<>$itotal<>$ikati<>$ihost<>$idate<>$iarea<>$ispot<>$ipst<>$iitem<>\n";
+			my $utf8 = Encode::encode_utf8($mes);
+
+			unshift(@item_new,$utf8);
 			$hit=1;
 		}else{
 			push(@item_new,"$_");
@@ -696,9 +689,7 @@ sub user_sell
 	elsif ($lockkey == 2) { &lock2; }
 	elsif ($lockkey == 3) { &file'lock; }
 
-	open(IN,"$item_path$kid");
-	@delete_item = <IN>;
-	close(IN);
+	@delete_item = &load_ini($item_path. $kid);
 
 	$item_count = 0;
 	$sell_flag = 0;
@@ -721,18 +712,22 @@ sub user_sell
 			}
 			if($u_rest > $kitem){
 				$u_rest -= $kitem;
-				unshift(@new_delete_item,"$item_count<>$u_no<>$u_name<>$u_dmg<>$u_gold<>$u_mode<>$u_uelm<>$u_eelm<>$u_hand<>$u_def<>$u_req<>$u_qlt<>$u_make<>$u_rest<>$u_eqp<>\n");
+
+				my $mes = "$item_count<>$u_no<>$u_name<>$u_dmg<>$u_gold<>$u_mode<>$u_uelm<>$u_eelm<>$u_hand<>$u_def<>$u_req<>$u_qlt<>$u_make<>$u_rest<>$u_eqp<>\n";
+				my $utf8 = Encode::encode_utf8($mes);
+
+				unshift(@new_delete_item,$utf8);
 				$item_count++;
 			}
 		} else {
-			unshift(@new_delete_item,"$item_count<>$u_no<>$u_name<>$u_dmg<>$u_gold<>$u_mode<>$u_uelm<>$u_eelm<>$u_hand<>$u_def<>$u_req<>$u_qlt<>$u_make<>$u_rest<>$u_eqp<>\n");
+			my $mes = "$item_count<>$u_no<>$u_name<>$u_dmg<>$u_gold<>$u_mode<>$u_uelm<>$u_eelm<>$u_hand<>$u_def<>$u_req<>$u_qlt<>$u_make<>$u_rest<>$u_eqp<>\n";
+			my $utf8 = Encode::encode_utf8($mes);
+			unshift(@new_delete_item,$utf8);
 			$item_count++;
 		}
 	}
 
-	open(IN,"$chara_file");
-	@item_chara = <IN>;
-	close(IN);
+	@item_chara = &load_ini($chara_file);
 
 	$hit=0;@item_new=();
 	foreach(@item_chara){
@@ -754,7 +749,11 @@ sub user_sell
 					$i_gold = $select_price;
 					$i_id = $kid;
 				}
-				unshift(@sell_item,"$i_no<>$i_name<>$i_dmg<>$i_gold<>$i_mode<>$i_uelm<>$i_eelm<>$i_hand<>$i_def<>$i_req<>$i_qlt<>$i_make<>$i_rest<>$i_id<>\n");
+
+				my $mes = "$i_no<>$i_name<>$i_dmg<>$i_gold<>$i_mode<>$i_uelm<>$i_eelm<>$i_hand<>$i_def<>$i_req<>$i_qlt<>$i_make<>$i_rest<>$i_id<>\n";
+				my $utf8 = Encode::encode_utf8($mes);
+
+				unshift(@sell_item,$utf8);
 			}
 			if($new_item == 0) {
 				unshift(@sell_item,$select_item);
@@ -765,7 +764,11 @@ sub user_sell
 
 			&shop_sort;
 			$iitem = $item_count;
-			unshift(@item_new,"$iid<>$ipass<>$iname<>$isex<>$ichara<>$in_0<>$in_1<>$in_2<>$in_3<>$in_4<>$in_5<>$in_6<>$ihp<>$imaxhp<>$iex<>$ilv<>$iap<>$igold<>$ilp<>$itotal<>$ikati<>$ihost<>$idate<>$iarea<>$ispot<>$ipst<>$iitem<>\n");
+
+			my $mes = "$iid<>$ipass<>$iname<>$isex<>$ichara<>$in_0<>$in_1<>$in_2<>$in_3<>$in_4<>$in_5<>$in_6<>$ihp<>$imaxhp<>$iex<>$ilv<>$iap<>$igold<>$ilp<>$itotal<>$ikati<>$ihost<>$idate<>$iarea<>$ispot<>$ipst<>$iitem<>\n";
+			my $utf8 = Encode::encode_utf8($mes);
+
+			unshift(@item_new,$utf8);
 			$hit=1;
 		}else{
 			push(@item_new,"$_");
@@ -811,9 +814,7 @@ sub bank_in
 	elsif ($lockkey == 2) { &lock2; }
 	elsif ($lockkey == 3) { &file'lock; }
 
-	open(IN,"$item_path$kid");
-	@delete_item = <IN>;
-	close(IN);
+	@delete_item = &load_ini($item_path. $kid);
 
 	$item_count = 0;
 	$sell_flag = 0;
@@ -835,18 +836,23 @@ sub bank_in
 			}
 			if($u_rest > $kitem){
 				$u_rest -= $kitem;
-				unshift(@new_delete_item,"$item_count<>$u_no<>$u_name<>$u_dmg<>$u_gold<>$u_mode<>$u_uelm<>$u_eelm<>$u_hand<>$u_def<>$u_req<>$u_qlt<>$u_make<>$u_rest<>$u_eqp<>\n");
+
+				my $mes = "$item_count<>$u_no<>$u_name<>$u_dmg<>$u_gold<>$u_mode<>$u_uelm<>$u_eelm<>$u_hand<>$u_def<>$u_req<>$u_qlt<>$u_make<>$u_rest<>$u_eqp<>\n";
+				my $utf8 = Encode::encode_utf8($mes);
+
+				unshift(@new_delete_item,$utf8);
 				$item_count++;
 			}
 		} else {
-			unshift(@new_delete_item,"$item_count<>$u_no<>$u_name<>$u_dmg<>$u_gold<>$u_mode<>$u_uelm<>$u_eelm<>$u_hand<>$u_def<>$u_req<>$u_qlt<>$u_make<>$u_rest<>$u_eqp<>\n");
+			my $mes = "$item_count<>$u_no<>$u_name<>$u_dmg<>$u_gold<>$u_mode<>$u_uelm<>$u_eelm<>$u_hand<>$u_def<>$u_req<>$u_qlt<>$u_make<>$u_rest<>$u_eqp<>\n";
+			my $utf8 = Encode::encode_utf8($mes);
+
+			unshift(@new_delete_item,$utf8);
 			$item_count++;
 		}
 	}
 
-	open(IN,"$chara_file");
-	@item_chara = <IN>;
-	close(IN);
+	@item_chara = &load_ini($chara_file);
 
 	$hit=0;@item_new=();
 	foreach(@item_chara){
@@ -883,7 +889,11 @@ sub bank_in
 					$i_rest += $kitem;
 					$new_item=1;
 				}
-				unshift(@sell_item,"$i_id<>$i_no<>$i_name<>$i_dmg<>$i_gold<>$i_mode<>$i_uelm<>$i_eelm<>$i_hand<>$i_def<>$i_req<>$i_qlt<>$i_make<>$i_rest<>\n");
+
+				my $mes = "$i_id<>$i_no<>$i_name<>$i_dmg<>$i_gold<>$i_mode<>$i_uelm<>$i_eelm<>$i_hand<>$i_def<>$i_req<>$i_qlt<>$i_make<>$i_rest<>\n";
+				my $utf8 = Encode::encode_utf8($mes);
+
+				unshift(@sell_item,$utf8);
 			}
 			if($new_item == 0) {
 				unshift(@sell_item,$select_item);
@@ -900,7 +910,11 @@ sub bank_in
 			&in_bank;
 
 			$iitem = $item_count;
-			unshift(@item_new,"$iid<>$ipass<>$iname<>$isex<>$ichara<>$in_0<>$in_1<>$in_2<>$in_3<>$in_4<>$in_5<>$in_6<>$ihp<>$imaxhp<>$iex<>$ilv<>$iap<>$igold<>$ilp<>$itotal<>$ikati<>$ihost<>$idate<>$iarea<>$ispot<>$ipst<>$iitem<>\n");
+
+			my $mes = "$iid<>$ipass<>$iname<>$isex<>$ichara<>$in_0<>$in_1<>$in_2<>$in_3<>$in_4<>$in_5<>$in_6<>$ihp<>$imaxhp<>$iex<>$ilv<>$iap<>$igold<>$ilp<>$itotal<>$ikati<>$ihost<>$idate<>$iarea<>$ispot<>$ipst<>$iitem<>\n";
+			my $utf8 = Encode::encode_utf8($mes);
+
+			unshift(@item_new,$utf8);
 			$hit=1;
 		}else{
 			push(@item_new,"$_");
@@ -953,9 +967,7 @@ sub bank_send
 	elsif ($lockkey == 2) { &lock2; }
 	elsif ($lockkey == 3) { &file'lock; }
 
-	open(IN,"$item_path$kid");
-	@delete_item = <IN>;
-	close(IN);
+	@delete_item = &load_ini($item_path. $kid);
 
 	$item_count = 0;
 	$sell_flag = 0;
@@ -977,18 +989,23 @@ sub bank_send
 			}
 			if($u_rest > $kitem){
 				$u_rest -= $kitem;
-				unshift(@new_delete_item,"$item_count<>$u_no<>$u_name<>$u_dmg<>$u_gold<>$u_mode<>$u_uelm<>$u_eelm<>$u_hand<>$u_def<>$u_req<>$u_qlt<>$u_make<>$u_rest<>$u_eqp<>\n");
+
+				my $mes = "$item_count<>$u_no<>$u_name<>$u_dmg<>$u_gold<>$u_mode<>$u_uelm<>$u_eelm<>$u_hand<>$u_def<>$u_req<>$u_qlt<>$u_make<>$u_rest<>$u_eqp<>\n";
+				my $utf8 = Encode::encode_utf8($mes);
+
+				unshift(@new_delete_item,$utf8);
 				$item_count++;
 			}
 		} else {
-			unshift(@new_delete_item,"$item_count<>$u_no<>$u_name<>$u_dmg<>$u_gold<>$u_mode<>$u_uelm<>$u_eelm<>$u_hand<>$u_def<>$u_req<>$u_qlt<>$u_make<>$u_rest<>$u_eqp<>\n");
+			my $mes = "$item_count<>$u_no<>$u_name<>$u_dmg<>$u_gold<>$u_mode<>$u_uelm<>$u_eelm<>$u_hand<>$u_def<>$u_req<>$u_qlt<>$u_make<>$u_rest<>$u_eqp<>\n";
+			my $utf8 = Encode::encode_utf8($mes);
+
+			unshift(@new_delete_item,$utf8);
 			$item_count++;
 		}
 	}
 
-	open(IN,"$chara_file");
-	@item_chara = <IN>;
-	close(IN);
+	@item_chara = &load_ini($chara_file);
 
 	$hit=0;@item_new=();
 	foreach(@item_chara){
@@ -999,16 +1016,18 @@ sub bank_send
 		}
 		if($kid eq "$iid"){
 			$iitem = $item_count;
-			unshift(@item_new,"$iid<>$ipass<>$iname<>$isex<>$ichara<>$in_0<>$in_1<>$in_2<>$in_3<>$in_4<>$in_5<>$in_6<>$ihp<>$imaxhp<>$iex<>$ilv<>$iap<>$igold<>$ilp<>$itotal<>$ikati<>$ihost<>$idate<>$iarea<>$ispot<>$ipst<>$iitem<>\n");
+
+			my $mes = "$iid<>$ipass<>$iname<>$isex<>$ichara<>$in_0<>$in_1<>$in_2<>$in_3<>$in_4<>$in_5<>$in_6<>$ihp<>$imaxhp<>$iex<>$ilv<>$iap<>$igold<>$ilp<>$itotal<>$ikati<>$ihost<>$idate<>$iarea<>$ispot<>$ipst<>$iitem<>\n";
+			my $utf8 = Encode::encode_utf8($mes);
+
+			unshift(@item_new,$utf8);
 			$hit+=1;
 
 			$kid   = $send_id;
 			$kspot = $ispot;
 			$kpst  = $ipst;
 
-			open(IN,"$bank_path$kid");
-			@item_array = <IN>;
-			close(IN);
+			@item_array = &load_ini($bank_path. $kid);
 
 			@sell_item=();
 			$new_item = 0;
@@ -1018,7 +1037,11 @@ sub bank_send
 					$i_rest += $kitem;
 					$new_item=1;
 				}
-				unshift(@sell_item,"$i_id<>$i_no<>$i_name<>$i_dmg<>$i_gold<>$i_mode<>$i_uelm<>$i_eelm<>$i_hand<>$i_def<>$i_req<>$i_qlt<>$i_make<>$i_rest<>\n");
+
+				my $mes = "$i_id<>$i_no<>$i_name<>$i_dmg<>$i_gold<>$i_mode<>$i_uelm<>$i_eelm<>$i_hand<>$i_def<>$i_req<>$i_qlt<>$i_make<>$i_rest<>\n";
+				my $utf8 = Encode::encode_utf8($mes);
+
+				unshift(@sell_item,$utf8);
 			}
 			if($new_item == 0) {
 				unshift(@sell_item,$select_item);
@@ -1089,9 +1112,7 @@ sub bank_money
 	elsif ($lockkey == 2) { &lock2; }
 	elsif ($lockkey == 3) { &file'lock; }
 
-	open(IN,"$chara_file");
-	@money = <IN>;
-	close(IN);
+	@money = &load_ini($chara_file);
 
 	@money_new=();@sn=();$hit=0;
 	foreach(@money){
@@ -1109,7 +1130,11 @@ sub bank_money
 				$error = "所持金が足りません。";
 				&item_check;
 			}
-			unshift(@money_new,"$sid<>$spass<>$sname<>$ssex<>$schara<>$sn[0]<>$sn[1]<>$sn[2]<>$sn[3]<>$sn[4]<>$sn[5]<>$sn[6]<>$shp<>$smaxhp<>$sex<>$slv<>$sap<>$tgold<>$slp<>$stotal<>$skati<>$host<>$sdate<>$sarea<>$sspot<>$spst<>$sitem<>\n");
+
+			my $mes = "$sid<>$spass<>$sname<>$ssex<>$schara<>$sn[0]<>$sn[1]<>$sn[2]<>$sn[3]<>$sn[4]<>$sn[5]<>$sn[6]<>$shp<>$smaxhp<>$sex<>$slv<>$sap<>$tgold<>$slp<>$stotal<>$skati<>$host<>$sdate<>$sarea<>$sspot<>$spst<>$sitem<>\n";
+			my $utf8 = Encode::encode_utf8($mes);
+
+			unshift(@money_new,$utf8);
 			$hit+=1;
 		}else{
 			push(@money_new,"$_");
@@ -1148,9 +1173,8 @@ sub bank_money
 sub item_sort
 {
 	#ソートし直す
-	open(IN,"$item_path$kid");
-	@sort_item = <IN>;
-	close(IN);
+
+	@sort_item = &load_ini($item_path. $kid);
 
 	@tmp1 = @tmp2 = @tmp3 = ();
 	foreach(@sort_item){
@@ -1166,7 +1190,11 @@ sub item_sort
 	@new_sort_item=();$cnt = @sort_item;
 	foreach(@sort_item){
 		($u_id,$u_no,$u_name,$u_dmg,$u_gold,$u_mode,$u_uelm,$u_eelm,$u_hand,$u_def,$u_req,$u_qlt,$u_make,$u_rest,$u_eqp) = split(/<>/);
-		unshift(@new_sort_item,"$cnt<>$u_no<>$u_name<>$u_dmg<>$u_gold<>$u_mode<>$u_uelm<>$u_eelm<>$u_hand<>$u_def<>$u_req<>$u_qlt<>$u_make<>$u_rest<>$u_eqp<>\n");
+
+		my $mes = "$cnt<>$u_no<>$u_name<>$u_dmg<>$u_gold<>$u_mode<>$u_uelm<>$u_eelm<>$u_hand<>$u_def<>$u_req<>$u_qlt<>$u_make<>$u_rest<>$u_eqp<>\n";
+		my $utf8 = Encode::encode_utf8($mes);
+
+		unshift(@new_sort_item,$utf8);
 		$cnt -= 1;
 	}
 	open(OUT,">$item_path$kid");
@@ -1188,9 +1216,7 @@ sub item_delete
 	elsif ($lockkey == 2) { &lock2; }
 	elsif ($lockkey == 3) { &file'lock; }
 
-	open(IN,"$item_path$kid");
-	@use_item = <IN>;
-	close(IN);
+	@use_item = &load_ini($item_path. $kid);
 
 	$item_count = 0;
 	$use_flag = 1;
@@ -1209,18 +1235,23 @@ sub item_delete
 			$use_qlt  = $u_qlt;
 			if($u_rest > 1){
 				$u_rest -= 1;
-				unshift(@new_use_item,"$item_count<>$u_no<>$u_name<>$u_dmg<>$u_gold<>$u_mode<>$u_uelm<>$u_eelm<>$u_hand<>$u_def<>$u_req<>$u_qlt<>$u_make<>$u_rest<>$u_eqp<>\n");
+
+				my $mes = "$item_count<>$u_no<>$u_name<>$u_dmg<>$u_gold<>$u_mode<>$u_uelm<>$u_eelm<>$u_hand<>$u_def<>$u_req<>$u_qlt<>$u_make<>$u_rest<>$u_eqp<>\n";
+				my $utf8 = Encode::encode_utf8($mes);
+
+				unshift(@new_use_item,$utf8);
 				$item_count++;
 			}
 		} else {
-			unshift(@new_use_item,"$item_count<>$u_no<>$u_name<>$u_dmg<>$u_gold<>$u_mode<>$u_uelm<>$u_eelm<>$u_hand<>$u_def<>$u_req<>$u_qlt<>$u_make<>$u_rest<>$u_eqp<>\n");
+			my $mes = "$item_count<>$u_no<>$u_name<>$u_dmg<>$u_gold<>$u_mode<>$u_uelm<>$u_eelm<>$u_hand<>$u_def<>$u_req<>$u_qlt<>$u_make<>$u_rest<>$u_eqp<>\n";
+			my $utf8 = Encode::encode_utf8($mes);
+
+			unshift(@new_use_item,$utf8);
 			$item_count++;
 		}
 	}
 
-	open(IN,"$chara_file");
-	@item_chara = <IN>;
-	close(IN);
+	@item_chara = &load_ini($chara_file);
 
 	$hit=0;@item_new=();
 	foreach(@item_chara){
@@ -1245,7 +1276,11 @@ sub item_delete
 				if($ihp > $imaxhp){$ihp = $imaxhp;}
 			}
 			$iitem = $item_count;
-			unshift(@item_new,"$iid<>$ipass<>$iname<>$isex<>$ichara<>$in_0<>$in_1<>$in_2<>$in_3<>$in_4<>$in_5<>$in_6<>$ihp<>$imaxhp<>$iex<>$ilv<>$iap<>$igold<>$ilp<>$itotal<>$ikati<>$ihost<>$idate<>$iarea<>$ispot<>$ipst<>$iitem<>\n");
+
+			my $mes = "$iid<>$ipass<>$iname<>$isex<>$ichara<>$in_0<>$in_1<>$in_2<>$in_3<>$in_4<>$in_5<>$in_6<>$ihp<>$imaxhp<>$iex<>$ilv<>$iap<>$igold<>$ilp<>$itotal<>$ikati<>$ihost<>$idate<>$iarea<>$ispot<>$ipst<>$iitem<>\n";
+			my $utf8 = Encode::encode_utf8($mes);
+
+			unshift(@item_new,$utf8);
 			$hit=1;
 		}else{
 			push(@item_new,"$_");

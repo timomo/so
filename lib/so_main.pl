@@ -1,19 +1,19 @@
+use utf8;
 #----------------#
 #   メイン画面   #
 #----------------#
 
 sub file_load
 {
-   our %USER = ();
-   open(FH, "<", $chara_file);
-   while(<FH>)
-   {
-     my $line = $_;
-     chomp $line;
-     my @tmp = split(/<>/, $line);
-     $USER{$tmp[0]} = \@tmp;
-   }
-   close(FH);
+   	our %USER = ();
+	my @lines = &load_ini($chara_file);
+
+	for my $line (@lines)
+	{
+		chomp $line;
+		my @tmp = split(/<>/, $line);
+		$USER{$tmp[0]} = \@tmp;
+	}
 }
 
 sub log_in {
@@ -43,9 +43,7 @@ sub log_in {
 
 	# load-char-data start
 
-	open(IN,"$chara_file");
-	@log_in = <IN>;
-	close(IN);
+	@log_in = &load_ini($chara_file);
 
 	# load-char-data end
 
@@ -351,9 +349,7 @@ EOM
 【届いているメッセージ】表示数<b>$max_gyo</b>件まで<br>
 EOM
 
-	open(IN,"$message_file");
-	@MESSAGE_LOG = <IN>;
-	close(IN);
+	@MESSAGE_LOG = &load_ini($message_file);
 
 	$hit=0;$i=1;
 	foreach(@MESSAGE_LOG){
@@ -363,14 +359,14 @@ EOM
 			print "<hr size=0><small><b>$hname</b>　＞ 「<b>$hmessage</b>」($htime)</small><br>\n";
 			$hit=1;$i++;
 		}elsif($kid eq $hid){
-			print "<hr size=0><small>$knameから$hhnameへ　＞ 「$hmessage」($htime)</small><br>\n";
+			print "<hr size=0><small>$kname から $hhname へ　＞ 「$hmessage」($htime)</small><br>\n";
 		}elsif("Ａ" eq "$pid"){
 			if($max_gyo < $i) { last; }
-			print "<hr size=0><small><b>$hname(全員へ)</b>　＞ 「<b>$hmessage</b>」($htime)</small><br>\n";
+			print "<hr size=0><small><b>$hname (全員へ)</b>　＞ 「<b>$hmessage</b>」($htime)</small><br>\n";
 			$hit=1;$i++;
 		}
 	}
-	if(!$hit){ print "<hr size=0>$kname宛てのメッセージはありません。<p>\n"; }
+	if(!$hit){ print "<hr size=0>$kname 宛てのメッセージはありません。<p>\n"; }
 	print "<hr size=0><p>";
 
 print <<EOF;

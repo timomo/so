@@ -1,14 +1,10 @@
+use utf8;
 #--------#
 #  宿屋  #
 #--------#
 sub yado {
-	open(IN,"$town_inn[$in{'area'}]");
-	@inn_array = <IN>;
-	close(IN);
-
-	open(IN,"$chara_file");
-	@inn_chara = <IN>;
-	close(IN);
+	@inn_array = &load_ini($town_inn[$in{'area'}]);
+	@inn_chara = &load_ini($chara_file);
 
 	$hit=0;
 	foreach(@inn_chara){
@@ -115,13 +111,8 @@ sub yado_in {
 	elsif ($lockkey == 2) { &lock2; }
 	elsif ($lockkey == 3) { &file'lock; }
 
-	open(IN,"$chara_file");
-	@YADO = <IN>;
-	close(IN);
-
-	open(IN,"$town_inn[$in{'area'}]");
-	@inn_array = <IN>;
-	close(IN);
+	@YADO = &load_ini($chara_file);
+	@inn_array = &load_ini($town_inn[$in{'area'}]);
 
 	foreach(@inn_array){
 		($y_no,$y_name,$y_food,$y_atc,$y_def,$y_spd,$y_rsk,$y_gold) = split(/<>/);
@@ -144,7 +135,11 @@ sub yado_in {
 			}
 			else { $ygold = $ygold - $yado_gold; }
 			$ymaxhp = int($ylv * 7.5 + $yn_3 * 7.5);
-			unshift(@yado_new,"$yid<>$ypass<>$yname<>$ysex<>$ychara<>$yn_0<>$yn_1<>$yn_2<>$yn_3<>$yn_4<>$yn_5<>$yn_6<>$ymaxhp<>$ymaxhp<>$yex<>$ylv<>$yap<>$ygold<>$max_lp<>$ytotal<>$ykati<>$host<>$ydate<>$yarea<>$yspot<>$ypst<>$yitem<>\n");
+
+			my $mes = "$yid<>$ypass<>$yname<>$ysex<>$ychara<>$yn_0<>$yn_1<>$yn_2<>$yn_3<>$yn_4<>$yn_5<>$yn_6<>$ymaxhp<>$ymaxhp<>$yex<>$ylv<>$yap<>$ygold<>$max_lp<>$ytotal<>$ykati<>$host<>$ydate<>$yarea<>$yspot<>$ypst<>$yitem<>\n";
+			my $utf8 = Encode::encode_utf8($mes);
+
+			unshift(@yado_new,$utf8);
 			$kid = $yid;
 			$kpass = $ypass;
 			$karea = $yarea;

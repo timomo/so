@@ -1,11 +1,12 @@
+use utf8;
+
 #------------#
 #  装備効果  #
 #------------#
 sub get_equip
 {
-	open(IN,"$item_path$kid");
-	@equip_item = <IN>;
-	close(IN);
+	@equip_item = &load_ini($item_path. $kid);
+
 	$hit=0;
 	foreach(@equip_item){
 		($i_id,$i_no,$i_name,$i_dmg,$i_gold,$i_mode,$i_uelm,$i_eelm,$i_hand,$i_def,$i_req,$i_qlt,$i_make,$i_rest,$i_eqp) = split(/<>/);

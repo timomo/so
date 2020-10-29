@@ -1,11 +1,10 @@
+use utf8;
 #----------------------#
 #  街データをロード    #
 #----------------------#
 sub town_load {
 
-	open(IN,"$town_info");
-	@log_town = <IN>;
-	close(IN);
+	@log_town = &load_ini($town_info);
 
 	foreach(@log_town){
 		($t_no,$t_info,$t_shop,$t_inn,$t_cost,$t_prize,$t_drop) = split(/<>/);
@@ -19,9 +18,7 @@ sub town_load {
 		$farea = @town_name - 1;
 	}
 
-	open(IN,"$town_info");
-	@log_town = <IN>;
-	close(IN);
+	@log_town = &load_ini($town_info);
 
 	foreach(@log_town){
 		($f_no,$f_info,$f_shop,$f_inn) = split(/<>/);
@@ -35,9 +32,7 @@ sub town_load {
 		$rarea = 0;
 	}
 
-	open(IN,"$town_info");
-	@log_town = <IN>;
-	close(IN);
+	@log_town = &load_ini($town_info);
 
 	foreach(@log_town){
 		($r_no,$r_info,$r_shop,$r_inn) = split(/<>/);
@@ -48,10 +43,9 @@ sub town_load {
 #------------------#
 #  メッセージ表示  #
 #------------------#
-sub get_msg {
-	open(IN,"$town_msg[$get_area]");
-	@townmsg = <IN>;
-	close(IN);
+sub get_msg
+{
+	@townmsg = &load_ini($town_msg[$get_area]);
 
 	foreach(@townmsg){
 		($m_id,$m_cnt,$m_msg) = split(/<>/);

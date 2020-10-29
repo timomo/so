@@ -1,11 +1,10 @@
+use utf8;
 
 #------------------#
 #  buffデータ読込  #
 #------------------#
 sub read_buff {
-	open(IN,"$buff_file");
-	@buff = <IN>;
-	close(IN);
+	@buff = &load_ini($buff_file);
 
 	$hit=0;@buff_new=();@rbuf=();
 	foreach(@buff){
@@ -33,9 +32,7 @@ sub regist_buff {
 	elsif ($lockkey == 2) { &lock2; }
 	elsif ($lockkey == 3) { &file'lock; }
 
-	open(IN,"$buff_file");
-	@buff = <IN>;
-	close(IN);
+	@buff = &load_ini($buff_file);
 
 	$hit=0;@buff_new=();
 	foreach(@buff){
@@ -47,7 +44,11 @@ sub regist_buff {
 				$bdef = $kbuf[1];
 				$bspd = $kbuf[2];
 			}
-			unshift(@buff_new,"$bid<>$brsk<>$batc<>$bdef<>$bspd<>\n");
+
+			my $mes = "$bid<>$brsk<>$batc<>$bdef<>$bspd<>\n";
+			my $utf8 = Encode::encode_utf8($mes);
+
+			unshift(@buff_new,$utf8);
 			$hit=1;
 		}else{
 			push(@buff_new,"$_");
@@ -55,7 +56,10 @@ sub regist_buff {
 	}
 
 	if(!$hit){
-		unshift(@buff_new,"$kid<>$krsk<>$kbuf[0]<>$kbuf[1]<>$kbuf[2]<>\n");
+		my $mes = "$kid<>$krsk<>$kbuf[0]<>$kbuf[1]<>$kbuf[2]<>\n";
+		my $utf8 = Encode::encode_utf8($mes);
+
+		unshift(@buff_new,$utf8);
 	}
 
 	open(OUT,">$buff_file");
