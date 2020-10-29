@@ -40,7 +40,7 @@ sub status_check {
 	}
 
 	print <<"EOM";
-<b>$knameのステータス詳細</b>
+<b>$kname のステータス詳細</b>
 <hr size=0>
 <B><FONT COLOR="#FF9933">$error</FONT></B>
 <form action="$script" method="post">

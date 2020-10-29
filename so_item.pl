@@ -74,7 +74,7 @@ EOM
 	$plus = 1 + $kn_6 / 200;
 
 	print <<"EOM";
-<b>$knameの所持品</b>
+<b>$kname の所持品</b>
 <hr size=0>
 <B>所持アイテム数</B> $kitem / $max_item<BR>
 <BR>

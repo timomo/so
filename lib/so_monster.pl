@@ -733,7 +733,7 @@ sub monster_stage_save
 			$newData->{$newKey1} ||= {};
 			if ($newKey2 eq "名前")
 			{
-				$data->{$key1}->{$key2} = Encode::encode_utf8($data->{$key1}->{$key2});
+				# $data->{$key1}->{$key2} = Encode::encode_utf8($data->{$key1}->{$key2});
 			}
 			elsif ($newKey2 eq "ログ" || $newKey2 eq "header" || $newKey2 eq "footer")
 			{
@@ -865,12 +865,6 @@ sub is_continue_monster
 
 sub monster
 {
-=begin
-	if($battle_flag == 1)
-	{
-		&error("現在行動中です。お待ち下さい。");
-	}
-=cut
 	$battle_flag=1;
 
 	# 途中データ確認

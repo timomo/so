@@ -317,7 +317,7 @@ sub bank {
 	&header;
 
 	print <<"EOM";
-<b>$knameの貸し金庫</b>
+<b>$kname の貸し金庫</b>
 <hr size=0>
 $buy_msg<B><FONT COLOR="#FF9933">$error</FONT></B>
 <form action="$script" method="post">

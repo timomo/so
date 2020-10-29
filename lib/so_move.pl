@@ -20,13 +20,13 @@ sub move {
 			if($mspot == 0){
 				$get_area=$karea;$get_id="04";$get_cnt="0";
 				&get_msg;
-				$movemsg = "$knameは$town_name[$karea]郊外に移動しました。<p>$get_msg";
+				$movemsg = "$kname は$town_name[$karea]郊外に移動しました。<p>$get_msg";
 			}elsif($mspot == 1){
 				$get_area=$karea;$get_id="05";$get_cnt="0";
 				&get_msg;
-				$movemsg = "$knameは$area_name[$karea]に移動しました。<p>$get_msg";
+				$movemsg = "$kname は$area_name[$karea]に移動しました。<p>$get_msg";
 			}elsif($mspot == 2){
-				$movemsg = "$knameは$town_name[$karea]を出発しました。";
+				$movemsg = "$kname は$town_name[$karea]を出発しました。";
 			}
 			if(int(rand(2)) == 0){
 				&event;

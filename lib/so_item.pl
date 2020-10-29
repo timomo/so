@@ -27,7 +27,7 @@ sub item_check {
 	&header;
 
 	print <<"EOM";
-<b>$knameの所持品</b>
+<b>$kname の所持品</b>
 <hr size=0>
 $msg<B><FONT COLOR="#FF9933">$error</FONT></B>
 <p>
@@ -1148,7 +1148,7 @@ sub bank_money
 	$kid = $send_id;
 	$krgold = $send_gold;
 	$kpgold = 0;$kpitem = 0;
-	$kmsg = "「$kname様より送金」 <b>$krgold</b> G";
+	$kmsg = "「$kname 様より送金」 <b>$krgold</b> G";
 	$bflag = 1;
 	&regist_bank;
 

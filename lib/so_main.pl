@@ -63,19 +63,19 @@ sub log_in {
 EOM
 
 	if($kspot == 0 && $kpst == 1){
-		print "<p>$movemsg</p><p>$knameは$town_name[$karea]郊外にいます。</p>\n";
+		print "<p>$movemsg</p><p>$kname は$town_name[$karea]郊外にいます。</p>\n";
 		$spot = "$town_name[$karea]郊外";
 	} elsif($kspot == 1){
-		print "<p>$movemsg</p><p>$knameは$area_name[$karea]を探索中です。</p>\n";
+		print "<p>$movemsg</p><p>$kname は$area_name[$karea]を探索中です。</p>\n";
 		$spot = "$area_name[$karea]最深部まで残り $kpst";
 	} elsif($kspot == 2  && $kpst > 0){
-		print "<p>$movemsg</p><p>$knameは$town_name[$karea]から$town_name[$farea]に移動しています。</p>\n";
+		print "<p>$movemsg</p><p>$kname は$town_name[$karea]から$town_name[$farea]に移動しています。</p>\n";
 		$spot = "$town_name[$farea]まで残り $kpst";
 	} elsif($kspot == 3  && $kpst > 0){
-		print "<p>$movemsg</p><p>$knameは$town_name[$karea]から$town_name[$rarea]に移動しています。</p>\n";
+		print "<p>$movemsg</p><p>$kname は$town_name[$karea]から$town_name[$rarea]に移動しています。</p>\n";
 		$spot = "$town_name[$rarea]まで残り $kpst";
 	} else {
-		print "<p>$movemsg</p><p>$knameは$town_name[$karea]にいます。</p>\n";
+		print "<p>$movemsg</p><p>$kname は$town_name[$karea]にいます。</p>\n";
 		$spot = "町の中";
 	}
 	$rid = $kid;

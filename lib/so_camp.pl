@@ -61,7 +61,7 @@ sub camp {
 	if($kbuff[3] < 0){
 		$movemsg .= "<p>寝込みを襲われた！";
 	} else {
-		$movemsg .= "<p>寝込みを襲われたが、$knameは反応し、飛び起きた！";
+		$movemsg .= "<p>寝込みを襲われたが、$kname は反応し、飛び起きた！";
 	}
 }
 
