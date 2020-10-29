@@ -20,7 +20,10 @@ sub html_top {
 </tr>
 <tr>
 <td align="center" valign="top">
-	<table border=1>
+
+<div class="blackboard question">
+
+	<table border=0>
 	<tr>
 	<td align=center colspan=5 class=b2>冒険中の方はこちら</td>
 	</tr>
@@ -34,6 +37,9 @@ sub html_top {
 	<td colspan="2"><input type="submit" value="旅の続き" /></td>
 	</tr>
 	</table>
+
+	</div>
+
 </td>
 </tr>
 </table>
