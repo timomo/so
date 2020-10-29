@@ -53,6 +53,10 @@ jQuery(document).ready(() => {
 	jQuery("#town_text").hide();
 	jQuery("#move_text").hide();
 	jQuery("#town-select-submit").hide();
+	jQuery("#status-select").hide();
+	jQuery("#status-select-submit").hide();
+	jQuery("form[name='town']").hide();
+	jQuery("form[name='move']").hide();
 
 	jQuery(".select-menu").bind("mouseenter", (event) =>
 	{

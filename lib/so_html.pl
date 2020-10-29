@@ -139,7 +139,6 @@ master_sound = [
 ];
 </script>
 <script src="/js/so_town.js"></script>
-<script src="/js/so_battle.js"></script>
 EOM
 
 

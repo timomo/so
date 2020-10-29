@@ -120,14 +120,16 @@ EOM
 	map{ $per{$_} = $per{$_} < 0 ? 0 : $per{$_} } keys %per;
 
 	print <<"EOM";
+<div class="blackboard question">
+
 <table border=0>
 <tr>
 <td>
-<table border="1" style="width: 100%">
+<table border="0" style="width: 100%">
 <tr><td rowspan="3" class="b2">$kname<br />LV$klv<br />LP $klp\/$max_lp</td><td colspan="2" class="b2" align="center">HP:<div style="float: right; background-color: #000; padding: 2px; width: 160px;"><div style="background-color: red; width: $per{hp}%; text-align: right;">&nbsp;</div></div></td></tr>
 <tr><td colspan="2" class="b2" align="center">EXP:<div style="float: right; background-color: #000; padding: 2px; width: 160px;"><div style="background-color: orange; width: $per{exp}%; text-align: right;">&nbsp;</div></div></td></tr>
 <tr><td colspan="2" class="b2" align="center">Risk:<div style="float: right; background-color: #000; padding: 2px; width: 160px;"><div style="background-color: yellow; width: $per{risk}%; text-align: right;">&nbsp;</div></div></td></tr>
-<tr><td colspan="2" class="b2" align="center">現在地</td></tr>
+<tr><td colspan="2" class="b2" align="center">【現在地】</td></tr>
 <tr>
 <td class="b1" width='25%'>地名</td>
 <td width='75%'>$town_name[$karea]</td>
@@ -137,27 +139,19 @@ EOM
 <td>$spot</td>
 </tr>
 <tr>
-<td colspan="2" class="b2" align="center">状態</td>
+<td colspan="2" class="b2" align="center">【状態】</td>
 </tr>
 <tr>
 <td class="b1">所持金</td>
 <td>$kgold</td>
 </tr>
-<tr>
-<td colspan="2" align="center">
-<button id="item_check" class="mode" type="button">アイテム一覧</button>
-<button id="status_check" class="mode" type="button">ステータス詳細</button>
-</td>
-</tr>
 </table>
 </td>
 </tr>
 </table>
-<br />
-<!--
-<tr>
-<td valign="top">
--->
+
+</div>
+
 <form name="town" action="$script" method="post">
 <input type="hidden" name="id" value="$kid" />
 <input type="hidden" name="pass" value="$kpass" />
@@ -262,6 +256,11 @@ EOM
 	print <<"EOM";
 </form>
 EOM
+
+	push(@select_menu, qq|<p class="answer-menu">|. "【ステータス】". qq|</p>|);
+	push(@select_menu, sprintf('<p id="mode_status-select_%s" class="select-menu">%s</p>', "item_check", "アイテム一覧"));
+	push(@select_menu, sprintf('<p id="mode_status-select_%s" class="select-menu">%s</p>', "status_check", "ステータス詳細"));
+
 	print <<"EOM";
 <div class="clearfix">
 	<div class="blackboard answer float-l">
@@ -371,9 +370,13 @@ EOM
 
 print <<EOF;
 <form id="check_form" action="$script" method="post">
-<input type="hidden" id="check_mode" name="mode" value="" />
+<select id="status-select" name="mode" onchange="javascript:selectTown(this);">
+<option value="item_check">アイテム一覧</option>
+<option value="status_check">ステータス詳細</option>
+</select>
 <input type="hidden" name="id" value="$kid" />
 <input type="hidden" name="pass" value="$kpass" />
+<input id="status-select-submit" type="submit" value="行動" />
 </form>
 <script>
 jQuery(document).ready(function() {

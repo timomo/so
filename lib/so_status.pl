@@ -44,10 +44,13 @@ sub status_check {
 <hr size=0>
 <B><FONT COLOR="#FF9933">$error</FONT></B>
 <form action="$script" method="post">
+
+<div class="blackboard question">
+
 <table border=0 width='100%'>
 <tr>
 <td valign=top width='40%'>
-<table border=1 width='100%'>
+<table border=0 width='100%'>
 <tr>
 <td colspan="10" class="b2" align="center">現在地</td>
 </tr>
@@ -139,7 +142,7 @@ EOM
 </td>
 </tr><tr>
 <td valign="top" width='30%'>
-<table border=1 width='100%'>
+<table border=0 width='100%'>
 <tr>
 <td colspan="6" class="b2" align="center">装備</td>
 </tr>
@@ -295,7 +298,7 @@ EOM
 
 <td valign="top" width='30%'>
 <form action="$script" method="post">
-<table border=1 width='100%'>
+<table border=0 width='100%'>
 <tr>
 <td colspan="5" class="b2" align="center">スキル</td>
 </tr>
@@ -352,6 +355,9 @@ EOM
 </form>
 </tr>
 </table>
+
+</div>
+
 <hr size=0><p>
 EOM
 

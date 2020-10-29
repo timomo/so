@@ -121,7 +121,10 @@ sub monster_step_run
 </TR>
 <TR>
 <TD>
-<TABLE BORDER=1>
+
+<div class="blackboard question">
+
+<TABLE BORDER=0>
 <TR>
 	<TD CLASS="b1">
 	LV
@@ -155,12 +158,18 @@ sub monster_step_run
 	</TD>
 </TR>
 </TABLE>
+
+</div>
+
 </TD>
 <TD>
 <FONT COLOR="#9999DD">VS</FONT>
 </TD>
 <TD>
-<TABLE BORDER=1>
+
+<div class="blackboard question">
+
+<TABLE BORDER=0>
 <TR>
 	<TD CLASS="b1">
 	LV
@@ -194,6 +203,9 @@ sub monster_step_run
 	</TD>
 </TR>
 </TABLE>
+
+</div>
+
 </TD>
 <TR>
 <TD COLSPAN="3">
