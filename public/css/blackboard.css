@@ -2,7 +2,10 @@
 see https://fantastech.net/dragon-quest-text
  */
 /* 黒板 */
-.blackboard {
+
+.blackboard,
+.jGrowl .so
+{
     position: relative;
     margin: 0 auto 1.5rem;
     /*

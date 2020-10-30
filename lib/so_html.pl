@@ -88,6 +88,8 @@ chara_config["戦闘楽曲"] = "あり";
 chara_config["戦闘効果音"] = "あり";
 chara_config["音声"] = "あり";
 
+jQuery.jGrowl.defaults.position = "bottom-right";
+jQuery.jGrowl.defaults.theme = "so";
 
 	var info = new Array();
 EOM
