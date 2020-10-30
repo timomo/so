@@ -547,7 +547,7 @@ app->helper(
     {
         my $self = shift;
 
-        my $npc = $characters->grep(sub { return $_->{操作種別} eq "npc" });
+        my $npc = $character_types->grep(sub { return $_->{操作種別} eq "npc" });
 
         if ($npc->size >= 100)
         {
