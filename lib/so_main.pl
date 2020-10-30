@@ -120,10 +120,14 @@ EOM
 <tr>
 <td>
 <table border="0" style="width: 100%">
-<tr><td rowspan="3" class="b2">$kname<br />LV$klv<br />LP $klp\/$max_lp</td><td colspan="2" class="b2" align="center">HP:<div style="float: right; background-color: #000; padding: 2px; width: 160px;"><div style="background-color: red; width: $per{hp}%; text-align: right;">&nbsp;</div></div></td></tr>
-<tr><td colspan="2" class="b2" align="center">EXP:<div style="float: right; background-color: #000; padding: 2px; width: 160px;"><div style="background-color: orange; width: $per{exp}%; text-align: right;">&nbsp;</div></div></td></tr>
-<tr><td colspan="2" class="b2" align="center">Risk:<div style="float: right; background-color: #000; padding: 2px; width: 160px;"><div style="background-color: yellow; width: $per{risk}%; text-align: right;">&nbsp;</div></div></td></tr>
-<tr><td colspan="2" class="b2" align="center">【現在地】</td></tr>
+<tr><td rowspan="3" class="b2">$kname<br />LV$klv<br />LP $klp\/$max_lp</td>
+<td colspan="2" class="b2" align="center">HP:<div class="meter" style="float: right; background-color: #000; padding: 2px; width: 160px;"><div style="background-color: red; width: $per{hp}%; text-align: right;" class="meter">&nbsp;</div></div></td></tr>
+<tr>
+<td colspan="2" class="b2" align="center">EXP:<div class="meter" style="float: right; background-color: #000; padding: 2px; width: 160px;"><div style="background-color: orange; width: $per{exp}%; text-align: right;" class="meter">&nbsp;</div></div></td></tr>
+<tr>
+<td colspan="2" class="b2" align="center">Risk:<div class="meter" style="float: right; background-color: #000; padding: 2px; width: 160px;"><div style="background-color: yellow; width: $per{risk}%; text-align: right;" class="meter">&nbsp;</div></div></td></tr>
+<tr>
+<td colspan="2" class="b2" align="center">【現在地】</td></tr>
 <tr>
 <td class="b1" width='25%'>地名</td>
 <td width='75%'>$town_name[$karea]</td>
