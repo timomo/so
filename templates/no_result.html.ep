@@ -1,0 +1,170 @@
+<html>
+<head>
+<meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0" />
+<meta name="format-detection" content="telephone=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+<meta http-equiv="refresh" content="5;URL=./current" />
+
+<title>Shimada Online</title>
+<script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.1.3/howler.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+<script src="/js/third-party/jquery.jgrowl.js"></script>
+<script src="/js/sound.js"></script>
+<script>
+<!--
+chara_config = {};
+chara_config["楽曲"] = "あり";
+chara_config["戦闘楽曲"] = "あり";
+chara_config["戦闘効果音"] = "あり";
+chara_config["音声"] = "あり";
+
+
+	var info = new Array();
+	info[0] = "";
+	info[1] = "";
+	info[2] = "";
+	info[3] = "";
+	info[4] = "";
+	info[5] = "";
+	info[6] = "";
+	info[7] = "";
+//-->
+</script>
+<script>
+master_sound = [
+    {"id":1,"ファイル名":"NES-RPG-A02-2(Town1-Loop130).mp3","名称":"town1","ユニークid":"1","サウンド種別":"1"},
+    {"id":2,"ファイル名":"NES-RPG-B10-2(Dungeon2-Loop170).mp3","名称":"dungeon1","ユニークid":"2","サウンド種別":"1"},
+    {"id":3,"ファイル名":"GB-RPG-A12-2(Battle1-Loop157).mp3","名称":"battle1","ユニークid":"3","サウンド種別":"1"},
+];
+</script>
+<script src="/js/so_town.js"></script>
+<style type="text/css">
+<!--
+body {
+    color: #666666;
+    background-color: #FFFFFF;
+    background-image: url(http://www.ann.hi-ho.ne.jp/nakiri/image/bg.gif);
+}
+body,tr,td,th,table { font-size: 10.5pt; }
+a:hover   {
+    color: #FF0000;
+}
+a:link    {
+    color: #0000FF;
+}
+a:visited {
+    color: #800080;
+}
+-->
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/so_common.css" type="text/css" />
+<link rel="stylesheet" href="/css/blackboard.css" type="text/css" />
+<link rel="stylesheet" href="/css/third-party/jquery.jgrowl.css" type="text/css" />
+</head>
+<body >
+<div id="stage"></div>
+<form action="/login" method="POST">
+<input type="hidden" name="mode" value="log_in" />
+<table border=0 width='100%'>
+<tr>
+	<td align="center" valign="top"><img src="http://www.ann.hi-ho.ne.jp/nakiri/image/SO.gif" width="227" height="81"></td>
+</tr>
+<tr>
+<td align="center" valign="top">
+
+<div class="blackboard question">
+
+	<table border=0>
+	<tr>
+	<td align=center colspan=5 class=b2>冒険中の方はこちら</td>
+	</tr>
+	<tr>
+	<td class=b1>入国ＩＤ</td>
+	<td><input type="text" size="11" name="id" value="" disabled /></td>
+	</tr><tr>
+	<td class=b1>パスワード</td>
+	<td><input type="password" size="11" name="pass" value="" disabled /></td>
+	</tr><tr>
+	<td colspan="2"><input type="submit" value="旅の続き" disabled /></td>
+	</tr>
+	</table>
+
+	</div>
+
+</td>
+</tr>
+</table>
+
+<div class="blackboard question">
+    <p>更新結果がありません。リダイレクトします。</p>
+</div>
+
+<p>
+<hr size=0>
+</form>
+<BR>
+[<B><FONT COLOR="#FF9933">お知らせ</FONT></B>]<BR>
+<!-- ここから -->
+要望・バグ報告は管理人キャラ「最終兵器巫女」までメッセージを送信下さい。<br>
+<br>
+<近況><br>
+・「暗黒」スキルが実装されました。自分のHPを消費して、攻撃力を上昇します。<br>
+　発動すると攻撃・防御属性は「闇」になります。<br>
+　発動するとHPがわずかに減少しますが、それで死ぬことはありません。<br>
+　スキルの使用はそれにまつわるアイテムを装備することで行えます。初期アイテムはユキノウラで販売しています。<br>
+　スキルの上昇に伴い、発動率、効果が上昇します。<br><br>
+・「忍術」スキルが実装されました。現仕様では、影分身のみ使用できます。<br>
+　影分身が発動すると増えた人数分、攻撃回数が上昇します。<br>
+　発動したターンに攻撃を受けると影分身が身代わりになってダメージを低減します。<br>
+　先制できれば、影分身で増えた攻撃回数で攻撃後、反撃を身代わりで防ぐことができるため、素早さが重要になります。<br>
+　スキルの使用はそれにまつわるアイテムを装備することで行えます。初期アイテムはユキノウラで販売しています。<br>
+　スキルの上昇に伴い、発動率、分身人数が上昇します。<br><br>
+　「暗黒」「忍術」の攻撃効果は武器にしか効きませんが、防御効果の恩恵は魔法も受けます。<br><br>
+・モンスターに攻撃に応じた属性がつきます<br><br>
+・弓、銃用の「矢」「弾丸」が実装されました。装填することで威力が上昇します。<br>
+　それに伴い、既存の武器の威力が調整されます。<br><br>
+・「近接戦闘」「狙撃」「集中」のボーナスを見直しました。以前は単純に倍率を上げていましたが<br>
+　倍率を抑え、代わりに加算を付与しています。<br><br>
+<テスト><br>
+・アイテム、お金の受け渡しができるようになりました。<br>
+いずれも街の中で、「アイテム一覧」から行えます。<br>
+現在、アイテムが送られてきたのを通知する機能は無いので、<br>
+送った際はメッセージも一緒に送ることを推奨します。<br><br>
+・戦闘画面にテスト的にレイヤーを導入しています<br><br>
+・プレイヤーとの戦闘形式が若干変化しています<br><br>
+　改善案等を募集します
+<!-- ここまで -->
+
+<BR>
+<BR>
+[<B><FONT COLOR="#FF9933">ランキング</FONT></B>]<BR>
+現在の Shadow Duel 参加者中ポイントTOP<b>30</b>を表示しています。
+<p>
+<table border=1>
+<tr>
+<th></th><th>名前</th><th>SDP</th><th>Rate</th><th>Rank</th>
+</tr>
+</table>
+<form action="./" method="post">
+[<B><FONT COLOR="#FF9933">入国管理室</FONT></B>]<BR>
+右手の入り口より入国手続きを行います。（新キャラ登録）&nbsp
+<input type="hidden" name="mode" value="chara_make" />
+<input type="submit" value="入国手続き" />
+</form>
+</td>
+</tr>
+</table>
+<p>
+<hr size=0 width="100%">
+<div align="right" class="small">
+FF ADVENTURE v0.45 by <a href="http://www.interq.or.jp/sun/cumro/">D.Takamiya(CUMRO)</a><br>
+Character Image by <a href="http://www.aas.mtci.ne.jp/~hiji/9ff/9ff.html">9-FFいっしょにTALK</a><br>
+cooperation site by <a href="http://webooo.csidenet.com/asvyweb/">FFADV推奨委員会</a><br>
+Music by <a href="https://otologic.jp/">OtoLogic</a>
+</div>
+</body></html>
+

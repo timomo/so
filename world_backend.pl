@@ -157,6 +157,12 @@ post "/current" => sub
     if (exists $json->{accept} && ($json->{accept} || "") ne "")
     {
         my $hit = $results->first(sub { return $_->{id} eq $id && $_->{accept} eq $json->{accept} });
+
+        if (! defined $hit) # 更新結果がない場合
+        {
+            return $self->render("no_result");
+        }
+
         return $self->render(text => $hit->{content}, format => "html");
     }
 
