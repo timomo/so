@@ -684,18 +684,21 @@ app->helper(
 
         $self->spawn;
 
-        my $id = "xQRmDIrOoD";
-
-        my $npc_command = $self->get_npc_command($id);
-
-        if (defined $npc_command)
+        for my $append (@$character_types)
         {
-            my $accept = $self->get_time_of_day;
+            my $id = $append->{id};
 
-            push(@$queue, { id => $id, param => $npc_command, "accept" => $accept });
+            my $npc_command = $self->get_npc_command($id);
+
+            if (defined $npc_command)
+            {
+                my $accept = $self->get_time_of_day;
+
+                push(@$queue, { id => $id, param => $npc_command, "accept" => $accept });
+            }
         }
 
-        $loop->timer(10, sub { $self->manage });
+        $loop->timer(60, sub { $self->manage });
     },
 );
 
