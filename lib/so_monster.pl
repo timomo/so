@@ -1116,7 +1116,8 @@ sub display_monster_battle
 			is_finished     => $win == 0 ? 0 : 1,
 			kid             => $kid,
 			kpass           => $kpass,
-			sel            => $in{sel} || -1,
+			sel             => $in{sel} || -1,
+			spot            => "モンスター",
 		},
 		\my $out,
 		binmode => ':encoding(utf8)'

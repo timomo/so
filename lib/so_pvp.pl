@@ -205,7 +205,10 @@ sub pvp_step_run
 </TR>
 <TR>
 <TD>
-<TABLE BORDER=1>
+
+<div class="blackboard question">
+
+<TABLE BORDER=0>
 <TR>
 	<TD CLASS="b1">
 	名前
@@ -239,12 +242,18 @@ sub pvp_step_run
 	</TD>
 </TR>
 </TABLE>
+
+</div>
+
 </TD>
 <TD>
 <FONT COLOR="#9999DD">VS</FONT>
 </TD>
 <TD>
-<TABLE BORDER=1>
+
+<div class="blackboard question">
+
+<TABLE BORDER=0>
 <TR>
 	<TD CLASS="b1">
 	名前
@@ -278,14 +287,18 @@ sub pvp_step_run
 	</TD>
 </TR>
 </TABLE>
+
+</div>
+
 </TD>
 <TR>
 <TD COLSPAN="3">
-<BR>
+	<div class="blackboard question">
+		<p>
 EOM
 
 	if($k1_btype eq "60" && $d1hp > 0){
-		$battle_date[$j] .= "<font color=$elmcolor[6]>$k1nameはHPを$d1hp消費し、黒いオーラを噴き出した・・</font><p>";
+		$battle_date[$j] .= "<font color=$elmcolor[6]>$k1name はHPを$d1hp 消費し、黒いオーラを噴き出した・・</font><p>";
 		$k1hp_flg -= $d1hp;
 		if($k1hp_flg < 1){
 			$k1hp_flg = 1;
@@ -296,7 +309,7 @@ EOM
 	$d1cut = 0;$d1rtn = 0;
 	if($k1_btype eq "61" && $k1buf[3] == 0){
 		if(($k1sk[15] / 50 + $k1_batc) > rand(100)){
-			$battle_date[$j] .= "$k1nameは相手を見据えて身構えた！<p>";
+			$battle_date[$j] .= "$k1name は相手を見据えて身構えた！<p>";
 			$d1cut = 1;
 		}
 	}
@@ -305,12 +318,12 @@ EOM
 	if($k1_btype eq "62" && $k1buf[3] == 0 ){
 		if(($k1sk[15] / 50 + $k1_batc) > rand(100)){
 			$d1up1 = int(rand($k1sk[15] / 100) + 1);
-			$battle_date[$j] .= "$k1nameは印を結んだ・・・影分身が$d1up1体現れた！<p>";
+			$battle_date[$j] .= "$k1name は印を結んだ・・・影分身が$d1up1 体現れた！<p>";
 		}
 	}
 
 	if($k2_btype eq "60" && $d2hp > 0){
-		$battle_date[$j] .= "<font color=$elmcolor[6]>$k2nameはHPを$d2hp消費し、黒いオーラを噴き出した・・</font><p>";
+		$battle_date[$j] .= "<font color=$elmcolor[6]>$k2name はHPを$d2hp 消費し、黒いオーラを噴き出した・・</font><p>";
 		$k2hp_flg -= $d2hp;
 		if($k2hp_flg < 1){
 			$k2hp_flg = 1;
@@ -321,7 +334,7 @@ EOM
 	$d2cut = 0;$d2rtn = 0;
 	if($k2_btype eq "61" && $k2buf[3] == 0){
 		if(($k2sk[15] / 50 + $k2_batc) > rand(100)){
-			$battle_date[$j] .= "$k2nameは相手を見据えて身構えた！<p>";
+			$battle_date[$j] .= "$k2name は相手を見据えて身構えた！<p>";
 			$d2cut = 1;
 		}
 	}
@@ -330,7 +343,7 @@ EOM
 	if($k2_btype eq "62" && $k2buf[3] == 0 ){
 		if(($k2sk[15] / 50 + $k2_batc) > rand(100)){
 			$d2up1 = int(rand($k2sk[15] / 100) + 1);
-			$battle_date[$j] .= "$k2nameは印を結んだ・・・影分身が$d2up1体現れた！<p>";
+			$battle_date[$j] .= "$k2name は印を結んだ・・・影分身が$d2up1 体現れた！<p>";
 		}
 	}
 
@@ -341,17 +354,17 @@ EOM
 		$fst_flg = 30;
 	}elsif($efctk1[0] && !$efctk2[0]){
 		$fst_flg = 30;
-		$com1 = "$k1nameの先制攻撃！<br>$com1";
+		$com1 = "$k1name の先制攻撃！<br>$com1";
 	}elsif(!$efctk1[0] && $efctk2[0]){
 		$fst_flg = 0;
-		$com2 = "$k2nameの先制攻撃！<br>$com2";
+		$com2 = "$k2name の先制攻撃！<br>$com2";
 	}
 	$turnflg = 0;
 	foreach(1..2) {
 		if(($fst_flg > 15 && $turnflg == 0) ||($fst_flg <= 15 && $turnflg == 1)){
 			if($k1buf[3] < 0 ){
 				$dmgk1 = 0;
-				$com1 = "$k1nameは動けない！<br>";
+				$com1 = "$k1name は動けない！<br>";
 				$k1buf[3]+= 1;
 			} else {
 				##Ｐ１ダメージ・命中判定
@@ -387,7 +400,7 @@ EOM
 				}
 
 				if($k1_btype eq "62" && $d1up1 > 0 && $atc_skillk1 <= 5){
-					$com1 .= "影分身が$d1up1体攻撃に参加した！<br>";
+					$com1 .= "影分身が$d1up1 体攻撃に参加した！<br>";
 					$swgk1 += $d1up1;
 				}
 
@@ -434,23 +447,23 @@ EOM
 				$dmgk1 = int($dmgk1 * $swgcnt / $swgk1);
 				$swgk1 = $swgcnt;
 				if($d2upd > 0){
-					$com1 .= "影分身が$d2upd人身代わりになった！<br>";
+					$com1 .= "影分身が$d2upd 人身代わりになった！<br>";
 				}
 				if($k2parcnt > 0){
-					$com1 .= "$k2nameは$k2parcnt回$par_msg[$atc_skillk2][$par_efc[$atc_skillk1]]<br>";
+					$com1 .= "$k2name は$k2parcnt 回$par_msg[$atc_skillk2][$par_efc[$atc_skillk1]]<br>";
 				}
 				if($k2blccnt > 0) {
-					$com1 .= "$k2nameは$k2blccnt回$k2_anamで防いだ！<br>";
+					$com1 .= "$k2name は$k2blccnt 回$k2_anam で防いだ！<br>";
 				}
 				if($k2esccnt> 0) {
-					$com1 .= "$k2nameは$k2esccnt回かわした！<br>";
+					$com1 .= "$k2name は$k2esccnt 回かわした！<br>";
 				}
 
 				$cutmsg1 = "";
 				if($d2cut == 2 && $turnflg == 0){
-					$cutmsg1 = "$k2nameは$k2_anamで弾くと同時に踏み込んだ！<br>";
+					$cutmsg1 = "$k2name は$k2_anam で弾くと同時に踏み込んだ！<br>";
 				} elsif($d2cut == 2){
-					$cutmsg1 = "$k2nameは$k2_anamで弾き飛ばした！<br>";
+					$cutmsg1 = "$k2name は$k2_anam で弾き飛ばした！<br>";
 				}
 				if($dmgk1 > 0){
 					$k1buf[0] = $k1buf[0] * $k1buftmp1[0];
@@ -483,7 +496,7 @@ EOM
 				}
 
 				if($efctk1[7] * 5 + $k1n_4 / 16 + $k1sk[$atc_skillk1] / 80 - $k2n_4 / 16 - $k2sk[$atc_skillk2] / 80 > int(rand(100)) && $dmgk1 > 0 && $efctk1[7] > 0){
-					$clit1 .= "<br><b class=\"clit\">$k2name$death_msg[$atc_skillk1][$k1_welm]</b><br>";
+					$clit1 .= "<br><b class=\"clit\">$k2name $death_msg[$atc_skillk1][$k1_welm]</b><br>";
 					$k2d_flg = 1;
 					$bonus1 += 10;
 				}
@@ -494,7 +507,7 @@ EOM
 				$battle_date[$j] .= "$com1 そして<b>$swgk1</b>回 ヒットし、 $k2name に <font class=\"dmg\"><b>$dmgk1</b></font> のダメージ！$k1efcmsg$clit1<p>";
 				$bonus1 += 1;
 				if($k1_bflg > 0){
-					$battle_date[$j] .= "$k1nameは素早く次の$k1_bnameを準備した！<p>";
+					$battle_date[$j] .= "$k1name は素早く次の$k1_bname を準備した！<p>";
 				}
 			} else {
 				$battle_date[$j] .= "$com1<p>";
@@ -508,7 +521,7 @@ EOM
 		} else {
 			if($k2buf[3] < 0 ){
 				$dmgk2 = 0;
-				$com2 = "$k2nameは動けない！<br>";
+				$com2 = "$k2name は動けない！<br>";
 				$k2buf[3]+= 1;
 			} else {
 				##Ｐ２ダメージ・命中判定
@@ -544,7 +557,7 @@ EOM
 				}
 
 				if($k2_btype eq "62" && $d2up1 > 0 && $atc_skillk2 <= 5){
-					$com2 .= "影分身が$d2up1体攻撃に参加した！<br>";
+					$com2 .= "影分身が$d2up1 体攻撃に参加した！<br>";
 					$swgk2 += $d2up1;
 				}
 
@@ -592,23 +605,23 @@ EOM
 				$swgk2 = $swgcnt;
 
 				if($d1upd > 0){
-					$com2 .= "影分身が$d1upd人身代わりになった！<br>";
+					$com2 .= "影分身が$d1upd 人身代わりになった！<br>";
 				}
 				if($k1parcnt > 0){
-					$com2 .= "$k1nameは$k1parcnt回$par_msg[$atc_skillk1][$par_efc[$atc_skillk2]]<br>";
+					$com2 .= "$k1name は$k1parcnt 回$par_msg[$atc_skillk1][$par_efc[$atc_skillk2]]<br>";
 				}
 				if($k1blccnt > 0) {
-					$com2 .= "$k1nameは$k1blccnt回$k1_anamで防いだ！<br>";
+					$com2 .= "$k1name は$k1blccnt 回$k1_anam で防いだ！<br>";
 				}
 				if($k1esccnt> 0) {
-					$com2 .= "$k1nameは$k1esccnt回かわした！<br>";
+					$com2 .= "$k1name は$k1esccnt 回かわした！<br>";
 				}
 
 				$cutmsg2 = "";
 				if($d1cut == 2 && $turnflg == 0){
-					$cutmsg2 = "$k1nameは$k1_anamで弾くと同時に踏み込んだ！<br>";
+					$cutmsg2 = "$k1name は$k1_anam で弾くと同時に踏み込んだ！<br>";
 				} elsif($d1cut == 2){
-					$cutmsg2 = "$k1nameは$k1_anamで弾き飛ばした！<br>";
+					$cutmsg2 = "$k1name は$k1_anam で弾き飛ばした！<br>";
 				}
 
 				if($dmgk2 > 0){
@@ -654,7 +667,7 @@ EOM
 				$bonus2 += 1;
 
 				if($k2_bflg > 0){
-					$battle_date[$j] .= "$k2nameは素早く次の$k2_bnameを準備した！<p>";
+					$battle_date[$j] .= "$k2name は素早く次の$k2_bname を準備した！<p>";
 				}
 			} else {
 				$battle_date[$j] .= "$com2<p>";
@@ -669,33 +682,17 @@ EOM
 		$turnflg = 1;
 	}
 
-	if($win > 0) {
-		$nextlink ="次へ>&nbsp;&nbsp;最後>>";
-	} else {
-		$nextlink ="<a href=\"javascript:page(3)\">次へ></a>&nbsp;&nbsp;<a href=\"javascript:page(4)\">最後>></a>";
-	}
-
-	if($i == 1) {
-		$backlink ="<<最初&nbsp;&nbsp;<戻る";
-	} else {
-		$backlink ="<a href=\"javascript:page(1)\"><<最初</a>&nbsp;&nbsp;<a href=\"javascript:page(2)\"><戻る</a>";
-	}
+	$battle_date[$j] .= "</p>\n</div>\n";
 
 	$battle_date[$j] = <<"EOM";
-<DIV id="sel$j" style="display: $display">
+<DIV id="sel$i">
 <TABLE BORDER=0>
-<TR>
-	<TD COLSPAN="3" ALIGN="right">
-	$backlink&nbsp;&nbsp;$nextlink
+$battle_date[$j]
 	</TD>
-</TR>
-</TD>
 </TR>
 </TABLE>
 </DIV>
 EOM
-	$i++;
-	$j++;
 
 	if($win > 0)
 	{
@@ -1186,6 +1183,7 @@ sub display_pvp_battle
 			kid             => $kid,
 			kpass           => $kpass,
 			sel             => $in{sel} || -1,
+			spot            => "PVP",
 		},
 		\my $out,
 		binmode => ':encoding(utf8)'

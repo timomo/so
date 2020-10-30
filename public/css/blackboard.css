@@ -70,7 +70,8 @@ see https://fantastech.net/dragon-quest-text
 }
 
 .select-menu,
-.select-command
+.select-command,
+.select-target-menu
 {
     cursor: pointer;
 }

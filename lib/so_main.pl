@@ -253,7 +253,7 @@ EOM
 
 	print <<"EOM";
 <div class="clearfix">
-	<div class="blackboard answer float-l">
+	<div class="blackboard answer float-l" id="select-menu-window">
 EOM
 	print join("\n", @select_menu);
 
@@ -368,6 +368,15 @@ print <<EOF;
 <input type="hidden" name="pass" value="$kpass" />
 <input id="status-select-submit" type="submit" value="行動" />
 </form>
+
+<form id="pvp_form" action="$script" method="post">
+<input type="hidden" name="mode" value="pvp" />
+<input type="hidden" name="rid" value="" />
+<input type="hidden" name="id" value="$kid" />
+<input type="hidden" name="pass" value="$kpass" />
+<input id="pvp-select-submit" type="submit" value="行動" />
+</form>
+
 <script>
 const spot = "$spot";
 </script>

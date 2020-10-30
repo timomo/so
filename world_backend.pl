@@ -99,7 +99,7 @@ post "/neighbors" => sub
 
             my $bool = $self->is_battle($append->{id}) ? ": 戦闘中" : "";
 
-            push(@ret, $c->{名前}. $bool);
+            push(@ret, [$c->{id}, $c->{名前}. $bool]);
         }
     }
 
@@ -171,8 +171,8 @@ post "/current" => sub
     my $url = Mojo::URL->new;
     $url->query({ %$param, id => $k->{id}, pass => $k->{パスワード} });
     $env->{QUERY_STRING} = $url->to_string;
-
     $env->{QUERY_STRING} =~ s/^\?//;
+
     # seek($env->{"psgi.input"}, 0, 0);
     my $content = join("", @{$app->($env)->[2]});
     my $utf8 = Encode::decode_utf8($content);
@@ -202,6 +202,11 @@ app->helper(
         my $k = $self->character($id);
         my $mode = $self->location($id);
 
+        if (! defined $k)
+        {
+            return undef;
+        }
+
         if ($self->is_battle($id) || $self->is_pvp($id)) { # 戦闘優先
             return "battle";
         }
@@ -227,6 +232,11 @@ app->helper(
         my $k = $self->character($id);
         my $mode = $self->location($id);
         my $state = $self->state($id);
+
+        if (! defined $state)
+        {
+            return undef;
+        }
 
         if ($state eq "battle")
         {
@@ -405,6 +415,8 @@ app->helper(
             chomp($line);
             my @tmp = split(/<>/, $line, 2);
 
+            # warn sprintf("%s: %s === %s", ($tmp[0] eq $id ? "true" : "false"),  $tmp[0], $id);
+
             if ($tmp[0] ne $id)
             {
                 next;
@@ -425,6 +437,8 @@ app->helper(
 
             return $k;
         }
+
+        return undef;
     },
 );
 
@@ -437,8 +451,7 @@ app->helper(
         my $file = Mojo::File->new($path);
         my $file2 = Mojo::File->new($path2);
         $file->touch;
-        $file2
-            ->touch;
+        $file2->touch;
         my @raw;
         my @raw2;
 
@@ -549,7 +562,7 @@ app->helper(
 
         my $npc = $character_types->grep(sub { return $_->{操作種別} eq "npc" });
 
-        if ($npc->size >= 100)
+        if ($npc->size > 5)
         {
             return;
         }
@@ -560,7 +573,7 @@ app->helper(
         @$n{@keys} = (
             $self->create_uuid, # id
             $self->create_uuid, # パスワード
-            "NPC:". ($npc->size + 1), # 名前
+            "NPC:". ($character_types->size + 1), # 名前
             1, # 性別: 1 ... 女性
             "", # 画像
             @default_parameter, # 力 賢さ 信仰心 体力 器用さ 素早さ 魅力
@@ -583,9 +596,21 @@ app->helper(
 
         $n->{操作種別} = "npc";
 
+        my $t = {};
+        @$t{@keys2} = (
+            $n->{id},
+            "npc",
+            undef,
+            $n->{エリア},
+            $n->{スポット},
+            $n->{距離},
+            undef
+        );
+
+        push(@$character_types, $t);
         push(@$characters, $n);
 
-        $self->save;
+        # $self->save;
     },
 );
 
@@ -684,15 +709,22 @@ app->helper(
 
         $self->spawn;
 
+        my $min = 9999;
+
         for my $append (@$character_types)
         {
             if ($append->{操作種別} eq "pc")
             {
                 next;
             }
-            my $time = time() - $append->{最終実行時間} + 60;
-            warn $time;
+            my $timer = 60;
+            my $time = $append->{最終実行時間} - time() + $timer;
+
             if ($time <= 0)
+            {
+                # noop
+            }
+            else
             {
                 next;
             }
@@ -708,12 +740,33 @@ app->helper(
                 push(@$queue, { id => $id, param => $npc_command, "accept" => $accept });
 
                 $append->{最終実行時間} = time();
+
+                {
+                    my $time2 = $append->{最終実行時間} - time() + $timer;
+
+                    warn $time2;
+
+                    if ($min < $time2)
+                    {
+                        $min = $time2;
+                    }
+                }
             }
+        }
+
+        if ($min == 9999)
+        {
+            $min = 60;
+        }
+
+        if ($min < 0)
+        {
+            $min = 1;
         }
 
         if ($queue->size == 0)
         {
-            $loop->timer(60, sub { $self->manage });
+            $loop->timer($min, sub { $self->manage });
         }
         else
         {

@@ -19,7 +19,9 @@ sub footer {
 
 	if ($kid and $mode ne "")
 	{
-		print '<div class="blackboard question" id="neighbors"></div>'. "\n";
+		print '<div class="clearfix">'. "\n";
+		print '<div class="blackboard answer float-l" id="neighbors"></div>'. "\n";
+		print "</div>\n";
 	}
 
 	print <<"EOM";
@@ -132,6 +134,7 @@ master_sound = [
     {"id":1,"ファイル名":"NES-RPG-A02-2(Town1-Loop130).mp3","名称":"town1","ユニークid":"1","サウンド種別":"1"},
     {"id":2,"ファイル名":"NES-RPG-B10-2(Dungeon2-Loop170).mp3","名称":"dungeon1","ユニークid":"2","サウンド種別":"1"},
     {"id":3,"ファイル名":"GB-RPG-A12-2(Battle1-Loop157).mp3","名称":"battle1","ユニークid":"3","サウンド種別":"1"},
+    {"id":4,"ファイル名":"GB-RPG-A13-2(Battle2-Loop157).mp3","名称":"battle2","ユニークid":"4","サウンド種別":"1"},
 ];
 </script>
 <script src="/js/so_town.js"></script>

@@ -1,6 +1,6 @@
 function selectTown(sel){
 
-	var n   = jQuery(sel).val(),
+	let n   = jQuery(sel).val(),
 	    msg = "";
 
 	switch(n) {
@@ -12,14 +12,14 @@ function selectTown(sel){
 		case "monster": msg = info[1]; break;
 		default: msg = "&nbsp;";
 	}
-	// jQuery("#town_text").html(msg);
+
 	jQuery("#select-description").html("<p>" + msg + "</p>");
 
 }
 
 function selectMove(sel){
 
-	var n   = jQuery(sel).val(),
+	let n   = jQuery(sel).val(),
 	    msg = "";
 
 	switch(n) {
@@ -29,60 +29,53 @@ function selectMove(sel){
 		case "3": msg = info[7]; break;
 		default: msg = "&nbsp;";
 	}
-	// jQuery("#move_text").html(msg);
+
 	jQuery("#select-description").html("<p>" + msg + "</p>");
 }
 
-
-jQuery(document).ready(() => {
-	if (typeof spot !== "undefined") {
-		if (spot === "町の中") {
-			music.request = "town1";
-		}
-		else if (spot === "モンスター" || spot === "デュエル") {
-			music.request = "battle1";
-		}
-		else {
-			music.request = "dungeon1";
-		}
-	}
-	else
-	{
-		return;
-	}
-
+function setup_neighbors()
+{
 	const neighbors = jQuery("#neighbors");
 
-	if (neighbors.length !== 0)
+	if (neighbors.length === 0)
 	{
-		jQuery.get( "/neighbors", {}, (data) => {
-			if (data.hasOwnProperty("neighbors")) {
-				const html = ["<p>近くにいるキャラ</p>"];
-
-				data.neighbors.forEach((neighbor) => {
-					html.push("<p>" + neighbor + "</p>");
-				});
-
-				jQuery("#neighbors").html(html);
-			}
-		});
+		return false;
 	}
 
-	jQuery("#camp-select").hide();
-	jQuery("#camp-select-submit").hide();
-	jQuery("#monster-select").hide();
-	jQuery("#monster-select-submit").hide();
-	jQuery("#town-select").hide();
-	jQuery("#town_text").hide();
-	jQuery("#move_text").hide();
-	jQuery("#town-select-submit").hide();
-	jQuery("#status-select").hide();
-	jQuery("#status-select-submit").hide();
-	jQuery("#default-select").hide();
-	jQuery("#default-select-submit").hide();
-	jQuery("form[name='town']").hide();
-	jQuery("form[name='move']").hide();
+	jQuery.get( "/neighbors", {}, (data) => {
+		if (data.hasOwnProperty("neighbors")) {
+			const menu = jQuery("<p class='answer-menu'>【近くにいるキャラ】</p>");
+			jQuery("#neighbors").append(menu);
+			const parent = jQuery("#neighbors");
 
+			data.neighbors.forEach((neighbor) => {
+				const p = jQuery("<p></p>");
+				p.addClass("select-target-menu");
+				p.html(neighbor[1]);
+				parent.append(p);
+				p.bind("mouseenter", (event) =>
+				{
+					jQuery("#neighbors .select-target-menu").removeClass("blink-before");
+					jQuery(event.target).addClass("blink-before");
+					jQuery("select[name='mesid']").val(neighbor[0]);
+					jQuery("form[id='pvp_form'] input:hidden[name='rid']").val(neighbor[0]);
+				});
+			});
+
+			if (data.neighbors.length !== 0) {
+				const p = jQuery("<p></p>");
+				p.addClass("select-menu");
+				p.attr("id", "mode_pvp-select_1");
+				p.html("近くにいるキャラに攻撃をしかける");
+				jQuery("#select-menu-window").append(p);
+				setup_select_menu();
+			}
+		}
+	});
+}
+
+function setup_take_control_form()
+{
 	let timer;
 
 	jQuery("form").bind("submit", (event) => {
@@ -107,6 +100,28 @@ jQuery(document).ready(() => {
 
 		return false;
 	});
+}
+
+function setup_select_menu()
+{
+	jQuery("#camp-select").hide();
+	jQuery("#camp-select-submit").hide();
+	jQuery("#monster-select").hide();
+	jQuery("#monster-select-submit").hide();
+	jQuery("#town-select").hide();
+	jQuery("#town_text").hide();
+	jQuery("#move_text").hide();
+	jQuery("#town-select-submit").hide();
+	jQuery("#status-select").hide();
+	jQuery("#status-select-submit").hide();
+	jQuery("#default-select").hide();
+	jQuery("#default-select-submit").hide();
+	jQuery("form[name='town']").hide();
+	jQuery("form[name='move']").hide();
+
+	jQuery(".select-menu")
+		.unbind("mouseenter")
+		.unbind("click");
 
 	jQuery(".select-menu").bind("mouseenter", (event) =>
 	{
@@ -132,19 +147,49 @@ jQuery(document).ready(() => {
 
 	jQuery(".select-menu").bind("click", (event) =>
 	{
-		// mode_camp-select_rest
-
 		const id = jQuery(event.target).attr("id");
 		const ary = id.split("_");
 		const name = ary.splice(0, 1)[0];
 		const select_id = ary.splice(0, 1)[0];
 		const select_value = ary.join("_");
 
-		jQuery("#" + select_id).val(select_value);
-		jQuery("#" + select_id + "-submit").trigger("click");
+		if (select_id !== "pvp-select") {
+			jQuery("#" + select_id).val(select_value);
+			jQuery("#" + select_id + "-submit").trigger("click");
+		}
+		else
+		{
+			jQuery("#" + select_id + "-submit").trigger("click");
+		}
+
+		return false;
+
 	});
+}
+
+jQuery(document).ready(() => {
+	if (typeof spot !== "undefined") {
+		if (spot === "町の中") {
+			music.request = "town1";
+		}
+		else if (spot === "モンスター" || spot === "デュエル") {
+			music.request = "battle1";
+		}
+		else if (spot === "PVP") {
+			music.request = "battle2";
+		}
+		else {
+			music.request = "dungeon1";
+		}
+	}
+	else
+	{
+		return;
+	}
+
+	setup_neighbors();
+	setup_take_control_form();
+	setup_select_menu();
 
 	jQuery(".select-menu:first").trigger("mouseenter");
-
-
 });
