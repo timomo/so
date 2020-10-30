@@ -107,15 +107,9 @@ EOM
 <B><FONT COLOR="#FF9933">$error</FONT></B>
 EOM
 	$error="";
-	if($ltime < $b_time or !$ktotal){
-	print <<"EOM";
-<FORM NAME="form1">
-行動可能になるまで残り<INPUT TYPE="text" NAME="clock" SIZE="3" VALUE="$vtime">秒です。0になると、自動的に更新します。
-</FORM>
-EOM
-	}
 
 	my %per = ();
+
 	@per{qw|hp  exp risk|} = ( ( ( $khp / $kmaxhp ) * 100 ), $kex, $rrsk );
 	map{ $per{$_} = $per{$_} < 0 ? 0 : $per{$_} } keys %per;
 
@@ -186,7 +180,7 @@ EOM
 <input type="hidden" name="spot" value="2" />
 EOM
 
-		if($ltime >= $m_time or !$ktotal) {
+		if(1) {
 			push(@select_menu, qw|<p class="answer-menu">【キャンプ】</p>|);
 			push(@select_menu, qw|<p id="mode_camp-select_rest" class="blink-before select-menu">休憩する</p>|);
 			push(@select_menu, qw|<p id="mode_camp-select_monster" class="select-menu">キャンピング</p>|);
@@ -208,7 +202,7 @@ EOM
 <input type="hidden" name="area" value="$karea" />
 <input type="hidden" name="mode" value="monster" />
 EOM
-	if($ltime >= $m_time or !$ktotal) {
+	if(1) {
 		my ( $label, $optionHTML ) = ( "", "" );
 		my @options;
 
@@ -257,10 +251,6 @@ EOM
 </form>
 EOM
 
-	push(@select_menu, qq|<p class="answer-menu">|. "【ステータス】". qq|</p>|);
-	push(@select_menu, sprintf('<p id="mode_status-select_%s" class="select-menu">%s</p>', "item_check", "アイテム一覧"));
-	push(@select_menu, sprintf('<p id="mode_status-select_%s" class="select-menu">%s</p>', "status_check", "ステータス詳細"));
-
 	print <<"EOM";
 <div class="clearfix">
 	<div class="blackboard answer float-l">
@@ -282,7 +272,7 @@ EOM
 EOM
 
 	if($kspot == 0 && $kpst == 0){
-		if($ltime >= $b_time or !$ktotal) {
+		if(1) {
 			print <<"EOM";
 <form action="$script" method="post">
 【Shadow Duel 管理局】<br>
@@ -328,7 +318,7 @@ EOM
 <option value="">送る相手を選択</option>
 EOM
 
-	foreach( @log_in ) {
+	for ( @log_in ) {
 		my ( $did, $dpass, $dname, $dmy ) = split /<>/, $_, 4;
 		next if($kid eq $did);
 		print "<option value=\"$did\">$dname</option>\n";
@@ -379,12 +369,6 @@ print <<EOF;
 <input id="status-select-submit" type="submit" value="行動" />
 </form>
 <script>
-jQuery(document).ready(function() {
-    jQuery("button.mode").click(function() {
-        jQuery("#check_mode").val( jQuery(this).attr("id") ).parent().submit();
-    });
-});
-
 const spot = "$spot";
 </script>
 EOF

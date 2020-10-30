@@ -35,14 +35,37 @@ function selectMove(sel){
 
 
 jQuery(document).ready(() => {
-	if (spot === "町の中") {
-		music.request = "town1";
+	if (typeof spot !== "undefined") {
+		if (spot === "町の中") {
+			music.request = "town1";
+		}
+		else if (spot === "モンスター" || spot === "デュエル") {
+			music.request = "battle1";
+		}
+		else {
+			music.request = "dungeon1";
+		}
 	}
-	else if (spot === "モンスター" || spot === "デュエル") {
-		music.request = "battle1";
+	else
+	{
+		return;
 	}
-	else {
-		music.request = "dungeon1";
+
+	const neighbors = jQuery("#neighbors");
+
+	if (neighbors.length !== 0)
+	{
+		jQuery.get( "/neighbors", {}, (data) => {
+			if (data.hasOwnProperty("neighbors")) {
+				const html = ["<p>近くにいるキャラ</p>"];
+
+				data.neighbors.forEach((neighbor) => {
+					html.push("<p>" + neighbor + "</p>");
+				});
+
+				jQuery("#neighbors").html(html);
+			}
+		});
 	}
 
 	jQuery("#camp-select").hide();
@@ -55,8 +78,35 @@ jQuery(document).ready(() => {
 	jQuery("#town-select-submit").hide();
 	jQuery("#status-select").hide();
 	jQuery("#status-select-submit").hide();
+	jQuery("#default-select").hide();
+	jQuery("#default-select-submit").hide();
 	jQuery("form[name='town']").hide();
 	jQuery("form[name='move']").hide();
+
+	let timer;
+
+	jQuery("form").bind("submit", (event) => {
+		const param = jQuery(event.target).serialize();
+
+		if (timer) {
+			clearInterval(timer);
+		}
+
+		jQuery.post( "/command", param, (data) => {
+			timer = setInterval(() => {
+
+				jQuery.get( "/is_result", data, (data2) => {
+					if (data2 && data2.result === "done") {
+						clearInterval(timer);
+						location.href = "?accept=" + data.accept;
+					}
+				} );
+
+			}, 500)
+		});
+
+		return false;
+	});
 
 	jQuery(".select-menu").bind("mouseenter", (event) =>
 	{
@@ -95,4 +145,6 @@ jQuery(document).ready(() => {
 	});
 
 	jQuery(".select-menu:first").trigger("mouseenter");
+
+
 });

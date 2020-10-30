@@ -4,14 +4,44 @@ use utf8;
 #　HTMLのフッター　#
 #------------------#
 sub footer {
-	if($mode ne ""){
-		print "<a href=\"$script\">TOPへ</a>\n";
-	}
-	if($kid and $mode ne 'log_in') { 
-		print " / <a href=\"$script?mode=log_in&id=$kid&pass=$kpass\">メイン画面へ</a>\n";
+	my @select_menu;
+
+	push(@select_menu, qq|<p class="answer-menu">|. "【デフォルト】". qq|</p>|);
+
+	if($kid) {
+		push(@select_menu, sprintf('<p id="mode_default-select_%s" class="select-menu">%s</p>', "log_in", "戻る"));
 	}
 
+	if($kid and ($mode ne "monster")) {
+		push(@select_menu, sprintf('<p id="mode_default-select_%s" class="select-menu">%s</p>', "item_check", "アイテム一覧"));
+		push(@select_menu, sprintf('<p id="mode_default-select_%s" class="select-menu">%s</p>', "status_check", "ステータス詳細"));
+	}
+
+	if ($kid and $mode ne "")
+	{
+		print '<div class="blackboard question" id="neighbors"></div>'. "\n";
+	}
+
+	print <<"EOM";
+<div class="clearfix">
+	<div class="blackboard answer float-l">
+EOM
+	print join("\n", @select_menu);
+
 print <<EOF;
+	</div>
+</div>
+
+<form action="$script" method="post">
+<select id="default-select" name="mode" onchange="javascript:selectTown(this);">
+<option value="item_check">アイテム一覧</option>
+<option value="status_check">ステータス詳細</option>
+<option value="log_in">戻る</option>
+</select>
+<input type="hidden" name="id" value="$kid" />
+<input type="hidden" name="pass" value="$kpass" />
+<input id="default-select-submit" type="submit" value="行動" />
+
 <hr size=0 width="100%">
 <div align="right" class="small">
 $ver by <a href="http://www.interq.or.jp/sun/cumro/">D.Takamiya(CUMRO)</a><br>
@@ -21,24 +51,14 @@ Music by <a href="https://otologic.jp/">OtoLogic</a>
 </div>
 EOF
 
-	if(($mode eq 'log_in' or ($mode eq 'monster' and $battle_flag ne "1") or $mode eq 'rest') and $ltime < $b_time and $ktotal){
-	print <<"EOM";
-<script type="text/javascript">window.setTimeout('CountDown()',100);</script>
-EOM
-	}
 	print "</body></html>\n\n";
 }
 
 #------------------#
 #  HTMLのヘッダー  #
 #------------------#
-sub header {
-
-my $refresh = "";
-if ( $vtime > 0 ) {
-    $refresh = sprintf('<META HTTP-EQUIV="Refresh" CONTENT="%d" />',$vtime);
-}
-
+sub header
+{
 	print <<"EOM";
 <html>
 <head>
@@ -47,7 +67,6 @@ if ( $vtime > 0 ) {
 <meta name="format-detection" content="telephone=no" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-$refresh
 <title>$main_title</title>
 <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.1.3/howler.js"></script>
@@ -66,24 +85,7 @@ chara_config["音声"] = "あり";
 	var info = new Array();
 EOM
 
-if(($mode eq 'log_in' or ($mode eq 'monster' and $battle_flag ne "1") or $mode eq 'rest') and $ltime < $b_time and $ktotal){
-	print <<"EOM";
-	var start=new Date();
-	start=Date.parse(start)/1000;
-	var counts=$vtime;
-
-	function CountDown(){
-		var now=new Date();
-		now=Date.parse(now)/1000;
-		var x=parseInt(counts-(now-start),10);
-		if(document.form1){document.form1.clock.value = x;}
-		if(x>0){
-			timerID=setTimeout("CountDown()", 100)
-		}else{
-			location.href="$script?mode=log_in&id=$kid&pass=$kpass"
-		}
-	}
-EOM
+if(($mode eq 'log_in' or ($mode eq 'monster' and $battle_flag ne "1") or $mode eq 'rest')){
 	if($kspot == 0 && $kpst == 0){
 		$info0 = "HP、LPを完全に回復することができます。";
 		$info1 = "アイテム等の購入ができます。";
@@ -110,15 +112,9 @@ EOM
 		$info5 = "$town_name[$karea]の方に引き返します。";
 	}
 }
-if(($mode eq 'log_in' || ($mode eq 'monster' and $battle_flag ne "1") or $mode eq 'rest') && ($ltime >= $b_time or !$ktotal)){
-	# noop
-}
-if(($mode eq 'monster' and $battle_flag eq "1") or $mode eq 'battle' ){
-	# noop
-}
 
 my $css_backgif = "";
-$css_backgif = "    background-image: url($backgif);" if ( $backgif ne "" );
+$css_backgif = "background-image: url($backgif);" if ( $backgif ne "" );
 
 	print <<"EOM";
 	info[0] = "$info0";
@@ -139,15 +135,6 @@ master_sound = [
 ];
 </script>
 <script src="/js/so_town.js"></script>
-EOM
-
-
-	if ($kid && $mode eq "log_in") { 
-	print <<"EOM";
-<script src="/js/so_app.js"></script>
-EOM
-	}
-	print <<"EOM";
 <style type="text/css">
 <!--
 body {
@@ -172,8 +159,7 @@ a:visited {
 <link rel="stylesheet" href="/css/blackboard.css" type="text/css" />
 <link rel="stylesheet" href="/css/third-party/jquery.jgrowl.css" type="text/css" />
 </head>
-<body $onload>
-<div id="stage"></div>
+<body>
 EOM
 }
 

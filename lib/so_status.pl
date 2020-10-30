@@ -359,6 +359,9 @@ EOM
 </div>
 
 <hr size=0><p>
+			<script>
+const spot = "$spot";
+</script>
 EOM
 
 	&footer;
@@ -402,7 +405,7 @@ sub status_up {
 
 			unshift(@status_new,$utf8);
 		}else{
-			push(@status_new,"$_");
+			push(@status_new,"$_\n");
 		}
 	}
 

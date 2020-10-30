@@ -244,7 +244,7 @@ sub regist {
 			unshift(@new,$utf8);
 			$hit=1;
 		}else{
-			push(@new,"$_");
+			push(@new,"$_\n");
 		}
 	}
 

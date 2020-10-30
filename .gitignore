@@ -15,5 +15,7 @@
 !/save/archive/.gitkeep
 /save/battle/*
 !/save/battle/.gitkeep
+/save/state/*
+!/save/state/.gitkeep
 /log/*.log
 !/log/.gitkeep

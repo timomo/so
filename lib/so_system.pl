@@ -6,8 +6,12 @@ sub load_ini
 	my @ret;
 
 	open(IN, "<", $path);
-	while(<IN>)
+
+	my @tmp = <IN>;
+
+	for (@tmp)
 	{
+		$_ =~ s/(?:\r\n|\r|\n)$//g;
 		my $str = Encode::decode_utf8($_);
 		push(@ret, $str);
 	}
@@ -20,36 +24,19 @@ sub load_ini
 #  デコード処理  #
 #----------------#
 sub decode {
+	my $buffer;
+
 	if ($ENV{'REQUEST_METHOD'} eq "POST") {
 		if ($ENV{'CONTENT_LENGTH'} > 51200) { &error("投稿量が大きすぎます。"); }
 		read(STDIN, $buffer, $ENV{'CONTENT_LENGTH'});
-	} else { $buffer = $ENV{'QUERY_STRING'}; }
-	my @pairs = split(/&/, $buffer);
-
-	%in = ();
-
-	foreach (@pairs) {
-		my ($name, $value) = split(/=/, $_);
-		$value =~ tr/+/ /;
-		$value =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
-
-		# 文字コードをシフトJIS変換
-		# &jcode'convert(*value, "sjis", "", "z");
-
-		# タグ処理
-		$value =~ s/</&lt;/g;
-		$value =~ s/>/&gt;/g;
-		$value =~ s/\"/&quot;/g;
-
-		# 改行等処理
-		$value =~ s/\r//g;
-		$value =~ s/\n//g;
-
-		# 一括削除用
-		if ($name eq 'del') { push(@DEL,$value); }
-
-		$in{$name} = $value;
 	}
+
+	my $params = Mojo::Parameters->new($buffer);
+	my $query = $ENV{'QUERY_STRING'};
+
+	$params = $params->merge( Mojo::Parameters->new($query) );
+
+	%in = %{$params->to_hash};
 
 	$mode = $in{'mode'};
 	$cookie_pass = $in{'pass'};

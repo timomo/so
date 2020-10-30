@@ -2,7 +2,8 @@ use utf8;
 #--------#
 #  宿屋  #
 #--------#
-sub yado {
+sub yado
+{
 	@inn_array = &load_ini($town_inn[$in{'area'}]);
 	@inn_chara = &load_ini($chara_file);
 
@@ -37,7 +38,10 @@ $get_msg<br>
 <form action="$script" method="post">
 <B>所持金</B> $kgold G<BR>
 <BR>
-<table border=1>
+
+<div class="blackboard question">
+
+<table border=0>
 <tr>
 <th></th><th>部屋名</th><th>料理</th><th>効果</th><th>価格</th>
 EOM
@@ -76,6 +80,9 @@ EOM
 	print <<"EOM";
 </tr>
 </table>
+
+</div>
+
 <p>
 <input type=hidden name=id   value=$in{'id'}>
 <input type=hidden name=pass value=$in{'pass'}>
@@ -84,6 +91,9 @@ EOM
 <input type=submit value="宿泊する">
 </form>
 <p>
+	<script>
+const spot = "$spot";
+</script>
 EOM
 
 	&footer;
@@ -94,13 +104,13 @@ EOM
 #------------#
 #  体力回復  #
 #------------#
-sub yado_in {
-
-	if($in{'inn_no'} eq ""){
+sub yado_in
+{
+	if(! exists $in{inn_no})
+	{
 		$error = "部屋を選んでください。";
 		&yado;
 	}
-
 
 	&get_host;
 
@@ -154,7 +164,7 @@ sub yado_in {
 			&regist_buff;
 			$hit=1;
 		}else{
-			push(@yado_new,"$_");
+			push(@yado_new,"$_\n");
 		}
 	}
 
@@ -183,6 +193,9 @@ sub yado_in {
 ゆっくり休んでHP、LPを完全に回復しました。<p>
 $get_msg
 <p>
+		<script>
+const spot = "$spot";
+</script>
 EOM
 
 	&footer;

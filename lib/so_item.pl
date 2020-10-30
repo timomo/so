@@ -154,6 +154,9 @@ EOM
 　現在の貸し金庫の手数料は「価値」の<b> $space_price </b>% です。
 </form>
 <p>
+		<script>
+const spot = "$spot";
+</script>
 EOM
 
 	&footer;
@@ -640,7 +643,7 @@ sub item_sell
 			unshift(@item_new,$utf8);
 			$hit=1;
 		}else{
-			push(@item_new,"$_");
+			push(@item_new,"$_\n");
 		}
 	}
 
@@ -777,7 +780,7 @@ sub user_sell
 			unshift(@item_new,$utf8);
 			$hit=1;
 		}else{
-			push(@item_new,"$_");
+			push(@item_new,"$_\n");
 		}
 	}
 
@@ -923,7 +926,7 @@ sub bank_in
 			unshift(@item_new,$utf8);
 			$hit=1;
 		}else{
-			push(@item_new,"$_");
+			push(@item_new,"$_\n");
 		}
 	}
 
@@ -1065,7 +1068,7 @@ sub bank_send
 
 			$kid = $in{'id'};
 		}else{
-			push(@item_new,"$_");
+			push(@item_new,"$_\n");
 		}
 	}
 
@@ -1143,7 +1146,7 @@ sub bank_money
 			unshift(@money_new,$utf8);
 			$hit+=1;
 		}else{
-			push(@money_new,"$_");
+			push(@money_new,"$_\n");
 		}
 	}
 
@@ -1289,7 +1292,7 @@ sub item_delete
 			unshift(@item_new,$utf8);
 			$hit=1;
 		}else{
-			push(@item_new,"$_");
+			push(@item_new,"$_\n");
 		}
 	}
 

@@ -24,7 +24,7 @@ sub event {
 
 			unshift(@event_new,$utf8);
 		}else{
-			push(@event_new,"$_");
+			push(@event_new,"$_\n");
 		}
 	}
 

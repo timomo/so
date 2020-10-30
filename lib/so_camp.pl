@@ -37,7 +37,7 @@ sub rest {
 
 	$krcv = 5;
 	&camp_gain;
-	$movemsg = "$kskm休憩し、HPが<B>$rcvhp</B>、リスクが<B>$rcvrsk%</B> 回復しました。";
+	$movemsg = "$kskm 休憩し、HPが<B>$rcvhp</B>、リスクが<B>$rcvrsk%</B> 回復しました。";
 	&event;
 	$mode = "log_in";
 	&log_in;
@@ -51,7 +51,7 @@ sub camp {
 
 	$krcv = 20;
 	&camp_gain;
-	$movemsg = "$kskmキャンプを行い、HPが<B>$rcvhp</B>、リスクが<B>$rcvrsk%</B> 回復しました。";
+	$movemsg = "$kskm キャンプを行い、HPが<B>$rcvhp</B>、リスクが<B>$rcvrsk%</B> 回復しました。";
 	if(int(rand(2)) == 0){
 		&event;
 		$mode = "log_in";

@@ -28,13 +28,14 @@ sub message {
 
 	if($mes_max > $max) { pop(@mes_regist); }
 
-	my $mes = "$in{'mesid'}<>$in{'id'}<>$in{'name'}<>$in{'mes'}<>$dname<>$gettime<>\n";
+	my $mes = "$in{'mesid'}<>$in{'id'}<>$in{'name'}<>$in{'mes'}<>$dname<>$gettime<>";
 	my $utf8 = Encode::encode_utf8($mes);
+	$utf8 = $mes;
 
-	unshift(@mes_regist,$utf8);
+	unshift(@mes_regist, $utf8);
 
 	open(OUT,">$message_file");
-	print OUT @mes_regist;
+	print OUT join("\n", @mes_regist);
 	close(OUT);
 
 	# ロック解除

@@ -2,12 +2,15 @@
 
 use File::Spec;
 use FindBin;
-use lib File::Spec->catdir($FindBin::RealBin, 'lib');
+# use lib File::Spec->catdir($FindBin::RealBin, 'lib');
 use Template;
 use YAML::XS;
 use CGI;
 use utf8;
 use JSON;
+use Mojo::Log;
+use Scalar::Util;
+use Mojo::Parameters;
 
 # 初期設定ファイルの読み込み
 require './so_system.dat';
@@ -36,26 +39,56 @@ require './lib/so_status.pl';
 require './lib/so_system.pl';
 require './lib/so_town.pl';
 require './lib/so_config.pl';
+require './lib/so_pvp.pl';
 
 our $tt = new Template (
 	ENCODING => 'utf8',
 	INCLUDE_PATH => File::Spec->catdir($FindBin::RealBin, 'template'),
 );
 
+our $logger = Mojo::Log->new;
+
+$mode = "";
+$error = "";
+
+my $require_login = 1;
+
 #--------------#
 #　メイン処理　#
 #--------------#
-if($mente) { &error("メンテナンス中です。しばらくお待ちください。"); }
+if($mente)
+{
+	&error("メンテナンス中です。しばらくお待ちください。");
+}
 &decode;
 srand();
 &access_ctrl;
 
-if ($in{'id'})
+if ($mode =~ /(?:html_top|log_in|chara_make|make_end|regist)/ || $mode eq "")
+{
+	$require_login = 0;
+}
+
+if ($require_login == 1)
+{
+	if (! exists $in{id})
+	{
+		&error("ログインしてください");
+	}
+}
+
+if (exists $in{id})
 {
 	&chara_load($in{'id'});
 
-	if (&is_continue_monster) {
+	if (&is_continue_monster)
+	{
 		&monster;
+		exit;
+	}
+	elsif (&is_continue_pvp)
+	{
+		&pvp;
 		exit;
 	}
 }
@@ -66,6 +99,7 @@ elsif($mode eq 'chara_make') { &chara_make; }
 elsif($mode eq 'make_end') { &make_end; }
 elsif($mode eq 'regist') { &regist; }
 elsif($mode eq 'battle') { &battle; }
+elsif($mode eq 'pvp') { &pvp; }
 elsif($mode eq 'monster') { &monster; }
 elsif($mode eq 'rest') { &rest; }
 elsif($mode eq 'yado') { &yado; }

@@ -49,7 +49,10 @@ EOM
 <B>所持金</B> $kgold G &nbsp; <B>所持アイテム数</B> $kitem / $max_item &nbsp; <a href=so_item.cgi?id=$kid&pass=$kpass  target="new">アイテム一覧</a>
 <BR>
 <BR>
-<table border=1>
+
+<div class="blackboard question">
+
+<table border=0>
 <tr>
 <th></th><th>種別</th><th>名前</th><th>効果</th><th>価値</th><th>使用</th><th>装備条件</th><th>属性</th><th>耐久</th><th>品質</th><th>作成者</th>
 EOM
@@ -120,6 +123,9 @@ EOM
 	print <<"EOM";
 </tr>
 </table>
+
+</div>
+
 <p>
 <input type=hidden name=id   value=$in{'id'}>
 <input type=hidden name=pass value=$in{'pass'}>
@@ -143,6 +149,9 @@ EOM
 	print <<"EOM";
 </form>
 <p>
+		<script>
+const spot = "$spot";
+</script>
 EOM
 
 	&footer;
@@ -191,7 +200,10 @@ EOM
 <B>所持金</B> $kgold G &nbsp; <B>所持アイテム数</B> $kitem / $max_item &nbsp; <a href=so_item.cgi?id=$kid&pass=$kpass  target="new">アイテム一覧</a>
 <BR>
 <BR>
-<table border=1>
+
+<div class="blackboard question">
+
+<table border=0>
 <tr>
 <th></th><th>販売者</th><th>種別</th><th>名前</th><th>効果</th><th>価値</th><th>使用</th><th>装備条件</th><th>属性</th><th>耐久</th><th>品質</th><th>作成者</th><th>在庫</th>
 EOM
@@ -259,6 +271,9 @@ EOM
 	print <<"EOM";
 </tr>
 </table>
+
+</div>
+
 <p>
 <input type=hidden name=id   value=$in{'id'}>
 <input type=hidden name=pass value=$in{'pass'}>
@@ -282,6 +297,9 @@ EOM
 	print <<"EOM";
 </form>
 <p>
+		<script>
+const spot = "$spot";
+</script>
 EOM
 
 	&footer;
@@ -335,7 +353,10 @@ EOM
 	print <<"EOM";
 <B>預かりアイテム数</B> $kpitem (手数料は価値の <b>$space_price</b> %) &nbsp; <B>所持アイテム数</B> $kitem / $max_item &nbsp; <a href=so_item.cgi?id=$kid&pass=$kpass  target="new">アイテム一覧</a><BR>
 <BR>
-<table border=1>
+
+<div class="blackboard question">
+
+<table border=0>
 <tr>
 <th></th><th>種別</th><th>名前</th><th>効果</th><th>価値</th><th>使用</th><th>装備条件</th><th>属性</th><th>耐久</th><th>品質</th><th>作成者</th><th>所持数</th>
 EOM
@@ -396,6 +417,9 @@ EOM
 	print <<"EOM";
 </tr>
 </table>
+
+</div>
+
 <p>
 <input type=hidden name=id   value=$in{'id'}>
 <input type=hidden name=pass value=$in{'pass'}>
@@ -423,6 +447,9 @@ EOM
 ※ここでの処理には手数料はかかりません。
 </form>
 <p>
+		<script>
+const spot = "$spot";
+</script>
 EOM
 
 	&footer;
@@ -500,7 +527,7 @@ sub item_buy {
 			unshift(@item_new,$utf8);
 			$hit=1;
 		}else{
-			push(@item_new,"$_");
+			push(@item_new,"$_\n");
 		}
 	}
 
@@ -635,7 +662,7 @@ sub user_buy {
 			unshift(@item_new,$utf8);
 			$hit=1;
 		}else{
-			push(@item_new,"$_");
+			push(@item_new,"$_\n");
 		}
 	}
 
@@ -753,7 +780,7 @@ sub bank_out {
 			unshift(@item_new,$utf8);
 			$hit=1;
 		}else{
-			push(@item_new,"$_");
+			push(@item_new,"$_\n");
 		}
 	}
 

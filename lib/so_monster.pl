@@ -110,13 +110,13 @@ sub monster_step_run
 		$mstpv = "行動不能";
 	}
 
-	$kefv = "<font color=$efcolor[0]>$katcv%</font> / <font color=$efcolor[1]>$kdefv%</font> / <font color=$efcolor[2]>$kspdv%</font> $kstpv";
-	$mefv = "<font color=$efcolor[0]>$matcv%</font> / <font color=$efcolor[1]>$mdefv%</font> / <font color=$efcolor[2]>$mspdv%</font> $mstpv";
+	$kefv = "<font color=$efcolor[0]>$katcv %</font> / <font color=$efcolor[1]>$kdefv %</font> / <font color=$efcolor[2]>$kspdv %</font> $kstpv";
+	$mefv = "<font color=$efcolor[0]>$matcv %</font> / <font color=$efcolor[1]>$mdefv %</font> / <font color=$efcolor[2]>$mspdv %</font> $mstpv";
 
 	$battle_date[$j] .= <<"EOM";
 <TR>
 	<TD CLASS="b2" COLSPAN="3" ALIGN="center">
-	$iターン
+	$i ターン
 	</TD>
 </TR>
 <TR>
@@ -570,12 +570,6 @@ sub monster_initialize
 	$vtime = $b_time - $ltime;
 	$mtime = $m_time - $ltime;
 
-	if($ltime < $m_time and $ktotal) {
-		$error = "$mtime秒後に行動できます。";
-		$mode = "log_in";
-		&log_in;
-	}
-
 	&add_risk;
 	$wrsk = $krsk;
 
@@ -639,6 +633,9 @@ sub monster_initialize
 	$md_flg = 0;
 
 	$i=1;$j=1;@battle_date=();
+
+	@battle_header = ();
+	@battle_footer = ();
 
 	push @battle_header, "$movemsg<br>";
 	push @battle_header, "$kname は、$mname に遭遇した！" if (! $bossflg);

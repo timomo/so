@@ -31,7 +31,7 @@ sub money_get {
 
 			unshift(@money_new,$utf8);
 		}else{
-			push(@money_new,"$_");
+			push(@money_new,"$_\n");
 		}
 	}
 
@@ -103,7 +103,7 @@ sub regist_bank {
 			unshift(@bank_new,$utf8);
 		$hit=1;
 		}else{
-			push(@bank_new,"$_");
+			push(@bank_new,"$_\n");
 		}
 	}
 
@@ -145,7 +145,7 @@ sub in_bank {
 			unshift(@bank_new,$utf8);
 		$hit=1;
 		}else{
-			push(@bank_new,"$_");
+			push(@bank_new,"$_\n");
 		}
 	}
 

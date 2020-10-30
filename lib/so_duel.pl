@@ -986,7 +986,7 @@ sub regist_battle {
 			unshift(@battle_new,$utf8);
 		$hit=1;
 		}else{
-			push(@battle_new,"$_");
+			push(@battle_new,"$_\n");
 		}
 	}
 
