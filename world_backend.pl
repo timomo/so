@@ -458,6 +458,8 @@ app->helper(
 
         $file->spurt(join($new_line, @raw));
         $file2->spurt(join($new_line, @raw2));
+
+        warn "##### saved!!!!";
     },
 );
 
@@ -688,6 +690,12 @@ app->helper(
             {
                 next;
             }
+            my $time = time() - $append->{最終実行時間} + 60;
+            warn $time;
+            if ($time <= 0)
+            {
+                next;
+            }
 
             my $id = $append->{id};
 
@@ -696,12 +704,21 @@ app->helper(
             if (defined $npc_command)
             {
                 my $accept = $self->get_time_of_day;
-
+  
                 push(@$queue, { id => $id, param => $npc_command, "accept" => $accept });
+
+                $append->{最終実行時間} = time();
             }
         }
 
-        $loop->timer(60, sub { $self->manage });
+        if ($queue->size == 0)
+        {
+            $loop->timer(60, sub { $self->manage });
+        }
+        else
+        {
+            $loop->timer(1, sub { $self->manage });
+        }
     },
 );
 
@@ -937,6 +954,7 @@ $loop->timer(1, sub {
     push(@$characters, @$all);
 });
 
+$loop->recurring(60, sub { app->save });
 $loop->timer(3, sub { app->manage });
 $loop->timer(5, sub { app->create_battle_ws_my });
 
