@@ -526,11 +526,11 @@ app->helper(
 
             if (defined $hit)
             {
-                $k->{操作種別} = $hit->{type};
+                $k->{操作種別} = $hit->{type} || "pc";
             }
             else
             {
-                $k->{操作種別} = "npc";
+                $k->{操作種別} = "pc";
             }
 
             push(@ret, $k);
@@ -684,6 +684,11 @@ app->helper(
 
         for my $append (@$character_types)
         {
+            if ($append->{操作種別} eq "pc")
+            {
+                next;
+            }
+
             my $id = $append->{id};
 
             my $npc_command = $self->get_npc_command($id);
@@ -926,15 +931,10 @@ websocket '/channel' => sub {
 };
 
 $loop->timer(1, sub {
-    $characters = Mojo::Collection->new;
-    $character_types = Mojo::Collection->new;
-
-    my $all = app->characters;
-
-    push(@$characters, @$all);
     my $types = app->character_types;
-
     push(@$character_types, @$types);
+    my $all = app->characters;
+    push(@$characters, @$all);
 });
 
 $loop->timer(3, sub { app->manage });
