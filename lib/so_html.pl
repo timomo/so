@@ -17,6 +17,10 @@ sub footer {
 		push(@select_menu, sprintf('<p id="mode_default-select_%s" class="select-menu">%s</p>', "status_check", "ステータス詳細"));
 	}
 
+	if($kid) {
+		push(@select_menu, sprintf('<p id="mode_default-select_%s" class="select-menu">%s</p>', "logout", "ログアウト"));
+	}
+
 	if ($kid and $mode ne "")
 	{
 		print '<div class="clearfix">'. "\n";
@@ -34,11 +38,12 @@ print <<EOF;
 	</div>
 </div>
 
-<form action="$script" method="post">
+<form action="$script" method="post" style="display: none">
 <select id="default-select" name="mode" onchange="javascript:selectTown(this);">
 <option value="item_check">アイテム一覧</option>
 <option value="status_check">ステータス詳細</option>
 <option value="log_in">戻る</option>
+<option value="logout">ログアウト</option>
 </select>
 <input type="hidden" name="id" value="$kid" />
 <input type="hidden" name="pass" value="$kpass" />

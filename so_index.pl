@@ -93,7 +93,12 @@ if (exists $in{id})
 	}
 }
 
-if($mode eq "") { &html_top; }
+if ($mode eq "" || ! defined $mode)
+{
+	$mode = "html_top";
+}
+
+if($mode eq "html_top") { &html_top; }
 elsif($mode eq 'log_in') { &log_in; }
 elsif($mode eq 'chara_make') { &chara_make; }
 elsif($mode eq 'make_end') { &make_end; }
@@ -122,4 +127,6 @@ elsif($mode eq 'status_up') { &status_up; }
 elsif($mode eq 'skill_manage') { &skill_manage; }
 elsif($mode eq 'bank') { &bank; }
 elsif($mode eq 'bank_out') { &bank_out; }
-&html_top;
+elsif($mode eq 'logout') { &logout; }
+
+&error("選択したページがありません:". $mode);

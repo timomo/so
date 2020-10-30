@@ -37,6 +37,8 @@ function setup_neighbors()
 {
 	const neighbors = jQuery("#neighbors");
 
+	jQuery("#pvp_form").hide();
+
 	if (neighbors.length === 0)
 	{
 		return false;
@@ -153,7 +155,11 @@ function setup_select_menu()
 		const select_id = ary.splice(0, 1)[0];
 		const select_value = ary.join("_");
 
-		if (select_id !== "pvp-select") {
+		if (select_id === "default-select" && select_value === "logout") {
+			location.href = "./logout";
+			return false;
+		}
+		else if (select_id !== "pvp-select") {
 			jQuery("#" + select_id).val(select_value);
 			jQuery("#" + select_id + "-submit").trigger("click");
 		}
