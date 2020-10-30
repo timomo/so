@@ -61,18 +61,6 @@ my $sep = "<>";
 my $new_line = "\r\n";
 my @default_parameter = (5, 5, 5, 5, 5, 5, 5);
 
-push(@$character_types, { id => "tyomo88", type => "pc" });
-push(@$character_types, { id => "nakiri", type => "pc" });
-push(@$character_types, { id => "tyomo89", type => "pc" });
-push(@$character_types, { id => "test", type => "pc" });
-push(@$character_types, { id => "hiron", type => "pc" });
-push(@$character_types, { id => "shimada", type => "pc" });
-push(@$character_types, { id => "kasimu", type => "pc" });
-push(@$character_types, { id => "SIREN", type => "pc" });
-push(@$character_types, { id => "chupa", type => "pc" });
-push(@$character_types, { id => "oota", type => "pc" });
-push(@$character_types, { id => "syabu", type => "pc" });
-
 app->log->level('debug');
 
 post "/is_result" => sub
@@ -938,6 +926,9 @@ websocket '/channel' => sub {
 };
 
 $loop->timer(1, sub {
+    $characters = Mojo::Collection->new;
+    $character_types = Mojo::Collection->new;
+
     my $all = app->characters;
 
     push(@$characters, @$all);
