@@ -51,7 +51,7 @@ sub regist_buff {
 			unshift(@buff_new,$utf8);
 			$hit=1;
 		}else{
-			push(@buff_new,"$_");
+			push(@buff_new,"$_\n");
 		}
 	}
 
