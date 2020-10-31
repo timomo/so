@@ -1,7 +1,7 @@
 function page(type){
 	let i,
-	    sel    = 0,
-	    maxsel = 0,
+		sel  = 0,
+		maxsel = 0,
 		nextid = 0,
 		backid = 0;
 
@@ -43,29 +43,80 @@ function page(type){
 }
 
 jQuery(document).ready(() => {
-	jQuery("[id^='sel']").hide();
+	jQuery("div[id^='sel']").hide();
 
-	const pointer = typeof sel !== 'undefined' ? sel : 0;
+	let min = 99999;
+	let max = 0;
+	let pointer = typeof sel !== 'undefined' ? sel : 0;
 
-	if (true) {
-		let maxsel = document.data.lastid.value;
-		maxsel = Number(maxsel);
+	const first = jQuery("a.btn-first");
+	const back = jQuery("a.btn-back");
+	const next = jQuery("a.btn-next");
+	const last = jQuery("a.btn-last");
 
-		for (let i = 0; i <= maxsel; i++) {
-			const layer = "sel" + i;
-			const nextPageObj = jQuery("#" + layer);
+	first.attr("href", "javascript:void(0)");
+	back.attr("href", "javascript:void(0)");
+	next.attr("href", "javascript:void(0)");
+	last.attr("href", "javascript:void(0)");
 
-			if (sel === i) {
-				nextPageObj.show();
+	jQuery("div[id^='sel']").each((idx, elem) => {
+		const obj = jQuery(elem);
+		const ary = obj.attr("id").split("sel");
+		const no = Number(ary[1]);
 
-				document.data.backid.value = i-1;
-				document.data.nextid.value = i+1;
+		if (no >= max) max = no;
+		if (no <= min) min = no;
+	});
 
-			} else {
-				nextPageObj.hide();
-			}
-		}
-	}
+	const check = (pointer) => {
+		let backP = pointer - 1;
+		let nextP = pointer + 1;
+
+		if (back < min) backP = min;
+		if (next > max) nextP = max;
+
+		const selBack = jQuery("div#sel" + backP);
+		const selNext = jQuery("div#sel" + nextP);
+
+		back.removeClass("enable");
+		next.removeClass("enable");
+		first.removeClass("enable");
+		last.removeClass("enable");
+
+		if (selBack.length !== 0) back.addClass("enable");
+		if (selNext.length !== 0) next.addClass("enable");
+		if (min !== pointer) first.addClass("enable");
+		if (max !== pointer) last.addClass("enable");
+	};
+
+	const func = (pos) => {
+		let backP = pointer - 1;
+		let nextP = pointer + 1;
+
+		if (back < min) backP = min;
+		if (next > max) nextP = max;
+
+		if (pos === "next" && pointer < max) pointer++;
+		if (pos === "back" && pointer > min) pointer--;
+		if (pos === "first") pointer = min;
+		if (pos === "last") pointer = max;
+
+		check(pointer);
+
+		const sel = jQuery("div#sel" + pointer);
+		jQuery("div[id^='sel']").hide();
+		sel.show();
+
+		document.command.sel.value = pointer;
+	};
+
+	next.bind("click", func.bind(next, "next"));
+	back.bind("click", func.bind(back, "back"));
+	first.bind("click", func.bind(first, "first"));
+	last.bind("click", func.bind(last, "last"));
+
+	check(pointer);
+	func("current");
 
 	jQuery(".select-command").bind("mouseenter", (event) => {
 		jQuery(".select-command").removeClass("blink-before");
