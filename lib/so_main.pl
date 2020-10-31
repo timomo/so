@@ -108,11 +108,6 @@ EOM
 EOM
 	$error="";
 
-	my %per = ();
-
-	@per{qw|hp  exp risk|} = ( ( ( $khp / $kmaxhp ) * 100 ), $kex, $rrsk );
-	map{ $per{$_} = $per{$_} < 0 ? 0 : $per{$_} } keys %per;
-
 	print <<"EOM";
 <div class="blackboard question">
 
@@ -120,12 +115,16 @@ EOM
 <tr>
 <td>
 <table border="0" style="width: 100%">
-<tr><td rowspan="3" class="b2">$kname<br />LV$klv<br />LP $klp\/$max_lp</td>
-<td colspan="2" class="b2" align="center">HP:<div class="meter" style="float: right; background-color: #000; padding: 2px; width: 160px;"><div style="background-color: red; width: $per{hp}%; text-align: right;" class="meter">&nbsp;</div></div></td></tr>
+<tr><td rowspan="3" class="b2" style="white-space: nowrap; text-align: left; line-height: 20px; padding-right: 15px;">
+$kname<br />
+LV: $klv<br />
+LP: $klp / $max_lp
+</td>
+<td colspan="2" class="b2" style="text-align: left">HP: $khp / $kmaxhp</td></tr>
 <tr>
-<td colspan="2" class="b2" align="center">EXP:<div class="meter" style="float: right; background-color: #000; padding: 2px; width: 160px;"><div style="background-color: orange; width: $per{exp}%; text-align: right;" class="meter">&nbsp;</div></div></td></tr>
+<td colspan="2" class="b2" style="text-align: left">EXP: $kex %</td></tr>
 <tr>
-<td colspan="2" class="b2" align="center">Risk:<div class="meter" style="float: right; background-color: #000; padding: 2px; width: 160px;"><div style="background-color: yellow; width: $per{risk}%; text-align: right;" class="meter">&nbsp;</div></div></td></tr>
+<td colspan="2" class="b2" style="text-align: left">Risk: $rrsk %</td></tr>
 <tr>
 <td colspan="2" class="b2" align="center">【現在地】</td></tr>
 <tr>

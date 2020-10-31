@@ -723,7 +723,7 @@ app->helper(
             {
                 next;
             }
-            my $timer = 60;
+            my $timer = 15;
             my $time = $append->{最終実行時間} - time() + $timer;
 
             if ($time <= 0)
@@ -762,7 +762,7 @@ app->helper(
 
         if ($min == 9999)
         {
-            $min = 60;
+            $min = 15;
         }
 
         if ($min < 0)
