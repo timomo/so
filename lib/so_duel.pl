@@ -9,8 +9,6 @@ sub battle {
 		&log_in;
 	} 
 
-	if($battle_flag) { &error("現在行動中です。お待ち下さい。"); }
-
 	##１Ｐデータ
 	@battle_k1 = &load_ini($chara_file);
 
