@@ -11,6 +11,7 @@ use JSON;
 use Mojo::Log;
 use Scalar::Util;
 use Mojo::Parameters;
+use Mojo::Template;
 
 # 初期設定ファイルの読み込み
 require './so_system.dat';
@@ -41,11 +42,11 @@ require './lib/so_town.pl';
 require './lib/so_config.pl';
 require './lib/so_pvp.pl';
 
-our $tt = new Template (
+our $tt = Template->new(
 	ENCODING => 'utf8',
 	INCLUDE_PATH => File::Spec->catdir($FindBin::RealBin, 'template'),
 );
-
+our $mt = Mojo::Template->new;
 our $logger = Mojo::Log->new;
 
 $mode = "";
@@ -75,21 +76,20 @@ if ($require_login == 1)
 	{
 		&error("ログインしてください");
 	}
-}
-
-if (exists $in{id})
-{
-	&chara_load($in{'id'});
-
-	if (&is_continue_monster)
+	else
 	{
-		&monster;
-		exit;
-	}
-	elsif (&is_continue_pvp)
-	{
-		&pvp;
-		exit;
+		&chara_load($in{'id'});
+
+		if (&is_continue_monster)
+		{
+			&monster;
+			exit;
+		}
+		elsif (&is_continue_pvp)
+		{
+			&pvp;
+			exit;
+		}
 	}
 }
 

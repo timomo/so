@@ -1,0 +1,21 @@
+<style type="text/css">
+body {
+    color: #666666;
+    background-color: #FFFFFF;
+    background-image: url(http://www.ann.hi-ho.ne.jp/nakiri/image/bg.gif);
+}
+body,tr,td,th,table { font-size: 10.5pt; }
+a:hover   {
+    color: #FF0000;
+}
+a:link    {
+    color: #0000FF;
+}
+a:visited {
+    color: #800080;
+}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/so_common.css" type="text/css" />
+<link rel="stylesheet" href="/css/blackboard.css" type="text/css" />
+<link rel="stylesheet" href="/css/third-party/jquery.jgrowl.css" type="text/css" />

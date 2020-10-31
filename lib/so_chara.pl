@@ -12,7 +12,10 @@ sub chara_make {
 <i>受付嬢「シマダ共和国にご入国でしょうか？こちらにご記入願います。」</i>
 <form action="$script" method="post">
 <input type="hidden" name="mode" value="make_end">
-<table border=1>
+
+<div class="blackboard question">
+
+<table border=0>
 <tr>
 <td class="b1" align=center>入国ＩＤ</td>
 <td><input type="text" name="id" size="11"><br><small>半角英数字4～8文字以内</small></td>
@@ -77,6 +80,9 @@ EOM
 </tr>
 </table>
 <input type="hidden" name=point value="$point">
+
+</div>
+
 </form>
 <p>
 EOM
@@ -159,7 +165,10 @@ sub make_end {
 以下の内容で登録が完了しました。
 <hr size=0>
 <p>
-<table border=1>
+
+<div class="blackboard question">
+
+<table border=0>
 <tr>
 <td class="b1">名前</td>
 <td>$in{'c_name'}</td>
@@ -202,7 +211,9 @@ sub make_end {
 <td>$chara_skill[$in{'skill2'}]</td>
 </tr>
 </table>
-<p>
+</div>
+
+<a href="/">TOPページへ</a>
 EOM
 
 		&footer;

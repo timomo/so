@@ -1,0 +1,14 @@
+<script src="/js/sound.js"></script>
+<script>
+chara_config = {};
+chara_config["楽曲"] = "あり";
+chara_config["戦闘楽曲"] = "あり";
+chara_config["戦闘効果音"] = "あり";
+chara_config["音声"] = "あり";
+
+master_sound = [
+    {"id":1,"ファイル名":"NES-RPG-A02-2(Town1-Loop130).mp3","名称":"town1","ユニークid":"1","サウンド種別":"1"},
+    {"id":2,"ファイル名":"NES-RPG-B10-2(Dungeon2-Loop170).mp3","名称":"dungeon1","ユニークid":"2","サウンド種別":"1"},
+    {"id":3,"ファイル名":"GB-RPG-A12-2(Battle1-Loop157).mp3","名称":"battle1","ユニークid":"3","サウンド種別":"1"},
+];
+</script>

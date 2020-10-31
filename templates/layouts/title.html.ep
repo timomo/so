@@ -1,0 +1,15 @@
+<form action="/login" method="POST">
+<input type="hidden" name="mode" value="log_in" />
+<table border=0 width='100%'>
+<tr>
+	<td align="center" valign="top">
+	<img src="http://www.ann.hi-ho.ne.jp/nakiri/image/SO.gif" width="227" height="81">
+	</td>
+</tr>
+<tr>
+<td align="center" valign="top">
+%== include 'layouts/login'
+</td>
+</tr>
+</table>
+</form>

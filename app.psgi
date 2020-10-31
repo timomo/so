@@ -223,27 +223,70 @@ get '/logout' => sub {
     $self->redirect_to('/');
 };
 
-any "/direct" => sub
-{
-    my $self = shift;
-    my $sub = CGI::Compile->compile(File::Spec->catfile($FindBin::Bin, 'so_index.pl'));
-    my $app = CGI::Emulate::PSGI->handler($sub);
-    my $env = $self->tx->req->env;
-    $env->{"psgi.input"} ||= *STDIN;
-    seek($env->{"psgi.input"}, 0, 0);
+app->helper(
+    emulate_cgi => sub
+    {
+        my $self = shift;
+        my $env = shift;
 
-    warn Dump($env);
+        my $sub = CGI::Compile->compile(File::Spec->catfile($FindBin::Bin, 'so_index.pl'));
+        my $app = CGI::Emulate::PSGI->handler($sub);
+        my $content = join("", @{$app->($env)->[2]});
+        my $utf8 = Encode::decode_utf8($content);
 
-    my $content = join("", @{$app->($env)->[2]});
-    my $utf8 = Encode::decode_utf8($content);
-
-    return $self->render(text => $utf8, format => "html");
-};
+        return $utf8;
+    },
+);
 
 any "/" => sub
 {
     my $self = shift;
-    return $self->render('index');
+    my $k = $self->current_user;
+    my $mode = $self->param("mode");
+
+    return $self->redirect_to("/current") if ($k);
+
+    my $env = $self->tx->req->env;
+    $env->{"psgi.input"} ||= *STDIN;
+    seek($env->{"psgi.input"}, 0, 0);
+
+    my $param = {};
+
+    if (! defined $mode)
+    {
+        return $self->render('index');
+    }
+    elsif ($mode eq "chara_make")
+    {
+        $param = { mode => "chara_make" };
+    }
+    elsif ($mode eq "make_end")
+    {
+        $param = { mode => "make_end" };
+
+        for (qw|id sex pass c_name chara n_0 n_1 n_2 n_3 n_4 n_5 n_6 point|)
+        {
+            $param->{$_} = $self->param($_);
+        }
+    }
+    elsif ($mode eq "regist")
+    {
+        $param = { mode => "regist" };
+
+        for (qw|skill1 skill2 new id sex pass c_name chara n_0 n_1 n_2 n_3 n_4 n_5 n_6|)
+        {
+            $param->{$_} = $self->param($_);
+        }
+    }
+
+    my $url = Mojo::URL->new;
+    $url->query($param);
+    $env->{QUERY_STRING} = $url->to_string;
+    $env->{QUERY_STRING} =~ s/^\?//;
+
+    my $utf8 = $self->emulate_cgi($env);
+
+    return $self->render(text => $utf8, format => "html");
 };
 
 app->start;

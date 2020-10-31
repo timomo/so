@@ -1,0 +1,18 @@
+<div class="blackboard question">
+	<table border=0>
+	    <tr>
+	        <td align=center colspan=5 class=b2>冒険中の方はこちら</td>
+	    </tr>
+	    <tr>
+	        <td class=b1>入国ＩＤ</td>
+	        <td><input type="text" size="11" name="id" value="" /></td>
+	    </tr>
+	    <tr>
+	        <td class=b1>パスワード</td>
+	        <td><input type="password" size="11" name="pass" value="" /></td>
+	    </tr>
+	    <tr>
+	        <td colspan="2"><input type="submit" value="旅の続き" /></td>
+	    </tr>
+	</table>
+</div>
