@@ -16,6 +16,7 @@ sub save_dat_append
 			$tmp[2] = $karea;
 			$tmp[3] = $kspot;
 			$tmp[4] = $kpst;
+			$tmp[5] = time;
 			$hit = 1;
 		}
 		push(@new, join("<>", @tmp));
@@ -29,6 +30,7 @@ sub save_dat_append
 		$tmp[2] = $karea;
 		$tmp[3] = $kspot;
 		$tmp[4] = $kpst;
+		$tmp[5] = time;
 		push(@new, join("<>", @tmp));
 	}
 
