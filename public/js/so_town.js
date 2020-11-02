@@ -143,6 +143,10 @@ function setup_select_menu()
 
 	jQuery(".select-menu").bind("click", (event) =>
 	{
+		if (jQuery("form").is(":disabled")) {
+			jQuery.jGrowl("サーバ未接続状態の為、操作出来ません。");
+		}
+
 		const id = jQuery(event.target).attr("id");
 		const ary = id.split("_");
 		const name = ary.splice(0, 1)[0];
@@ -169,6 +173,7 @@ function setup_select_menu()
 
 let ws;
 
+/*
 function get_cookies() {
 	const tmp = document.cookie.split(';');
 	const ret = {};
@@ -193,6 +198,7 @@ function get_so_cookies() {
 
 	return ret;
 }
+ */
 
 function ws_send(method, data) {
 	const request = {};
@@ -202,7 +208,7 @@ function ws_send(method, data) {
 	// request.const_id = cookie.id;
 	request.data = data;
 
-	console.error(method, request);
+	// console.error(method, request);
 
 	ws.send(JSON.stringify(request));
 }
@@ -230,6 +236,10 @@ function setup_websocket(timer) {
 
 		console.debug("ws opened");
 
+		jQuery.jGrowl("サーバに接続しました。");
+
+		jQuery("form").prop("disabled", false);
+
 		if (timer) clearTimeout(timer);
 
 		timer = setTimeout(() => {
@@ -239,6 +249,10 @@ function setup_websocket(timer) {
 
 	ws.onclose = function () {
 		console.warn("ws closed. try reconnect...");
+
+		jQuery.jGrowl("サーバから切断されました。");
+
+		jQuery("form").prop("disabled", true);
 
 		count.ping = 0;
 
@@ -275,6 +289,11 @@ function setup_websocket(timer) {
 		location.href = "?accept=" + data.accept;
 	};
 
+	const func_server_disconnect = (data) => {
+		jQuery.jGrowl("worldサーバから切断されました。");
+		jQuery("form").prop("disabled", true);
+	};
+
 	ws.onmessage = function (e) {
 		const response = JSON.parse(e.data);
 
@@ -290,6 +309,9 @@ function setup_websocket(timer) {
 				break;
 			case "result":
 				func_result(response.data);
+				break;
+			case "battle_server_disconnect":
+				func_server_disconnect(response.data);
 				break;
 			default:
 				console.error(response);
