@@ -29,6 +29,7 @@ use CGI::Compile;
 use CGI::Emulate::PSGI;
 use Time::HiRes;
 use String::Random;
+use DBIx::Custom;
 # use String::Random;
 # use Devel::Cycle;
 
@@ -64,6 +65,8 @@ my $sep = "<>";
 my $new_line = "\r\n";
 my @default_parameter = (5, 5, 5, 5, 5, 5, 5);
 my $app;
+my $clients = {};
+my $dbis = {};
 
 app->log->level('debug');
 
@@ -99,8 +102,8 @@ post "/neighbors" => sub
     {
         my $c = $self->character($append->{id});
 
-        if (defined $c) {
-
+        if (defined $c)
+        {
             my $bool = $self->is_battle($append->{id}) || $self->is_pvp($append->{id}) ? ": 戦闘中" : "";
             my $name = sprintf("%s Lv: %d%s", $c->{名前}, $c->{レベル}, $bool);
 
@@ -155,42 +158,51 @@ post "/current" => sub
     my $id = $json->{id};
     my $k = $self->character($id);
 
-    if (! defined $k) {
-        return;
+    if (! defined $k)
+    {
+        return $self->render("no_result");
     }
 
     if (exists $json->{accept} && ($json->{accept} || "") ne "")
     {
         my $hit = $results->first(sub { return $_->{id} eq $id && $_->{accept} eq $json->{accept} });
 
-        if (! defined $hit) # 更新結果がない場合
+        if (! defined $hit) # 更新結果がメモリ上にない場合
         {
-            return $self->render("no_result");
+            my $path = File::Spec->catfile($FindBin::Bin, qw|save archive|, $json->{accept}. ".command.html");
+
+            if (! -f $path)
+            {
+                return $self->render("no_result");
+            }
+
+            my $file = Mojo::File->new($path);
+            my $utf8 = $file->slurp;
+
+            if (defined $utf8)
+            {
+                my $enc = Encode::decode_utf8($utf8);
+                return $self->render(text => $enc, format => "html");
+            }
         }
 
-        return $self->render(text => $hit->{content}, format => "html");
+        my $enc = Encode::decode_utf8($hit->{content});
+
+        return $self->render(text => $enc, format => "html");
     }
 
     my $mode = $self->location($id);
     my $param = {};
     $param->{mode} = $mode || "log_in";
 
-    if (! defined $app)
-    {
-        my $sub = CGI::Compile->compile(File::Spec->catfile($FindBin::Bin, 'so_index.pl'));
-        $app = CGI::Emulate::PSGI->handler($sub);
-    }
-
     my $env = $self->tx->req->env || {};
-
     my $url = Mojo::URL->new;
+
     $url->query({ %$param, id => $k->{id}, pass => $k->{パスワード} });
     $env->{QUERY_STRING} = $url->to_string;
     $env->{QUERY_STRING} =~ s/^\?//;
 
-    # seek($env->{"psgi.input"}, 0, 0);
-    my $content = join("", @{$app->($env)->[2]});
-    my $utf8 = Encode::decode_utf8($content);
+    my $utf8 = $self->emulate_cgi($env);
 
     return $self->render(text => $utf8, format => "html");
 };
@@ -199,15 +211,39 @@ post "/command" => sub
 {
     my $self = shift;
     my $json = $self->req->json;
-    my $id = delete $json->{id};
-    my $accept = $self->get_time_of_day;
+    my $res = $self->command($json);
 
-    push(@$queue, { id => $id, param => $json, "accept" => $accept });
-
-    $loop->timer(1, sub { $self->manage });
-
-    return $self->render(json => {accept => $accept});
+    return $self->render(json => $res);
 };
+
+app->helper(
+    command => sub
+    {
+        my $self = shift;
+        my $json = shift;
+        my $accept = $self->get_time_of_day;
+        my $ret = { accept => $accept };
+        my $c = $self->get_connection($json);
+
+        push(@$queue, { id => $json->{const_id}, param => $json->{data}, "accept" => $accept });
+
+        my $ref = {};
+        $ref->{from} = $json->{const_id};
+        $ref->{要求id} = $accept;
+        $ref->{パラメータ} = YAML::XS::Dump($json->{data});
+
+        $self->dbi("main")->model("コマンド結果")->insert($ref, ctime => "ctime");
+
+        $loop->timer(1, sub { $self->manage });
+
+        if (defined $c)
+        {
+            $c->send({ json => { method => "command", data => $ret } });
+        }
+
+        return $ret;
+    },
+);
 
 app->helper(
     get_state => sub
@@ -394,6 +430,8 @@ app->helper(
     {
         my $self = shift;
         my $id = shift;
+
+        warn "--------". $id;
 
         my $dir = Mojo::File->new(File::Spec->catdir($FindBin::Bin, "save", "battle"));
         my $collection = $dir->list_tree;
@@ -655,7 +693,7 @@ app->helper(
 
         my $npc = $character_types->grep(sub { return $_->{操作種別} eq "npc" });
 
-        if ($npc->size > 5)
+        if ($npc->size > 1)
         {
             return;
         }
@@ -733,14 +771,21 @@ app->helper(
 
         if (! defined $hit)
         {
-            warn $id;
-
             my $k = $self->character($id);
-            push(@$characters, $k);
 
-            $hit = $k;
+            if (defined $k)
+            {
+                @$hit{@keys2} = ($k->{id}, undef, $k->{エリア}, $k->{スポット}, $k->{距離}, undef);
+            }
+        }
 
-            # TODO: 現在地を割り出す
+        if ($self->is_pvp($id))
+        {
+            $mode = "pvp";
+        }
+        elsif ($self->is_battle($id))
+        {
+            $mode = "monster";
         }
 
         # set
@@ -761,40 +806,64 @@ app->helper(
         my $id = $command->{id};
         my $k = $self->character($id);
 
-        if (! defined $k) {
+        if (! defined $k)
+        {
             return;
         }
 
         my $param = $command->{param};
         my $accept = $command->{accept};
-
-        if (! defined $app)
-        {
-            my $sub = CGI::Compile->compile(File::Spec->catfile($FindBin::Bin, 'so_index.pl'));
-            $app = CGI::Emulate::PSGI->handler($sub);
-        }
-
         my $env = {};
-
         my $mode = $param->{mode};
-        $self->location($id, $mode);
+        my $mode_prev = $self->location($id);
 
-        warn sprintf("chara=%s, mode=%s", $id, $mode);
-        warn Dump([$param, $accept]);
+        $self->log->debug(sprintf("chara=%s, mode=%s", $id, $mode));
+        # warn Dump([$param, $accept]);
 
         my $url = Mojo::URL->new;
         $url->query({ %$param, id => $k->{id}, pass => $k->{パスワード} });
         $env->{QUERY_STRING} = $url->to_string;
         $env->{QUERY_STRING} =~ s/^\?//;
-        # seek($env->{"psgi.input"}, 0, 0);
-        my $content = join("", @{$app->($env)->[2]});
-        my $utf8 = Encode::decode_utf8($content);
 
-        # my $tmp = Mojo::File->new(File::Spec->catfile($FindBin::Bin, "save", "archive", $accept. ".result.html"));
-        # $tmp->touch;
-        # $tmp->spurt($content);
+        my $utf8 = $self->emulate_cgi($env);
+        my $enc = Encode::encode_utf8($utf8);
 
-        push(@$results, { "accept" => $accept, id => $id, content => $utf8 });
+        my $file = Mojo::File->new(File::Spec->catfile($FindBin::Bin, qw|save archive|, $accept. ".command.html"));
+        $file->spurt($enc);
+
+        my $result = $self->dbi("main")->model("コマンド結果")->select(["*"], where => {要求id => $accept});
+        my $row = $result->fetch_hash_one;
+
+        if (! defined $row)
+        {
+            $self->log->error("ジョブがない![". $accept. "]");
+            return;
+        }
+
+        $row->{結果id} = $accept;
+
+        $self->dbi("main")->model("コマンド結果")->update($row, where => {要求id => $accept}, mtime => "mtime");
+
+        push(@$results, { "accept" => $accept, id => $id, content => $enc });
+
+        my $mode_next = $self->location($id);
+
+        if ($param->{mode} eq "pvp" && $mode_prev ne $mode_next)
+        {
+            my $c = $self->get_connection({ const_id => $param->{rid} });
+            if (defined $c)
+            {
+                $self->unicast_ping({ const_id => $param->{rid} });
+            }
+        }
+
+        my $c = $self->get_connection({ const_id => $id });
+
+        if (defined $c)
+        {
+            $c->send({ json => { method => "result", data => { accept => $accept, } } });
+        }
+
     },
 );
 
@@ -802,7 +871,6 @@ app->helper(
     manage => sub
     {
         my ($self) = @_;
-        warn "###############";
         $self->log->debug("###############");
 
         if ($queue->size != 0) {
@@ -845,21 +913,16 @@ app->helper(
             }
 
             my $id = $append->{id};
-
             my $npc_command = $self->get_npc_command($id);
 
             if (defined $npc_command)
             {
-                my $accept = $self->get_time_of_day;
-  
-                push(@$queue, { id => $id, param => $npc_command, "accept" => $accept });
+                $self->command({ const_id => $id, data => $npc_command });
 
                 $append->{最終実行時間} = time();
 
                 {
                     my $time2 = $append->{最終実行時間} - time() + $timer;
-
-                    warn $time2;
 
                     if ($min < $time2)
                     {
@@ -905,6 +968,50 @@ app->helper(
 );
 
 app->helper(
+    get_connection => sub
+    {
+        my ($self, $json) = @_;
+        my $const_id = $json->{const_id};
+        my $c = $clients->{$const_id};
+
+        if ($c && ! $c->is_finished)
+        {
+            return $c;
+        }
+        else
+        {
+            $self->log->warn(sprintf("%s の接続が切れてます！", $const_id));
+            delete $clients->{$const_id};
+        }
+        return undef;
+    },
+);
+
+app->helper(
+    unicast_ping => sub
+    {
+        my ($self, $json) = @_;
+        my $data = { location => undef, time => undef };
+        my $const_id = $json->{const_id};
+        my $c = $self->get_connection($json);
+        my $append = $appends->first(sub { return $_->{id} eq $const_id });
+
+        if (defined $append)
+        {
+            $data->{location} = $append->{最終コマンド};
+            $data->{time} = $append->{最終実行時間};
+        }
+
+        if (defined $c)
+        {
+            warn "<-------------------". $json->{method};
+
+            $c->send({ json => { method => "ping", data => $data } });
+        }
+    },
+);
+
+app->helper(
     multicast_ping => sub {
         my ($self, $data) = @_;
         my $const_id = "dummy";
@@ -913,7 +1020,8 @@ app->helper(
 
         $self->log->debug(ref $c);
 
-        if ($c && ! $c->is_finished) {
+        if ($c && ! $c->is_finished)
+        {
             $self->log->debug($self->dump($mes));
             $c->send({ json => $mes });
         }
@@ -1059,7 +1167,58 @@ app->helper(
 );
 
 app->helper(
-    dump => sub {
+    dbi => sub
+    {
+        my $self = shift;
+        my $type = shift;
+
+        if ($type eq "main")
+        {
+            if (defined $dbis->{$type})
+            {
+                return $dbis->{$type};
+            }
+
+            my $dbFile = File::Spec->catfile($FindBin::Bin, "so.sqlite");
+            my $dbi = DBIx::Custom->connect(
+                "dbi:SQLite:dbname=$dbFile",
+                undef,
+                undef,
+                { sqlite_unicode => 1 }
+            );
+
+            $dbi = $dbi->safety_character("\x{2E80}-\x{2FDF}々〇〻\x{3400}-\x{4DBF}\x{4E00}-\x{9FFF}\x{F900}-\x{FAFF}\x{20000}-\x{2FFFF}ーぁ-んァ-ヶa-zA-Z0-9_");
+            $dbi->create_model("コマンド結果");
+
+            $dbis->{$type} = $dbi;
+
+            return $dbi;
+        }
+    },
+);
+
+app->helper(
+    emulate_cgi => sub
+    {
+        my $self = shift;
+        my $env = shift;
+
+        if (! defined $app)
+        {
+            my $sub = CGI::Compile->compile(File::Spec->catfile($FindBin::Bin, 'so_index.pl'));
+            $app = CGI::Emulate::PSGI->handler($sub);
+        }
+
+        my $content = join("", @{$app->($env)->[2]});
+        my $utf8 = Encode::decode_utf8($content);
+
+        return $utf8;
+    },
+);
+
+app->helper(
+    dump => sub
+    {
         my ($self, $ref, $encode) = @_;
         my $context = Dump($ref);
         if (!defined $encode) {
@@ -1079,19 +1238,19 @@ websocket '/channel' => sub {
     my $tx = $c->tx;
     Mojo::IOLoop->stream($tx->connection)->timeout(0);
 
-    my $txName = sprintf("%s", $c->tx);
-
-    app->create_battle_ws($c);
-
     $c->on(json => sub {
         my ($c, $json) = @_;
 
+        warn "------------------->". $json->{method};
+
         given ($json->{method}) {
             when (/^ping$/) {
-                # app->battle_request_ws($c, "ping", $json->{data});
+                my $const_id = $json->{const_id};
+                $clients->{$const_id} = $tx;
+                app->unicast_ping($json);
             }
             when (/^command$/) {
-                # app->battle_request_ws($c, "command", $json->{data});
+                app->command($json);
             }
             when (/^difference$/) {
                 # app->battle_request_ws($c, "difference", $json->{data});
@@ -1111,6 +1270,15 @@ websocket '/channel' => sub {
 
     $c->on(finish => sub {
         my ($c) = @_;
+
+        for my $key (keys %$clients)
+        {
+            if ($clients->{$key} == $c)
+            {
+                delete $clients->{$key};
+            }
+        }
+
         $c->events->unsubscribe(message => $cb);
     });
 };
@@ -1123,6 +1291,8 @@ $loop->timer(1, sub {
     my $all = app->characters;
     push(@$characters, @$all);
 });
+
+app->dbi("main");
 
 $loop->recurring(60, sub { app->save });
 $loop->timer(3, sub { app->manage });

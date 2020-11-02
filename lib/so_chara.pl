@@ -250,9 +250,8 @@ sub regist {
 #			&error("一人一キャラクターです。");
 		}elsif($cid eq "$kid"){
 			my $mes = "$kid<>$kpass<>$kname<>$ksex<>$kchara<>$kn_0<>$kn_1<>$kn_2<>$kn_3<>$kn_4<>$kn_5<>$kn_6<>$khp<>$kmaxhp<>$kex<>$klv<>$kap<>$kgold<>$klp<>$ktotal<>$kkati<>$host<>$date<>$karea<>$kspot<>$kpst<>$kitem<>\n";
-			my $utf8 = Encode::encode_utf8($mes);
+			unshift(@new, $mes);
 
-			unshift(@new,$utf8);
 			$hit=1;
 		}else{
 			push(@new,"$_\n");
@@ -280,15 +279,15 @@ sub regist {
 		$kid = $in{'id'};
 		$kpass = $in{'pass'};
 		my $mes = "$in{'id'}<>$in{'pass'}<>$in{c_name}<>$in{'sex'}<>$in{'chara'}<>$n_0<>$n_1<>$n_2<>$n_3<>$n_4<>$n_5<>$n_6<>$hp<>$hp<>$ex<>$lv<>$ap<>$gold<>$lp<>$total<>$kati<>$host<>$date<>$area<>$spot<>$pst<>$item<>\n";
-		my $utf8 = Encode::encode_utf8($mes);
-
-		unshift(@new,$utf8);
+		unshift(@new, $mes);
 
 		@kbuf = (100,100,100);
 		$krsk    = 0;
 		$buff_flg = 1;
 		&regist_buff;
 	}
+
+	$new[$_] = Encode::encode_utf8($new[$_]) for 0 .. $#new;
 
 	my $file = Mojo::File->new($chara_file);
 	$file->touch;

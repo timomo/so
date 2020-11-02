@@ -117,7 +117,7 @@ sub log_in
 		kgold => $kgold,
 	});
 
-	my $error_string = Encode::decode_utf8($error);
+	my $error_string = Encode::decode_utf8($error) if (! utf8::is_utf8($error));
 
 	print <<"EOM";
 $description

@@ -114,6 +114,7 @@ sub header
 	print <<"EOM";
 <script>
 	var info = $string;
+	const const_id = "$kid";
 </script>
 EOM
 

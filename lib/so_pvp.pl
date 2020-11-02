@@ -1048,6 +1048,8 @@ sub pvp
 {
 	$battle_flag=1;
 
+	&save_dat_append;
+
 	# 途中データ確認
 	my $data;
 	if (&is_continue_pvp)

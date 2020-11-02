@@ -19,3 +19,4 @@
 !/save/state/.gitkeep
 /access_log/*.log
 !/access_log/.gitkeep
+/so.sqlite

@@ -81,24 +81,18 @@ function setup_take_control_form()
 	let timer;
 
 	jQuery("form").bind("submit", (event) => {
-		const param = jQuery(event.target).serialize();
+		const param = jQuery(event.target).serializeArray();
+		const tmp = {};
 
 		if (timer) {
 			clearInterval(timer);
 		}
 
-		jQuery.post( "/command", param, (data) => {
-			timer = setInterval(() => {
-
-				jQuery.get( "/is_result", data, (data2) => {
-					if (data2 && data2.result === "done") {
-						clearInterval(timer);
-						location.href = "?accept=" + data.accept;
-					}
-				} );
-
-			}, 500)
+		param.forEach((ary) => {
+			tmp[ary.name] = ary.value;
 		});
+
+		command(tmp);
 
 		return false;
 	});
@@ -173,19 +167,128 @@ function setup_select_menu()
 	});
 }
 
+let ws;
+
+function ws_send(method, data) {
+	const request = {};
+
+	request.method = method;
+	request.const_id = const_id;
+	request.data = data;
+
+	console.error(method, request);
+
+	ws.send(JSON.stringify(request));
+}
+
+function command(data) {
+	ws_send("command", data);
+}
+
+function ping() {
+	ws_send("ping", {});
+}
+
+function setup_websocket(timer) {
+	let state = undefined;
+	let time = undefined;
+	const count = {};
+	count.ping = 0;
+	count["接続回数"] = 0;
+
+	ws = new WebSocket("ws://" + location.host + "/channel");
+
+	ws.onopen = function () {
+		count.ping = 0;
+		count["接続回数"] += 1;
+
+		console.debug("ws opened");
+
+		if (timer) clearTimeout(timer);
+
+		timer = setTimeout(() => {
+			ping();
+		}, 2000);
+	};
+
+	ws.onclose = function () {
+		console.warn("ws closed. try reconnect...");
+
+		count.ping = 0;
+
+		timer = setTimeout(() => {
+			setup_websocket(timer);
+		}, 1000);
+	};
+
+	const func_ping = (data) => {
+		if (state === undefined)
+		{
+			state = data.location;
+			time = data.time;
+		}
+		if (time !== data.time)
+		{
+			console.error("更新あり！");
+			location.href = "./current";
+			location.reload();
+		}
+		console.error("ping", data);
+	};
+
+	const func_command = (data) => {
+		console.error("command", data);
+	};
+
+	const func_reload = (data) => {
+		console.error("reload", data);
+	};
+
+	const func_result = (data) => {
+		console.error("result", data);
+		location.href = "?accept=" + data.accept;
+	};
+
+	ws.onmessage = function (e) {
+		const response = JSON.parse(e.data);
+
+		switch (response.method) {
+			case "ping":
+				func_ping(response.data);
+				break;
+			case "command":
+				func_command(response.data);
+				break;
+			case "reload":
+				func_reload(response.data);
+				break;
+			case "result":
+				func_result(response.data);
+				break;
+			default:
+				console.error(response);
+				break;
+		}
+	};
+}
+
 jQuery(document).ready(() => {
+	if (typeof const_id !== "undefined") {
+		setup_websocket();
+	}
+
 	if (typeof spot !== "undefined") {
 		if (spot === "町の中") {
-			music.request = "town1";
+			// music.request = "town1";
 		}
 		else if (spot === "モンスター" || spot === "デュエル") {
-			music.request = "battle1";
+			// music.request = "battle1";
 		}
 		else if (spot === "PVP") {
-			music.request = "battle2";
+			// music.request = "battle2";
 		}
 		else {
-			music.request = "dungeon1";
+			// music.request = "dungeon1";
 		}
 	}
 	else

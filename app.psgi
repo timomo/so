@@ -289,4 +289,111 @@ any "/" => sub
     return $self->render(text => $utf8, format => "html");
 };
 
+my $serverTxs = {};
+
+app->helper(
+    create_battle_ws => sub
+    {
+        my $self = shift;
+        my $c = shift;
+        my $clientTx = $c->tx;
+
+        $ua ||= Mojo::UserAgent->new;
+
+        $ua->websocket('ws://127.0.0.1:3001/channel' => sub
+        {
+            my ($ua, $tx) = @_;
+            unless ($tx->is_websocket) {
+                $clientTx->finish;
+                return;
+            }
+            $tx->on(finish => sub
+            {
+                my ($tx, $code, $reason) = @_;
+
+                $clientTx->send({ json => { method => "battle_server_disconnect", data => {} } });
+                $self->log->info("WebSocket closed with status $code.");
+                $clientTx->finish;
+                delete $serverTxs->{sprintf("%s", $clientTx)};
+            });
+            $tx->on(json => sub
+            {
+                my ($tx, $msg) = @_;
+
+                $clientTx->send({ json => $msg });
+            });
+            $self->log->info("WebSocket connected!: $tx");
+            $serverTxs->{sprintf("%s", $clientTx)} = $tx;
+        });
+    },
+);
+
+app->helper(
+    battle_request_ws => sub {
+        my $self = shift;
+        my $c = shift;
+        my $method = shift;
+        my $const_id = shift;
+        my $data = shift;
+        my $mes = { method => $method, const_id => $const_id, data => $data };
+        my $txName = sprintf("%s", $c->tx);
+        my $tx = $serverTxs->{$txName};
+
+        return if (!$tx);
+
+        $tx->send({ json => $mes });
+    },
+);
+
+helper events => sub
+{
+    state $events = Mojo::EventEmitter->new
+};
+
+websocket '/channel' => sub
+{
+    my ($c) = @_;
+
+    my $tx = $c->tx;
+    Mojo::IOLoop->stream($tx->connection)->timeout(0);
+
+    my $txName = sprintf("%s", $c->tx);
+
+    app->create_battle_ws($c);
+
+    $c->on(json => sub
+    {
+        my ($c, $json) = @_;
+
+        given ($json->{method}) {
+            when (/^ping$/) {
+                app->battle_request_ws($c, "ping", $json->{const_id}, $json->{data});
+            }
+            when (/^command$/) {
+                app->battle_request_ws($c, "command", $json->{const_id}, $json->{data});
+            }
+            when (/^difference$/) {
+                app->battle_request_ws($c, "difference", $json->{const_id}, $json->{data});
+            }
+            when (/^reload/) {
+                app->battle_request_ws($c, "difference", $json->{const_id}, $json->{data});
+            }
+        }
+    });
+
+    my $cb = $c->events->on(
+        message => sub
+        {
+            my ($event, $json) = @_;
+            $c->send({ json => $json });
+        }
+    );
+
+    $c->on(finish => sub
+    {
+        my ($c) = @_;
+        $c->events->unsubscribe(message => $cb);
+    });
+};
+
 app->start;

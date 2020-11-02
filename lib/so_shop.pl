@@ -2,7 +2,8 @@ use utf8;
 #----------------#
 #  ショップ表示  #
 #----------------#
-sub item_shop {
+sub item_shop
+{
 
 	@shop_array = &load_ini($town_shop[$in{'area'}]);
 	@item_chara = &load_ini($chara_file);
@@ -155,6 +156,7 @@ const spot = "$spot";
 EOM
 
 	&footer;
+	&save_dat_append;
 
 	exit;
 }
@@ -303,6 +305,7 @@ const spot = "$spot";
 EOM
 
 	&footer;
+	&save_dat_append;
 
 	exit;
 }
@@ -310,7 +313,8 @@ EOM
 #------------#
 #  銀行表示  #
 #------------#
-sub bank {
+sub bank
+{
 	@bank_item = &load_ini($bank_path. $in{'id'});
 	@item_chara = &load_ini($chara_file);
 
@@ -453,6 +457,7 @@ const spot = "$spot";
 EOM
 
 	&footer;
+	&save_dat_append;
 
 	exit;
 }
@@ -697,7 +702,8 @@ sub user_buy {
 #----------------#
 #  銀行出し入れ  #
 #----------------#
-sub bank_out {
+sub bank_out
+{
 	$item_id = $in{'id'};
 	$item_pass = $in{'pass'};
 	$item_cnt = $in{'item'};

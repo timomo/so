@@ -29,10 +29,10 @@ sub message {
 	if($mes_max > $max) { pop(@mes_regist); }
 
 	my $mes = "$in{'mesid'}<>$in{'id'}<>$in{'name'}<>$in{'mes'}<>$dname<>$gettime<>";
-	my $utf8 = Encode::encode_utf8($mes);
-	$utf8 = $mes;
 
-	unshift(@mes_regist, $utf8);
+	unshift(@mes_regist, $mes);
+
+	$mes_regist[$_] = Encode::encode_utf8($mes_regist[$_]) for 0 .. $#mes_regist;
 
 	my $file = Mojo::File->new($message_file);
 	$file->touch;

@@ -2,7 +2,8 @@ use utf8;
 #----------------#
 #  所持アイテム  #
 #----------------#
-sub item_check {
+sub item_check
+{
 	@user_item = &load_ini($item_path. $in{'id'});
 	@item_chara = &load_ini($chara_file);
 
@@ -160,6 +161,7 @@ const spot = "$spot";
 EOM
 
 	&footer;
+	&save_dat_append;
 
 	exit;
 }
