@@ -154,6 +154,8 @@ get "/current" => sub
 
     return $self->reply->not_found unless ($k);
 
+    $self->cookie(id => $k->{id});
+
     my $accept = $self->param("accept");
     my $url = sprintf("/current");
     my $utf8 = $self->backend_request("POST", $url, { "accept" => $accept, id => $k->{id} });
@@ -365,18 +367,20 @@ websocket '/channel' => sub
     {
         my ($c, $json) = @_;
 
+        my $id = $c->cookie("id");
+
         given ($json->{method}) {
             when (/^ping$/) {
-                app->battle_request_ws($c, "ping", $json->{const_id}, $json->{data});
+                app->battle_request_ws($c, "ping", $id, $json->{data});
             }
             when (/^command$/) {
-                app->battle_request_ws($c, "command", $json->{const_id}, $json->{data});
+                app->battle_request_ws($c, "command", $id, $json->{data});
             }
             when (/^difference$/) {
-                app->battle_request_ws($c, "difference", $json->{const_id}, $json->{data});
+                app->battle_request_ws($c, "difference", $id, $json->{data});
             }
             when (/^reload/) {
-                app->battle_request_ws($c, "difference", $json->{const_id}, $json->{data});
+                app->battle_request_ws($c, "difference", $id, $json->{data});
             }
         }
     });

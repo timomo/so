@@ -231,6 +231,7 @@ app->helper(
         $ref->{from} = $json->{const_id};
         $ref->{要求id} = $accept;
         $ref->{パラメータ} = YAML::XS::Dump($json->{data});
+        $ref->{パラメータ} = Encode::decode_utf8($ref->{パラメータ});
 
         $self->dbi("main")->model("コマンド結果")->insert($ref, ctime => "ctime");
 
@@ -331,10 +332,12 @@ app->helper(
                 {
                     if ($mode ne "message")
                     {
+                        my $mes = "これはNPC " . $k->{名前}. " からのメッセージ送信テストです。絶賛開発中です。";
+
                         return {
                             mode  => "message",
                             mesid => $target_append->{id},
-                            mes   => "これはNPC " . $k->{名前} . " からのメッセージ送信テストです。絶賛開発中です。",
+                            mes   => $mes,
                             name  => $k->{名前},
                         };
                     }
@@ -431,7 +434,7 @@ app->helper(
         my $self = shift;
         my $id = shift;
 
-        warn "--------". $id;
+        # warn "--------". $id;
 
         my $dir = Mojo::File->new(File::Spec->catdir($FindBin::Bin, "save", "battle"));
         my $collection = $dir->list_tree;
@@ -817,7 +820,7 @@ app->helper(
         my $mode = $param->{mode};
         my $mode_prev = $self->location($id);
 
-        $self->log->debug(sprintf("chara=%s, mode=%s", $id, $mode));
+        $self->log->debug(sprintf("chara=%s, mode=%s, rid=%s", $id, $mode. $param->{rid} || ""));
         # warn Dump([$param, $accept]);
 
         my $url = Mojo::URL->new;
@@ -831,7 +834,7 @@ app->helper(
         my $file = Mojo::File->new(File::Spec->catfile($FindBin::Bin, qw|save archive|, $accept. ".command.html"));
         $file->spurt($enc);
 
-        my $result = $self->dbi("main")->model("コマンド結果")->select(["*"], where => {要求id => $accept});
+        my $result = $self->dbi("main")->model("コマンド結果")->select(["*"], where => {要求id => $accept, from => $id});
         my $row = $result->fetch_hash_one;
 
         if (! defined $row)
@@ -844,18 +847,36 @@ app->helper(
 
         $self->dbi("main")->model("コマンド結果")->update($row, where => {要求id => $accept}, mtime => "mtime");
 
-        push(@$results, { "accept" => $accept, id => $id, content => $enc });
+        # TODO: もしPVPなら、コマンド結果が2つ？
 
-        my $mode_next = $self->location($id);
+        warn Dump($param);
 
-        if ($param->{mode} eq "pvp" && $mode_prev ne $mode_next)
+        if ($param->{mode} eq "pvp")
         {
-            my $c = $self->get_connection({ const_id => $param->{rid} });
+            delete $row->{id};
+
+            if ($param->{k1id} eq $id)
+            {
+                $row->{from} = $param->{k2id};
+            }
+            else
+            {
+                $row->{from} = $param->{k1id};
+            }
+
+            $self->dbi("main")->model("コマンド結果")->insert($row, ctime => "ctime");
+
+            my $c = $self->get_connection({ const_id => $row->{from} });
+
             if (defined $c)
             {
-                $self->unicast_ping({ const_id => $param->{rid} });
+                $c->send({ json => { method => "result", data => { accept => $accept, } } });
             }
         }
+
+        # push(@$results, { "accept" => $accept, id => $id, content => $enc });
+
+        my $mode_next = $self->location($id);
 
         my $c = $self->get_connection({ const_id => $id });
 
@@ -872,6 +893,13 @@ app->helper(
     {
         my ($self) = @_;
         $self->log->debug("###############");
+
+        # reload
+        {
+            $characters = Mojo::Collection->new;
+            my $all = app->characters;
+            push(@$characters, @$all);
+        }
 
         if ($queue->size != 0) {
             my $command = pop(@$queue);
@@ -1004,7 +1032,7 @@ app->helper(
 
         if (defined $c)
         {
-            warn "<-------------------". $json->{method};
+            warn "<------------------- ping";
 
             $c->send({ json => { method => "ping", data => $data } });
         }

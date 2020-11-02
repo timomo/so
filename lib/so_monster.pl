@@ -1120,6 +1120,8 @@ sub display_monster_battle
 			kpass           => $kpass,
 			sel             => $in{sel} || -1,
 			spot            => "モンスター",
+			mode            => "monster",
+			rid             => "",
 		},
 		\my $out,
 		binmode => ':encoding(utf8)'

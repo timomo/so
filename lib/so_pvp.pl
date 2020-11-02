@@ -748,12 +748,30 @@ sub pvp_initialize
 
 	$rid = $k1id;
 	&read_battle;
-	$k1odd = $kwin / $ktotal;
+
+	if ($kwin != 0 && $ktotal != 0)
+	{
+		$k1odd = $kwin / $ktotal;
+	}
+	else
+	{
+		$k1odd = 0;
+	}
+
 	$k1rank = $krank;
 
 	$rid = $k2id;
 	&read_battle;
-	$k2odd = $kwin / $ktotal;
+
+	if ($kwin != 0 && $ktotal != 0)
+	{
+		$k2odd = $kwin / $ktotal;
+	}
+	else
+	{
+		$k2odd = 0;
+	}
+
 	$k2rank = $krank;
 
 	@k1buf = (1,1,1,0);
@@ -1186,6 +1204,9 @@ sub display_pvp_battle
 			kpass           => $kpass,
 			sel             => $in{sel} || -1,
 			spot            => "PVP",
+			mode            => "pvp",
+			k1id             => $k1id,
+			k2id             => $k2id,
 		},
 		\my $out,
 		binmode => ':encoding(utf8)'

@@ -51,6 +51,7 @@ our $logger = Mojo::Log->new;
 
 $mode = "";
 $error = "";
+$movemsg = "";
 
 my $require_login = 1;
 

@@ -169,11 +169,37 @@ function setup_select_menu()
 
 let ws;
 
+function get_cookies() {
+	const tmp = document.cookie.split(';');
+	const ret = {};
+
+	tmp.forEach((value) => {
+		const content = value.split("=");
+		ret[content[0]] = content[1];
+	});
+
+	return ret;
+}
+
+function get_so_cookies() {
+	const tmp = get_cookies();
+	const ary = tmp.FFADV.split(",");
+	const ret = {};
+
+	ary.forEach((value) => {
+		const content = value.split("<>");
+		ret[content[0]] = content[1];
+	});
+
+	return ret;
+}
+
 function ws_send(method, data) {
 	const request = {};
+	// const cookie = get_so_cookies();
 
 	request.method = method;
-	request.const_id = const_id;
+	// request.const_id = cookie.id;
 	request.data = data;
 
 	console.error(method, request);
@@ -279,16 +305,16 @@ jQuery(document).ready(() => {
 
 	if (typeof spot !== "undefined") {
 		if (spot === "町の中") {
-			// music.request = "town1";
+			music.request = "town1";
 		}
 		else if (spot === "モンスター" || spot === "デュエル") {
-			// music.request = "battle1";
+			music.request = "battle1";
 		}
 		else if (spot === "PVP") {
-			// music.request = "battle2";
+			music.request = "battle2";
 		}
 		else {
-			// music.request = "dungeon1";
+			music.request = "dungeon1";
 		}
 	}
 	else
