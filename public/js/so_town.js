@@ -60,7 +60,7 @@ function setup_neighbors()
 					jQuery("#neighbors .select-target-menu").removeClass("blink-before");
 					jQuery(event.target).addClass("blink-before");
 					jQuery("select[name='mesid']").val(neighbor[0]);
-					jQuery("form[id='pvp_form'] input:hidden[name='rid']").val(neighbor[0]);
+					jQuery("form[id='pvp_form'] input:hidden[name='k2id']").val(neighbor[0]);
 				});
 			});
 

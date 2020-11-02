@@ -328,7 +328,8 @@ $message
 
 <form id="pvp_form" action="$script" method="post">
 <input type="hidden" name="mode" value="pvp" />
-<input type="hidden" name="rid" value="" />
+<input type="hidden" name="k2id" value="" />
+<input type="hidden" name="k1id" value="$kid" />
 <input type="hidden" name="id" value="$kid" />
 <input type="hidden" name="pass" value="$kpass" />
 <input id="pvp-select-submit" type="submit" value="行動" />

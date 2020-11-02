@@ -302,12 +302,29 @@ app->helper(
             if ($self->is_pvp($id))
             {
                 $self->log->debug(sprintf("battle: PVP中: id = %s, パスワード = %s, スポット = %s, エリア = %s, 距離 = %s", $k->{id}, $k->{パスワード}, $k->{スポット}, $k->{エリア}, $k->{距離}));
-                return { mode => "pvp" };
+
+                my $ids = $self->get_pvp_ids($id);
+
+                if (ref $ids eq "ARRAY")
+                {
+                    return {
+                        mode => "pvp",
+                        id => $id,
+                        k1id => $ids->[0],
+                        k2id  => $ids->[1],
+                    };
+                }
+
+                $self->log->error(sprintf("battle: PVP中、ARRAY失敗: id = %s, パスワード = %s, スポット = %s, エリア = %s, 距離 = %s", $k->{id}, $k->{パスワード}, $k->{スポット}, $k->{エリア}, $k->{距離}));
+
+                return;
             }
             else
             {
                 $self->log->debug(sprintf("battle: 戦闘中: id = %s, パスワード = %s, スポット = %s, エリア = %s, 距離 = %s", $k->{id}, $k->{パスワード}, $k->{スポット}, $k->{エリア}, $k->{距離}));
-                return { mode => "monster" };
+                return {
+                    mode => "monster"
+                };
             }
         }
         elsif ($state eq "search")
@@ -327,10 +344,11 @@ app->helper(
                 my $neighbors = Mojo::Collection->new(@{$self->neighbors($id)});
                 my $shuffle = $neighbors->shuffle;
                 my $target_append = $shuffle->head(1)->last;
+                my $is_battle = $self->is_battle($id) || $self->is_pvp($id) ? 1 : 0;
 
                 if (defined $target_append)
                 {
-                    if ($mode ne "message")
+                    if (0)
                     {
                         my $mes = "これはNPC " . $k->{名前}. " からのメッセージ送信テストです。絶賛開発中です。";
 
@@ -341,13 +359,15 @@ app->helper(
                             name  => $k->{名前},
                         };
                     }
-                    elsif (1)
+                    elsif ($is_battle == 0)
                     {
                         # 今の所、決め打ちで、襲い掛かる
                         $self->log->debug(sprintf("search: ユーザを見て襲いかかる: id = %s, パスワード = %s, スポット = %s, エリア = %s, 距離 = %s", $k->{id}, $k->{パスワード}, $k->{スポット}, $k->{エリア}, $k->{距離}));
                         return {
                             mode => "pvp",
-                            rid  => $target_append->{id},
+                            id => $id,
+                            k1id => $id,
+                            k2id  => $target_append->{id},
                         };
                     }
                     else # 一度メッセージを送ったら、去る
@@ -452,6 +472,35 @@ app->helper(
         }
 
         return 0;
+    },
+);
+
+app->helper(
+    get_pvp_ids => sub
+    {
+        my $self = shift;
+        my $id = shift;
+
+        my $dir = Mojo::File->new(File::Spec->catdir($FindBin::Bin, "save", "battle"));
+        my $collection = $dir->list_tree;
+
+        for my $file (@$collection)
+        {
+            if ($file->basename !~ /\.pvp\.yaml$/)
+            {
+                next;
+            }
+            if ($file->basename =~ /$id/)
+            {
+                my $name = $file->basename;
+                $name =~ s/\.pvp\.yaml$//;
+                my @tmp = split("_____", $name);
+
+                return \@tmp;
+            }
+        }
+
+        return undef;
     },
 );
 
@@ -945,6 +994,9 @@ app->helper(
 
             if (defined $npc_command)
             {
+                # $npc_command->{id} = $id;
+                die Dump($npc_command);
+
                 $self->command({ const_id => $id, data => $npc_command });
 
                 $append->{最終実行時間} = time();
