@@ -1029,7 +1029,7 @@ sub is_continue_pvp
 
 	for my $file (@$collection)
 	{
-		warn $file->basename;
+		# warn $file->basename;
 
 		if ($file->basename !~ /\.pvp\.yaml$/)
 		{

@@ -71,7 +71,7 @@ $item_file = "./master/item.mst";
 $drop_file   ="./master/drop.mst";
 
 # ログパス
-$log_path   ="./log/";
+$log_path   ="./access_log/";
 
 # BAN対象
 $ban_file   ="./save/ban.dat";

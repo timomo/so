@@ -51,15 +51,19 @@ my $archive = [];
 my $results = Mojo::Collection->new;
 my $queue = Mojo::Collection->new;
 my $characters = Mojo::Collection->new;
+my $character_types = Mojo::Collection->new;
+my $appends = Mojo::Collection->new;
+
 my @keys = (qw|
     id パスワード 名前 性別 画像 力 賢さ 信仰心 体力 器用さ 素早さ 魅力 HP 最大HP
     経験値 レベル 残りAP 所持金 LP 戦闘数 勝利数 ホスト 最終アクセス エリア スポット 距離 アイテム
 |);
-my @keys2 = (qw|id 操作種別 最終コマンド エリア スポット 距離 最終実行時間|);
-my $character_types = Mojo::Collection->new;
+my @keys2 = (qw|id 最終コマンド エリア スポット 距離 最終実行時間|);
+my @keys3 = (qw|id 操作種別|);
 my $sep = "<>";
 my $new_line = "\r\n";
 my @default_parameter = (5, 5, 5, 5, 5, 5, 5);
+my $app;
 
 app->log->level('debug');
 
@@ -97,7 +101,7 @@ post "/neighbors" => sub
 
         if (defined $c) {
 
-            my $bool = $self->is_battle($append->{id}) ? ": 戦闘中" : "";
+            my $bool = $self->is_battle($append->{id}) || $self->is_pvp($append->{id}) ? ": 戦闘中" : "";
 
             push(@ret, [$c->{id}, $c->{名前}. $bool]);
         }
@@ -115,7 +119,7 @@ app->helper(
         my $k = $self->character($id);
         my @ret = ();
 
-        my $neighbors = $character_types->grep(sub
+        my $neighbors = $appends->grep(sub
         {
             my $append = shift;
 
@@ -166,12 +170,16 @@ post "/current" => sub
         return $self->render(text => $hit->{content}, format => "html");
     }
 
-    my $mode = app->location($id);
+    my $mode = $self->location($id);
     my $param = {};
     $param->{mode} = $mode || "log_in";
 
-    my $sub = CGI::Compile->compile(File::Spec->catfile($FindBin::Bin, 'so_index.pl'));
-    my $app = CGI::Emulate::PSGI->handler($sub);
+    if (! defined $app)
+    {
+        my $sub = CGI::Compile->compile(File::Spec->catfile($FindBin::Bin, 'so_index.pl'));
+        $app = CGI::Emulate::PSGI->handler($sub);
+    }
+
     my $env = $self->tx->req->env || {};
 
     my $url = Mojo::URL->new;
@@ -201,7 +209,7 @@ post "/command" => sub
 };
 
 app->helper(
-    state => sub
+    get_state => sub
     {
         my $self = shift;
         my $id = shift;
@@ -237,10 +245,17 @@ app->helper(
         my $id = shift;
         my $k = $self->character($id);
         my $mode = $self->location($id);
-        my $state = $self->state($id);
+        my $state = $self->get_state($id);
+
+        if (! defined $mode)
+        {
+            $self->log->warn(sprintf("location: 取得に失敗: id = %s, パスワード = %s, スポット = %s, エリア = %s, 距離 = %s", $k->{id}, $k->{パスワード}, $k->{スポット}, $k->{エリア}, $k->{距離}));
+            return undef;
+        }
 
         if (! defined $state)
         {
+            $self->log->warn(sprintf("state: 取得に失敗: id = %s, パスワード = %s, スポット = %s, エリア = %s, 距離 = %s", $k->{id}, $k->{パスワード}, $k->{スポット}, $k->{エリア}, $k->{距離}));
             return undef;
         }
 
@@ -248,12 +263,12 @@ app->helper(
         {
             if ($self->is_pvp($id))
             {
-                warn sprintf("battle: PVP中: id = %s, パスワード = %s, スポット = %s, エリア = %s, 距離 = %s", $k->{id}, $k->{パスワード}, $k->{スポット}, $k->{エリア}, $k->{距離});
+                $self->log->debug(sprintf("battle: PVP中: id = %s, パスワード = %s, スポット = %s, エリア = %s, 距離 = %s", $k->{id}, $k->{パスワード}, $k->{スポット}, $k->{エリア}, $k->{距離}));
                 return { mode => "pvp" };
             }
             else
             {
-                warn sprintf("battle: 戦闘中: id = %s, パスワード = %s, スポット = %s, エリア = %s, 距離 = %s", $k->{id}, $k->{パスワード}, $k->{スポット}, $k->{エリア}, $k->{距離});
+                $self->log->debug(sprintf("battle: 戦闘中: id = %s, パスワード = %s, スポット = %s, エリア = %s, 距離 = %s", $k->{id}, $k->{パスワード}, $k->{スポット}, $k->{エリア}, $k->{距離}));
                 return { mode => "monster" };
             }
         }
@@ -261,7 +276,7 @@ app->helper(
         {
             if ($k->{スポット} == 0 && $k->{距離} == 0) # どこかの街の中
             {
-                warn sprintf("search: 街の中: id = %s, パスワード = %s, スポット = %s, エリア = %s, 距離 = %s", $k->{id}, $k->{パスワード}, $k->{スポット}, $k->{エリア}, $k->{距離});
+                $self->log->debug(sprintf("search: 街の中: id = %s, パスワード = %s, スポット = %s, エリア = %s, 距離 = %s", $k->{id}, $k->{パスワード}, $k->{スポット}, $k->{エリア}, $k->{距離}));
                 return {
                     mode => "monster",
                     area => $k->{エリア},
@@ -289,7 +304,7 @@ app->helper(
                     elsif (1)
                     {
                         # 今の所、決め打ちで、襲い掛かる
-                        warn sprintf("search: ユーザを見て襲いかかる: id = %s, パスワード = %s, スポット = %s, エリア = %s, 距離 = %s", $k->{id}, $k->{パスワード}, $k->{スポット}, $k->{エリア}, $k->{距離});
+                        $self->log->debug(sprintf("search: ユーザを見て襲いかかる: id = %s, パスワード = %s, スポット = %s, エリア = %s, 距離 = %s", $k->{id}, $k->{パスワード}, $k->{スポット}, $k->{エリア}, $k->{距離}));
                         return {
                             mode => "pvp",
                             rid  => $target_append->{id},
@@ -297,7 +312,7 @@ app->helper(
                     }
                     else # 一度メッセージを送ったら、去る
                     {
-                        warn sprintf("search: ユーザを見て去る: id = %s, パスワード = %s, スポット = %s, エリア = %s, 距離 = %s", $k->{id}, $k->{パスワード}, $k->{スポット}, $k->{エリア}, $k->{距離});
+                        $self->log->debug(sprintf("search: ユーザを見て去る: id = %s, パスワード = %s, スポット = %s, エリア = %s, 距離 = %s", $k->{id}, $k->{パスワード}, $k->{スポット}, $k->{エリア}, $k->{距離}));
                         return {
                             mode => "monster",
                             area => $k->{エリア},
@@ -307,7 +322,7 @@ app->helper(
                 }
                 else
                 {
-                    warn sprintf("search: 近辺探索中: id = %s, パスワード = %s, スポット = %s, エリア = %s, 距離 = %s", $k->{id}, $k->{パスワード}, $k->{スポット}, $k->{エリア}, $k->{距離});
+                    $self->log->debug(sprintf("search: 近辺探索中: id = %s, パスワード = %s, スポット = %s, エリア = %s, 距離 = %s", $k->{id}, $k->{パスワード}, $k->{スポット}, $k->{エリア}, $k->{距離}));
                     return {
                         mode => "monster",
                         area => $k->{エリア},
@@ -320,7 +335,7 @@ app->helper(
         {
             if ($k->{スポット} == 0 && $k->{距離} == 0) # どこかの街の中
             {
-                warn sprintf("cure: 街の中: id = %s, パスワード = %s, スポット = %s, エリア = %s, 距離 = %s, 前回コマンド = %s, HP = %s", $k->{id}, $k->{パスワード}, $k->{スポット}, $k->{エリア}, $k->{距離}, $mode, $k->{HP});
+                $self->log->debug(sprintf("cure: 街の中: id = %s, パスワード = %s, スポット = %s, エリア = %s, 距離 = %s, 前回コマンド = %s, HP = %s", $k->{id}, $k->{パスワード}, $k->{スポット}, $k->{エリア}, $k->{距離}, $mode, $k->{HP}));
                 if ($mode ne "yado")
                 {
                     return {
@@ -340,7 +355,7 @@ app->helper(
             else # 近辺を探索中
             {
                 if ($k->{所持金} >= 9000) { # 一旦、所持金チェックは決め打ちで。。。
-                    warn sprintf("cure: 近辺探索中で街へ: id = %s, パスワード = %s, スポット = %s, エリア = %s, 距離 = %s", $k->{id}, $k->{パスワード}, $k->{スポット}, $k->{エリア}, $k->{距離});
+                    $self->log->debug(sprintf("cure: 近辺探索中で街へ: id = %s, パスワード = %s, スポット = %s, エリア = %s, 距離 = %s", $k->{id}, $k->{パスワード}, $k->{スポット}, $k->{エリア}, $k->{距離}));
                     return {
                         mode => "monster",
                         area => $k->{エリア},
@@ -349,7 +364,7 @@ app->helper(
                 }
                 else
                 {
-                    warn sprintf("cure: 近辺探索中で休憩: id = %s, パスワード = %s, スポット = %s, エリア = %s, 距離 = %s", $k->{id}, $k->{パスワード}, $k->{スポット}, $k->{エリア}, $k->{距離});
+                    $self->log->debug(sprintf("cure: 近辺探索中で休憩: id = %s, パスワード = %s, スポット = %s, エリア = %s, 距離 = %s", $k->{id}, $k->{パスワード}, $k->{スポット}, $k->{エリア}, $k->{距離}));
                     return {
                         mode => "rest",
                         area => $k->{エリア},
@@ -453,32 +468,64 @@ app->helper(
     {
         my $self = shift;
         my $path = File::Spec->catfile($FindBin::Bin, qw|save chara.dat|);
-        my $path2 = File::Spec->catfile($FindBin::Bin, qw|save append.dat|);
+        my $path3 = File::Spec->catfile($FindBin::Bin, qw|save chara_type.dat|);
         my $file = Mojo::File->new($path);
-        my $file2 = Mojo::File->new($path2);
+        my $file3 = Mojo::File->new($path3);
+
         $file->touch;
-        $file2->touch;
+        $file3->touch;
+
         my @raw;
-        my @raw2;
+        my @raw3;
 
         for my $k (@$characters)
         {
             my @tmp = @{$k}{@keys};
             push(@raw, Encode::encode_utf8(join($sep, @tmp)));
-            my @tmp2;
-            push(@tmp2, $k->{id}); # id
-            push(@tmp2, $k->{操作種別}); # 操作種別
-            push(@tmp2, $k->{mode} || ""); # 最終コマンド
-            push(@tmp2, $k->{エリア});
-            push(@tmp2, $k->{スポット});
-            push(@tmp2, $k->{距離});
-            push(@raw2, Encode::encode_utf8(join($sep, @tmp2)));
+        }
+
+        for my $type (@$character_types)
+        {
+            my @tmp2 = @$type{@keys3};
+            push(@raw3, Encode::encode_utf8(join($sep, @tmp2)));
         }
 
         $file->spurt(join($new_line, @raw));
-        $file2->spurt(join($new_line, @raw2));
+        $file3->spurt(join($new_line, @raw3));
 
         warn "##### saved!!!!";
+    },
+);
+
+app->helper(
+    save_append => sub
+    {
+        my $self = shift;
+        my $ref  = shift;
+        my $path2 = File::Spec->catfile($FindBin::Bin, qw|save append.dat|);
+        my $file2 = Mojo::File->new($path2);
+        $file2->touch;
+        my @raw2;
+        my $hit = 0;
+
+        for my $append (@$appends)
+        {
+            if ($append->{id} eq $ref->{id})
+            {
+                $append = $ref;
+                $hit = 1;
+            }
+            my @tmp2 = @$append{@keys2};
+            push(@raw2, Encode::encode_utf8(join($sep, @tmp2)));
+        }
+
+        if ($hit == 0)
+        {
+            my @tmp2 = @$ref{@keys2};
+            push(@raw2, Encode::encode_utf8(join($sep, @tmp2)));
+        }
+
+        $file2->spurt(join($new_line, @raw2));
     },
 );
 
@@ -486,14 +533,61 @@ app->helper(
     character_types => sub
     {
         my $self = shift;
-        my $path = File::Spec->catfile($FindBin::Bin, qw|save append.dat|);
+        my $path = File::Spec->catfile($FindBin::Bin, qw|save chara_type.dat|);
         my $file = Mojo::File->new($path);
+        $file->touch;
         my @raw = split(/\r\n|\r|\n/, $file->slurp);
         my @ret;
 
         for my $line (@raw)
         {
             chomp($line);
+
+            if ($line =~ /^$/)
+            {
+                next;
+            }
+
+            my @tmp = split(/<>/, $line, 2);
+            my @tmp2 = split(/<>/, Encode::decode_utf8($tmp[1]));
+
+            for my $no (0 .. $#tmp2)
+            {
+                if ($tmp2[$no] =~ /^\d+$/)
+                {
+                    $tmp2[$no] *= 1;
+                }
+            }
+
+            my $k = {};
+            @$k{@keys3} = ($tmp[0], @tmp2);
+
+            push(@ret, $k);
+        }
+
+        return \@ret;
+    },
+);
+
+app->helper(
+    load_append => sub
+    {
+        my $self = shift;
+        my $path = File::Spec->catfile($FindBin::Bin, qw|save append.dat|);
+        my $file = Mojo::File->new($path);
+        $file->touch;
+        my @raw = split(/\r\n|\r|\n/, $file->slurp);
+        my @ret;
+
+        for my $line (@raw)
+        {
+            chomp($line);
+
+            if ($line =~ /^$/)
+            {
+                next;
+            }
+
             my @tmp = split(/<>/, $line, 2);
             my @tmp2 = split(/<>/, Encode::decode_utf8($tmp[1]));
 
@@ -527,6 +621,12 @@ app->helper(
         for my $line (@raw)
         {
             chomp($line);
+
+            if ($line =~ /^$/)
+            {
+                next;
+            }
+
             my @tmp = split(/<>/, $line, 2);
             my @tmp2 = split(/<>/, Encode::decode_utf8($tmp[1]));
 
@@ -540,20 +640,6 @@ app->helper(
 
             my $k = {};
             @$k{@keys} = ($tmp[0], @tmp2);
-
-            # TODO: $character_types は読み込んでいる前提で
-
-            my $hit = $character_types->first(sub { return $_->{id} eq $k->{id} });
-
-            if (defined $hit)
-            {
-                $k->{操作種別} = $hit->{type} || "pc";
-            }
-            else
-            {
-                $k->{操作種別} = "pc";
-            }
-
             push(@ret, $k);
         }
 
@@ -600,12 +686,15 @@ app->helper(
             0, # アイテム
         );
 
-        $n->{操作種別} = "npc";
-
         my $t = {};
-        @$t{@keys2} = (
+        @$t{@keys3} = (
             $n->{id},
             "npc",
+        );
+
+        my $append = {};
+        @$append{@keys2} = (
+            $n->{id},
             undef,
             $n->{エリア},
             $n->{スポット},
@@ -613,8 +702,12 @@ app->helper(
             undef
         );
 
+        push(@$appends, $append);
         push(@$character_types, $t);
         push(@$characters, $n);
+
+        $self->save_append($append);
+        $self->save;
 
         # $self->save;
     },
@@ -634,8 +727,8 @@ app->helper(
         my $self = shift;
         my $id = shift;
         my $mode = shift;
-
-        my $hit = $characters->first(sub { return $_->{id} eq $id });
+        my $tmp = Mojo::Collection->new(@{$self->load_append});
+        my $hit = $tmp->first(sub { return $_->{id} eq $id });
 
         if (! defined $hit)
         {
@@ -651,10 +744,11 @@ app->helper(
 
         # set
         if (defined $mode) {
-            $hit->{mode} = $mode;
+            $hit->{最終コマンド} = $mode;
+            $self->save_append($hit);
         }
 
-        return $hit->{mode};
+        return $hit->{最終コマンド};
     },
 );
 
@@ -664,7 +758,6 @@ app->helper(
         my $self = shift;
         my $command = shift;
         my $id = $command->{id};
-
         my $k = $self->character($id);
 
         if (! defined $k) {
@@ -673,8 +766,13 @@ app->helper(
 
         my $param = $command->{param};
         my $accept = $command->{accept};
-        my $sub = CGI::Compile->compile(File::Spec->catfile($FindBin::Bin, 'so_index.pl'));
-        my $app = CGI::Emulate::PSGI->handler($sub);
+
+        if (! defined $app)
+        {
+            my $sub = CGI::Compile->compile(File::Spec->catfile($FindBin::Bin, 'so_index.pl'));
+            $app = CGI::Emulate::PSGI->handler($sub);
+        }
+
         my $env = {};
 
         my $mode = $param->{mode};
@@ -717,12 +815,22 @@ app->helper(
 
         my $min = 9999;
 
-        for my $append (@$character_types)
+        for my $type (@$character_types)
         {
-            if ($append->{操作種別} eq "pc")
+            if (! exists $type->{id})
             {
+                $self->log->warn("character_types に空データあり！");
                 next;
             }
+
+            my $append = $appends->first(sub { return $_->{id} eq $type->{id} });
+
+            if (! defined $append || ! exists $append->{id})
+            {
+                $self->log->warn("appends に空データあり！");
+                next;
+            }
+
             my $timer = 15;
             my $time = $append->{最終実行時間} - time() + $timer;
 
@@ -1009,12 +1117,14 @@ websocket '/channel' => sub {
 $loop->timer(1, sub {
     my $types = app->character_types;
     push(@$character_types, @$types);
+    my $tmp = app->load_append;
+    push(@$appends, @$tmp);
     my $all = app->characters;
     push(@$characters, @$all);
 });
 
 $loop->recurring(60, sub { app->save });
 $loop->timer(3, sub { app->manage });
-$loop->timer(5, sub { app->create_battle_ws_my });
+# $loop->timer(5, sub { app->create_battle_ws_my });
 
 app->start;

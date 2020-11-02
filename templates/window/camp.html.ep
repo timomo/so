@@ -1,0 +1,12 @@
+<form name="town" action="<%= $script %>" method="post">
+<input type="hidden" name="id" value="<%= $kid %>" />
+<input type="hidden" name="pass" value="<%= $kpass %>" />
+<input type="hidden" name="area" value="<%= $karea %>" />
+<input type="hidden" name="spot" value="2" />
+
+<select id="camp-select" name="mode" onchange="javascript:selectTown(this);">
+<option value="rest">休憩する</option>
+<option value="monster">キャンピング</option>
+</select>
+<input id="camp-select-submit" type="submit" value="休む" />
+</form>

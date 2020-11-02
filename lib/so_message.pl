@@ -34,15 +34,15 @@ sub message {
 
 	unshift(@mes_regist, $utf8);
 
-	open(OUT,">$message_file");
-	print OUT join("\n", @mes_regist);
-	close(OUT);
+	my $file = Mojo::File->new($message_file);
+	$file->touch;
+	$file->spurt(join("\n", @mes_regist));
 
 	# ロック解除
 	if ($lockkey == 3) { &file'unlock; }
 	else { if(-e $lockfile) { unlink($lockfile); } }
 
-	$movemsg = "$dnameへメッセージを送りました。";
+	$movemsg = "$dname へメッセージを送りました。";
 	$mode = "log_in";
 	&log_in;
 

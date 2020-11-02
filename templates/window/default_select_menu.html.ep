@@ -1,0 +1,16 @@
+<div class="clearfix">
+	<div class="blackboard answer float-l">
+	    %= join("\n", @$select_menu);
+	</div>
+</div>
+<form action="<%= $script %>" method="post" style="display: none">
+<select id="default-select" name="mode" onchange="javascript:selectTown(this);">
+<option value="item_check">アイテム一覧</option>
+<option value="status_check">ステータス詳細</option>
+<option value="log_in">戻る</option>
+<option value="logout">ログアウト</option>
+</select>
+<input type="hidden" name="id" value="<%= $kid %>" />
+<input type="hidden" name="pass" value="<%= $kpass %>" />
+<input id="default-select-submit" type="submit" value="行動" />
+</form>

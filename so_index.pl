@@ -46,7 +46,7 @@ our $tt = Template->new(
 	ENCODING => 'utf8',
 	INCLUDE_PATH => File::Spec->catdir($FindBin::RealBin, 'template'),
 );
-our $mt = Mojo::Template->new;
+our $mt = Mojo::Template->new(vars => 1);
 our $logger = Mojo::Log->new;
 
 $mode = "";
@@ -65,7 +65,7 @@ if($mente)
 srand();
 &access_ctrl;
 
-if ($mode =~ /(?:html_top|log_in|chara_make|make_end|regist)/ || $mode eq "")
+if ($mode =~ /(?:html_top|chara_make|make_end|regist)/ || $mode eq "")
 {
 	$require_login = 0;
 }

@@ -1,5 +1,41 @@
 use utf8;
 
+sub save_dat_append
+{
+	my $path = File::Spec->catfile($FindBin::Bin, "save", "append.dat");
+	my @appends = &load_ini($path);
+	my @new;
+	my $hit = 0;
+
+	for my $append (@appends)
+	{
+		my @tmp = split(/<>/, $append);
+		if ($tmp[0] eq $kid)
+		{
+			$tmp[1] = $mode;
+			$tmp[2] = $karea;
+			$tmp[3] = $kspot;
+			$tmp[4] = $kpst;
+			$hit = 1;
+		}
+		push(@new, join("<>", @tmp));
+	}
+
+	if ($hit == 0)
+	{
+		my @tmp;
+		$tmp[0] = $kid;
+		$tmp[1] = $mode;
+		$tmp[2] = $karea;
+		$tmp[3] = $kspot;
+		$tmp[4] = $kpst;
+		push(@new, join("<>", @tmp));
+	}
+
+	my $file = Mojo::File->new($path);
+	$file->spurt(join("\n", @new));
+}
+
 sub load_ini
 {
 	my $path = shift;

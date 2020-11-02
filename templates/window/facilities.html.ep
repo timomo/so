@@ -1,0 +1,12 @@
+<form name="town" action="<%= $script %>" method="post">
+<input type="hidden" name="id" value="<%= $kid %>" />
+<input type="hidden" name="pass" value="<%= $kpass %>" />
+<input type="hidden" name="area" value="<%= $karea %>" />
+<select id="town-select" name="mode" onchange="javascript:selectTown(this);">
+<option value="yado">宿屋：<%= $t_inn %></option>
+<option value="item_shop">ショップ：<%= $t_shop %></option>
+<option value="user_shop">市場：チュパフリマ <%= $area %></option>
+<option value="bank">銀行：シマダ国営銀行（<%= $area %>店）</option>
+</select>
+<input id="town-select-submit" type="submit" value="入店" />
+</form>

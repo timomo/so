@@ -1,0 +1,10 @@
+<div id="move_text" class="text_detail">&nbsp;</div>
+<div class="clearfix">
+	<div class="blackboard answer float-l" id="select-menu-window">
+
+%= join("\n", @$select_menu);
+
+	</div>
+</div>
+
+<div class="blackboard question" id="select-description"></div>
