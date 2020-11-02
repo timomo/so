@@ -290,11 +290,12 @@ sub regist {
 		&regist_buff;
 	}
 
-	open(OUT,">$chara_file");
-	print OUT @new;
-	close(OUT);
+	my $file = Mojo::File->new($chara_file);
+	$file->touch;
+	$file->spurt(join("", @new));
 
-	if(!$hit and $in{'new'} eq 'new'){
+	if(!$hit and $in{'new'} eq 'new')
+	{
 		&skill_regist;
 		$kcnt =1;
 		&item_regist;

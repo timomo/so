@@ -102,8 +102,9 @@ post "/neighbors" => sub
         if (defined $c) {
 
             my $bool = $self->is_battle($append->{id}) || $self->is_pvp($append->{id}) ? ": 戦闘中" : "";
+            my $name = sprintf("%s Lv: %d%s", $c->{名前}, $c->{レベル}, $bool);
 
-            push(@ret, [$c->{id}, $c->{名前}. $bool]);
+            push(@ret, [$c->{id}, $name]);
         }
     }
 
