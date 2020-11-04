@@ -23,6 +23,7 @@ my @keys = (qw|
 |);
 
 my $ua;
+my $app;
 
 app->helper(
     backend_request => sub
@@ -231,8 +232,12 @@ app->helper(
         my $self = shift;
         my $env = shift;
 
-        my $sub = CGI::Compile->compile(File::Spec->catfile($FindBin::Bin, 'so_index.pl'));
-        my $app = CGI::Emulate::PSGI->handler($sub);
+        if (! defined $app)
+        {
+            my $sub = CGI::Compile->compile(File::Spec->catfile($FindBin::Bin, 'so_index.pl'));
+            $app = CGI::Emulate::PSGI->handler($sub);
+        }
+
         my $content = join("", @{$app->($env)->[2]});
         my $utf8 = Encode::decode_utf8($content);
 
