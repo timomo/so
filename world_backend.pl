@@ -678,6 +678,8 @@ app->helper(
 
         $self->dbi("main")->model("コマンド結果")->update($row, where => {要求id => $accept}, mtime => "mtime");
 
+        $self->reset_ini_all;
+
         # TODO: もしPVPなら、コマンド結果が2つ？
 
         warn Dump($param);
@@ -726,15 +728,13 @@ app->helper(
         $self->log->debug("###############");
 
         # reload
-        {
-            $characters = Mojo::Collection->new;
-            my $all = app->characters;
-            push(@$characters, @$all);
-        }
+        $self->reset_ini_all;
 
-        if ($queue->size != 0) {
+        if ($queue->size != 0)
+        {
             my $command = pop(@$queue);
-            if (defined $command) {
+            if (defined $command)
+            {
                 $self->step_run($command);
             }
         }
@@ -784,6 +784,7 @@ app->helper(
                 $self->command({ const_id => $id, data => $npc_command });
 
                 $append->{最終実行時間} = time();
+                $self->save_append($append);
 
                 {
                     my $time2 = $append->{最終実行時間} - time() + $timer;
@@ -821,11 +822,10 @@ app->helper(
     multicast_reload => sub
     {
         my $self = shift;
-        my $uuid = shift;
 
-        for my $id (keys %{$battleTx->{$uuid}}) {
-            my $const_id = $battleTx->{$uuid}->{$id}->{const_id};
-            my $c = $myTx;
+        for my $id (keys %$clients)
+        {
+            my $c = $clients->{$id};
             my $mes = { method => "reload", data => 1 };
             $c->send({ json => $mes });
         }
@@ -877,158 +877,15 @@ app->helper(
 );
 
 app->helper(
-    multicast_ping => sub {
-        my ($self, $data) = @_;
-        my $const_id = "dummy";
-        my $c = $myTx;
-        my $mes = { method => "ping", data => $data };
+    multicast_ping => sub
+    {
+        my ($self) = @_;
 
-        $self->log->debug(ref $c);
-
-        if ($c && ! $c->is_finished)
+        for my $id (keys %$clients)
         {
-            $self->log->debug($self->dump($mes));
-            $c->send({ json => $mes });
-        }
-        else
-        {
-            $myTx = undef;
-            $loop->timer(1, sub {app->create_battle_ws_my});
+            $self->unicast_ping({ const_id => $id });
         }
     },
-);
-
-app->helper(
-    create_battle_ws_my => sub {
-        my $self = shift;
-
-        warn "here";
-
-        if (! defined $myTx) {
-
-            $self->log->debug("create_battle_ws_my start");
-
-            $ua ||= Mojo::UserAgent->new;
-
-            $ua->websocket('ws://127.0.0.1:3000/channel3' => sub {
-                my ($ua, $tx) = @_;
-
-                # warn YAML::XS::Dump($tx->res->to_string);
-
-                unless ($tx->is_websocket) {
-                    $self->log->info("WebSocketのハンドシェイクに失敗");
-                    if (defined $myTx) {
-                        $myTx->finish;
-                    }
-                    $myTx = undef;
-                    $loop->timer(5, sub {$self->create_battle_ws_my()});
-                    return;
-                }
-                $tx->on(finish => sub {
-                    my ($tx, $code, $reason) = @_;
-                    $self->log->info("my:WebSocket closed with status $code.");
-                    $myTx->finish;
-                    $myTx = undef;
-                    $loop->timer(5, sub {$self->create_battle_ws_my()});
-                });
-                $tx->on(json => sub {
-                    my ($tx, $json) = @_;
-
-                    return if (! exists $json->{data});
-
-                    given ($json->{method}) {
-                        when (/^active$/) {
-                            $active = $json->{data};
-                        }
-                        when (/^archive$/) {
-                            $archive = $json->{data};
-                        }
-                        default {
-                            $self->log->debug(Dump($json));
-                        }
-                    }
-
-                });
-
-                $self->log->info("my:WebSocket connected!: $tx");
-                $myTx = $tx;
-            });
-        }
-    },
-);
-
-app->helper(
-    create_battle_ws => sub {
-        my $self = shift;
-        my $c = shift;
-        my $clientTx = $c->tx;
-
-        $ua ||= Mojo::UserAgent->new;
-
-        $ua->websocket('ws://127.0.0.1:3000/channel3' => sub {
-            my ($ua, $tx) = @_;
-            unless ($tx->is_websocket) {
-                $clientTx->finish;
-                return;
-            }
-            $tx->on(finish => sub {
-                my ($tx, $code, $reason) = @_;
-
-                $clientTx->send({ json => { method => "battle_server_disconnect", data => {} } });
-
-                $self->log->info("WebSocket closed with status $code.");
-                $clientTx->finish;
-                delete $serverTxs->{sprintf("%s", $clientTx)};
-            });
-            $tx->on(json => sub {
-                my ($tx, $msg) = @_;
-                $clientTx->send({ json => $msg });
-            });
-            $self->log->info("WebSocket connected!: $tx");
-            $serverTxs->{sprintf("%s", $clientTx)} = $tx;
-        });
-    },
-);
-
-app->helper(
-    battle_request => sub {
-        my $self = shift;
-        my $method = shift;
-        my $url = shift;
-        my $data = shift;
-
-        $method = lc($method);
-
-        $ua ||= Mojo::UserAgent->new;
-        my $res;
-        eval {
-            $res = $ua->$method("127.0.0.1:3000$url" => json => $data)->result;
-        };
-        if ($@) {
-            $self->log->warn("connect faild: " . $@);
-        }
-
-        if ($res) {
-            if ($res->is_success) {
-                my $content_type = $res->headers->content_type;
-                if ($content_type =~ qr|^text/html|) {
-                    return Encode::decode_utf8($res->body);
-                }
-                return JSON->new->utf8->decode($res->body);
-            }
-            elsif ($res->is_error) {
-                say $res->message
-            }
-            elsif ($res->code == 301) {
-                say $res->headers->location
-            }
-            else {
-                say 'Whatever...'
-            }
-        }
-
-        return;
-    }
 );
 
 app->helper(
@@ -1093,6 +950,23 @@ app->helper(
     }
 );
 
+app->helper(
+    reset_ini_all => sub
+    {
+        my ($self) = @_;
+
+        $character_types = Mojo::Collection->new;
+        my $types = app->character_types;
+        push(@$character_types, @$types);
+        $appends = Mojo::Collection->new;
+        my $tmp = app->load_append;
+        push(@$appends, @$tmp);
+        $characters = Mojo::Collection->new;
+        my $all = app->characters;
+        push(@$characters, @$all);
+    },
+);
+
 helper events => sub {
     state $events = Mojo::EventEmitter->new
 };
@@ -1109,18 +983,22 @@ websocket '/channel' => sub {
         warn "------------------->". $json->{method};
 
         given ($json->{method}) {
-            when (/^ping$/) {
+            when (/^ping$/)
+            {
                 my $const_id = $json->{const_id};
                 $clients->{$const_id} = $tx;
                 app->unicast_ping($json);
             }
-            when (/^command$/) {
+            when (/^command$/)
+            {
                 app->command($json);
             }
-            when (/^difference$/) {
+            when (/^difference$/)
+            {
                 # app->battle_request_ws($c, "difference", $json->{data});
             }
-            when (/^reload/) {
+            when (/^reload/)
+            {
                 # app->battle_request_ws($c, "difference", $json->{data});
             }
         }
@@ -1149,12 +1027,7 @@ websocket '/channel' => sub {
 };
 
 $loop->timer(1, sub {
-    my $types = app->character_types;
-    push(@$character_types, @$types);
-    my $tmp = app->load_append;
-    push(@$appends, @$tmp);
-    my $all = app->characters;
-    push(@$characters, @$all);
+    app->reset_ini_all
 });
 
 app->dbi("main");

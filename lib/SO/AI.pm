@@ -22,7 +22,6 @@ sub close
     $self->data({});
     $self->watch_hook({});
     $self->context(undef);
-    # $self->id(undef);
 }
 
 sub open

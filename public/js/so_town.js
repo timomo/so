@@ -121,14 +121,19 @@ function setup_select_menu()
 
 	jQuery(".select-menu").bind("mouseenter", (event) =>
 	{
-		jQuery(".select-menu").removeClass("blink-before");
-		jQuery(event.target).addClass("blink-before");
-
 		const id = jQuery(event.target).attr("id");
 		const ary = id.split("_");
 		const name = ary.splice(0, 1)[0];
 		const select_id = ary.splice(0, 1)[0];
 		const select_value = ary.join("_");
+
+		jQuery(".select-menu").removeClass("blink-before");
+
+		if (jQuery("#" + select_id).parent("form").prop("disabled")) {
+			return false;
+		}
+
+		jQuery(event.target).addClass("blink-before");
 
 		jQuery("#" + select_id).val(select_value);
 
@@ -143,15 +148,16 @@ function setup_select_menu()
 
 	jQuery(".select-menu").bind("click", (event) =>
 	{
-		if (jQuery("form").is(":disabled")) {
-			jQuery.jGrowl("サーバ未接続状態の為、操作出来ません。");
-		}
-
 		const id = jQuery(event.target).attr("id");
 		const ary = id.split("_");
 		const name = ary.splice(0, 1)[0];
 		const select_id = ary.splice(0, 1)[0];
 		const select_value = ary.join("_");
+
+		if (jQuery("#" + select_id).parent("form").prop("disabled")) {
+			jQuery.jGrowl("サーバ未接続状態の為、操作出来ません。");
+			return false;
+		}
 
 		if (select_id === "default-select" && select_value === "logout") {
 			location.href = "./logout";
@@ -204,6 +210,12 @@ function ws_send(method, data) {
 	const request = {};
 	// const cookie = get_so_cookies();
 
+	if (ws.readyState !== 1)
+	{
+		console.error("websocket未接続の為、操作不能");
+		return true;
+	}
+
 	request.method = method;
 	// request.const_id = cookie.id;
 	request.data = data;
@@ -237,7 +249,6 @@ function setup_websocket(timer) {
 		console.debug("ws opened");
 
 		jQuery.jGrowl("サーバに接続しました。");
-
 		jQuery("form").prop("disabled", false);
 
 		if (timer) clearTimeout(timer);
@@ -251,9 +262,7 @@ function setup_websocket(timer) {
 		console.warn("ws closed. try reconnect...");
 
 		jQuery.jGrowl("サーバから切断されました。");
-
 		jQuery("form").prop("disabled", true);
-
 		count.ping = 0;
 
 		timer = setTimeout(() => {
