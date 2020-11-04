@@ -264,19 +264,40 @@ app->helper(
     {
         my $self = shift;
         my $id = shift;
-        my $dir = Mojo::File->new(File::Spec->catdir($FindBin::Bin, "save", "battle"));
-        my $collection = $dir->list_tree;
 
-        for my $file (@$collection)
+        my $hit = $queue->first(sub
         {
-            if ($file->basename !~ /\.pvp\.yaml$/)
+            my $command = shift;
+            my $param = $command->{param};
+
+            if ($param->{mode} ne "pvp")
             {
-                next;
+                return 0;
             }
-            if ($file->basename =~ /$id/)
+
+            if ($param->{id} ne $id && $param->{k1id} ne $id && $param->{k2id} ne $id)
             {
-                return 1;
+                return 0;
             }
+
+            return 1;
+        });
+
+        if (defined $hit)
+        {
+            return 1;
+        }
+
+        my $ids = $self->get_pvp_ids($id);
+
+        if (! defined $ids)
+        {
+            return 0;
+        }
+
+        if ($ids->[0] eq $id || $ids->[1] eq $id)
+        {
+            return 1;
         }
 
         return 0;
@@ -497,7 +518,7 @@ app->helper(
         my $self = shift;
         my $npc = $character_types->grep(sub { return $_->{操作種別} eq "npc" });
 
-        if ($npc->size > 1)
+        if ($npc->size >= $self->config->{number_of_npc})
         {
             return;
         }
@@ -622,9 +643,6 @@ app->helper(
         my $mode = $param->{mode};
         my $mode_prev = $self->location($id);
 
-        $self->log->debug(sprintf("chara=%s, mode=%s, rid=%s", $id, $mode. $param->{rid} || ""));
-        # warn Dump([$param, $accept]);
-
         my $url = Mojo::URL->new;
         $url->query({ %$param, id => $k->{id}, pass => $k->{パスワード} });
         $env->{QUERY_STRING} = $url->to_string;
@@ -659,22 +677,18 @@ app->helper(
         {
             delete $row->{id};
 
-            if ($param->{k1id} eq $id)
+            for my $tmp_id ($param->{k1id}, $param->{k2id})
             {
-                $row->{from} = $param->{k2id};
-            }
-            else
-            {
-                $row->{from} = $param->{k1id};
-            }
+                $row->{from} = $tmp_id;
 
-            $self->dbi("main")->model("コマンド結果")->insert($row, ctime => "ctime");
+                $self->dbi("main")->model("コマンド結果")->insert($row, ctime => "ctime");
 
-            my $c = $self->get_connection({ const_id => $row->{from} });
+                my $c = $self->get_connection({ const_id => $row->{from} });
 
-            if (defined $c)
-            {
-                $c->send({ json => { method => "result", data => { accept => $accept, } } });
+                if (defined $c)
+                {
+                    $c->send({ json => { method => "result", data => { accept => $accept, } } });
+                }
             }
         }
 
@@ -706,6 +720,7 @@ app->helper(
             my $command = pop(@$queue);
             if (defined $command)
             {
+                warn Dump($command);
                 $self->step_run($command);
             }
         }
@@ -950,8 +965,6 @@ websocket '/channel' => sub {
 
     $c->on(json => sub {
         my ($c, $json) = @_;
-
-        warn "------------------->". $json->{method};
 
         given ($json->{method}) {
             when (/^ping$/)

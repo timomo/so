@@ -98,10 +98,12 @@ sub command
             my $neighbors = Mojo::Collection->new(@{$self->context->neighbors($id)});
             my $shuffle = $neighbors->shuffle;
             my $target_append = $shuffle->head(1)->last;
-            my $is_battle = $self->context->is_battle($id) || $self->context->is_pvp($id) ? 1 : 0;
 
             if (defined $target_append)
             {
+                my $is_battle = $self->context->is_battle($id) || $self->context->is_pvp($id) ? 1 : 0;
+                my $is_battle2 = $self->context->is_battle($target_append->{id}) || $self->context->is_pvp($target_append->{id}) ? 1 : 0;
+
                 if (0)
                 {
                     my $mes = "これはNPC " . $k->{名前}. " からのメッセージ送信テストです。絶賛開発中です。";
@@ -113,7 +115,7 @@ sub command
                         name  => $k->{名前},
                     };
                 }
-                elsif ($is_battle == 0)
+                elsif ($is_battle == 0 && $is_battle2 == 0)
                 {
                     # 今の所、決め打ちで、襲い掛かる
                     $self->context->log->debug(sprintf("search: ユーザを見て襲いかかる: id = %s, パスワード = %s, スポット = %s, エリア = %s, 距離 = %s", $k->{id}, $k->{パスワード}, $k->{スポット}, $k->{エリア}, $k->{距離}));

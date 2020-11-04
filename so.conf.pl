@@ -6,4 +6,5 @@
         new_line          => "\r\n",
         default_parameter => [ 5, 5, 5, 5, 5, 5, 5 ],
         log_level         => "debug",
+        number_of_npc     => 10,
 };

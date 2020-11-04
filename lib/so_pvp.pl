@@ -710,7 +710,7 @@ sub pvp_initialize
 	$hit=0;
 	foreach(@battle_k1){
 		($k1id,$k1pass,$k1name,$k1sex,$k1chara,$k1n_0,$k1n_1,$k1n_2,$k1n_3,$k1n_4,$k1n_5,$k1n_6,$k1hp,$k1maxhp,$k1ex,$k1lv,$k1ap,$k1gold,$k1lp,$k1total,$k1kati,$k1host,$k1date,$k1area,$k1spot,$k1pst,$k1item) = split(/<>/);
-		if($in{'id'} eq "$k1id" and $in{'pass'} eq "$k1pass") {
+		if($in{'k1id'} eq "$k1id" and $in{'pass'} eq "$k1pass") {
 			$hit=1;
 			last;
 		}
@@ -733,10 +733,10 @@ sub pvp_initialize
 
 	foreach(@battle_k2){
 		($k2id,$k2pass,$k2name,$k2sex,$k2chara,$k2n_0,$k2n_1,$k2n_2,$k2n_3,$k2n_4,$k2n_5,$k2n_6,$k2hp,$k2maxhp,$k2ex,$k2lv,$k2ap,$k2gold,$k2lp,$k2total,$k2kati,$k2host,$k2date,$k2area,$k2spot,$k2pst,$k2item) = split(/<>/);
-		if($in{'rid'} eq "$k2id") { last; }
+		if($in{'k2id'} eq "$k2id") { last; }
 	}
 
-	if($in{'id'} eq $in{'rid'}) { &error("不正なパラメータです。"); }
+	if($in{'k1id'} eq $in{'k2id'}) { &error("不正なパラメータです。"); }
 
 	$kid = $k2id;
 	&skill_load;
