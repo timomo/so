@@ -380,18 +380,9 @@ app->helper(
     {
         my $self = shift;
         my $id = shift;
-        my $path = File::Spec->catfile($FindBin::Bin, qw|save chara.dat|);
-        my $ret = $self->load_ini($path, \@keys);
-
-        for my $k (@$ret)
-        {
-            if ($k->{id} eq $id)
-            {
-                return $k;
-            }
-        }
-
-        return undef;
+        my $result = $self->dbi("main")->model("キャラ")->select(["*"], where => {id => $id});
+        my $row = $result->fetch_hash_one;
+        return $row;
     },
 );
 
@@ -412,6 +403,23 @@ app->helper(
 
         for my $k (@$characters)
         {
+            my $result = $self->dbi("main")->model("キャラ")->select(["*"], where => {id => $k->{id}});
+            my $row = $result->fetch_hash_one;
+
+            eval
+            {
+                if (defined $row) {
+                    $self->dbi("main")->model("キャラ")->update($k, where => {id => $k->{id}}, mtime => "mtime");
+                } else {
+                    $self->dbi("main")->model("キャラ")->insert($k, ctime => "ctime");
+                }
+            };
+            if ($@)
+            {
+                warn $@;
+                die $self->dump($k);
+            }
+
             my @tmp = @{$k}{@keys};
             push(@raw, Encode::encode_utf8(join($sep, @tmp)));
         }
@@ -930,6 +938,7 @@ app->helper(
 
             $dbi = $dbi->safety_character("\x{2E80}-\x{2FDF}々〇〻\x{3400}-\x{4DBF}\x{4E00}-\x{9FFF}\x{F900}-\x{FAFF}\x{20000}-\x{2FFFF}ーぁ-んァ-ヶa-zA-Z0-9_");
             $dbi->create_model("コマンド結果");
+            $dbi->create_model("キャラ");
 
             $dbis->{$type} = $dbi;
 
@@ -1049,7 +1058,7 @@ $loop->timer(1, sub {
     app->reset_ini_all
 });
 
-$loop->recurring(60, sub { app->save });
+$loop->recurring(10, sub { app->save });
 $loop->timer(3, sub { app->manage });
 # $loop->timer(5, sub { app->create_battle_ws_my });
 
