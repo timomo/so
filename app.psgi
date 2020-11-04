@@ -17,11 +17,9 @@ push @{app->static->paths}, File::Spec->catdir($FindBin::Bin, qw|public js|);
 push @{app->static->paths}, File::Spec->catdir($FindBin::Bin, qw|public css|);
 push @{app->static->paths}, File::Spec->catdir($FindBin::Bin, qw|public sound|);
 
-my @keys = (qw|
-    id パスワード 名前 性別 画像 力 賢さ 信仰心 体力 器用さ 素早さ 魅力 HP 最大HP
-    経験値 レベル 残りAP 所持金 LP 戦闘数 勝利数 ホスト 最終アクセス エリア スポット 距離 アイテム
-|);
+plugin Config => { file => "so.conf.pl" };
 
+my @keys = @{app->config->{keys}};
 my $ua;
 my $app;
 
@@ -35,10 +33,18 @@ app->helper(
 
         $method = lc($method);
 
+        if ($method eq "GET")
+        {
+            my $obj = Mojo::URL->new;
+            $obj->query($data);
+            $url .= $url->to_string;
+        }
+
         $ua ||= Mojo::UserAgent->new;
         my $res;
         eval
         {
+            warn "------------------------->$url";
             $res = $ua->$method("127.0.0.1:3001$url" => json => $data)->result;
         };
         if ($@)
@@ -76,7 +82,7 @@ app->helper(
         }
 
         return;
-    }
+    },
 );
 
 app->helper(
@@ -84,35 +90,7 @@ app->helper(
     {
         my $self = shift;
         my $id = shift;
-        my $path = File::Spec->catfile($FindBin::Bin, qw|save chara.dat|);
-        my $file = Mojo::File->new($path);
-        my @raw = split(/\r\n|\r|\n/, $file->slurp);
-
-        for my $line (@raw)
-        {
-            chomp($line);
-            my @tmp = split(/<>/, $line, 2);
-
-            if ($tmp[0] ne $id)
-            {
-                next;
-            }
-
-            my @tmp2 = split(/<>/, Encode::decode_utf8($tmp[1]));
-
-            for my $no (0 .. $#tmp2)
-            {
-                if ($tmp2[$no] =~ /^\d+$/)
-                {
-                    $tmp2[$no] *= 1;
-                }
-            }
-
-            my $k = {};
-            @$k{@keys} = ($tmp[0], @tmp2);
-
-            return $k;
-        }
+        return $self->backend_request("GET", "/character/$id", {});
     },
 );
 
@@ -142,8 +120,7 @@ get "/neighbors" => sub
 
     return $self->reply->not_found unless ($k);
 
-    my $url = sprintf("/neighbors");
-    my $utf8 = $self->backend_request("POST", $url, { id => $k->{id} });
+    my $utf8 = $self->backend_request("get", "/neighbors", { id => $k->{id} });
 
     return $self->render(json => $utf8);
 };
@@ -158,28 +135,9 @@ get "/current" => sub
     $self->cookie(id => $k->{id});
 
     my $accept = $self->param("accept");
-    my $url = sprintf("/current");
-    my $utf8 = $self->backend_request("POST", $url, { "accept" => $accept, id => $k->{id} });
+    my $utf8 = $self->backend_request("get", "/current", { "accept" => $accept, id => $k->{id} });
 
     return $self->render(text => $utf8 || "", format => 'html');
-};
-
-get "/is_result" => sub
-{
-    my $self = shift;
-    my $json = $self->req->query_params->to_hash;
-
-    delete $json->{pass};
-
-    my $k = $self->current_user;
-
-    return $self->reply->not_found unless ($k);
-
-    my $url = sprintf("/is_result");
-
-    my $utf8 = $self->backend_request("POST", $url, { %$json, id => $k->{id} });
-
-    return $self->render(json => $utf8);
 };
 
 post "/command" => sub
@@ -193,9 +151,7 @@ post "/command" => sub
 
     return $self->reply->not_found unless ($k);
 
-    my $url = sprintf("/command");
-
-    my $utf8 = $self->backend_request("POST", $url, { %$json, id => $k->{id} });
+    my $utf8 = $self->backend_request("POST", "/command", { %$json, id => $k->{id} });
 
     return $self->render(json => $utf8);
 };
@@ -310,7 +266,8 @@ app->helper(
         $ua->websocket('ws://127.0.0.1:3001/channel' => sub
         {
             my ($ua, $tx) = @_;
-            unless ($tx->is_websocket) {
+            unless ($tx->is_websocket)
+            {
                 $clientTx->finish;
                 return;
             }
@@ -336,7 +293,8 @@ app->helper(
 );
 
 app->helper(
-    battle_request_ws => sub {
+    battle_request_ws => sub
+    {
         my $self = shift;
         my $c = shift;
         my $method = shift;
@@ -374,17 +332,22 @@ websocket '/channel' => sub
 
         my $id = $c->cookie("id");
 
-        given ($json->{method}) {
-            when (/^ping$/) {
+        given ($json->{method})
+        {
+            when (/^ping$/)
+            {
                 app->battle_request_ws($c, "ping", $id, $json->{data});
             }
-            when (/^command$/) {
+            when (/^command$/)
+            {
                 app->battle_request_ws($c, "command", $id, $json->{data});
             }
-            when (/^difference$/) {
+            when (/^difference$/)
+            {
                 app->battle_request_ws($c, "difference", $id, $json->{data});
             }
-            when (/^reload/) {
+            when (/^reload/)
+            {
                 app->battle_request_ws($c, "difference", $id, $json->{data});
             }
         }

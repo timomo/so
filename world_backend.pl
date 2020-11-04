@@ -34,64 +34,30 @@ use DBIx::Custom;
 use lib File::Spec->catdir($FindBin::Bin, "lib");
 use SO::AI;
 
-plugin Config => { file => 'so.conf.pl' };
-
-my $loop = Mojo::IOLoop->singleton;
+plugin Config => { file => "so.conf.pl" };
 
 $Storable::Deparse = 1;
 $Storable::Eval = 1;
 
-my $instances = {};
-my $loopIds = {};
-my $battleTx = {};
-my $appTx = {};
-my $ua;
-my $serverTxs = {};
-my $myTx;
-my $active = [];
-my $archive = [];
+my $loop = Mojo::IOLoop->singleton;
 my $results = Mojo::Collection->new;
 my $queue = Mojo::Collection->new;
 my $characters = Mojo::Collection->new;
 my $character_types = Mojo::Collection->new;
 my $appends = Mojo::Collection->new;
-
-my @keys = (qw|
-    id パスワード 名前 性別 画像 力 賢さ 信仰心 体力 器用さ 素早さ 魅力 HP 最大HP
-    経験値 レベル 残りAP 所持金 LP 戦闘数 勝利数 ホスト 最終アクセス エリア スポット 距離 アイテム
-|);
-my @keys2 = (qw|id 最終コマンド エリア スポット 距離 最終実行時間|);
-my @keys3 = (qw|id 操作種別|);
-my $sep = "<>";
-my $new_line = "\r\n";
-my @default_parameter = (5, 5, 5, 5, 5, 5, 5);
+my @keys = @{app->config->{keys}};
+my @keys2 = @{app->config->{keys2}};
+my @keys3 = @{app->config->{keys3}};
+my $sep = app->config->{sep};
+my $new_line = app->config->{new_line};
+my @default_parameter = @{app->config->{default_parameter}};
 my $app;
 my $clients = {};
 my $dbis = {};
 
-app->log->level('debug');
+app->log->level(app->config->{log_level});
 
-post "/is_result" => sub
-{
-    my $self = shift;
-    my $json = $self->req->json;
-    my $id = $json->{id};
-
-    # warn Dump($json);
-
-    if (exists $json->{accept} && $json->{accept} ne "")
-    {
-        my $hit = $results->first(sub { return $_->{id} eq $id && $_->{accept} eq $json->{accept} });
-
-        if (defined $hit)
-        {
-            return $self->render(json => { result => "done" });
-        }
-    }
-    return $self->render(json => { result => "yet" });
-};
-
-post "/neighbors" => sub
+get "/neighbors" => sub
 {
     my $self = shift;
     my $json = $self->req->json;
@@ -105,7 +71,7 @@ post "/neighbors" => sub
 
         if (defined $c)
         {
-            my $bool = $self->is_battle($append->{id}) || $self->is_pvp($append->{id}) ? ": 戦闘中" : "";
+            my $bool = $self->is_battle($append->{id}) || $self->is_pvp($append->{id}) ? "(戦闘中)" : "";
             my $name = sprintf("%s Lv: %d%s", $c->{名前}, $c->{レベル}, $bool);
 
             push(@ret, [$c->{id}, $name]);
@@ -152,7 +118,7 @@ app->helper(
     },
 );
 
-post "/current" => sub
+get "/current" => sub
 {
     my $self = shift;
     my $json = $self->req->json;
@@ -213,8 +179,14 @@ post "/command" => sub
     my $self = shift;
     my $json = $self->req->json;
     my $res = $self->command($json);
-
     return $self->render(json => $res);
+};
+
+get "/character/:id" => sub
+{
+    my $self = shift;
+    my $k = $self->character($self->param("id"));
+    return $self->render(json => $k);
 };
 
 app->helper(
@@ -523,7 +495,6 @@ app->helper(
     spawn => sub
     {
         my $self = shift;
-
         my $npc = $character_types->grep(sub { return $_->{操作種別} eq "npc" });
 
         if ($npc->size > 1)
@@ -1029,8 +1000,6 @@ websocket '/channel' => sub {
 $loop->timer(1, sub {
     app->reset_ini_all
 });
-
-app->dbi("main");
 
 $loop->recurring(60, sub { app->save });
 $loop->timer(3, sub { app->manage });

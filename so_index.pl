@@ -12,6 +12,7 @@ use Mojo::Log;
 use Scalar::Util;
 use Mojo::Parameters;
 use Mojo::Template;
+# use Mojo::UserAgent;
 
 # 初期設定ファイルの読み込み
 require './so_system.dat';
