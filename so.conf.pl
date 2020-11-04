@@ -7,5 +7,5 @@
         default_parameter   => [ 5, 5, 5, 5, 5, 5, 5 ],
         log_level           => "debug",
         number_of_npc       => 10,
-        url_of_world_server => "http://127.0.0.1:3001",
+        url_of_world_server => "127.0.0.1:3001",
 };

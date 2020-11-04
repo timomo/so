@@ -33,11 +33,11 @@ app->helper(
 
         $method = lc($method);
 
-        if ($method eq "GET")
+        if ($method eq "get")
         {
             my $obj = Mojo::URL->new;
             $obj->query($data);
-            $url .= $url->to_string;
+            $url .= $obj->to_string;
         }
 
         $ua ||= Mojo::UserAgent->new;

@@ -57,6 +57,16 @@ my $dbis = {};
 
 app->log->level(app->config->{log_level});
 
+post "/append" => sub
+{
+    my $self = shift;
+    my $json = $self->req->json;
+
+    $self->save_append($json);
+
+    return $self->render(json => { result => 1 });
+};
+
 get "/neighbors" => sub
 {
     my $self = shift;
@@ -309,6 +319,29 @@ app->helper(
     {
         my $self = shift;
         my $id = shift;
+
+        my $hit = $queue->first(sub
+        {
+            my $command = shift;
+            my $param = $command->{param};
+
+            if ($param->{mode} ne "pvp")
+            {
+                return 0;
+            }
+
+            if ($param->{id} ne $id && $param->{k1id} ne $id && $param->{k2id} ne $id)
+            {
+                return 0;
+            }
+
+            return 1;
+        });
+
+        if (defined $hit)
+        {
+            return [$hit->{param}->{k1id}, $hit->{param}->{k2id}];
+        }
 
         my $dir = Mojo::File->new(File::Spec->catdir($FindBin::Bin, "save", "battle"));
         my $collection = $dir->list_tree;
@@ -671,7 +704,7 @@ app->helper(
 
         # TODO: もしPVPなら、コマンド結果が2つ？
 
-        warn Dump($param);
+        # warn Dump($param);
 
         if ($param->{mode} eq "pvp")
         {
@@ -910,6 +943,8 @@ app->helper(
     {
         my $self = shift;
         my $env = shift;
+        $env->{"psgi.input"} ||= *STDIN;
+        $env->{"psgi.errors"} ||= *STDERR;
 
         if (! defined $app)
         {

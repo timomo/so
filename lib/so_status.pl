@@ -365,7 +365,7 @@ const spot = "$spot";
 EOM
 
 	&footer;
-	&save_dat_append;
+	&save_dat_append_1p;
 
 	exit;
 }

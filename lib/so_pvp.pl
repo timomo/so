@@ -1066,7 +1066,8 @@ sub pvp
 {
 	$battle_flag=1;
 
-	&save_dat_append;
+	&save_dat_append_1p;
+	&save_dat_append_2p;
 
 	# 途中データ確認
 	my $data;

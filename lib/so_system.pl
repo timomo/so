@@ -3,9 +3,58 @@ use utf8;
 sub save_dat_append_1p
 {
 	my $param = {};
-	@$param{$config->{keys2}} = ($kid, $mode, $karea, $kspot, $kpst, time);
+	@$param{@{$config->{keys2}}} = ($kid, $mode, $karea, $kspot, $kpst, time);
 
-	&save_dat_append_server("PUT", "/append", $param);
+	&save_dat_append_file("post", "/append", $param);
+}
+
+sub save_dat_append_2p
+{
+	my $param = {};
+	@$param{@{$config->{keys2}}} = ($k2id, $mode, $k2area, $k2spot, $k2pst, time);
+
+	&save_dat_append_file("post", "/append", $param);
+}
+
+sub save_dat_append_file
+{
+	my $method = shift;
+	my $url = shift;
+	my $data = shift;
+	my $path = File::Spec->catfile($FindBin::Bin, "save", "append.dat");
+	my @appends = &load_ini($path);
+	my @new;
+	my $hit = 0;
+
+	for my $append (@appends)
+	{
+		my @tmp = split(/<>/, $append);
+		if ($tmp[0] eq $data->{id})
+		{
+			$tmp[1] = $data->{最終コマンド};
+			$tmp[2] = $data->{エリア};
+			$tmp[3] = $data->{スポット};
+			$tmp[4] = $data->{距離};
+			$tmp[5] = $data->{最終実行時間};
+			$hit = 1;
+		}
+		push(@new, join("<>", @tmp));
+	}
+
+	if ($hit == 0)
+	{
+		my @tmp;
+		$tmp[0] = $data->{id};
+		$tmp[1] = $data->{最終コマンド};
+		$tmp[2] = $data->{エリア};
+		$tmp[3] = $data->{スポット};
+		$tmp[4] = $data->{距離};
+		$tmp[5] = $data->{最終実行時間};
+		push(@new, join("<>", @tmp));
+	}
+
+	my $file = Mojo::File->new($path);
+	$file->spurt(join("\n", @new));
 }
 
 sub save_dat_append_server
@@ -16,20 +65,19 @@ sub save_dat_append_server
 
 	$method = lc($method);
 
-	if ($method eq "GET")
+	if ($method eq "get")
 	{
 		my $obj = Mojo::URL->new;
 		$obj->query($data);
-		$url .= $url->to_string;
+		$url .= $obj->to_string;
 	}
 
-	$ua ||= Mojo::UserAgent->new;
 	my $res;
-
 	my $host = $config->{url_of_world_server};
 
 	eval
 	{
+		$logger->debug($url);
 		$res = $ua->$method($host. $url => json => $data)->result;
 	};
 	if ($@)
@@ -51,13 +99,12 @@ sub save_dat_append_server
 			};
 			if ($@)
 			{
-				warn $@;
 				$logger->error($@);
 			}
 			return $utf8;
 		}
 		elsif ($res->is_error) {
-			$logger->error($res->message);
+			$logger->error(Encode::decode_utf8($res->message));
 		}
 		elsif ($res->code == 301) {
 			$logger->warn($res->headers->location);

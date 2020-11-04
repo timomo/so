@@ -876,7 +876,7 @@ sub monster
 {
 	$battle_flag=1;
 
-	&save_dat_append;
+	&save_dat_append_1p;
 
 	# 途中データ確認
 	my $data;

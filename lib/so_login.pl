@@ -3,7 +3,32 @@ use utf8;
 #-----------------#
 #  TOPページ表示  #
 #-----------------#
-sub html_top {
+sub html_top
+{
+	my @battle = &load_ini($battle_file);
+	my $sousu = @battle;
+
+	my @tmp1 = ();
+	my @tmp2 = ();
+
+	foreach(@battle)
+	{
+		my ($aa,$bb,$point,$total,$win) = split(/<>/);
+		my $rate;
+		if($total != 0 && $win != 0)
+		{
+			$rate = int($win / $total * 1000);
+		}
+		else
+		{
+			$rate = 0;
+		}
+		push(@tmp1, int($point * $rate));
+		push(@tmp2, $rate);
+	}
+
+	@battle = @battle[sort {$tmp1[$b] <=> $tmp1[$a] or
+		$tmp2[$b] <=> $tmp2[$a]} 0 .. $#tmp1];
 
 	&get_cookie;
 
@@ -50,25 +75,6 @@ sub html_top {
 [<B><FONT COLOR="#FF9933">お知らせ</FONT></B>]<BR>
 $kanri_message
 <BR>
-EOM
-	@battle = &load_ini($battle_file);
-	$sousu = @battle;
-
-	@tmp1 = @tmp2 = ();
-	foreach(@battle){
-		my ($aa,$bb,$point,$total,$win) = split(/<>/);
-		if($total != 0 && $win != 0){
-			$rate = int($win / $total * 1000);
-		}else{
-			$rate = 0;
-		}
- 		push(@tmp1, int($point * $rate));
- 		push(@tmp2, $rate);
-	}
-	@battle = @battle[sort {$tmp1[$b] <=> $tmp1[$a] or
-			$tmp2[$b] <=> $tmp2[$a]} 0 .. $#tmp1];
-
-	print <<"EOM";
 <BR>
 [<B><FONT COLOR="#FF9933">ランキング</FONT></B>]<BR>
 現在の Shadow Duel 参加者中ポイントTOP<b>$rank_top</b>を表\示しています。
@@ -79,25 +85,37 @@ EOM
 </tr>
 EOM
 
-	$i=1;
-	foreach(@battle){
-		($bid,$bname,$bpoint,$btotal,$bwin,$brank) = split(/<>/);
-		if($i > $rank_top) { last; }
-		if($btotal != 0 && $bwin != 0){
+	my $i = 1;
+
+	foreach(@battle)
+	{
+		my ($bid, $bname, $bpoint, $btotal, $bwin, $brank) = split(/<>/);
+		my $brate;
+
+		if($i > $rank_top)
+		{
+			last;
+		}
+		if($btotal != 0 && $bwin != 0)
+		{
 			$brate = int($bwin / $btotal * 1000) / 10;
-		}else{
+		}
+		else
+		{
 			$brate = 0;
 		}
+
 		print "<tr>\n";
 		print "<td align=center>$i</td><td>$bname</td><td align=center>$bpoint</td><td align=center>$brate%</td><td align=center>$sdrank[$brank]</td>\n";
 		print "</tr>\n";
+
 		$i++;
 	}
 
-	print "</table>\n";
 	print <<"EOM";
+</table>
 <form action="$script" method="post">
-[<B><FONT COLOR="#FF9933">入国管理室</FONT></B>]<BR>
+[<B><span COLOR="#FF9933">入国管理室</span></B>]<BR>
 右手の入り口より入国手続きを行います。（新キャラ登録）&nbsp
 <input type="hidden" name="mode" value="chara_make" />
 <input type="submit" value="入国手続き" />
@@ -117,15 +135,16 @@ EOM
 #------------------#
 #   ログイン制御   #
 #------------------#
-sub access_ctrl {
+sub access_ctrl
+{
 	$ENV{'TZ'} = "JST-9";
-	$times = time();
-	($sec,$min,$hour,$mday,$mon,$year,$wday,$stime) = localtime($times);
+	my $times = time();
+	my ($sec, $min, $hour, $mday, $mon, $year, $wday, $stime) = localtime($times);
 
-	$log_time = sprintf("%04d\%02d\%02d", $year+1900,$mon+1,$mday);
+	my $log_time = sprintf("%04d\%02d\%02d", $year+1900,$mon+1,$mday);
 	$log_time .= ".log";
 
-	$time = sprintf("%04d\/%02d\/%02d %02d\:%02d\:%02d", $year+1900,$mon+1,$mday,$hour,$min,$sec);
+	my $time = sprintf("%04d\/%02d\/%02d %02d\:%02d\:%02d", $year+1900,$mon+1,$mday,$hour,$min,$sec);
 
 	if($in{'id'} eq ""){
 		if($kid eq ""){
@@ -137,22 +156,23 @@ sub access_ctrl {
 		$user = $in{'id'};
 	}
 
-	@BAN_USER = &load_ini($ban_file);
+	my @BAN_USER = &load_ini($ban_file);
 
 	foreach(@BAN_USER) {
-		($bid,$bmess) = split(/<>/);
-		if($in{'id'} eq "$bid"){
-			&error("入力されたID:$bidは$bmessのため、入国管理局に指名手配されています。");
+		my ($bid,$bmess) = split(/<>/);
+		if($in{'id'} eq "$bid")
+		{
+			&error("入力されたID:$bid は$bmess のため、入国管理局に指名手配されています。");
 		}
 	}
 
 	&get_host;
 
-	@access_log = &load_ini($log_path. $log_time);
+	my @access_log = &load_ini($log_path. $log_time);
 
 	unshift(@access_log,"$time<>$host<>$user<>$mode<>\n");
 
-	open(OUT,">$log_path$log_time");
+	open(OUT,">", $log_path. $log_time);
 	print OUT @access_log;
 	close(OUT);
 }

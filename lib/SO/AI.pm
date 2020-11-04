@@ -59,7 +59,7 @@ sub command
 
             my $ids = $self->context->get_pvp_ids($id);
 
-            if (ref $ids eq "ARRAY")
+            if (defined $ids)
             {
                 return {
                     mode => "pvp",
