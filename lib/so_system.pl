@@ -1,5 +1,75 @@
 use utf8;
 
+sub save_dat_append_1p
+{
+	my $param = {};
+	@$param{$config->{keys2}} = ($kid, $mode, $karea, $kspot, $kpst, time);
+
+	&save_dat_append_server("PUT", "/append", $param);
+}
+
+sub save_dat_append_server
+{
+	my $method = shift;
+	my $url = shift;
+	my $data = shift;
+
+	$method = lc($method);
+
+	if ($method eq "GET")
+	{
+		my $obj = Mojo::URL->new;
+		$obj->query($data);
+		$url .= $url->to_string;
+	}
+
+	$ua ||= Mojo::UserAgent->new;
+	my $res;
+
+	my $host = $config->{url_of_world_server};
+
+	eval
+	{
+		$res = $ua->$method($host. $url => json => $data)->result;
+	};
+	if ($@)
+	{
+		$logger->error($@);
+		return;
+	}
+
+	if (defined $res) {
+		if ($res->is_success) {
+			my $content_type = $res->headers->content_type;
+			if ($content_type =~ qr|^text/html|) {
+				return Encode::decode_utf8($res->body);
+			}
+			my $utf8;
+			eval
+			{
+				$utf8 = Mojo::JSON::decode_json($res->body);
+			};
+			if ($@)
+			{
+				warn $@;
+				$logger->error($@);
+			}
+			return $utf8;
+		}
+		elsif ($res->is_error) {
+			$logger->error($res->message);
+		}
+		elsif ($res->code == 301) {
+			$logger->warn($res->headers->location);
+		}
+		else {
+			$logger->warn('Whatever...');
+		}
+	}
+
+	return;
+}
+
 sub save_dat_append
 {
 	my $path = File::Spec->catfile($FindBin::Bin, "save", "append.dat");

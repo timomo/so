@@ -42,11 +42,12 @@ sub footer
 		ver => $ver,
 	});
 
-	print <<EOF;
-$default_select_menu
-$footer
-</body></html>
+	my $html = $mt->render(<<'EOF', { default_select_menu => $default_select_menu, footer => $footer });
+<%= $default_select_menu %>
+<%= $footer %>
 EOF
+
+	print $html;
 }
 #------------------#
 #  HTMLのヘッダー  #
@@ -93,37 +94,44 @@ sub header
 	my $css_backgif = "";
 	$css_backgif = "background-image: url($backgif);" if ( $backgif ne "" );
 
-	my $header = $mt->render_file('templates/layouts/header.html.ep', {
-		main_title => $main_title,
-	});
+	my $header = $mt->render_file('templates/layouts/header.html.ep', { main_title => $main_title });
 	my $meta = $mt->render_file('templates/layouts/meta.html.ep', {});
 	my $javascript = $mt->render_file('templates/layouts/javascript.html.ep', {});
 	my $javascript_default = $mt->render_file('templates/layouts/javascript_default.html.ep', {});
 	my $sound = $mt->render_file('templates/layouts/sound.html.ep', {});
 	my $stylesheet = $mt->render_file('templates/layouts/stylesheet.html.ep', {});
 
-	print $header;
-	print $meta;
-	print $javascript;
-	print $javascript_default;
-	print $sound;
-
 	my $info_array = [$info0 || "", $info1 || "", $info2 || "", $info3 || "", $info4 || "", $info5 || "", $f_info || "", $r_info || ""];
-	my $string = JSON->new->encode($info_array);
+	my $info_array_json = JSON->new->encode($info_array);
 
-	print <<"EOM";
+	my $args = {
+		header             => $header,
+		meta               => $meta,
+		javascript         => $javascript,
+		javascript_default => $javascript_default,
+		sound              => $sound,
+		info_array         => $info_array_json,
+		const_id           => $kid,
+		stylesheet         => $stylesheet,
+	};
+
+	my $html = $mt->render(<<'EOF', $args);
+<%= $header %>
+<%= $meta %>
+<%= $javascript %>
+<%= $javascript_default %>
+<%= $sound %>
 <script>
-	var info = $string;
-	const const_id = "$kid";
+	const info = <%= $info_array %>;
+	const const_id = "<%= $const_id %>";
 </script>
-EOM
-
-	print <<"EOM";
-<script src="/js/so_town.js"></script>
-$stylesheet
+<script src="./js/so_town.js"></script>
+<%= $stylesheet %>
 </head>
 <body>
-EOM
+EOF
+
+	print $html;
 }
 
 1;

@@ -12,7 +12,8 @@ use Mojo::Log;
 use Scalar::Util;
 use Mojo::Parameters;
 use Mojo::Template;
-# use Mojo::UserAgent;
+use Mojo::UserAgent;
+use Mojolicious::Plugin::Config;
 
 # 初期設定ファイルの読み込み
 require './so_system.dat';
@@ -49,6 +50,8 @@ our $tt = Template->new(
 );
 our $mt = Mojo::Template->new(vars => 1);
 our $logger = Mojo::Log->new;
+our $config = Mojolicious::Plugin::Config->load(File::Spec->catfile($FindBin::Bin, "so.conf.pl"), $config);
+our $ua = Mojo::UserAgent->new;
 
 $mode = "";
 $error = "";
