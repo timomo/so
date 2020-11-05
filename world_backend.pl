@@ -404,7 +404,7 @@ app->helper(
 
             $system->save_chara($k);
 
-            my $append = $system->load_append($k->{id});
+            my $append = $system->append_data($k->{id});
 
             if (! defined $append)
             {
@@ -418,6 +418,14 @@ app->helper(
                     time
                 );
                 $system->save_append($append);
+            }
+            else
+            {
+                $append = $system->load_append($k->{id});
+                if (defined $append)
+                {
+                    $system->save_append($append);
+                }
             }
         }
 
