@@ -964,14 +964,16 @@ app->helper(
         for my $file (@$collection)
         {
             my $basename = $file->basename;
-            if ($basename =~ /\.(command|pvp|monster)\./)
+            if ($basename =~ /^(.+)\.(command|pvp|monster)\./)
             {
-                $cnt->{$1}++;
+                $cnt->{$2}++;
 
-                if ($cnt->{$1} > $self->config->{detach_history}->{$1})
+                if ($cnt->{$2} > $self->config->{detach_history}->{$2})
                 {
                     $self->log->debug(sprintf("detach_history によりファイル[%s]を削除しました。", $basename));
                     $file->remove;
+
+                    $self->dbi("main")->model("コマンド結果")->delete(where => { 結果id => $1 });
                 }
             }
         }
