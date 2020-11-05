@@ -62,6 +62,23 @@ my $system = SO::System->new(context => app);
 
 app->log->level(app->config->{log_level});
 
+app->helper(
+    range_rand => sub {
+        my ($self, $min, $max) = @_;
+
+        if ($max < $min) {
+            ($max, $min) = ($min, $max);
+        }
+        elsif ($max == $min) {
+            return int($max);
+        }
+
+        my $rand = $min + int(rand($max - $min)) + 1;
+
+        return $rand;
+    }
+);
+
 post "/append" => sub
 {
     my $self = shift;
@@ -84,8 +101,16 @@ get "/neighbors" => sub
 
         if (defined $c)
         {
-            my $bool = $self->is_battle($append->{id}) || $self->is_pvp($append->{id}) ? "(戦闘中)" : "";
-            my $name = sprintf("%s Lv: %d%s", $c->{名前}, $c->{レベル}, $bool);
+            my $string = "";
+            if ($self->is_battle($append->{id}))
+            {
+                $string = "(モンスター戦闘中)";
+            }
+            elsif ($self->is_pvp($append->{id}))
+            {
+                $string = "(PVP戦闘中)";
+            }
+            my $name = sprintf("%s Lv: %d%s", $c->{名前}, $c->{レベル}, $string);
 
             push(@ret, [$c->{id}, $name]);
         }
@@ -171,6 +196,17 @@ get "/current" => sub
         {
             $param->{k1id} = $ids->[0];
             $param->{k2id} = $ids->[1];
+        }
+        else
+        {
+            $param->{mode} = "log_in";
+        }
+    }
+    elsif ($param->{mode} eq "monster")
+    {
+        if ($self->is_battle($id))
+        {
+            # noop
         }
         else
         {

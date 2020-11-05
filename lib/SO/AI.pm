@@ -128,8 +128,9 @@ sub command
             my $neighbors = Mojo::Collection->new(@{$self->context->neighbors($id)});
             my $shuffle = $neighbors->shuffle;
             my $target_append = $shuffle->head(1)->last;
+            my $rand = $self->context->range_rand(0 ,100);
 
-            if (defined $target_append)
+            if (defined $target_append && $rand >= 70)
             {
                 my $is_battle = $self->context->is_battle($id) || $self->context->is_pvp($id) ? 1 : 0;
                 my $is_battle2 = $self->context->is_battle($target_append->{id}) || $self->context->is_pvp($target_append->{id}) ? 1 : 0;
