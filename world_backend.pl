@@ -102,29 +102,18 @@ app->helper(
         my $id = shift;
 
         my $k = $self->character($id);
+        my @keys = (qw|id エリア スポット 距離|);
+        my $query = {};
 
-        my $neighbors = $appends->grep(sub
+        for my $key (@keys)
         {
-            my $append = shift;
+            $query->{$key} = $k->{$key};
+        }
 
-            if ($k->{id} eq $append->{id})
-            {
-                return 0;
-            }
-
-            if ($k->{エリア} == $append->{エリア})
-            {
-                if ($k->{スポット} == $append->{スポット})
-                {
-                    if ($k->{距離} == $append->{距離}) {
-                        return 1;
-                    }
-                }
-            }
-
-            return 0;
-        });
-
+        my $where = "id != :id and エリア = :エリア and スポット = :スポット and 距離 = :距離";
+        my $result = $self->dbi("main")->model("キャラ追加情報1")->select(["*"], where => [$where, $query]);
+        my $rows = $result->fetch_hash_all;
+        my $neighbors = Mojo::Collection->new(@{$rows});
         my $rand = $neighbors->head(5);
 
         return $rand;
