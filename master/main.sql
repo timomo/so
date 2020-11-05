@@ -43,3 +43,16 @@ CREATE TABLE キャラ (
         ctime DATETIME,
 	    mtime DATETIME
  );
+
+DROP TABLE IF EXISTS キャラ追加情報1;
+
+CREATE TABLE キャラ追加情報1 (
+        id TEXT PRIMARY KEY,
+        最終コマンド TEXT,
+        エリア INTEGER NOT NULL,
+        スポット INTEGER NOT NULL,
+        距離 INTEGER NOT NULL,
+        最終実行時間 INTEGER,
+        ctime DATETIME,
+	    mtime DATETIME
+ );

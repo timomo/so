@@ -171,38 +171,38 @@ sub make_end {
 <table border=0>
 <tr>
 <td class="b1">名前</td>
-<td>$in{'c_name'}</td>
+<td>$kname</td>
 <td class="b1">性別</td>
 <td>$esex</td>
 </tr>
 <td class="b1">HP</td>
-<td>$hp</td>
+<td>$khp</td>
 <td class="b1">LP</td>
-<td>$lp</td>
+<td>$klp</td>
 </tr>
 <tr>
 <td class="b1">力</td>
-<td>$n_0</td>
+<td>$kn_0</td>
 <td class="b1">賢さ</td>
-<td>$n_1</td>
+<td>$kn_1</td>
 </tr>
 <tr>
 <td class="b1">信仰心</td>
-<td>$n_2</td>
+<td>$kn_2</td>
 <td class="b1">体力</td>
-<td>$n_3</td>
+<td>$kn_3</td>
 </tr>
 <tr>
 <td class="b1">器用さ</td>
-<td>$n_4</td>
+<td>$kn_4</td>
 <td class="b1">素早さ</td>
-<td>$n_5</td>
+<td>$kn_5</td>
 </tr>
 <tr>
 <td class="b1">魅力</td>
-<td>$n_6</td>
+<td>$kn_6</td>
 <td class="b1">所持金</td>
-<td>$gold</td>
+<td>$kgold</td>
 </tr>
 <tr>
 <td class="b1">メインスキル</td>
@@ -222,106 +222,94 @@ EOM
 	}
 }
 
-#----------------#
-#  書き込み処理  #
-#----------------#
-sub regist {
-	&set_cookie;
-
+sub regist
+{
 	&get_host;
+	my $date = time();
 
-	$date = time();
+	if ($in{'new'} eq 'new')
+	{
+		$klp = $max_lp;
+		$khp = int(($in{n_3} + $kiso_nouryoku[3]) * 5 + 10);
+		$kmaxhp = $khp;
+		$kex = 0;
+		$klv = 1;
+		$kgold = 0;
+		$kn_0 = $kiso_nouryoku[0] + $in{n_0};
+		$kn_1 = $kiso_nouryoku[1] + $in{n_1};
+		$kn_2 = $kiso_nouryoku[2] + $in{n_2};
+		$kn_3 = $kiso_nouryoku[3] + $in{n_3};
+		$kn_4 = $kiso_nouryoku[4] + $in{n_4};
+		$kn_5 = $kiso_nouryoku[5] + $in{n_5};
+		$kn_6 = $kiso_nouryoku[6] + $in{n_6};
+		$kap = 0;
+		$karea = 0;
+		$kspot = 0;
+		$kpst = 0;
+		$kitem = 2;
+		$ktotal = 0;
+		$kid = $in{id};
+		$kpass = $in{pass};
+		$kname = $in{c_name};
+		$ksex = $in{sex};
+		$kchara = $in{chara};
+		$kati = 0;
 
-	# ファイルロック
-	if ($lockkey == 1) { &lock1; }
-	elsif ($lockkey == 2) { &lock2; }
-	elsif ($lockkey == 3) { &file'lock; }
+		my $dup1 = $system->load_chara($kid);
 
-	@regist = &load_ini($chara_file);
-
-	$hit=0;@new=();
-	foreach(@regist){
-		($cid,$cpass,$cname,$csex,$cchara,$cn_0,$cn_1,$cn_2,$cn_3,$cn_4,$cn_5,$cn_6,$chp,$cmaxhp,$cex,$clv,$cap,$cgold,$clp,$ctotal,$ckati,$chost,$cdate,$carea,$cspot,$cpst,$citem) = split(/<>/);
-		if($cid eq "$in{'id'}" and $in{'new'} eq 'new') {
-			&error("そのIDはすでに登録されています。");
-		}elsif($cname eq "$in{'c_name'}" and $in{'new'} eq 'new') {
+		if (defined $dup1)
+		{
+			&error("そのID[". $kid. "]はすでに登録されています。");
+		}
+		my $dup2 = $system->load_chara_by_name($kname);
+		if (defined $dup2)
+		{
 			&error("同名のキャラクターが存在します。");
-#		}elsif($host eq "$chost" and $in{'new'} eq 'new'){
-#			&error("一人一キャラクターです。");
-		}elsif($cid eq "$kid"){
-			my $mes = "$kid<>$kpass<>$kname<>$ksex<>$kchara<>$kn_0<>$kn_1<>$kn_2<>$kn_3<>$kn_4<>$kn_5<>$kn_6<>$khp<>$kmaxhp<>$kex<>$klv<>$kap<>$kgold<>$klp<>$ktotal<>$kkati<>$host<>$date<>$karea<>$kspot<>$kpst<>$kitem<>\n";
-			unshift(@new, $mes);
-
-			$hit=1;
-		}else{
-			push(@new,"$_\n");
 		}
 	}
 
-	if(!$hit and $in{'new'} eq 'new'){
-		$lp=$max_lp;
-		$hp = int(($in{'n_3'} + $kiso_nouryoku[3]) * 5 + 10);
-		$ex=0;
-		$lv=1;
-		$gold=0;
-		$n_0 = $kiso_nouryoku[0] + $in{'n_0'};
-		$n_1 = $kiso_nouryoku[1] + $in{'n_1'};
-		$n_2 = $kiso_nouryoku[2] + $in{'n_2'};
-		$n_3 = $kiso_nouryoku[3] + $in{'n_3'};
-		$n_4 = $kiso_nouryoku[4] + $in{'n_4'};
-		$n_5 = $kiso_nouryoku[5] + $in{'n_5'};
-		$n_6 = $kiso_nouryoku[6] + $in{'n_6'};
-		$ap=0;
-		$area=0;
-		$spot=0;
-		$pst=0;
-		$item=2;
-		$kid = $in{'id'};
-		$kpass = $in{'pass'};
-		my $mes = "$in{'id'}<>$in{'pass'}<>$in{c_name}<>$in{'sex'}<>$in{'chara'}<>$n_0<>$n_1<>$n_2<>$n_3<>$n_4<>$n_5<>$n_6<>$hp<>$hp<>$ex<>$lv<>$ap<>$gold<>$lp<>$total<>$kati<>$host<>$date<>$area<>$spot<>$pst<>$item<>\n";
-		unshift(@new, $mes);
+	my $new = {};
+	@$new{@{$config->{keys}}} = (
+		$kid, $kpass, $kname, $ksex, $kchara,
+		$kn_0, $kn_1, $kn_2, $kn_3, $kn_4, $kn_5, $kn_6,
+		$khp, $kmaxhp, $kex, $klv, $kap, $kgold, $klp,
+		$ktotal, $kkati, $host, $date,
+		$karea, $kspot, $kpst,
+		$kitem
+	);
 
+	$system->save_chara($new);
+
+	if ($in{'new'} eq 'new')
+	{
 		@kbuf = (100,100,100);
 		$krsk    = 0;
 		$buff_flg = 1;
 		&regist_buff;
-	}
 
-	$new[$_] = Encode::encode_utf8($new[$_]) for 0 .. $#new;
-
-	my $file = Mojo::File->new($chara_file);
-	$file->touch;
-	$file->spurt(join("", @new));
-
-	if(!$hit and $in{'new'} eq 'new')
-	{
 		&skill_regist;
 		$kcnt =1;
 		&item_regist;
+
+		&make_end;
 	}
-
-	# ロック解除
-	if ($lockkey == 3) { &file'unlock; }
-	else { if(-e $lockfile) { unlink($lockfile); } }
-
-	if($in{'new'}) { &make_end; }
 }
 
 sub chara_load
 {
-	@battle = &load_ini($chara_file);
-
 	my $id = shift;
-	$hit=0;
-	foreach(@battle){
-		($kid,$kpass,$kname,$ksex,$kchara,$kn_0,$kn_1,$kn_2,$kn_3,$kn_4,$kn_5,$kn_6,$khp,$kmaxhp,$kex,$klv,$kap,$kgold,$klp,$ktotal,$kkati,$khost,$kdate,$karea,$kspot,$kpst,$kitem) = split(/<>/);
-		if($id eq "$kid") {
-			$hit=1;
-			last;
-		}
-	}
-	if ($hit == 0) {
-		($kid,$kpass,$kname,$ksex,$kchara,$kn_0,$kn_1,$kn_2,$kn_3,$kn_4,$kn_5,$kn_6,$khp,$kmaxhp,$kex,$klv,$kap,$kgold,$klp,$ktotal,$kkati,$khost,$kdate,$karea,$kspot,$kpst,$kitem) = ();
+	my $k = $system->load_chara($id);
+
+	if (defined $k)
+	{
+		(
+			$kid, $kpass, $kname, $ksex, $kchara,
+			$kn_0, $kn_1, $kn_2, $kn_3, $kn_4, $kn_5, $kn_6,
+			$khp, $kmaxhp, $kex, $klv, $kap, $kgold, $klp,
+			$ktotal, $kkati, $khost, $kdate,
+			$karea, $kspot, $kpst,
+			$kitem
+		) = @$k{@{$config->{keys}}};
 	}
 }
 

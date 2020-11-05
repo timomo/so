@@ -5,29 +5,11 @@ use utf8;
 #----------------#
 sub log_in
 {
-	$chara_flag = 1;
-
-	$esex = "女";
+	my $esex = "女";
 	$esex = "男" if($ksex);
 
 	my @select_menu = ();
-
-	# ファイルロック
-	if ($lockkey == 1) { &lock1; }
-	elsif ($lockkey == 2) { &lock2; }
-	elsif ($lockkey == 3) { &file'lock; }
-
-	# load-char-data start
-
-	@log_in = &load_ini($chara_file);
-
-	# load-char-data end
-
-	$ltime = time();
-	$ltime = $ltime - $kdate;
-	$vtime = $b_time - $ltime;
-	$mtime = $m_time - $ltime;
-
+	my @log_in = &load_ini($chara_file);
 	$next_ex = $lv_up;
 
 	&town_load;
@@ -342,7 +324,7 @@ EOF
 
 	&footer;
 
-	&save_dat_append_1p;
+	&save_dat_append;
 
 	exit;
 }

@@ -991,6 +991,15 @@ sub pvp_stage_apply
 sub pvp_stage_load
 {
 	my $battle = &get_pvp_file_path;
+
+	if ($battle eq "" || ! defined $battle)
+	{
+		$logger->error("PVPデータを読み込み出来ません。");
+		$mode = "log_in";
+		&save_dat_append;
+		&error("PVPデータを読み込み出来ません。");
+	}
+
 	my $file = Mojo::File->new($battle);
 	my $str = $file->slurp;
 	my $data = YAML::XS::Load($str);
@@ -1041,25 +1050,14 @@ sub get_pvp_file_path
 
 sub is_continue_pvp
 {
-	# my $battle = File::Spec->catfile($FindBin::Bin, "save", "battle", $k1id. "_____". $k2id. ".pvp.yaml");
-	my $dir = Mojo::File->new(File::Spec->catdir($FindBin::Bin, "save", "battle"));
-	my $collection = $dir->list_tree;
-
-	for my $file (@$collection)
-	{
-		# warn $file->basename;
-
-		if ($file->basename !~ /\.pvp\.yaml$/)
-		{
-			next;
-		}
-		if ($file->basename =~ /$kid/)
-		{
-			return 1;
-		}
-	}
-
-    return 0;
+	my $pvp = SO::PVP->new(context => $controller);
+	my $bool1;
+	my $bool2;
+	$pvp->open;
+	$bool1 = $pvp->is_pvp($k1id);
+	$bool2 = $pvp->is_pvp($k2id);
+	$pvp->close;
+	return $bool1 == 1 || $bool2 == 1;
 }
 
 sub pvp
@@ -1114,13 +1112,51 @@ sub pvp
 	&calc_pvp_handicap;
 	&calc_pvp_bonus;
 
-	# &regist;
+	&regist_pvp_1p;
+	&regist_pvp_2p;
+
+	$mode = "log_in";
+
+	&save_dat_append_1p;
+	&save_dat_append_2p;
+	&save_dat_append;
+
 	&pvp_finalize;
 	&display_pvp_battle;
 
 	$battle_flag=0;
 
 	exit;
+}
+
+sub regist_pvp_1p
+{
+	my $date = time();
+	my $new = {};
+	@$new{@{$config->{keys}}} = (
+		$k1id, $k1pass, $k1name, $k1sex, $k1chara,
+		$k1n_0, $k1n_1, $k1n_2, $k1n_3, $k1n_4, $k1n_5, $k1n_6,
+		$k1hp, $k1maxhp, $k1ex, $k1lv, $k1ap, $k1gold, $k1lp,
+		$k1total, $k1kati, $k1host, $date,
+		$k1area, $k1spot, $k1pst,
+		$k1item
+	);
+	$system->save_chara($new);
+}
+
+sub regist_pvp_2p
+{
+	my $date = time();
+	my $new = {};
+	@$new{@{$config->{keys}}} = (
+		$k2id, $k2pass, $k2name, $k2sex, $k2chara,
+		$k2n_0, $k2n_1, $k2n_2, $k2n_3, $k2n_4, $k2n_5, $k2n_6,
+		$k2hp, $k2maxhp, $k2ex, $k2lv, $k2ap, $k2gold, $k2lp,
+		$k2total, $k2kati, $k2host, $date,
+		$k2area, $k2spot, $k2pst,
+		$k2item
+	);
+	$system->save_chara($new);
 }
 
 sub calc_pvp_bonus

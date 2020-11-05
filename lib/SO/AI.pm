@@ -31,13 +31,41 @@ sub open
     $self->data($k);
 }
 
+sub state
+{
+    my $self = shift;
+    my $id = $self->id;
+    my $k = $self->context->character($id);
+    my $mode = $self->context->location($id);
+
+    if (! defined $k)
+    {
+        return undef;
+    }
+
+    if ($self->context->is_battle($id) || $self->context->is_pvp($id)) { # 戦闘優先
+        return "battle";
+    }
+
+    my $per = ($k->{HP} / $k->{最大HP}) * 100;
+
+    if ($per < 30) # 回復優先
+    {
+        return "cure";
+    }
+    else # 探索優先
+    {
+        return "search";
+    }
+};
+
 sub command
 {
     my $self = shift;
     my $k = $self->data;
     my $id = $self->id;
     my $mode = $self->context->location($id);
-    my $state = $self->context->get_state($id);
+    my $state = $self->context->state($id);
 
     if (! defined $mode)
     {
@@ -77,7 +105,8 @@ sub command
         {
             $self->context->log->debug(sprintf("battle: 戦闘中: id = %s, パスワード = %s, スポット = %s, エリア = %s, 距離 = %s", $k->{id}, $k->{パスワード}, $k->{スポット}, $k->{エリア}, $k->{距離}));
             return {
-                mode => "monster"
+                mode => "monster",
+                id   => $id,
             };
         }
     }
@@ -90,6 +119,7 @@ sub command
                 mode => "monster",
                 area => $k->{エリア},
                 spot => 0,
+                id   => $id,
             };
         }
         else # 近辺を探索中
@@ -113,6 +143,7 @@ sub command
                         mesid => $target_append->{id},
                         mes   => $mes,
                         name  => $k->{名前},
+                        id    => $id,
                     };
                 }
                 elsif ($is_battle == 0 && $is_battle2 == 0)
@@ -133,6 +164,7 @@ sub command
                         mode => "monster",
                         area => $k->{エリア},
                         spot => 0,
+                        id   => $id,
                     };
                 }
             }
@@ -143,6 +175,7 @@ sub command
                     mode => "monster",
                     area => $k->{エリア},
                     spot => 0,
+                    id   => $id,
                 };
             }
         }
@@ -157,6 +190,7 @@ sub command
                 return {
                     mode => "yado",
                     area => $k->{エリア},
+                    id   => $id,
                 };
             }
             elsif ($mode eq "yado")
@@ -165,6 +199,7 @@ sub command
                     inn_no => 0,
                     mode => "yado_in",
                     area => $k->{エリア},
+                    id   => $id,
                 };
             }
         }
@@ -176,6 +211,7 @@ sub command
                     mode => "monster",
                     area => $k->{エリア},
                     spot => 1,
+                    id   => $id,
                 };
             }
             else
@@ -185,6 +221,7 @@ sub command
                     mode => "rest",
                     area => $k->{エリア},
                     spot => 2,
+                    id   => $id,
                 };
             }
         }

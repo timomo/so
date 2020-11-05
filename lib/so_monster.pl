@@ -868,15 +868,19 @@ sub monster_stage_load
 
 sub is_continue_monster
 {
-	my $battle = File::Spec->catfile($FindBin::Bin, "save", "battle", $kid. ".monster.yaml");
-	return -f $battle;
+	my $pvp = SO::Monster->new(context => $controller);
+	my $bool1;
+	$pvp->open;
+	$bool1 = $pvp->is_battle($kid);
+	$pvp->close;
+	return $bool1 == 1;
 }
 
 sub monster
 {
 	$battle_flag=1;
 
-	&save_dat_append_1p;
+	&save_dat_append;
 
 	# 途中データ確認
 	my $data;

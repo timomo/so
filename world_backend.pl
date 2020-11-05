@@ -33,6 +33,9 @@ use DBIx::Custom;
 # use Devel::Cycle;
 use lib File::Spec->catdir($FindBin::Bin, "lib");
 use SO::AI;
+use SO::PVP;
+use SO::Monster;
+use SO::System;
 
 plugin Config => { file => "so.conf.pl" };
 
@@ -54,6 +57,7 @@ my @default_parameter = @{app->config->{default_parameter}};
 my $app;
 my $clients = {};
 my $dbis = {};
+my $system = SO::System->new(context => app);
 
 app->log->level(app->config->{log_level});
 
@@ -98,7 +102,6 @@ app->helper(
         my $id = shift;
 
         my $k = $self->character($id);
-        my @ret = ();
 
         my $neighbors = $appends->grep(sub
         {
@@ -230,32 +233,16 @@ app->helper(
 );
 
 app->helper(
-    get_state => sub
+    state => sub
     {
         my $self = shift;
         my $id = shift;
-        my $k = $self->character($id);
-        my $mode = $self->location($id);
+        my $ai = SO::AI->new(context => $self, id => $id);
+        $ai->open;
+        my $state = $ai->state;
+        $ai->close;
 
-        if (! defined $k)
-        {
-            return undef;
-        }
-
-        if ($self->is_battle($id) || $self->is_pvp($id)) { # 戦闘優先
-            return "battle";
-        }
-
-        my $per = ($k->{HP} / $k->{最大HP}) * 100;
-
-        if ($per < 30) # 回復優先
-        {
-            return "cure";
-        }
-        else # 探索優先
-        {
-            return "search";
-        }
+        return $state;
     },
 );
 
@@ -264,8 +251,14 @@ app->helper(
     {
         my $self = shift;
         my $id = shift;
-        my $path = File::Spec->catfile($FindBin::Bin, qw|save battle|, $id. qw|.monster.yaml|);
-        return -f $path;
+        my $pvp = SO::Monster->new(context => $self);
+        my $bool;
+
+        $pvp->open;
+        $bool = $pvp->is_battle($id);
+        $pvp->close;
+
+        return $bool;
     },
 );
 
@@ -274,43 +267,21 @@ app->helper(
     {
         my $self = shift;
         my $id = shift;
+        my $pvp = SO::PVP->new(context => $self);
+        my $bool;
 
-        my $hit = $queue->first(sub
-        {
-            my $command = shift;
-            my $param = $command->{param};
+        $pvp->open;
+        $bool = $pvp->is_pvp($id);
+        $pvp->close;
 
-            if ($param->{mode} ne "pvp")
-            {
-                return 0;
-            }
+        return $bool;
+    },
+);
 
-            if ($param->{id} ne $id && $param->{k1id} ne $id && $param->{k2id} ne $id)
-            {
-                return 0;
-            }
-
-            return 1;
-        });
-
-        if (defined $hit)
-        {
-            return 1;
-        }
-
-        my $ids = $self->get_pvp_ids($id);
-
-        if (! defined $ids)
-        {
-            return 0;
-        }
-
-        if ($ids->[0] eq $id || $ids->[1] eq $id)
-        {
-            return 1;
-        }
-
-        return 0;
+app->helper(
+    queue => sub
+    {
+        return $queue;
     },
 );
 
@@ -319,50 +290,14 @@ app->helper(
     {
         my $self = shift;
         my $id = shift;
+        my $pvp = SO::PVP->new(context => $self);
+        my $ids;
 
-        my $hit = $queue->first(sub
-        {
-            my $command = shift;
-            my $param = $command->{param};
+        $pvp->open;
+        $ids = $pvp->get_pvp_ids($id);
+        $pvp->close;
 
-            if ($param->{mode} ne "pvp")
-            {
-                return 0;
-            }
-
-            if ($param->{id} ne $id && $param->{k1id} ne $id && $param->{k2id} ne $id)
-            {
-                return 0;
-            }
-
-            return 1;
-        });
-
-        if (defined $hit)
-        {
-            return [$hit->{param}->{k1id}, $hit->{param}->{k2id}];
-        }
-
-        my $dir = Mojo::File->new(File::Spec->catdir($FindBin::Bin, "save", "battle"));
-        my $collection = $dir->list_tree;
-
-        for my $file (@$collection)
-        {
-            if ($file->basename !~ /\.pvp\.yaml$/)
-            {
-                next;
-            }
-            if ($file->basename =~ /$id/)
-            {
-                my $name = $file->basename;
-                $name =~ s/\.pvp\.yaml$//;
-                my @tmp = split("_____", $name);
-
-                return \@tmp;
-            }
-        }
-
-        return undef;
+        return $ids;
     },
 );
 
@@ -390,15 +325,11 @@ app->helper(
     save => sub
     {
         my $self = shift;
-        my $path = File::Spec->catfile($FindBin::Bin, qw|save chara.dat|);
         my $path3 = File::Spec->catfile($FindBin::Bin, qw|save chara_type.dat|);
-        my $file = Mojo::File->new($path);
         my $file3 = Mojo::File->new($path3);
 
-        $file->touch;
         $file3->touch;
 
-        my @raw;
         my @raw3;
 
         for my $k (@$characters)
@@ -420,8 +351,23 @@ app->helper(
                 die $self->dump($k);
             }
 
-            my @tmp = @{$k}{@keys};
-            push(@raw, Encode::encode_utf8(join($sep, @tmp)));
+            $system->save_chara($k);
+
+            my $append = $system->load_append($k->{id});
+
+            if (! defined $append)
+            {
+                $append = {};
+                @$append{@{$self->config->{keys2}}} = (
+                    $k->{id},
+                    $self->location($k->{id}),
+                    $k->{エリア},
+                    $k->{スポット},
+                    $k->{距離},
+                    time
+                );
+                $system->save_append($append);
+            }
         }
 
         for my $type (@$character_types)
@@ -430,7 +376,6 @@ app->helper(
             push(@raw3, Encode::encode_utf8(join($sep, @tmp2)));
         }
 
-        $file->spurt(join($new_line, @raw));
         $file3->spurt(join($new_line, @raw3));
 
         warn "##### saved!!!!";
@@ -442,64 +387,24 @@ app->helper(
     {
         my $self = shift;
         my $ref  = shift;
-        my $path2 = File::Spec->catfile($FindBin::Bin, qw|save append.dat|);
-        my $file2 = Mojo::File->new($path2);
-        $file2->touch;
-        my @raw2;
-        my $hit = 0;
+        my $result = $self->dbi("main")->model("キャラ追加情報1")->select(["*"], where => {id => $ref->{id}});
+        my $row = $result->fetch_hash_one;
 
-        for my $append (@$appends)
+        eval
         {
-            if ($append->{id} eq $ref->{id})
-            {
-                $append = $ref;
-                $hit = 1;
+            if (defined $row) {
+                $self->dbi("main")->model("キャラ追加情報1")->update($ref, where => {id => $ref->{id}}, mtime => "mtime");
+            } else {
+                $self->dbi("main")->model("キャラ追加情報1")->insert($ref, ctime => "ctime");
             }
-            my @tmp2 = @$append{@keys2};
-            push(@raw2, Encode::encode_utf8(join($sep, @tmp2)));
-        }
-
-        if ($hit == 0)
+        };
+        if ($@)
         {
-            my @tmp2 = @$ref{@keys2};
-            push(@raw2, Encode::encode_utf8(join($sep, @tmp2)));
+            warn $@;
+            die $self->dump($ref);
         }
 
-        $file2->spurt(join($new_line, @raw2));
-    },
-);
-
-app->helper(
-    load_raw_ini => sub
-    {
-        my $self = shift;
-        my $path = shift;
-        my $file = Mojo::File->new($path);
-        $file->touch;
-        my @raw = split(/\r\n|\r|\n/, $file->slurp);
-        my @ret;
-
-        for my $line (@raw) {
-            chomp($line);
-
-            if ($line =~ /^$/) {
-                next;
-            }
-
-            my @tmp2 = split(/<>/, Encode::decode_utf8($line));
-
-            for my $no (0 .. $#tmp2)
-            {
-                if ($tmp2[$no] =~ /^\d+$/)
-                {
-                    $tmp2[$no] *= 1;
-                }
-            }
-
-            push(@ret, \@tmp2);
-        }
-
-        return \@ret;
+        $system->save_append($ref);
     },
 );
 
@@ -509,17 +414,8 @@ app->helper(
         my $self = shift;
         my $path = shift;
         my $keys = shift;
-        my $ret = $self->load_raw_ini($path);
-        my @ret;
-
-        for my $tmp (@$ret)
-        {
-            my $k = {};
-            @$k{@$keys} = @$tmp;
-            push(@ret, $k);
-        }
-
-        return \@ret;
+        my $ret = $system->load_ini($path, $keys);
+        return $ret;
     },
 );
 
@@ -939,6 +835,7 @@ app->helper(
             $dbi = $dbi->safety_character("\x{2E80}-\x{2FDF}々〇〻\x{3400}-\x{4DBF}\x{4E00}-\x{9FFF}\x{F900}-\x{FAFF}\x{20000}-\x{2FFFF}ーぁ-んァ-ヶa-zA-Z0-9_");
             $dbi->create_model("コマンド結果");
             $dbi->create_model("キャラ");
+            $dbi->create_model("キャラ追加情報1");
 
             $dbis->{$type} = $dbi;
 
@@ -1058,7 +955,7 @@ $loop->timer(1, sub {
     app->reset_ini_all
 });
 
-$loop->recurring(10, sub { app->save });
+$loop->recurring(60, sub { app->save });
 $loop->timer(3, sub { app->manage });
 # $loop->timer(5, sub { app->create_battle_ws_my });
 

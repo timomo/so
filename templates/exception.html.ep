@@ -1,0 +1,24 @@
+%== include 'layouts/header'
+%== include 'layouts/meta'
+<meta http-equiv="refresh" content="5;URL=./" />
+%== include 'layouts/javascript'
+%== include 'layouts/sound'
+%== include 'layouts/javascript_info'
+<script src="/js/so_town.js"></script>
+%== include 'layouts/stylesheet'
+</head>
+<body>
+%== include "layouts/title"
+<div class="blackboard question">
+<p>エラーが起きました。リダイレクトします。</p>
+% if (defined $confirmation) {
+<p><%== $confirmation %></p>
+% }
+</div>
+<BR>
+%== include 'layouts/note'
+<BR>
+<BR>
+%== include 'layouts/ranking'
+%== include 'layouts/chara_make'
+%== include 'layouts/footer'

@@ -2,7 +2,6 @@
 
 use File::Spec;
 use FindBin;
-# use lib File::Spec->catdir($FindBin::RealBin, 'lib');
 use Template;
 use YAML::XS;
 use CGI;
@@ -14,6 +13,12 @@ use Mojo::Parameters;
 use Mojo::Template;
 use Mojo::UserAgent;
 use Mojolicious::Plugin::Config;
+use lib File::Spec->catdir($FindBin::RealBin, 'lib');
+use SO::Monster;
+use SO::PVP;
+use SO::Dummy;
+use SO::System;
+use Mojolicious;
 
 # 初期設定ファイルの読み込み
 require './so_system.dat';
@@ -54,10 +59,16 @@ our $config = Mojolicious::Plugin::Config->load(File::Spec->catfile($FindBin::Bi
 our $ua = Mojo::UserAgent->new;
 $ua->connect_timeout(1);
 $ua->request_timeout(1);
+our $mojo = Mojolicious->new;
+$mojo->controller_class("SO::Dummy");
+our $controller = $mojo->build_controller;
+$controller->config($config);
+$controller->log($logger);
+our $system = SO::System->new(context => $controller);
 
-$mode = "";
-$error = "";
-$movemsg = "";
+unshift @{$mojo->renderer->paths}, File::Spec->catdir($FindBin::Bin, "templates");
+
+&initialize;
 
 my $require_login = 1;
 
@@ -92,11 +103,30 @@ if ($require_login == 1)
 			&monster;
 			exit;
 		}
-		elsif (&is_continue_pvp)
+
+		if (defined $in{k1id})
 		{
-			&pvp;
-			exit;
+			$k1id = $in{k1id};
 		}
+		if (defined $in{k2id})
+		{
+			$k2id = $in{k2id};
+		}
+
+		if (defined $k1id && defined $k2id)
+		{
+			warn "-------------->";
+			warn Dump(\%in);
+			warn Dump([ $k1id, $k2id ]);
+			warn "-------------->";
+
+			if (&is_continue_pvp)
+			{
+				&pvp;
+				exit;
+			}
+		}
+
 	}
 }
 
@@ -114,8 +144,8 @@ elsif($mode eq 'battle') { &battle; }
 elsif($mode eq 'pvp') { &pvp; }
 elsif($mode eq 'monster') { &monster; }
 elsif($mode eq 'rest') { &rest; }
-elsif($mode eq 'yado') { &yado; }
-elsif($mode eq 'yado_in') { &yado_in; }
+elsif($mode eq 'yado') { $spot = "宿屋"; &yado; }
+elsif($mode eq 'yado_in') { $spot = "宿屋"; &yado_in; }
 elsif($mode eq 'message') { &message; }
 elsif($mode eq 'item_shop') { &item_shop; }
 elsif($mode eq 'item_buy') { &item_buy; }

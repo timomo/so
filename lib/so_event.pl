@@ -2,7 +2,26 @@ use utf8;
 #----------------------#
 #  イベントメッセージ  #
 #----------------------#
-sub event {
+
+sub event
+{
+	&get_host;
+	$date = time();
+
+	my $new = {};
+	@$new{@{$config->{keys}}} = (
+		$kid, $kpass, $kname, $ksex, $kchara,
+		$kn_0, $kn_1, $kn_2, $kn_3, $kn_4, $kn_5, $kn_6,
+		$khp, $kmaxhp, $kex, $klv, $kap, $kgold, $klp,
+		$ktotal, $kkati, $host, $date,
+		$karea, $kspot, $kpst,
+		$kitem
+	);
+
+	$system->save_chara($new);
+}
+
+sub _event {
 
 	&get_host;
 

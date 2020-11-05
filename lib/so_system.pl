@@ -3,156 +3,22 @@ use utf8;
 sub save_dat_append_1p
 {
 	my $param = {};
-	@$param{@{$config->{keys2}}} = ($kid, $mode, $karea, $kspot, $kpst, time);
-
-	&save_dat_append_file("post", "/append", $param);
+	@$param{@{$config->{keys2}}} = ($k1id, $mode, $k1area, $k1spot, $k1pst, time);
+	$system->save_append($param);
 }
 
 sub save_dat_append_2p
 {
 	my $param = {};
 	@$param{@{$config->{keys2}}} = ($k2id, $mode, $k2area, $k2spot, $k2pst, time);
-
-	&save_dat_append_file("post", "/append", $param);
-}
-
-sub save_dat_append_file
-{
-	my $method = shift;
-	my $url = shift;
-	my $data = shift;
-	my $path = File::Spec->catfile($FindBin::Bin, "save", "append.dat");
-	my @appends = &load_ini($path);
-	my @new;
-	my $hit = 0;
-
-	for my $append (@appends)
-	{
-		my @tmp = split(/<>/, $append);
-		if ($tmp[0] eq $data->{id})
-		{
-			$tmp[1] = $data->{最終コマンド};
-			$tmp[2] = $data->{エリア};
-			$tmp[3] = $data->{スポット};
-			$tmp[4] = $data->{距離};
-			$tmp[5] = $data->{最終実行時間};
-			$hit = 1;
-		}
-		push(@new, join("<>", @tmp));
-	}
-
-	if ($hit == 0)
-	{
-		my @tmp;
-		$tmp[0] = $data->{id};
-		$tmp[1] = $data->{最終コマンド};
-		$tmp[2] = $data->{エリア};
-		$tmp[3] = $data->{スポット};
-		$tmp[4] = $data->{距離};
-		$tmp[5] = $data->{最終実行時間};
-		push(@new, join("<>", @tmp));
-	}
-
-	my $file = Mojo::File->new($path);
-	$file->spurt(join("\n", @new));
-}
-
-sub save_dat_append_server
-{
-	my $method = shift;
-	my $url = shift;
-	my $data = shift;
-
-	$method = lc($method);
-
-	if ($method eq "get")
-	{
-		my $obj = Mojo::URL->new;
-		$obj->query($data);
-		$url .= $obj->to_string;
-	}
-
-	my $res;
-	my $host = $config->{url_of_world_server};
-
-	eval
-	{
-		$logger->debug($url);
-		$res = $ua->$method($host. $url => json => $data)->result;
-	};
-	if ($@)
-	{
-		$logger->error($@);
-		return;
-	}
-
-	if (defined $res) {
-		if ($res->is_success) {
-			my $content_type = $res->headers->content_type;
-			if ($content_type =~ qr|^text/html|) {
-				return Encode::decode_utf8($res->body);
-			}
-			my $utf8;
-			eval
-			{
-				$utf8 = Mojo::JSON::decode_json($res->body);
-			};
-			if ($@)
-			{
-				$logger->error($@);
-			}
-			return $utf8;
-		}
-		elsif ($res->is_error) {
-			$logger->error(Encode::decode_utf8($res->message));
-		}
-		elsif ($res->code == 301) {
-			$logger->warn($res->headers->location);
-		}
-		else {
-			$logger->warn('Whatever...');
-		}
-	}
-
-	return;
+	$system->save_append($param);
 }
 
 sub save_dat_append
 {
-	my $path = File::Spec->catfile($FindBin::Bin, "save", "append.dat");
-	my @appends = &load_ini($path);
-	my @new;
-	my $hit = 0;
-
-	for my $append (@appends)
-	{
-		my @tmp = split(/<>/, $append);
-		if ($tmp[0] eq $kid)
-		{
-			$tmp[1] = $mode;
-			$tmp[2] = $karea;
-			$tmp[3] = $kspot;
-			$tmp[4] = $kpst;
-			$tmp[5] = time;
-			$hit = 1;
-		}
-		push(@new, join("<>", @tmp));
-	}
-
-	if ($hit == 0)
-	{
-		my @tmp;
-		$tmp[0] = $kid;
-		$tmp[1] = $mode;
-		$tmp[2] = $karea;
-		$tmp[3] = $kspot;
-		$tmp[4] = $kpst;
-		$tmp[5] = time;
-		push(@new, join("<>", @tmp));
-	}
-
-	my $file = Mojo::File->new($path);
-	$file->spurt(join("\n", @new));
+	my $param = {};
+	@$param{@{$config->{keys2}}} = ($kid, $mode, $karea, $kspot, $kpst, time);
+	$system->save_append($param);
 }
 
 sub load_ini
@@ -190,12 +56,8 @@ sub decode {
 	my $query = $ENV{'QUERY_STRING'};
 
 	$params = $params->merge( Mojo::Parameters->new($query) );
-
 	%in = %{$params->to_hash};
-
 	$mode = $in{'mode'};
-	$cookie_pass = $in{'pass'};
-	$cookie_id = $in{'id'};
 }
 
 #----------------#
@@ -218,16 +80,9 @@ sub get_host {
 #--------------#
 sub error {
 	# ロック解除
-	if ($lockkey == 3) { &file'unlock; }
-	else { if(-e $lockfile) { unlink($lockfile); } }
-	$battle_flag=0;
-
-	&header;
-	print "<center><hr width=400><h3>ERROR !</h3>\n";
-	print "<P><font color=red><B>$_[0]</B></font>\n";
-	print "<P><hr width=400>\n";
-	print "<a href=\"$script\">TOPへ</a></center>\n";
-	print "</body></html>\n";
+	my $error = shift;
+	my $html = $controller->render_to_string(template => "exception", confirmation => $error);
+	print $html;
 	exit;
 }
 
@@ -367,6 +222,58 @@ sub file'error
 	select(STDOUT);	$| = 1;
 	print "$error[$_[0]]\n";
 	exit;
+}
+
+sub initialize
+{
+	our $mode = undef;
+	our $error = undef;
+	our $movemsg = undef;
+	our %in = undef;
+	our $battle_flag = undef;
+	our $spot = undef;
+
+	# player
+	our $kid = undef; our $kpass = undef; our $kname = undef; our $ksex = undef; our $kchara = undef;
+	our $kn_0 = undef; our $kn_1 = undef; our $kn_2 = undef; our $kn_3 = undef; our $kn_4 = undef; our $kn_5 = undef; our $kn_6 = undef;
+	our $khp = undef; our $kmaxhp = undef; our $kex = undef; our $klv = undef; our $kap = undef;our $kgold = undef; our $klp = undef;
+	our $ktotal = undef; our $kkati = undef; our $host = undef; our $date = undef;
+	our $karea = undef; our $kspot = undef; our $kpst = undef;
+	our $kitem = undef;
+	our @kbuff = undef;
+
+	# PVP戦
+	our $k1id = undef; our $k1pass = undef; our $k1name = undef; our $k1sex = undef; our $k1chara = undef;
+	our $k1n_0 = undef; our $k1n_1 = undef; our $k1n_2 = undef; our $k1n_3 = undef; our $k1n_4 = undef; our $k1n_5 = undef; our $k1n_6 = undef;
+	our $k1hp = undef; our $k1maxhp = undef; our $k1ex = undef; our $k1lv = undef; our $k1ap = undef;our $k1gold = undef; our $k1lp = undef;
+	our $k1total = undef; our $k1kati = undef; our $k1host = undef; our $k1date = undef;
+	our $k1area = undef; our $k1spot = undef; our $k1pst = undef;
+	our $k1item = undef;
+	our @k1buff = undef;
+	our $k2id = undef; our $k2pass = undef; our $k2name = undef; our $k2sex = undef; our $k2chara = undef;
+	our $k2n_0 = undef; our $k2n_1 = undef; our $k2n_2 = undef; our $k2n_3 = undef; our $k2n_4 = undef; our $k2n_5 = undef; our $k2n_6 = undef;
+	our $k2hp = undef; our $k2maxhp = undef; our $k2ex = undef; our $k2lv = undef; our $k2ap = undef; our $k2gold = undef; our $k2lp = undef;
+	our $k2total = undef; our $k2kati = undef; our $k2host = undef; our $k2date = undef;
+	our $k2area = undef; our $k2spot = undef; our $k2pst = undef;
+	our $k2item = undef;
+	our @k2buff = undef;
+	our $k1hp_flg = undef; our $k1d_flg = undef;
+	our $k2hp_flg = undef; our $k2d_flg = undef;
+	our $comment = undef; our $award1 = undef; our $award2 = undef;
+	our $win1 = undef; our $win2 = undef;
+
+	# モンスター戦
+	our $mno = undef; our $mname = undef; our $mlv = undef; our $mex = undef; our $mgold = undef;
+	our $mhp = undef; our $msp = undef; our $mdmg = undef; our $mdef = undef; our $mspd = undef; our $mtec = undef;
+	our $melm = undef; our $mdrop = undef; our $mtype = undef; our @mbuff = undef;
+	our $wrsk = undef;
+
+	our $i = undef; our $j = undef;
+	our $win = undef;
+	our @battle_date = undef; our @battle_header = undef; our @battle_fotter = undef;
+	our $turn = undef;
+	our $khp_flg = undef; our $kd_flg = undef;
+	our $mhp_flg = undef; our $md_flg = undef;
 }
 
 1;
