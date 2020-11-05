@@ -263,10 +263,8 @@ app->helper(
 
         $self->change_timer("manage", 1, sub {$self->manage});
 
-        if (defined $c)
-        {
-            $c->send({ json => { method => "command", data => $ret } });
-        }
+        my $mes = { method => "command", data => $ret };
+        $self->unicast_send($mes, $json->{const_id});
 
         return $ret;
     },
@@ -669,6 +667,8 @@ app->helper(
 
         # warn Dump($param);
 
+        my @ids = ($id);
+
         if ($param->{mode} eq "pvp")
         {
             delete $row->{id};
@@ -676,29 +676,14 @@ app->helper(
             for my $tmp_id ($param->{k1id}, $param->{k2id})
             {
                 $row->{from} = $tmp_id;
-
                 $self->dbi("main")->model("コマンド結果")->insert($row, ctime => "ctime");
-
-                my $c = $self->get_connection({ const_id => $row->{from} });
-
-                if (defined $c)
-                {
-                    $c->send({ json => { method => "result", data => { accept => $accept, } } });
-                }
+                push(@ids, $row->{from});
             }
         }
 
-        # push(@$results, { "accept" => $accept, id => $id, content => $enc });
+        my $mes = { method => "result", data => { accept => $accept, } };
 
-        my $mode_next = $self->location($id);
-
-        my $c = $self->get_connection({ const_id => $id });
-
-        if (defined $c)
-        {
-            $c->send({ json => { method => "result", data => { accept => $accept, } } });
-        }
-
+        $self->unicast_send($mes, @ids);
     },
 );
 
@@ -819,13 +804,10 @@ app->helper(
     multicast_reload => sub
     {
         my $self = shift;
+        my @ids = keys %$clients;
+        my $mes = { method => "reload", data => 1 };
 
-        for my $id (keys %$clients)
-        {
-            my $c = $clients->{$id};
-            my $mes = { method => "reload", data => 1 };
-            $c->send({ json => $mes });
-        }
+        $self->unicast_send($mes, @ids);
     },
 );
 
@@ -857,25 +839,37 @@ app->helper(
 );
 
 app->helper(
+    unicast_send => sub
+    {
+        my ($self, $data, @ids) = @_;
+
+        for my $id (@ids)
+        {
+            my $c = $self->get_connection({ const_id => $id });
+            if (defined $c)
+            {
+                $c->send({ json => $data });
+            }
+        }
+    },
+);
+
+app->helper(
     unicast_ping => sub
     {
-        my ($self, $json) = @_;
-        my $data = { location => undef, time => undef };
-        my $const_id = $json->{const_id};
-        my $c = $self->get_connection($json);
-        my $append = $appends->first(sub { return $_->{id} eq $const_id });
+        my ($self, @ids) = @_;
 
-        if (defined $append)
+        for my $id (@ids)
         {
-            $data->{location} = $append->{最終コマンド};
-            $data->{time} = $append->{最終実行時間};
-        }
-
-        if (defined $c)
-        {
-            # warn "<------------------- ping";
-
-            $c->send({ json => { method => "ping", data => $data } });
+            my $data = { location => undef, time => undef };
+            my $append = $appends->first(sub { return $_->{id} eq $id });
+            if (defined $append)
+            {
+                $data->{location} = $append->{最終コマンド};
+                $data->{time} = $append->{最終実行時間};
+                my $mes = { method => "ping", data => $data };
+                $self->unicast_send($mes, $id);
+            }
         }
     },
 );
@@ -884,11 +878,8 @@ app->helper(
     multicast_ping => sub
     {
         my ($self) = @_;
-
-        for my $id (keys %$clients)
-        {
-            $self->unicast_ping({ const_id => $id });
-        }
+        my @ids = keys %$clients;
+        $self->unicast_ping(@ids);
     },
 );
 
@@ -1022,7 +1013,7 @@ websocket '/channel' => sub {
             {
                 my $const_id = $json->{const_id};
                 $clients->{$const_id} = $tx;
-                app->unicast_ping($json);
+                app->unicast_ping($const_id);
             }
             when (/^command$/)
             {
