@@ -57,6 +57,7 @@ my @default_parameter = @{app->config->{default_parameter}};
 my $app;
 my $clients = {};
 my $dbis = {};
+my $loops = {};
 my $system = SO::System->new(context => app);
 
 app->log->level(app->config->{log_level});
@@ -65,9 +66,7 @@ post "/append" => sub
 {
     my $self = shift;
     my $json = $self->req->json;
-
     $self->save_append($json);
-
     return $self->render(json => { result => 1 });
 };
 
@@ -101,7 +100,7 @@ app->helper(
         my $self = shift;
         my $id = shift;
 
-        my $k = $self->character($id);
+        my $k = $self->append_data($id);
         my @keys = (qw|id エリア スポット 距離|);
         my $query = {};
 
@@ -172,6 +171,7 @@ get "/current" => sub
     $env->{QUERY_STRING} =~ s/^\?//;
 
     my $utf8 = $self->emulate_cgi($env);
+    $self->reset_ini_all;
 
     return $self->render(text => $utf8, format => "html");
 };
@@ -210,7 +210,7 @@ app->helper(
 
         $self->dbi("main")->model("コマンド結果")->insert($ref, ctime => "ctime");
 
-        $loop->timer(1, sub { $self->manage });
+        $self->change_timer("manage", 1, sub {$self->manage});
 
         if (defined $c)
         {
@@ -296,6 +296,17 @@ app->helper(
         my $self = shift;
         my @tmp = Time::HiRes::gettimeofday;
         return join(".", @tmp);
+    },
+);
+
+app->helper(
+    append_data => sub
+    {
+        my $self = shift;
+        my $id = shift;
+        my $result = $self->dbi("main")->model("キャラ追加情報1")->select(["*"], where => {id => $id});
+        my $row = $result->fetch_hash_one;
+        return $row;
     },
 );
 
@@ -636,7 +647,7 @@ app->helper(
     manage => sub
     {
         my ($self) = @_;
-        $self->log->debug("###############");
+        # $self->log->debug("###############");
 
         # reload
         $self->reset_ini_all;
@@ -663,7 +674,7 @@ app->helper(
                 next;
             }
 
-            my $append = $appends->first(sub { return $_->{id} eq $type->{id} });
+            my $append = $self->append_data($type->{id});
 
             if (! defined $append || ! exists $append->{id})
             {
@@ -719,14 +730,29 @@ app->helper(
             $min = 1;
         }
 
+        $self->log->debug("----------------->$min, size=". $queue->size);
+
         if ($queue->size == 0)
         {
-            $loop->timer($min, sub { $self->manage });
+            $self->change_timer("manage", $min, sub {$self->manage});
         }
         else
         {
-            $loop->timer(1, sub { $self->manage });
+            $self->change_timer("manage", 1, sub {$self->manage});
         }
+    },
+);
+
+app->helper(
+    change_timer => sub
+    {
+        my $self = shift;
+        my $key = shift;
+        my $time = shift;
+        my $cb = shift;
+
+        $loop->remove($loops->{$key});
+        $loops->{$key} = $loop->timer($time, $cb);
     },
 );
 

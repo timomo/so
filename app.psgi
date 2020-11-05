@@ -19,7 +19,6 @@ push @{app->static->paths}, File::Spec->catdir($FindBin::Bin, qw|public sound|);
 
 plugin Config => { file => "so.conf.pl" };
 
-my @keys = @{app->config->{keys}};
 my $ua;
 my $app;
 
