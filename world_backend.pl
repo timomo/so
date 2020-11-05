@@ -1029,8 +1029,8 @@ $loop->timer(1, sub {
     app->reset_ini_all
 });
 
-# $loop->recurring(60, sub { app->save });
-# $loop->timer(3, sub { app->manage });
+$loop->recurring(60, sub { app->save });
+$loop->timer(3, sub { app->manage });
 # $loop->timer(5, sub { app->create_battle_ws_my });
 
 $loop->timer(3, sub { app->save });
