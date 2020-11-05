@@ -404,7 +404,7 @@ app->helper(
 
             $system->save_chara($k);
 
-            my $append = $system->append_data($k->{id});
+            my $append = $self->append_data($k->{id});
 
             if (! defined $append)
             {
@@ -417,14 +417,14 @@ app->helper(
                     $k->{距離},
                     time
                 );
-                $system->save_append($append);
+                $self->save_append($append);
             }
             else
             {
                 $append = $system->load_append($k->{id});
                 if (defined $append)
                 {
-                    $system->save_append($append);
+                    $self->save_append($append);
                 }
             }
         }
@@ -1029,8 +1029,10 @@ $loop->timer(1, sub {
     app->reset_ini_all
 });
 
-$loop->recurring(60, sub { app->save });
-$loop->timer(3, sub { app->manage });
+# $loop->recurring(60, sub { app->save });
+# $loop->timer(3, sub { app->manage });
 # $loop->timer(5, sub { app->create_battle_ws_my });
+
+$loop->timer(3, sub { app->save });
 
 app->start;
