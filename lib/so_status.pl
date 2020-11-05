@@ -2,21 +2,8 @@ use utf8;
 #------------------#
 #  ステータス画面  #
 #------------------#
-sub status_check {
-	$chara_flag=1;
-
-	@log_in = &load_ini($chara_file);
-
-	$hit=0;
-	foreach(@log_in){
-		($kid,$kpass,$kname,$ksex,$kchara,$kn_0,$kn_1,$kn_2,$kn_3,$kn_4,$kn_5,$kn_6,$khp,$kmaxhp,$kex,$klv,$kap,$kgold,$klp,$ktotal,$kkati,$khost,$kdate,$karea,$kspot,$kpst,$kitem) = split(/<>/);
-		if($in{'id'} eq "$kid" and $in{'pass'} eq "$kpass") {
-			$hit=1; last;
-		}
-	}
-
-	if(!$hit) { &error("入力されたIDは登録されていません。又はパスワードが違います。"); }
-
+sub status_check
+{
 	if($ksex) { $esex = "男"; } else { $esex = "女"; }
 	$next_ex = $lv_up;
 

@@ -3,32 +3,8 @@ use utf8;
 #--------#
 #  休憩  #
 #--------#
-sub rest {
-	@battle = &load_ini($chara_file);
-
-	$hit=0;
-	foreach(@battle){
-		($kid,$kpass,$kname,$ksex,$kchara,$kn_0,$kn_1,$kn_2,$kn_3,$kn_4,$kn_5,$kn_6,$khp,$kmaxhp,$kex,$klv,$kap,$kgold,$klp,$ktotal,$kkati,$khost,$kdate,$karea,$kspot,$kpst,$kitem) = split(/<>/);
-		if($in{'id'} eq "$kid" and $in{'pass'} eq "$kpass") {
-			$hit=1;
-			last;
-		}
-	}
-
-	if(!$hit) { &error("入力されたIDは登録されていません。又はパスワードが違います。"); }
-	if($kspot == 0 && $kpst == 0) { &error("不正なパラメータです。"); }
-
-	$ltime = time();
-	$ltime = $ltime - $kdate;
-	$vtime = $b_time - $ltime;
-	$mtime = $m_time - $ltime;
-
-	if($ltime < $m_time and $ktotal) {
-		$error = "$mtime秒後に行動できます。";
-		$mode = "log_in";
-		&log_in;
-	}
-
+sub rest
+{
 	$kdate = time();
 
 	&skill_load;
@@ -44,7 +20,8 @@ sub rest {
 #------------#
 #  キャンプ  #
 #------------#
-sub camp {
+sub camp
+{
 	$kdate = time();
 
 	$krcv = 20;

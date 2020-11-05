@@ -5,18 +5,6 @@ use utf8;
 sub yado
 {
 	@inn_array = &load_ini($town_inn[$in{'area'}]);
-	@inn_chara = &load_ini($chara_file);
-
-	$hit=0;
-	foreach(@inn_chara){
-		($kid,$kpass,$kname,$ksex,$kchara,$kn_0,$kn_1,$kn_2,$kn_3,$kn_4,$kn_5,$kn_6,$khp,$kmaxhp,$kex,$klv,$kap,$kgold,$klp,$ktotal,$kkati,$khost,$kdate,$karea,$kspot,$kpst,$kitem) = split(/<>/);
-		if($in{'id'} eq "$kid" and $in{'pass'} eq "$kpass") {
-			$hit=1;
-			last;
-		}
-	}
-
-	if(!$hit) { &error("入力されたIDは登録されていません。又はパスワードが違います。"); }
 
 	if($kspot != 0 || $kpst != 0) { &error("不正なパラメータです。"); }
 

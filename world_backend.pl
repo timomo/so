@@ -163,6 +163,21 @@ get "/current" => sub
     my $param = {};
     $param->{mode} = $mode || "log_in";
 
+    if ($param->{mode} eq "pvp")
+    {
+        my $ids = $self->get_pvp_ids($id);
+
+        if (defined $ids)
+        {
+            $param->{k1id} = $ids->[0];
+            $param->{k2id} = $ids->[1];
+        }
+        else
+        {
+            $param->{mode} = "log_in";
+        }
+    }
+
     my $env = $self->tx->req->env || {};
     my $url = Mojo::URL->new;
 
