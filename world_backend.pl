@@ -952,6 +952,35 @@ app->helper(
 );
 
 app->helper(
+    detach_history => sub
+    {
+        my ($self) = @_;
+        my $dir = Mojo::File->new(File::Spec->catdir($FindBin::Bin, "save", "archive"));
+        my $collection = $dir->list_tree->sort(sub { uc($b) cmp uc($a) });
+        my $cnt = {
+            command => 0,
+            pvp     => 0,
+            monster => 0,
+        };
+
+        for my $file (@$collection)
+        {
+            my $basename = $file->basename;
+            if ($basename =~ /\.(command|pvp|monster)\./)
+            {
+                $cnt->{$1}++;
+
+                if ($cnt->{$1} > $self->config->{detach_history}->{$1})
+                {
+                    $self->log->debug(sprintf("detach_history によりファイル[%s]を削除しました。", $basename));
+                    $file->remove;
+                }
+            }
+        }
+    },
+);
+
+app->helper(
     reset_ini_all => sub
     {
         my ($self) = @_;
@@ -1029,10 +1058,8 @@ $loop->timer(1, sub {
     app->reset_ini_all
 });
 
+$loop->recurring(60, sub { app->detach_history });
 $loop->recurring(60, sub { app->save });
 $loop->timer(3, sub { app->manage });
-# $loop->timer(5, sub { app->create_battle_ws_my });
-
-$loop->timer(3, sub { app->save });
 
 app->start;
