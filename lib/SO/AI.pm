@@ -59,6 +59,18 @@ sub state
     }
 };
 
+sub log
+{
+    my $self = shift;
+    my $level = shift;
+    my $k = $self->data;
+    my $mode = $self->context->location($k->{id});
+    my $mes = "id = %s, パスワード = %s, スポット = %s, エリア = %s, 距離 = %s, HP = %s, 前回コマンド = %s. ". shift;
+    my @args = (@$k{qw|id パスワード スポット エリア 距離 HP|}, $mode, @_);
+
+    $self->context->log->$level(sprintf($mes, @args));
+}
+
 sub command
 {
     my $self = shift;
@@ -69,13 +81,13 @@ sub command
 
     if (! defined $mode)
     {
-        $self->context->log->warn(sprintf("location: 取得に失敗: id = %s, パスワード = %s, スポット = %s, エリア = %s, 距離 = %s", $k->{id}, $k->{パスワード}, $k->{スポット}, $k->{エリア}, $k->{距離}));
+        $self->log("warn", "mode 取得に失敗");
         return undef;
     }
 
     if (! defined $state)
     {
-        $self->context->log->warn(sprintf("state: 取得に失敗: id = %s, パスワード = %s, スポット = %s, エリア = %s, 距離 = %s", $k->{id}, $k->{パスワード}, $k->{スポット}, $k->{エリア}, $k->{距離}));
+        $self->log("warn", "state 取得に失敗");
         return undef;
     }
 
@@ -83,7 +95,7 @@ sub command
     {
         if ($self->context->is_pvp($id))
         {
-            $self->context->log->debug(sprintf("battle: PVP中: id = %s, パスワード = %s, スポット = %s, エリア = %s, 距離 = %s", $k->{id}, $k->{パスワード}, $k->{スポット}, $k->{エリア}, $k->{距離}));
+            $self->log("debug", "PVP");
 
             my $ids = $self->context->get_pvp_ids($id);
 
@@ -97,13 +109,13 @@ sub command
                 };
             }
 
-            $self->context->log->error(sprintf("battle: PVP中、ARRAY失敗: id = %s, パスワード = %s, スポット = %s, エリア = %s, 距離 = %s", $k->{id}, $k->{パスワード}, $k->{スポット}, $k->{エリア}, $k->{距離}));
+            $self->log("error", "PVP: ARRAY 失敗");
 
             return;
         }
         else
         {
-            $self->context->log->debug(sprintf("battle: 戦闘中: id = %s, パスワード = %s, スポット = %s, エリア = %s, 距離 = %s", $k->{id}, $k->{パスワード}, $k->{スポット}, $k->{エリア}, $k->{距離}));
+            $self->log("debug", "monster: 戦闘中");
             return {
                 mode => "monster",
                 id   => $id,
@@ -114,7 +126,7 @@ sub command
     {
         if ($k->{スポット} == 0 && $k->{距離} == 0) # どこかの街の中
         {
-            $self->context->log->debug(sprintf("search: 街の中: id = %s, パスワード = %s, スポット = %s, エリア = %s, 距離 = %s", $k->{id}, $k->{パスワード}, $k->{スポット}, $k->{エリア}, $k->{距離}));
+            $self->log("debug", "search: 街の中");
             return {
                 mode => "monster",
                 area => $k->{エリア},
@@ -150,7 +162,7 @@ sub command
                 elsif ($is_battle == 0 && $is_battle2 == 0)
                 {
                     # 今の所、決め打ちで、襲い掛かる
-                    $self->context->log->debug(sprintf("search: ユーザを見て襲いかかる: id = %s, パスワード = %s, スポット = %s, エリア = %s, 距離 = %s", $k->{id}, $k->{パスワード}, $k->{スポット}, $k->{エリア}, $k->{距離}));
+                    $self->log("debug", "search: ユーザを見て襲いかかる");
                     return {
                         mode => "pvp",
                         id => $id,
@@ -160,7 +172,7 @@ sub command
                 }
                 else # 一度メッセージを送ったら、去る
                 {
-                    $self->context->log->debug(sprintf("search: ユーザを見て去る: id = %s, パスワード = %s, スポット = %s, エリア = %s, 距離 = %s", $k->{id}, $k->{パスワード}, $k->{スポット}, $k->{エリア}, $k->{距離}));
+                    $self->log("debug", "search: ユーザを見て去る");
                     return {
                         mode => "monster",
                         area => $k->{エリア},
@@ -171,7 +183,7 @@ sub command
             }
             else
             {
-                $self->context->log->debug(sprintf("search: 近辺探索中: id = %s, パスワード = %s, スポット = %s, エリア = %s, 距離 = %s", $k->{id}, $k->{パスワード}, $k->{スポット}, $k->{エリア}, $k->{距離}));
+                $self->log("debug", "search: 近辺探索中");
                 return {
                     mode => "monster",
                     area => $k->{エリア},
@@ -185,9 +197,10 @@ sub command
     {
         if ($k->{スポット} == 0 && $k->{距離} == 0) # どこかの街の中
         {
-            $self->context->log->debug(sprintf("cure: 街の中: id = %s, パスワード = %s, スポット = %s, エリア = %s, 距離 = %s, 前回コマンド = %s, HP = %s", $k->{id}, $k->{パスワード}, $k->{スポット}, $k->{エリア}, $k->{距離}, $mode, $k->{HP}));
+            $self->log("debug", "cure: 街の中");
             if ($mode ne "yado")
             {
+                $self->log("debug", "cure: 街の中から宿へ");
                 return {
                     mode => "yado",
                     area => $k->{エリア},
@@ -196,6 +209,7 @@ sub command
             }
             elsif ($mode eq "yado")
             {
+                $self->log("debug", "cure: 宿に泊まる");
                 return {
                     inn_no => 0,
                     mode => "yado_in",
@@ -207,7 +221,7 @@ sub command
         else # 近辺を探索中
         {
             if ($k->{所持金} >= 9000) { # 一旦、所持金チェックは決め打ちで。。。
-                $self->context->log->debug(sprintf("cure: 近辺探索中で街へ: id = %s, パスワード = %s, スポット = %s, エリア = %s, 距離 = %s", $k->{id}, $k->{パスワード}, $k->{スポット}, $k->{エリア}, $k->{距離}));
+                $self->log("debug", "cure: 近辺探索中で街へ");
                 return {
                     mode => "monster",
                     area => $k->{エリア},
@@ -217,7 +231,7 @@ sub command
             }
             else
             {
-                $self->context->log->debug(sprintf("cure: 近辺探索中で休憩: id = %s, パスワード = %s, スポット = %s, エリア = %s, 距離 = %s", $k->{id}, $k->{パスワード}, $k->{スポット}, $k->{エリア}, $k->{距離}));
+                $self->log("debug", "cure: 近辺探索中で休憩");
                 return {
                     mode => "rest",
                     area => $k->{エリア},

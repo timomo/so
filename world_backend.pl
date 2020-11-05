@@ -716,7 +716,7 @@ app->helper(
             my $command = pop(@$queue);
             if (defined $command)
             {
-                warn Dump($command);
+                # warn Dump($command);
                 $self->step_run($command);
             }
         }
@@ -758,7 +758,7 @@ app->helper(
             my $ai = SO::AI->new(context => $self, id => $id);
             $ai->open;
             my $npc_command = $ai->command;
-            warn Dump($npc_command);
+            # warn Dump($npc_command);
             $ai->close;
 
             if (defined $npc_command)
@@ -866,7 +866,7 @@ app->helper(
 
         if (defined $c)
         {
-            warn "<------------------- ping";
+            # warn "<------------------- ping";
 
             $c->send({ json => { method => "ping", data => $data } });
         }
