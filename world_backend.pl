@@ -836,14 +836,21 @@ app->helper(
         my $const_id = $json->{const_id};
         my $c = $clients->{$const_id};
 
-        if ($c && ! $c->is_finished)
+        if (defined $c)
         {
-            return $c;
+            if ($c->is_finished)
+            {
+                $self->log->warn(sprintf("%s の接続が切れてます！", $const_id));
+                delete $clients->{$const_id};
+            }
+            else
+            {
+                return $c;
+            }
         }
         else
         {
-            $self->log->warn(sprintf("%s の接続が切れてます！", $const_id));
-            delete $clients->{$const_id};
+            # そもそもない
         }
         return undef;
     },
