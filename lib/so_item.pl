@@ -633,7 +633,8 @@ sub item_sell
 			unshift(@item_new,$utf8);
 			$hit=1;
 		}else{
-			push(@item_new,"$_\n");
+			my $utf8 = Encode::encode_utf8($_);
+			push(@item_new,"$utf8\n");
 		}
 	}
 

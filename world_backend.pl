@@ -496,6 +496,12 @@ app->helper(
         my $self = shift;
         my $path = File::Spec->catfile($FindBin::Bin, qw|save append.dat|);
         my $ret = $self->load_ini($path, \@keys2);
+
+        for my $d (@$ret)
+        {
+            $system->modify_append_data($d);
+        }
+
         return $ret;
     },
 );
@@ -506,6 +512,12 @@ app->helper(
         my $self = shift;
         my $path = File::Spec->catfile($FindBin::Bin, qw|save chara.dat|);
         my $ret = $self->load_ini($path, \@keys);
+
+        for my $d (@$ret)
+        {
+            $system->modify_chara_data($d);
+        }
+
         return $ret;
     },
 );

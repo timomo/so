@@ -4,6 +4,7 @@ sub save_dat_append_1p
 {
 	my $param = {};
 	@$param{@{$config->{keys2}}} = ($k1id, $mode, $k1area, $k1spot, $k1pst, time);
+	$system->modify_append_data($param);
 	$system->save_append($param);
 }
 
@@ -11,6 +12,7 @@ sub save_dat_append_2p
 {
 	my $param = {};
 	@$param{@{$config->{keys2}}} = ($k2id, $mode, $k2area, $k2spot, $k2pst, time);
+	$system->modify_append_data($param);
 	$system->save_append($param);
 }
 
@@ -18,6 +20,7 @@ sub save_dat_append
 {
 	my $param = {};
 	@$param{@{$config->{keys2}}} = ($kid, $mode, $karea, $kspot, $kpst, time);
+	$system->modify_append_data($param);
 	$system->save_append($param);
 }
 

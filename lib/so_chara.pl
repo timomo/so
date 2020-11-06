@@ -278,6 +278,7 @@ sub regist
 		$kitem
 	);
 
+	$system->modify_chara_data($new);
 	$system->save_chara($new);
 
 	if ($in{'new'} eq 'new')

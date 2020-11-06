@@ -121,6 +121,7 @@ sub load_append
     for my $k (@$list)
     {
         if ($k->{id} eq $id) {
+            $self->modify_append_data($k);
             return $k;
         }
     }
@@ -136,6 +137,7 @@ sub load_chara
     for my $k (@$list)
     {
         if ($k->{id} eq $id) {
+            $self->modify_chara_data($k);
             return $k;
         }
     }
@@ -157,6 +159,38 @@ sub load_chara_by_name
     return undef;
 }
 
+sub modify_append_data
+{
+    my $self = shift;
+    my $new = shift;
+    my $keys = $self->context->config->{keys2};
+    my $regex = qr/(?:エリア|スポット|距離|最終実行時間)/;
+
+    for my $key (@$keys)
+    {
+        if ($key =~ /$regex/)
+        {
+            $new->{$key} ||= 0;
+        }
+    }
+}
+
+sub modify_chara_data
+{
+    my $self = shift;
+    my $new = shift;
+    my $keys = $self->context->config->{keys};
+    my $regex = qr/(?:性別|画像|力|賢さ|信仰心|体力|器用さ|素早さ|魅力|HP|最大HP|経験値|レベル|残りAP|所持金|LP|戦闘数|勝利数|最終アクセス|エリア|スポット|距離|アイテム)/;
+
+    for my $key (@$keys)
+    {
+        if ($key =~ /$regex/)
+        {
+            $new->{$key} ||= 0;
+        }
+    }
+}
+
 sub save_chara
 {
     my $self = shift;
@@ -164,6 +198,8 @@ sub save_chara
     my $new = shift;
     my $list = $self->load_ini($path, $self->context->config->{keys});
     my $hit = 0;
+
+    $self->modify_chara_data($new);
 
     for my $k (@$list)
     {
@@ -194,6 +230,8 @@ sub save_append
     my $new = shift;
     my $list = $self->load_ini($path, $self->context->config->{keys2});
     my $hit = 0;
+
+    $self->modify_append_data($new);
 
     if (! defined $new->{id})
     {

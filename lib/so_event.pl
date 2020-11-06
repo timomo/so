@@ -18,6 +18,7 @@ sub event
 		$kitem
 	);
 
+	$system->modify_chara_data($new);
 	$system->save_chara($new);
 }
 
