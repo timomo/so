@@ -1,0 +1,13 @@
+%= include "layouts/header"
+%= include "layouts/meta"
+%= include "layouts/javascript"
+%= include "layouts/javascript_default"
+%= include "layouts/sound"
+<script>
+	const info = <%== JSON->new->encode($info_array) %>;
+	const const_id = "<%= $const_id %>";
+</script>
+<script src="./js/so_town.js"></script>
+%= include "layouts/stylesheet"
+</head>
+<body>

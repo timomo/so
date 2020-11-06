@@ -1,7 +1,7 @@
 <div class="blackboard question">
 
 % for my $mes (@$message) {
-    <%= $mes %>
+    <%== $mes %>
 % }
 
 </div>

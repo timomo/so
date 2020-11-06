@@ -81,72 +81,24 @@ sub log_in
 		push(@message, "<p>少し疲れてきました・・。</p>");
 	}
 
-	my $description = $mt->render_file('templates/window/description.html.ep', {
-		message => \@message,
-	});
-
-	my $status = $mt->render_file('templates/window/status.html.ep', {
-		kname => $kname,
-		klv => $klv,
-		klp => $klp,
-		max_lp => $max_lp,
-		khp => $khp,
-		kmaxhp => $kmaxhp,
-		kex => $kex,
-		rrsk => $rrsk,
-		area => $town_name[$karea],
-		spot => $spot,
-		kgold => $kgold,
-	});
-
 	my $error_string = Encode::decode_utf8($error) if (! utf8::is_utf8($error));
-
-	print <<"EOM";
-$description
-<b><font color="#FF9933">$error_string</font></b>
-$status
-EOM
 
 	$error = "";
 
 	if($kspot == 0 && $kpst == 0)
 	{
-		my $facilities = $mt->render_file('templates/window/facilities.html.ep', {
-			script  => $script,
-			kid     => $kid,
-			kpass   => $kpass,
-			karea   => $karea,
-			area    => $town_name[$karea],
-			t_inn   => $t_inn,
-			t_shop => $t_shop,
-		});
-
 		push(@select_menu, sprintf('<p class="answer-menu">【%sの施設】</p>', $town_name[$karea]));
 		push(@select_menu, sprintf('<p id="mode_town-select_%s" class="select-menu">%s</p>', "yado", "宿屋：".$t_inn));
 		push(@select_menu, sprintf('<p id="mode_town-select_%s" class="select-menu">%s</p>', "item_shop", "ショップ：".$t_inn));
 		push(@select_menu, sprintf('<p id="mode_town-select_%s" class="select-menu">%s</p>', "user_shop", "市場：チュパフリマ：". $town_name[$karea]));
 		push(@select_menu, sprintf('<p id="mode_town-select_%s" class="select-menu">%s</p>', "bank", "銀行：シマダ国営銀行（". $town_name[$karea]. "店）"));
-
-		print $facilities;
 	}
 	else
 	{
-		my $camp = $mt->render_file('templates/window/camp.html.ep', {
-			script  => $script,
-			kid     => $kid,
-			kpass   => $kpass,
-			karea   => $karea,
-		});
-
 		push(@select_menu, qw|<p class="answer-menu">【キャンプ】</p>|);
 		push(@select_menu, qw|<p id="mode_camp-select_rest" class="blink-before select-menu">休憩する</p>|);
 		push(@select_menu, qw|<p id="mode_camp-select_monster" class="select-menu">キャンピング</p>|);
-
-		print $camp;
 	}
-	print <<"EOM";
-<div id="town_text" class="text_detail">&nbsp;</div>
-EOM
 
 	my ( $label, $optionHTML ) = ( "", "" );
 	my @options;
@@ -184,20 +136,7 @@ EOM
 		$optionHTML .= sprintf( "<option value=\"%s\">%s</option>\n", @$_);
 	}
 
-	my $move = $mt->render_file('templates/window/move.html.ep', {
-		script      => $script,
-		kid         => $kid,
-		kpass       => $kpass,
-		karea       => $karea,
-		optionHTML => $optionHTML,
-	});
-
-	my $select_menu = $mt->render_file('templates/window/select_menu.html.ep', {
-		select_menu => \@select_menu,
-	});
-
-	print $move;
-	print $select_menu;
+	my @rid;
 
 	if($kspot == 0 && $kpst == 0)
 	{
@@ -205,8 +144,6 @@ EOM
 		&read_battle;
 		$rank = $krank;
 		$todd=0;
-
-		my @rid;
 
 		foreach(@log_in)
 		{
@@ -221,15 +158,6 @@ EOM
 				push(@rid, "<option value=$tid>$tname Lv$tlv（$sdrank[$krank]）</option>");
 			}
 		}
-
-		my $shadow_duel = $mt->render_file('templates/window/shadow_duel.html.ep', {
-			script      => $script,
-			kid         => $kid,
-			kpass       => $kpass,
-			rid       => \@rid,
-		});
-
-		print $shadow_duel;
 	}
 
 	my @mesid;
@@ -285,42 +213,38 @@ EOM
 		push(@message_log, "<hr size=0><p>$kname 宛てのメッセージはありません。</p>");
 	}
 
-	my $message = $mt->render_file('templates/window/message.html.ep', {
-		script      => $script,
-		kid         => $kid,
-		kname       => $kname,
-		kpass       => $kpass,
-		mesid       => \@mesid,
-		message_log => \@message_log,
-		max_gyo     => $max_gyo,
-	});
+	my $html = $controller->render_to_string(
+		template      => "log_in",
+		script        => $script,
+		kid           => $kid,
+		kname         => $kname,
+		kpass         => $kpass,
+		karea         => $karea,
+		mesid         => \@mesid,
+		message_log   => \@message_log,
+		max_gyo       => $max_gyo,
+		spot          => $spot,
+		optionHTML    => $optionHTML,
+		select_menu   => \@select_menu,
+		kspot         => $kspot,
+		kpst          => $kpst,
+		rid           => \@rid,
+		area          => $town_name[$karea],
+		t_inn         => $t_inn,
+		t_shop        => $t_shop,
+		klv           => $klv,
+		klp           => $klp,
+		max_lp        => $max_lp,
+		khp           => $khp,
+		kmaxhp        => $kmaxhp,
+		kex           => $kex,
+		rrsk          => $rrsk,
+		kgold         => $kgold,
+		message       => \@message,
+		error_string  => $error_string,
+	);
 
-	print <<EOF;
-$message
-<hr size=0>
-<form id="check_form" action="$script" method="post">
-<select id="status-select" name="mode" onchange="javascript:selectTown(this);">
-<option value="item_check">アイテム一覧</option>
-<option value="status_check">ステータス詳細</option>
-</select>
-<input type="hidden" name="id" value="$kid" />
-<input type="hidden" name="pass" value="$kpass" />
-<input id="status-select-submit" type="submit" value="行動" />
-</form>
-
-<form id="pvp_form" action="$script" method="post">
-<input type="hidden" name="mode" value="pvp" />
-<input type="hidden" name="k2id" value="" />
-<input type="hidden" name="k1id" value="$kid" />
-<input type="hidden" name="id" value="$kid" />
-<input type="hidden" name="pass" value="$kpass" />
-<input id="pvp-select-submit" type="submit" value="行動" />
-</form>
-
-<script>
-const spot = "$spot";
-</script>
-EOF
+	print Encode::encode_utf8($html);
 
 	&footer;
 

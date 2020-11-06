@@ -1,0 +1,6 @@
+% if ($kid and $mode ne "") {
+  %= include "window/neighbors"
+% }
+
+%= include "window/default_select_menu"
+%= include "layouts/footer"

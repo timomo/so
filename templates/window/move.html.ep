@@ -4,7 +4,7 @@
 <input type="hidden" name="area" value="<%= $karea %>" />
 <input type="hidden" name="mode" value="monster" />
 <select id="monster-select" name="spot" onchange="javascript:selectMove(this);">
-<%= $optionHTML %>
+<%== $optionHTML %>
 </select>
 <input id="monster-select-submit" type="submit" value="行動" />
 </form>

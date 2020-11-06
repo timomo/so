@@ -1,6 +1,6 @@
 <div class="clearfix">
 	<div class="blackboard answer float-l">
-	    %= join("\n", @$select_menu);
+	    %== join("\n", @$select_menu);
 	</div>
 </div>
 <form action="<%= $script %>" method="post" style="display: none">

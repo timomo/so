@@ -5,7 +5,7 @@
 <input type="hidden" name="pass" value="<%= $kpass %>" />
 <select name="rid">
 <option value="">挑戦相手を選択(強さ)</option>
-%= join("\n", @$rid);
+%== join("\n", @$rid);
 </select>
 <input type="submit" value="決闘" />
 <div class="text_detail">自分の分身と他人の分身を戦わせることができます。</div>

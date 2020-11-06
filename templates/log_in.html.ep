@@ -1,0 +1,24 @@
+
+%== include "window/description"
+<b><span color="#FF9933"><%= $error_string %></span></b>
+%= include "window/status"
+
+% if($kspot == 0 && $kpst == 0) {
+    %= include "window/facilities"
+% } else {
+    %= include "window/camp"
+% }
+
+<div id="town_text" class="text_detail">&nbsp;</div>
+
+%= include "window/move"
+%= include "window/select_menu"
+
+% if($kspot == 0 && $kpst == 0) {
+
+    %= include "window/shadow_duel"
+
+% }
+
+%= include "window/message"
+%= include "window/hidden_form"

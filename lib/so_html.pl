@@ -25,29 +25,17 @@ sub footer
 		push(@select_menu, sprintf('<p id="mode_default-select_%s" class="select-menu">%s</p>', "logout", "ログアウト"));
 	}
 
-	if ($kid and $mode ne "")
-	{
-		my $neighbors = $mt->render_file('templates/window/neighbors.html.ep', {});
-		print $neighbors;
-	}
-
-	my $default_select_menu = $mt->render_file('templates/window/default_select_menu.html.ep', {
+	my $html = $controller->render_to_string(
+		template    => "footer",
+		ver         => $ver,
 		kid         => $kid,
+		mode        => $mode,
 		kpass       => $kpass,
 		script      => $script,
 		select_menu => \@select_menu,
-	});
+	);
 
-	my $footer = $mt->render_file('templates/layouts/footer.html.ep', {
-		ver => $ver,
-	});
-
-	my $html = $mt->render(<<'EOF', { default_select_menu => $default_select_menu, footer => $footer });
-<%= $default_select_menu %>
-<%= $footer %>
-EOF
-
-	print $html;
+	print Encode::encode_utf8($html);
 }
 #------------------#
 #  HTMLのヘッダー  #
@@ -94,44 +82,17 @@ sub header
 	my $css_backgif = "";
 	$css_backgif = "background-image: url($backgif);" if ( $backgif ne "" );
 
-	my $header = $mt->render_file('templates/layouts/header.html.ep', { main_title => $main_title });
-	my $meta = $mt->render_file('templates/layouts/meta.html.ep', {});
-	my $javascript = $mt->render_file('templates/layouts/javascript.html.ep', {});
-	my $javascript_default = $mt->render_file('templates/layouts/javascript_default.html.ep', {});
-	my $sound = $mt->render_file('templates/layouts/sound.html.ep', {});
-	my $stylesheet = $mt->render_file('templates/layouts/stylesheet.html.ep', {});
-
 	my $info_array = [$info0 || "", $info1 || "", $info2 || "", $info3 || "", $info4 || "", $info5 || "", $f_info || "", $r_info || ""];
-	my $info_array_json = JSON->new->encode($info_array);
 
-	my $args = {
-		header             => $header,
-		meta               => $meta,
-		javascript         => $javascript,
-		javascript_default => $javascript_default,
-		sound              => $sound,
-		info_array         => $info_array_json,
-		const_id           => $kid,
-		stylesheet         => $stylesheet,
-	};
+	my $html = $controller->render_to_string(
+		template     => "header",
+		main_title   => $main_title,
+		info_array   => $info_array,
+		const_id     => $kid,
+		css_backgif  => $css_backgif,
+	);
 
-	my $html = $mt->render(<<'EOF', $args);
-<%= $header %>
-<%= $meta %>
-<%= $javascript %>
-<%= $javascript_default %>
-<%= $sound %>
-<script>
-	const info = <%= $info_array %>;
-	const const_id = "<%= $const_id %>";
-</script>
-<script src="./js/so_town.js"></script>
-<%= $stylesheet %>
-</head>
-<body>
-EOF
-
-	print $html;
+	print Encode::encode_utf8($html);
 }
 
 1;

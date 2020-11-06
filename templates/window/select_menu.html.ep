@@ -2,7 +2,7 @@
 <div class="clearfix">
 	<div class="blackboard answer float-l" id="select-menu-window">
 
-%= join("\n", @$select_menu);
+%== join("\n", @$select_menu);
 
 	</div>
 </div>
