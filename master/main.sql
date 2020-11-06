@@ -56,3 +56,21 @@ CREATE TABLE キャラ追加情報1 (
         ctime DATETIME,
 	    mtime DATETIME
  );
+
+DROP TABLE IF EXISTS メッセージ;
+
+/*
+2PdnIdMvpZ<>BYpqoaTNSU<>NPC:1<>これはNPC NPC:1 からのメッセージ送信テストです。絶賛開発中です。<>NPC:2<>2020/11/02 19:25<>
+*/
+
+CREATE TABLE メッセージ (
+        id INTEGER PRIMARY KEY,
+        送付元id TEXT NOT NULL,
+        送付元名前 TEXT NOT NULL,
+        送付先id TEXT,
+        送付先名前 TEXT,
+        メッセージ TEXT NOT NULL,
+        受信日時 DATETIME,
+        ctime DATETIME,
+	    mtime DATETIME
+ );

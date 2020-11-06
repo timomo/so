@@ -49,6 +49,7 @@ my $queue = Mojo::Collection->new;
 my $characters = Mojo::Collection->new;
 my $character_types = Mojo::Collection->new;
 my $appends = Mojo::Collection->new;
+my $messages = Mojo::Collection->new;
 my @keys = @{app->config->{keys}};
 my @keys2 = @{app->config->{keys2}};
 my @keys3 = @{app->config->{keys3}};
@@ -63,6 +64,62 @@ my $system = SO::System->new(context => app);
 $system->open;
 
 app->log->level(app->config->{log_level});
+
+post "/message" => sub
+{
+    my $self = shift;
+    my $json = $self->req->json;
+    my $id = $self->send_message(@$json{qw|id 送付元id メッセージ|});
+    return $self->render(json => { result => $id });
+};
+
+get "/message" => sub
+{
+    my $self = shift;
+    my $json = $self->req->json;
+    my $rows = $self->get_message($json->{id});
+    return $self->render(json => { result => $rows });
+};
+
+app->helper(
+    get_message => sub
+    {
+        my ($self, $from) = @_;
+        my $where = "送付元id = :送付元id or 送付先id = :送付先id";
+        my $query = { 送付元id => $from, 送付先id => $from };
+        my $result = $self->dbi("main")->model("メッセージ")->select(["*"], where => [$where, $query], append => "order by 受信日時 desc limit 5");
+        return $result->fetch_hash_all;
+    },
+);
+
+app->helper(
+    send_message => sub
+    {
+        my ($self, $from, $to, $message) = @_;
+        my $c1 = $self->character($from);
+        my $c2 = $self->character($to);
+        my $dat = {};
+
+        @$dat{@{$self->config->{keys4}}} = (
+            undef,
+            $from,
+            $c1->{名前},
+            $to,
+            $c2->{名前},
+            $message,
+            DateTime->now(time_zone => "Asia/Tokyo")->datetime,
+        );
+
+        delete $dat->{id};
+
+        $self->dbi("main")->model("メッセージ")->insert($dat, ctime => "ctime");
+
+        my $mes = { method => "message", data => 1 };
+        $self->unicast_send($mes, $from, $to);
+
+        return $self->dbi("main")->dbh->sqlite_last_insert_rowid;
+    },
+);
 
 app->helper(
     range_rand => sub {
@@ -388,7 +445,16 @@ app->helper(
             my $result = $self->dbi("main")->model("キャラ")->select(["*"], where => {id => $k->{id}});
             my $row = $result->fetch_hash_one;
 
-            my $ref = { %$row, %$k };
+            my $ref = {};
+
+            if (defined $row)
+            {
+                $ref = { %$row, %$k };
+            }
+            else
+            {
+                $ref = { %$k };
+            }
 
             eval
             {
@@ -518,6 +584,16 @@ app->helper(
             $system->modify_chara_data($d);
         }
 
+        return $ret;
+    },
+);
+
+app->helper(
+    messages_from_file => sub
+    {
+        my ($self) = @_;
+        my $path = File::Spec->catfile($FindBin::Bin, qw|save message.dat|);
+        my $ret = $self->load_ini($path, [qw|送付元id 送付先id 送付元名前 メッセージ 送付先名前 受信日時|]);
         return $ret;
     },
 );
@@ -958,6 +1034,7 @@ app->helper(
             $dbi->create_model("コマンド結果");
             $dbi->create_model("キャラ");
             $dbi->create_model("キャラ追加情報1");
+            $dbi->create_model("メッセージ");
 
             $dbis->{$type} = $dbi;
 
@@ -1031,6 +1108,59 @@ app->helper(
 );
 
 app->helper(
+    check_new_messages => sub
+    {
+        my ($self) = @_;
+        my $ids = Mojo::Collection->new;
+
+        $messages->each(sub
+        {
+            my $mes = shift;
+            $mes->{受信日時} =~ s/\//-/g; # 2020/11/02 19:25
+            $mes->{受信日時} .= ":00";
+
+            my $query = {};
+            $query->{送付元id} = $mes->{送付元id};
+            $query->{送付先id} = $mes->{送付先id};
+            $query->{メッセージ} = $mes->{メッセージ};
+            $query->{受信日時} = $mes->{受信日時};
+
+            my $result = $self->dbi("main")->model("メッセージ")->select(["*"], where => $query);
+            my $row = $result->fetch_hash_one;
+
+            if (defined $row)
+            {
+                # noop
+            }
+            else
+            {
+                # 送付元id 送付先id 送付元名前 メッセージ 送付先名前 受信日時
+
+                my $dat = {};
+                $dat->{送付元id} = $mes->{送付元id};
+                $dat->{送付先id} = $mes->{送付先id};
+                $dat->{送付元名前} = $mes->{送付元名前};
+                $dat->{送付先名前} = $mes->{送付先名前};
+                $dat->{メッセージ} = $mes->{メッセージ};
+                $dat->{受信日時} = $mes->{受信日時};
+
+
+                $self->dbi("main")->model("メッセージ")->insert($dat, ctime => "ctime");
+
+                push(@$ids, $mes->{送付元id});
+                push(@$ids, $mes->{送付先id});
+            }
+        });
+
+        my $uniq = $ids->uniq();
+
+        my $mes = { method => "message", data => 1 };
+
+        $self->unicast_send($mes, @$uniq);
+    },
+);
+
+app->helper(
     reset_ini_all => sub
     {
         my ($self) = @_;
@@ -1038,12 +1168,20 @@ app->helper(
         $character_types = Mojo::Collection->new;
         my $types = app->character_types;
         push(@$character_types, @$types);
+
         $appends = Mojo::Collection->new;
         my $tmp = app->load_append;
         push(@$appends, @$tmp);
+
         $characters = Mojo::Collection->new;
         my $all = app->characters;
         push(@$characters, @$all);
+
+        $messages = Mojo::Collection->new;
+        $tmp = app->messages_from_file;
+        push(@$messages, @$tmp);
+
+        $self->check_new_messages;
     },
 );
 

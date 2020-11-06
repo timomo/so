@@ -8,9 +8,13 @@
 <option value="">送る相手を選択</option>
 %== join("\n", @$mesid);
 </select>
-<input type="submit" value="送信" /><br>
+<input type="button" value="送信" id="send_message" /><br>
 <input type="text" name="mes" size="25" />
 <div class="text_detail">他のキャラクターへメッセージを送ることができます。</div>
 </form>
+
+<div class="blackboard question">
 【届いているメッセージ】表示数<b><%= $max_gyo %></b>件まで<br />
-%== join("\n", @$message_log);
+<span id="display_messages">
+</span>
+</div>

@@ -4,6 +4,7 @@
     ],
         keys2               => [ qw|id 最終コマンド エリア スポット 距離 最終実行時間| ],
         keys3               => [ qw|id 操作種別| ],
+        keys4               => [ qw|id 送付元id 送付元名前 送付先id 送付先名前 メッセージ 受信日時| ],
         sep                 => "<>",
         new_line            => "\r\n",
         default_parameter   => [ 5, 5, 5, 5, 5, 5, 5 ],

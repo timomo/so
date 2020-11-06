@@ -98,6 +98,19 @@ function setup_take_control_form()
 	});
 }
 
+function setup_message()
+{
+	jQuery("#send_message").bind("click", (event) => {
+		const form = jQuery(event.target).closest("form");
+		const to = form.find("select[name='mesid']").val();
+		const message = form.find("input[name='mes']").val();
+
+		jQuery.post("./message", { "送付元id": to, "メッセージ": message }, (data) => {
+			// noop
+		});
+	});
+}
+
 function setup_select_menu()
 {
 	jQuery("#camp-select").hide();
@@ -233,6 +246,23 @@ function ping() {
 	ws_send("ping", {});
 }
 
+function get_message() {
+	jQuery.get("./message", {}, (data) => {
+		const messages = [];
+
+		jQuery("#display_messages").html("");
+
+		data.result.forEach((row) => {
+			const p = jQuery("<p></p>");
+			p.html(
+				row["送付元名前"] + " > " + row["送付先名前"] + " 「" + row["メッセージ"] + "」" + "（" + row["ctime"] + "）"
+			);
+			jQuery("#display_messages").append(p);
+		});
+		console.error(data);
+	});
+}
+
 function setup_websocket(timer) {
 	let state = undefined;
 	let time = undefined;
@@ -303,6 +333,11 @@ function setup_websocket(timer) {
 		jQuery("form").prop("disabled", true);
 	};
 
+	const func_message = (data) => {
+		jQuery.jGrowl("新着メッセージあり");
+		get_message();
+	};
+
 	ws.onmessage = function (e) {
 		const response = JSON.parse(e.data);
 
@@ -319,6 +354,9 @@ function setup_websocket(timer) {
 			case "result":
 				func_result(response.data);
 				break;
+			case "message":
+				func_message(response.data);
+				break;
 			case "battle_server_disconnect":
 				func_server_disconnect(response.data);
 				break;
@@ -333,6 +371,8 @@ jQuery(document).ready(() => {
 	if (typeof const_id !== "undefined") {
 		setup_websocket();
 	}
+
+	get_message();
 
 	if (typeof spot !== "undefined") {
 		if (spot === "町の中") {
@@ -356,6 +396,7 @@ jQuery(document).ready(() => {
 	setup_neighbors();
 	setup_take_control_form();
 	setup_select_menu();
+	setup_message();
 
 	jQuery(".select-menu:first").trigger("mouseenter");
 });
