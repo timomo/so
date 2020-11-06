@@ -14,6 +14,7 @@ use DateTime::HiRes;
 has id => undef;
 has watch_hook => sub {{}};
 has context => undef;
+has log_level => undef;
 
 sub close
 {
@@ -25,6 +26,7 @@ sub close
 sub open
 {
     my $self = shift;
+    $self->log_level($self->context->log->level);
     # my $k = $self->context->character($self->id);
     # $self->data($k);
 }
@@ -101,6 +103,7 @@ sub save_raw_ini
     for my $data (@$list)
     {
         my @tmp = @$data{@$keys};
+        $tmp[$_] ||= "" for 0 .. $#tmp;
         my $line = join($self->context->config->{sep}, @tmp);
         my $utf8 = Encode::encode_utf8($line);
         push(@save, $utf8);
@@ -293,9 +296,9 @@ sub DESTROY
 {
     my ($self) = @_;
     my $dt = DateTime::HiRes->now(time_zone => "Asia/Tokyo");
-    my $mes = sprintf("[%s] [%s] [%s] %s [%s] DESTROY", $dt->strftime('%Y-%m-%d %H:%M:%S.%5N'), $$, "custom", $self, $self->id || "-");
+    my $mes = sprintf("[%s] [%s] [%s] %s [%s] DESTROY", $dt->strftime('%Y-%m-%d %H:%M:%S.%5N'), $$, "debug", $self, $self->id || "-");
     my $utf8 = Encode::encode_utf8($mes);
-    warn $utf8. "\n";
+    warn $utf8. "\n" if ($self->log_level eq "debug");
 }
 
 1;

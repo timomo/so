@@ -1,0 +1,31 @@
+<b>宿屋：<%= $t_inn %></b>
+<hr size=0>
+<%== $get_msg %><br>
+<B><span COLOR="#FF9933"><%= $error %></span></B>
+<form action="<%= $script %>" method="post">
+<B>所持金</B> <%= $kgold %> G<BR>
+<BR>
+
+<div class="blackboard question">
+
+<table border=0>
+<tr>
+<th></th><th>部屋名</th><th>料理</th><th>効果</th><th>価格</th>
+</tr>
+
+%== join("\n", @$rooms);
+
+</table>
+
+</div>
+
+<p>
+<input type=hidden name=id   value=<%= $kid %>>
+<input type=hidden name=area value=<%= $karea %>>
+<input type=hidden name=mode value="yado_in">
+<input type=submit value="宿泊する">
+</form>
+<p>
+	<script>
+const spot = "<%= $spot %>";
+</script>

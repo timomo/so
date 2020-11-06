@@ -2,7 +2,7 @@
 body {
     color: #666666;
     background-color: #FFFFFF;
-%== $css_backgif
+    background-image: url(http://www.ann.hi-ho.ne.jp/nakiri/image/bg.gif);
 }
 body,tr,td,th,table { font-size: 10.5pt; }
 a:hover   {

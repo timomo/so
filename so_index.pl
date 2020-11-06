@@ -56,15 +56,19 @@ our $tt = Template->new(
 our $mt = Mojo::Template->new(vars => 1);
 our $logger = Mojo::Log->new;
 our $config = Mojolicious::Plugin::Config->load(File::Spec->catfile($FindBin::Bin, "so.conf.pl"), $config);
+$logger->level($config->{log_level_index});
 our $ua = Mojo::UserAgent->new;
 $ua->connect_timeout(1);
 $ua->request_timeout(1);
 our $mojo = Mojolicious->new;
+$mojo->log($logger);
 $mojo->controller_class("SO::Dummy");
 our $controller = $mojo->build_controller;
 $controller->config($config);
 $controller->log($logger);
+$controller->open;
 our $system = SO::System->new(context => $controller);
+$system->open;
 
 unshift @{$mojo->renderer->paths}, File::Spec->catdir($FindBin::Bin, "templates");
 
@@ -115,11 +119,6 @@ if ($require_login == 1)
 
 		if (defined $k1id && defined $k2id)
 		{
-			warn "-------------->";
-			warn Dump(\%in);
-			warn Dump([ $k1id, $k2id ]);
-			warn "-------------->";
-
 			if (&is_continue_pvp)
 			{
 				&pvp;

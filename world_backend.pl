@@ -42,6 +42,7 @@ plugin Config => { file => "so.conf.pl" };
 $Storable::Deparse = 1;
 $Storable::Eval = 1;
 
+my $not_delivered = {};
 my $loop = Mojo::IOLoop->singleton;
 my $results = Mojo::Collection->new;
 my $queue = Mojo::Collection->new;
@@ -59,6 +60,7 @@ my $clients = {};
 my $dbis = {};
 my $loops = {};
 my $system = SO::System->new(context => app);
+$system->open;
 
 app->log->level(app->config->{log_level});
 
@@ -386,30 +388,32 @@ app->helper(
             my $result = $self->dbi("main")->model("キャラ")->select(["*"], where => {id => $k->{id}});
             my $row = $result->fetch_hash_one;
 
+            my $ref = { %$row, %$k };
+
             eval
             {
                 if (defined $row) {
-                    $self->dbi("main")->model("キャラ")->update($k, where => {id => $k->{id}}, mtime => "mtime");
+                    $self->dbi("main")->model("キャラ")->update($ref, where => {id => $ref->{id}}, mtime => "mtime");
                 } else {
-                    $self->dbi("main")->model("キャラ")->insert($k, ctime => "ctime");
+                    $self->dbi("main")->model("キャラ")->insert($ref, ctime => "ctime");
                 }
             };
             if ($@)
             {
                 warn $@;
-                die $self->dump($k);
+                die $self->dump($ref);
             }
 
-            $system->save_chara($k);
+            $system->save_chara($ref);
 
-            my $append = $self->append_data($k->{id});
+            my $append = $self->append_data($ref->{id});
 
             if (! defined $append)
             {
                 $append = {};
                 @$append{@{$self->config->{keys2}}} = (
                     $k->{id},
-                    $self->location($k->{id}),
+                    $self->location($ref->{id}),
                     $k->{エリア},
                     $k->{スポット},
                     $k->{距離},
@@ -812,6 +816,30 @@ app->helper(
 );
 
 app->helper(
+    is_connection_state => sub
+    {
+        my ($self, $const_id) = @_;
+        my $c = $clients->{$const_id};
+        if (defined $c)
+        {
+            if ($c->is_finished)
+            {
+                return 1;
+            }
+            else
+            {
+                return 2;
+            }
+        }
+        else
+        {
+            # そもそもない
+            return 0;
+        }
+    },
+);
+
+app->helper(
     get_connection => sub
     {
         my ($self, $json) = @_;
@@ -845,10 +873,20 @@ app->helper(
 
         for my $id (@ids)
         {
-            my $c = $self->get_connection({ const_id => $id });
-            if (defined $c)
+            my $state = $self->is_connection_state($id);
+
+            if ($state == 0 || $state == 1)
             {
-                $c->send({ json => $data });
+                $not_delivered->{$id} ||= Mojo::Collection->new;
+                push(@{$not_delivered->{$id}}, $data);
+            }
+            elsif ($state == 2)
+            {
+                my $c = $self->get_connection({ const_id => $id });
+                if (defined $c)
+                {
+                    $c->send({ json => $data });
+                }
             }
         }
     },
@@ -1010,12 +1048,26 @@ websocket '/channel' => sub {
     $c->on(json => sub {
         my ($c, $json) = @_;
 
-        given ($json->{method}) {
+        given ($json->{method})
+        {
             when (/^ping$/)
             {
                 my $const_id = $json->{const_id};
                 $clients->{$const_id} = $tx;
                 app->unicast_ping($const_id);
+
+                # 一旦、未配送のデータを一気に送る
+                if (exists $not_delivered->{$const_id})
+                {
+                    my $delivery = $not_delivered->{$const_id};
+                    if ($delivery->size != 0)
+                    {
+                        while (my $data = shift(@$delivery))
+                        {
+                            app->unicast_send($data, $const_id);
+                        }
+                    }
+                }
             }
             when (/^command$/)
             {

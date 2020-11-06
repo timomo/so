@@ -1131,7 +1131,7 @@ sub display_monster_battle
 		binmode => ':encoding(utf8)'
 	);
 
-	print $out;
+	print Encode::encode_utf8($out);
 
 	&footer;
 }

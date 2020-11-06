@@ -1,0 +1,8 @@
+<b>宿屋：<%= $t_inn %></b>
+<hr size="0">
+ゆっくり休んでHP、LPを完全に回復しました。<p>
+<%== $get_msg %>
+<p>
+		<script>
+const spot = "<%= $spot %>";
+</script>

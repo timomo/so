@@ -1,0 +1,48 @@
+<b><%= $kname %> の貸し金庫</b>
+<hr size=0>
+<%== $buy_msg %><B><span COLOR="#FF9933"><%== $error %></span></B>
+<form action="<%= $script %>" method="post">
+
+% if($kitem >= $max_item) {
+アイテムはこれ以上所持できません。<BR><BR>
+% } else {
+持ち出したいアイテムをチェックしてください。<BR><BR>
+% }
+
+<B>預かりアイテム数</B> <%= $kpitem %> (手数料は価値の <b><%= $space_price %></b> %) &nbsp; <B>所持アイテム数</B> <%= $kitem %> / <%= $max_item %><BR>
+<BR>
+
+<div class="blackboard question">
+
+<table border=0>
+<tr>
+<th></th><th>種別</th><th>名前</th><th>効果</th><th>価値</th><th>使用</th><th>装備条件</th><th>属性</th><th>耐久</th><th>品質</th><th>作成者</th><th>所持数</th>
+</tr>
+
+%== join("\n", @$item_list);
+
+</table>
+
+</div>
+
+<p>
+<input type=hidden name=id   value="<%= $kid %>" />
+<input type=hidden name=area value="<%= $karea %>" />
+<input type=hidden name=mode value="bank_out" />
+
+% if ($kitem < $max_item) {
+個数
+<select name="item">
+%== join("\n", @$item_count);
+</select>
+ 個 <input type="submit" value="貸し金庫より取り出す" />
+
+% }
+
+<br>
+※ここでの処理には手数料はかかりません。
+</form>
+<p>
+<script>
+const spot = "<%= $spot %>";
+</script>

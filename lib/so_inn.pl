@@ -4,12 +4,12 @@ use utf8;
 #--------#
 sub yado
 {
-	@inn_array = &load_ini($town_inn[$in{'area'}]);
+	my @inn_array = &load_ini($town_inn[$in{'area'}]);
 
 	if($kspot != 0 || $kpst != 0) { &error("不正なパラメータです。"); }
 
 	#割引率の設定
-	$cut = 1 - $kn_6 / 200;
+	my $cut = 1 - $kn_6 / 200;
 
 	&town_load;
 
@@ -18,28 +18,13 @@ sub yado
 
 	&header;
 
-	print <<"EOM";
-<b>宿屋：$t_inn</b>
-<hr size=0>
-$get_msg<br>
-<B><FONT COLOR="#FF9933">$error</FONT></B>
-<form action="$script" method="post">
-<B>所持金</B> $kgold G<BR>
-<BR>
-
-<div class="blackboard question">
-
-<table border=0>
-<tr>
-<th></th><th>部屋名</th><th>料理</th><th>効果</th><th>価格</th>
-EOM
-	$error = "";
+	my @rooms;
 
 	foreach(@inn_array){
-		($yno,$yname,$yfood,$yatc,$ydef,$yspd,$yrsk,$ygold) = split(/<>/);
+		my ($yno,$yname,$yfood,$yatc,$ydef,$yspd,$yrsk,$ygold) = split(/<>/);
 		$ygold = int($ygold * $cut);
 		# アイテム種別により処理変更
-		$ybuf = "";
+		my $ybuf = "";
 		if ($yatc != 0) {
 			$ybuf .= "攻撃：$yatc % ";
 		}
@@ -55,34 +40,32 @@ EOM
 		if ($yatc == 0 && $ydef == 0 && $yspd == 0 && $yrsk == 0){
 			$ybuf = "効果無し";
 		}
-		$select = "";
+		my $select = "";
 		if($yno == 0){
 			$select = "checked";
 		}
 
-		print "<tr>\n";
-		print "<td><input type=radio name=inn_no value=\"$yno\" $select></td><td>$yname</td><td>$yfood</td><td align=center>$ybuf</td><td align=center>$ygold</td>\n";
-		print "</tr>\n";
+		my $room = "<tr><td><input type=radio name=inn_no value=\"$yno\" $select></td><td>$yname</td><td>$yfood</td><td align=center>$ybuf</td><td align=center>$ygold</td></tr>";
+
+		push(@rooms, $room);
 	}
 
-	print <<"EOM";
-</tr>
-</table>
+	my $html = $controller->render_to_string(
+		template      => "yado",
+		t_inn => $t_inn,
+		get_msg => $get_msg,
+		error => $error,
+		script => $script,
+		kgold => $kgold,
+		rooms => \@rooms,
+		kid => $kid,
+		karea => $karea,
+		spot => $spot,
+	);
 
-</div>
+	print Encode::encode_utf8($html);
 
-<p>
-<input type=hidden name=id   value=$in{'id'}>
-<input type=hidden name=pass value=$in{'pass'}>
-<input type=hidden name=area value=$in{'area'}>
-<input type=hidden name=mode value=yado_in>
-<input type=submit value="宿泊する">
-</form>
-<p>
-	<script>
-const spot = "$spot";
-</script>
-EOM
+	$error = "";
 
 	&footer;
 	&save_dat_append;
@@ -175,17 +158,14 @@ sub yado_in
 
 	&town_load;
 
-	print <<"EOM";
+	my $html = $controller->render_to_string(
+		template      => "yado_in",
+		t_inn => $t_inn,
+		get_msg => $get_msg,
+		spot => $spot,
+	);
 
-<b>宿屋：$t_inn</b>
-<hr size=0>
-ゆっくり休んでHP、LPを完全に回復しました。<p>
-$get_msg
-<p>
-		<script>
-const spot = "$spot";
-</script>
-EOM
+	print Encode::encode_utf8($html);
 
 	&footer;
 	&save_dat_append;

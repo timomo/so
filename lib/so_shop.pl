@@ -4,13 +4,12 @@ use utf8;
 #----------------#
 sub item_shop
 {
-
-	@shop_array = &load_ini($town_shop[$in{'area'}]);
+	my @shop_array = &load_ini($town_shop[$in{'area'}]);
 
 	if($kspot != 0 || $kpst != 0) { &error("不正なパラメータです"); }
 
 	#割引率の設定
-	$cut = 1 - $kn_6 / 200;
+	my $cut = 1 - $kn_6 / 200;
 
 	&town_load;
 
@@ -21,130 +20,141 @@ sub item_shop
 
 	&header;
 
-	print <<"EOM";
-<b>市場：$t_shop</b>
-<hr size=0>
-$get_msg<br>
-$buy_msg<B><FONT COLOR="#FF9933">$error</FONT></B>
-<form action="$script" method="post">
-EOM
-	$buy_msg = "";$error = "";
-	if($kitem >= $max_item) { 
-		print <<"EOM";
-アイテムはこれ以上所持できません。<BR><BR>
-EOM
-	}
-	print <<"EOM";
-<B>所持金</B> $kgold G &nbsp; <B>所持アイテム数</B> $kitem / $max_item &nbsp; <a href=so_item.cgi?id=$kid&pass=$kpass  target="new">アイテム一覧</a>
-<BR>
-<BR>
+	my $i = 0;
 
-<div class="blackboard question">
+	my @item_array = &load_ini($item_file);
+	my @item_list;
+	my @item_count;
 
-<table border=0>
-<tr>
-<th></th><th>種別</th><th>名前</th><th>効果</th><th>価値</th><th>使用</th><th>装備条件</th><th>属性</th><th>耐久</th><th>品質</th><th>作成者</th>
-EOM
-	$i=0;
+	foreach(@shop_array)
+	{
+		my $hit = 0;
 
-	@item_array = &load_ini($item_file);
+		my ($ino, $iname, $idmg, $igold, $imode, $iuelm, $ieelm, $ihand, $idef, $ireq, $iqlt, $imake, $irest);
 
-	foreach(@shop_array){
-		$hit=0;
-		foreach(@item_array){
-			($ino,$iname,$idmg,$igold,$imode,$iuelm,$ieelm,$ihand,$idef,$ireq,$iqlt,$imake,$irest) = split(/<>/);
-			$shopitem = "$ino$iqlt$imake";
-			if($shop_array[$i] == $shopitem) { $hit=1;last; }
+		foreach(@item_array)
+		{
+			($ino, $iname, $idmg, $igold, $imode, $iuelm, $ieelm, $ihand, $idef, $ireq, $iqlt, $imake, $irest) = split(/<>/);
+			my $shopitem = "$ino$iqlt$imake";
+
+			if($shop_array[$i] == $shopitem)
+			{
+				$hit=1;
+				last;
+			}
 		}
-		if(!$hit) { &error("アイテムが存在しません。"); }
+		if($hit == 0) { &error("アイテムが存在しません。"); }
 		$i++;
 
 		$igold = int($igold * $cut);
 		&check_limit;
-		if ($imode == 01) {
+		if ($imode == 01)
+		{
 			$idmg = "<font color=$efcolor[2]>HP回復：$idmg</font>";
 			$ireq = "&nbsp;";
-		} elsif ($imode == 02) {
+		}
+		elsif ($imode == 02)
+		{
 			$idmg = "<font color=$efcolor[2]>LP回復：$idmg</font>";
 			$ireq = "&nbsp;";
-		} elsif ($imode == 03) {
+		}
+		elsif ($imode == 03)
+		{
 			$idmg = "移動する";
 			$ireq = "&nbsp;";
-		} elsif ($imode == 04) {
+		}
+		elsif ($imode == 04)
+		{
 			$idmg = "<font color=$efcolor[2]>$chara_skill[$idmg]</font>";
 			$ireq = "&nbsp;";
-		} elsif ($imode == 05) {
+		}
+		elsif ($imode == 05)
+		{
 			$idmg = "素材";
 			$ireq = "&nbsp;";
-		} elsif ($imode == 07) {
+		}
+		elsif ($imode == 07)
+		{
 			$idmg = "<font color=$efcolor[2]>治療：$idmg</font>";
 			$ireq = "&nbsp;";
-		} elsif (10 <= $imode && $imode < 20) {
+		}
+		elsif (10 <= $imode && $imode < 20)
+		{
 			$idmg = "<font color=$efcolor[0]>攻撃：$idmg</font>";
 			$ireq = "<font color=$reqcolor>$item_uelm[$iuelm]：$ireq</font>";
-		} elsif (20 <= $imode && $imode < 30) {
+		}
+		elsif (20 <= $imode && $imode < 30)
+		{
 			$idmg = "<font color=$efcolor[0]>攻撃：$idmg</font>";
 			$ireq = "<font color=$reqcolor>$item_uelm[$iuelm]：$ireq</font>";
-		} elsif (30 <= $imode && $imode < 40) {
+		}
+		elsif (30 <= $imode && $imode < 40)
+		{
 			$idmg = "<font color=$efcolor[1]>防御：$idmg</font>";
 			$ireq = "<font color=$reqcolor>力：$ireq</font>";
-		} elsif (40 <= $imode && $imode < 50) {
+		}
+		elsif (40 <= $imode && $imode < 50)
+		{
 			$idmg = "<font color=$efcolor[1]>防御：$idmg</font>";
 			$ireq = "<font color=$reqcolor>力：$ireq</font>";
-		} elsif (50 <= $imode && $imode < 60) {
+		}
+		elsif (50 <= $imode && $imode < 60)
+		{
 			$idmg = "<font color=$efcolor[1]>回避：$idmg</font>";
 			$ireq = "<font color=$reqcolor>力：$ireq</font>";
-		} elsif (60 <= $imode && $imode < 70) {
+		}
+		elsif (60 <= $imode && $imode < 70)
+		{
 			$idmg = "<font color=$efcolor[2]>補助：$idmg</font>";
 			$ireq = "<font color=$reqcolor>$item_uelm[$iuelm]：$ireq</font>";
-		} elsif (70 <= $imode && $imode < 80) {
+		}
+		elsif (70 <= $imode && $imode < 80)
+		{
 			$idmg = "<font color=$efcolor[0]>攻撃：$idmg</font>";
 			$ireq = "<font color=$reqcolor>$item_uelm[$iuelm]：$ireq</font>";
-		} else {
+		}
+		else
+		{
 			$idmg = "&nbsp";
 			$ireq = "&nbsp;";
 		}
-		print "<tr>\n";
-		print "<td><input type=radio name=item_no value=\"$ino$iqlt$imake\"></td><td align=center>$item_mode[$imode]</td><td>$iname</td><td align=center>$idmg</td><td align=center>$igold G</td><td align=center>$item_hand[$ihand]</td><td align=center>$ireq</td><td align=center><font color=$elmcolor[$ieelm]>$item_eelm[$ieelm]</font></td><td align=center>$item_def[$idef]</td><td align=center>$item_qlt[$iqlt]</td><td align=center>$imake</td>\n";
-		print "</tr>\n";
+
+		my $mes = "<tr><td><input type=radio name=item_no value=\"$ino$iqlt$imake\"></td><td align=center>$item_mode[$imode]</td><td>$iname</td><td align=center>$idmg</td><td align=center>$igold G</td><td align=center>$item_hand[$ihand]</td><td align=center>$ireq</td><td align=center><font color=$elmcolor[$ieelm]>$item_eelm[$ieelm]</font></td><td align=center>$item_def[$idef]</td><td align=center>$item_qlt[$iqlt]</td><td align=center>$imake</td></tr>";
+
+		push(@item_list, $mes);
 	}
 
-	print <<"EOM";
-</tr>
-</table>
-
-</div>
-
-<p>
-<input type=hidden name=id   value=$in{'id'}>
-<input type=hidden name=pass value=$in{'pass'}>
-<input type=hidden name=area value=$in{'area'}>
-<input type=hidden name=mode value=item_buy>
-EOM
-	if($kitem < $max_item) { 
-	print <<"EOM";
-<select name="item">
-EOM
-	$i=1;
-	foreach(1..$max_itemcnt){
-		print "<option value=\"$i\">$i\n";
-		$i++;
+	if($kitem < $max_item) {
+		$i = 1;
+		foreach (1 .. $max_itemcnt) {
+			push(@item_count, "<option value=\"$i\">$i</option>");
+			$i++;
+		}
 	}
-		print <<"EOM";
-</select>
- 個 <input type=submit value="アイテムを買う">
-EOM
-	}
-	print <<"EOM";
-</form>
-<p>
-		<script>
-const spot = "$spot";
-</script>
-EOM
+
+	my $html = $controller->render_to_string(
+		template   => "item_shop",
+		t_shop     => $t_shop,
+		get_msg    => $get_msg || "",
+		buy_msg    => $buy_msg || "",
+		error      => $error || "",
+		script     => $script,
+		kitem      => $kitem,
+		max_item   => $max_item,
+		kgold      => $kgold,
+		spot       => $spot,
+		kid        => $kid,
+		karea      => $karea,
+		item_count => \@item_count,
+		item_list  => \@item_list,
+	);
+
+	print Encode::encode_utf8($html);
 
 	&footer;
 	&save_dat_append;
+
+	$buy_msg = "";$error = "";
 
 	exit;
 }
@@ -152,21 +162,10 @@ EOM
 #----------------#
 #  自由市場表示  #
 #----------------#
-sub user_shop {
-
-	@item_array = &load_ini($user_shop[$in{'area'}]);
-	@item_chara = &load_ini($chara_file);
-
-	$hit=0;
-	foreach(@item_chara){
-		($kid,$kpass,$kname,$ksex,$kchara,$kn_0,$kn_1,$kn_2,$kn_3,$kn_4,$kn_5,$kn_6,$khp,$kmaxhp,$kex,$klv,$kap,$kgold,$klp,$ktotal,$kkati,$khost,$kdate,$karea,$kspot,$kpst,$kitem) = split(/<>/);
-		if($in{'id'} eq "$kid" and $in{'pass'} eq "$kpass") {
-			$hit=1;
-			last;
-		}
-	}
-
-	if(!$hit) { &error("入力されたIDは登録されていません。又はパスワードが違います。"); }
+sub user_shop
+{
+	my @item_array = &load_ini($user_shop[$in{'area'}]);
+	my @item_chara = &load_ini($chara_file);
 
 	if($kspot != 0 || $kpst != 0) { &error("不正なパラメータです"); }
 
@@ -174,32 +173,12 @@ sub user_shop {
 
 	&header;
 
-	print <<"EOM";
-<b>市場：チュパフリマ $town_name[$karea]</b>
-<hr size=0>
-$buy_msg<B><FONT COLOR="#FF9933">$error</FONT></B>
-<form action="$script" method="post">
-EOM
-	$buy_msg = "";$error = "";
-	if($kitem >= $max_item) { 
-		print <<"EOM";
-アイテムはこれ以上所持できません。<BR><BR>
-EOM
-	}
-	print <<"EOM";
-<B>所持金</B> $kgold G &nbsp; <B>所持アイテム数</B> $kitem / $max_item &nbsp; <a href=so_item.cgi?id=$kid&pass=$kpass  target="new">アイテム一覧</a>
-<BR>
-<BR>
+	my @item_list;
+	my @item_count;
 
-<div class="blackboard question">
-
-<table border=0>
-<tr>
-<th></th><th>販売者</th><th>種別</th><th>名前</th><th>効果</th><th>価値</th><th>使用</th><th>装備条件</th><th>属性</th><th>耐久</th><th>品質</th><th>作成者</th><th>在庫</th>
-EOM
-
-	foreach(@item_array){
-		($ino,$iname,$idmg,$igold,$imode,$iuelm,$ieelm,$ihand,$idef,$ireq,$iqlt,$imake,$irest,$iid) = split(/<>/);
+	foreach(@item_array)
+	{
+		my ($ino,$iname,$idmg,$igold,$imode,$iuelm,$ieelm,$ihand,$idef,$ireq,$iqlt,$imake,$irest,$iid) = split(/<>/);
 		# アイテム種別により処理変更
 		&check_limit;
 		if ($imode == 01) {
@@ -245,7 +224,8 @@ EOM
 			$idmg = "&nbsp";
 			$ireq = "&nbsp;";
 		}
-	
+		my ($bid,$bpass,$bname);
+
 		foreach(@item_chara){
 			($bid,$bpass,$bname) = split(/<>/);
 			if($iid eq "$bid") { last; }
@@ -253,44 +233,37 @@ EOM
 
 		if($iid eq "$kid"){ $igold = 0; }
 
-		print "<tr>\n";
-		print "<td><input type=radio name=item_no value=\"$ino$iqlt$imake$iid\"></td><td>$bname</td><td align=center>$item_mode[$imode]</td><td>$iname</td><td align=center>$idmg</td><td align=center>$igold G</td><td align=center>$item_hand[$ihand]</td><td align=center>$ireq</td><td align=center><font color=$elmcolor[$ieelm]>$item_eelm[$ieelm]</font></td><td align=center>$item_def[$idef]</td><td align=center>$item_qlt[$iqlt]</td><td align=center>$imake</td><td align=center>$irest 個</td>\n";
-		print "</tr>\n";
+		my $mes = "<tr><td><input type=radio name=item_no value=\"$ino$iqlt$imake$iid\"></td><td>$bname</td><td align=center>$item_mode[$imode]</td><td>$iname</td><td align=center>$idmg</td><td align=center>$igold G</td><td align=center>$item_hand[$ihand]</td><td align=center>$ireq</td><td align=center><font color=$elmcolor[$ieelm]>$item_eelm[$ieelm]</font></td><td align=center>$item_def[$idef]</td><td align=center>$item_qlt[$iqlt]</td><td align=center>$imake</td><td align=center>$irest 個</td></tr>";
+
+		push(@item_list, $mes);
 	}
 
-	print <<"EOM";
-</tr>
-</table>
-
-</div>
-
-<p>
-<input type=hidden name=id   value=$in{'id'}>
-<input type=hidden name=pass value=$in{'pass'}>
-<input type=hidden name=area value=$in{'area'}>
-<input type=hidden name=mode value=user_buy>
-EOM
-	if($kitem < $max_item) { 
-	print <<"EOM";
-<select name="item">
-EOM
-	$i=1;
-	foreach(1..$max_itemcnt){
-		print "<option value=\"$i\">$i\n";
-		$i++;
+	if($kitem < $max_item) {
+		$i = 1;
+		foreach (1 .. $max_itemcnt) {
+			push(@item_count, "<option value=\"$i\">$i</option>");
+			$i++;
+		}
 	}
-		print <<"EOM";
-</select>
- 個 <input type=submit value="アイテムを買う">
-EOM
-	}
-	print <<"EOM";
-</form>
-<p>
-		<script>
-const spot = "$spot";
-</script>
-EOM
+
+	my $html = $controller->render_to_string(
+		template   => "user_shop",
+		script     => $script,
+		town_name  => \@town_name,
+		karea      => $karea,
+		buy_msg    => $buy_msg || "",
+		error      => $error || "",
+		kitem      => $kitem,
+		max_item   => $max_item,
+		kgold      => $kgold,
+		kid        => $kid,
+		karea      => $karea,
+		item_list  => \@item_list,
+		item_count => \@item_count,
+		spot       => $spot,
+	);
+
+	print Encode::encode_utf8($html);
 
 	&footer;
 	&save_dat_append;
@@ -303,58 +276,27 @@ EOM
 #------------#
 sub bank
 {
-	@bank_item = &load_ini($bank_path. $in{'id'});
-	@item_chara = &load_ini($chara_file);
-
-	$hit=0;
-	foreach(@item_chara){
-		($kid,$kpass,$kname,$ksex,$kchara,$kn_0,$kn_1,$kn_2,$kn_3,$kn_4,$kn_5,$kn_6,$khp,$kmaxhp,$kex,$klv,$kap,$kgold,$klp,$ktotal,$kkati,$khost,$kdate,$karea,$kspot,$kpst,$kitem) = split(/<>/);
-		if($in{'id'} eq "$kid" and $in{'pass'} eq "$kpass") {
-			$hit=1;
-			last;
-		}
-	}
-
-	if(!$hit) { &error("入力されたIDは登録されていません。又はパスワードが違います。"); }
+	my @bank_item = &load_ini($bank_path. $in{'id'});
+	my @item_chara = &load_ini($chara_file);
+	my $hit=0;
 
 	$rid = $kid;
 	&read_bank;
-	$space_price = int($kpitem / 5) + 1;
+	my $space_price = int($kpitem / 5) + 1;
 
 	#割増率の設定
-	$plus = 1 + $kn_6 / 200;
+	my $plus = 1 + $kn_6 / 200;
 
 	&header;
 
-	print <<"EOM";
-<b>$kname の貸し金庫</b>
-<hr size=0>
-$buy_msg<B><FONT COLOR="#FF9933">$error</FONT></B>
-<form action="$script" method="post">
-EOM
-	$buy_msg = "";$error = "";
-	if($kitem >= $max_item) { 
-		print <<"EOM";
-アイテムはこれ以上所持できません。<BR><BR>
-EOM
-	} else {
-		print <<"EOM";
-持ち出したいアイテムをチェックしてください。<BR><BR>
-EOM
-	}
-	print <<"EOM";
-<B>預かりアイテム数</B> $kpitem (手数料は価値の <b>$space_price</b> %) &nbsp; <B>所持アイテム数</B> $kitem / $max_item &nbsp; <a href=so_item.cgi?id=$kid&pass=$kpass  target="new">アイテム一覧</a><BR>
-<BR>
+	$error = "";
 
-<div class="blackboard question">
+	my @item_list;
+	my @item_count;
 
-<table border=0>
-<tr>
-<th></th><th>種別</th><th>名前</th><th>効果</th><th>価値</th><th>使用</th><th>装備条件</th><th>属性</th><th>耐久</th><th>品質</th><th>作成者</th><th>所持数</th>
-EOM
-	$msg = "";$error = "";
-	foreach(@bank_item){
-		($iid,$ino,$iname,$idmg,$igold,$imode,$iuelm,$ieelm,$ihand,$idef,$ireq,$iqlt,$imake,$irest) = split(/<>/);
+	foreach(@bank_item)
+	{
+		my ($iid,$ino,$iname,$idmg,$igold,$imode,$iuelm,$ieelm,$ihand,$idef,$ireq,$iqlt,$imake,$irest) = split(/<>/);
 		$igold = int($igold * $plus / 2);
 		&check_limit;
 		# アイテム種別により処理変更
@@ -401,48 +343,38 @@ EOM
 			$idmg = "&nbsp";
 			$ireq = "&nbsp;";
 		}
-		print "<tr>\n";
-		print "<td><input type=radio name=item_no value=\"$iid\"></td><td align=center>$item_mode[$imode]</td><td>$iname</td><td align=center>$idmg</td><td align=center>$igold G</td><td align=center>$item_hand[$ihand]</td><td align=center>$ireq</td><td align=center><font color=$elmcolor[$ieelm]>$item_eelm[$ieelm]</font></td><td align=center>$item_def[$idef]</td><td align=center>$item_qlt[$iqlt]</td><td align=center>$imake</td><td align=center>$irest 個</td>\n";
-		print "</tr>\n";
+		my $mes = "<tr><td><input type=radio name=item_no value=\"$iid\"></td><td align=center>$item_mode[$imode]</td><td>$iname</td><td align=center>$idmg</td><td align=center>$igold G</td><td align=center>$item_hand[$ihand]</td><td align=center>$ireq</td><td align=center><font color=$elmcolor[$ieelm]>$item_eelm[$ieelm]</font></td><td align=center>$item_def[$idef]</td><td align=center>$item_qlt[$iqlt]</td><td align=center>$imake</td><td align=center>$irest 個</td></tr>";
+		push(@item_list, $mes);
 	}
 
-	print <<"EOM";
-</tr>
-</table>
-
-</div>
-
-<p>
-<input type=hidden name=id   value=$in{'id'}>
-<input type=hidden name=pass value=$in{'pass'}>
-<input type=hidden name=area value=$in{'area'}>
-<input type=hidden name=mode value=bank_out>
-EOM
-	if($kitem < $max_item) { 
-	print <<"EOM";
-個数
-<select name="item">
-EOM
-	$i=1;
-	foreach(1..$max_itemcnt){
-		print "<option value=\"$i\">$i\n";
-		$i++;
+	if($kitem < $max_item) {
+		$i = 1;
+		foreach (1 .. $max_itemcnt) {
+			push(@item_count, "<option value=\"$i\">$i</option>");
+			$i++;
+		}
 	}
-		print <<"EOM";
-</select>
- 個 
-<input type=submit value="貸し金庫より取り出す">
-EOM
-	}
-	print <<"EOM";
-<br>
-※ここでの処理には手数料はかかりません。
-</form>
-<p>
-		<script>
-const spot = "$spot";
-</script>
-EOM
+
+	my $html = $controller->render_to_string(
+		template    => "bank",
+		kname       => $kname,
+		buy_msg     => $buy_msg || "",
+		error       => $error || "",
+		script      => $script,
+		kitem       => $kitem,
+		max_item    => $max_item,
+		kpitem      => $kpitem,
+		space_price => $space_price,
+		kid         => $kid,
+		karea       => $karea,
+		spot        => $spot,
+		item_list   => \@item_list,
+		item_count  => \@item_count,
+	);
+
+	print Encode::encode_utf8($html);
+
+	$buy_msg = ""; $error = "";
 
 	&footer;
 	&save_dat_append;
@@ -453,36 +385,35 @@ EOM
 #----------------#
 #  ショップ購入  #
 #----------------#
-sub item_buy {
-	$item_id = $in{'id'};
-	$item_pass = $in{'pass'};
-	$item_area = $in{'area'};
-	$item_cnt = $in{'item'};
-	if($in{'item_no'} eq ""){
+sub item_buy
+{
+	my $item_id = $in{'id'};
+	my $item_area = $in{'area'};
+	my $item_cnt = $in{'item'};
+
+	if ($in{'item_no'} eq "")
+	{
 		$error = "アイテムを選んでください。";
 		&item_shop;
 	}
 
-	@item_array = &load_ini($item_file);
-	$hit=0;
+	my @item_array = &load_ini($item_file);
+	my $hit = 0;
+	my $item_no_id = Encode::encode_utf8($in{'item_no'});
+	my ($i_no,$i_name,$i_dmg,$i_gold,$i_mode,$i_uelm,$i_eelm,$i_hand,$i_def,$i_req,$i_qlt,$i_make,$i_rest);
 
-	my $item_no_id = Encode::decode_utf8($in{'item_no'});
-
-	foreach(@item_array){
+	foreach(@item_array)
+	{
 		($i_no,$i_name,$i_dmg,$i_gold,$i_mode,$i_uelm,$i_eelm,$i_hand,$i_def,$i_req,$i_qlt,$i_make,$i_rest) = split(/<>/);
-		if($item_no_id eq "$i_no$i_qlt$i_make") { $hit=1;last; }
+		my $tmp = Encode::encode_utf8("$i_no$i_qlt$i_make");
+		if($item_no_id eq $tmp) { $hit=1;last; }
 	}
 
-	if(!$hit) { &error("アイテムが存在しません。"); }
+	if ($hit == 0) { &error("アイテムが存在しません。"); }
 
 	&get_host;
 
-	$date = time();
-
-	# ファイルロック
-	if ($lockkey == 1) { &lock1; }
-	elsif ($lockkey == 2) { &lock2; }
-	elsif ($lockkey == 3) { &file'lock; }
+	my $date = time();
 
 	@item_chara = &load_ini($chara_file);
 	@item_array = &load_ini($town_shop[$item_area]);
@@ -492,7 +423,7 @@ sub item_buy {
 	$hit=0;@item_new=();
 	foreach(@item_chara){
 		($iid,$ipass,$iname,$isex,$ichara,$in_0,$in_1,$in_2,$in_3,$in_4,$in_5,$in_6,$ihp,$imaxhp,$iex,$ilv,$iap,$igold,$ilp,$itotal,$ikati,$ihost,$idate,$iarea,$ispot,$ipst,$iitem) = split(/<>/);
-		if($iid eq "$item_id" && $ipass eq "$item_pass" ) {
+		if($iid eq "$item_id") {
 			if($iitem eq $max_item) {
 				$error = "所持アイテムが多すぎます。";
 				&item_shop;
@@ -537,10 +468,6 @@ sub item_buy {
 	$get_area=$item_area;$get_id="02";$get_cnt="1";
 	&get_msg;
 
-	# ロック解除
-	if ($lockkey == 3) { &file'unlock; }
-	else { if(-e $lockfile) { unlink($lockfile); } }
-
 	$buy_msg = "$buy_nameを$item_cnt 個$buy_gold Gで買いました。";
 
 	&item_shop;
@@ -549,45 +476,49 @@ sub item_buy {
 #----------------#
 #  自由市場購入  #
 #----------------#
-sub user_buy {
-	$item_id = $in{'id'};
-	$item_pass = $in{'pass'};
-	$item_area = $in{'area'};
-	$item_cnt = $in{'item'};
-	if($in{'item_no'} eq ""){
+sub user_buy
+{
+	my $item_id = $in{'id'};
+	my $item_area = $in{'area'};
+	my $item_cnt = $in{'item'};
+
+	if($in{'item_no'} eq "")
+	{
 		$error = "アイテムを選んでください。";
 		&user_shop;
 	}
 
-	@item_array = &load_ini($user_shop[$item_area]);
+	my @item_array = &load_ini($user_shop[$item_area]);
 
-	my $item_no_id = Encode::decode_utf8($in{'item_no'});
+	my $item_no_id = Encode::encode_utf8($in{'item_no'});
 
-	$hit=0;
+	my ($i_no,$i_name,$i_dmg,$i_gold,$i_mode,$i_uelm,$i_eelm,$i_hand,$i_def,$i_req,$i_qlt,$i_make,$i_rest,$i_id);
+	my $hit = 0;
+
 	foreach(@item_array){
 		($i_no,$i_name,$i_dmg,$i_gold,$i_mode,$i_uelm,$i_eelm,$i_hand,$i_def,$i_req,$i_qlt,$i_make,$i_rest,$i_id) = split(/<>/);
-		if($item_no_id eq "$i_no$i_qlt$i_make$i_id") { $hit=1;last; }
+		my $tmp = Encode::encode_utf8("$i_no$i_qlt$i_make$i_id");
+		if($item_no_id eq $tmp) { $hit=1;last; }
 	}
-	if(!$hit) { &error("アイテムが存在しません。"); }
+	if($hit == 0) { &error("アイテムが存在しません。"); }
 
 	&get_host;
 
-	$date = time();
+	my $date = time();
 
-	# ファイルロック
-	if ($lockkey == 1) { &lock1; }
-	elsif ($lockkey == 2) { &lock2; }
-	elsif ($lockkey == 3) { &file'lock; }
+	my @item_chara = &load_ini($chara_file);
 
-	@item_chara = &load_ini($chara_file);
+	my $buy_gold = 0;
+	my $buy_name = "";
+	my $rtn_flag = 0;
+	$hit = 0;
+	my @item_new=();
+	my @buy_item = ();
 
-	$buy_gold = 0;
-	$buy_name = "";
-	$rtn_flag = 0;
-	$hit=0;@item_new=();
-	foreach(@item_chara){
-		($iid,$ipass,$iname,$isex,$ichara,$in_0,$in_1,$in_2,$in_3,$in_4,$in_5,$in_6,$ihp,$imaxhp,$iex,$ilv,$iap,$igold,$ilp,$itotal,$ikati,$ihost,$idate,$iarea,$ispot,$ipst,$iitem) = split(/<>/);
-		if($iid eq "$item_id" && $ipass eq "$item_pass" ) {
+	foreach(@item_chara)
+	{
+		my ($iid,$ipass,$iname,$isex,$ichara,$in_0,$in_1,$in_2,$in_3,$in_4,$in_5,$in_6,$ihp,$imaxhp,$iex,$ilv,$iap,$igold,$ilp,$itotal,$ikati,$ihost,$idate,$iarea,$ispot,$ipst,$iitem) = split(/<>/);
+		if($iid eq $item_id) {
 			if($iitem eq $max_item) {
 				$error = "所持アイテムが多すぎます。";
 				&user_shop;
@@ -659,7 +590,7 @@ sub user_buy {
 		}
 	}
 
-	if(!$hit) { &error("キャラクターが見つかりません。"); }
+	if($hit == 0) { &error("キャラクターが見つかりません。"); }
 	if($kspot != 0 || $kpst != 0) { &error("不正なパラメータです"); }
 
 	open(OUT,">$user_shop[$item_area]");
@@ -673,16 +604,12 @@ sub user_buy {
 	print OUT @item_new;
 	close(OUT);
 
-	# ロック解除
-	if ($lockkey == 3) { &file'unlock; }
-	else { if(-e $lockfile) { unlink($lockfile); } }
-
 	$buy_msg = "$buy_gold Gで買いました。";
 	if($rtn_flag == 1){
 		$buy_msg = "引き戻しました。";
 	}
 
-	$buy_msg = "$buy_nameを$item_cnt 個$buy_msg";
+	$buy_msg = "$buy_name を$item_cnt 個$buy_msg";
 
 	&user_shop;
 }

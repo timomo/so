@@ -15,6 +15,7 @@ has data => sub {{}};
 has watch_hook => sub {{}};
 has context => undef;
 has id => undef;
+has log_level => undef;
 
 sub close
 {
@@ -29,6 +30,7 @@ sub open
     my $self = shift;
     my $k = $self->context->character($self->id);
     $self->data($k);
+    $self->log_level($self->context->log->level);
 }
 
 sub state
@@ -300,9 +302,9 @@ sub DESTROY
 {
     my ($self) = @_;
     my $dt = DateTime::HiRes->now(time_zone => "Asia/Tokyo");
-    my $mes = sprintf("[%s] [%s] [%s] %s [%s] DESTROY", $dt->strftime('%Y-%m-%d %H:%M:%S.%5N'), $$, "custom", $self, $self->id || "-");
+    my $mes = sprintf("[%s] [%s] [%s] %s [%s] DESTROY", $dt->strftime('%Y-%m-%d %H:%M:%S.%5N'), $$, "debug", $self, $self->id || "-");
     my $utf8 = Encode::encode_utf8($mes);
-    warn $utf8. "\n";
+    warn $utf8. "\n" if ($self->log_level eq "debug");
 }
 
 1;
