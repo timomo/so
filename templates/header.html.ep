@@ -7,7 +7,7 @@
 	const info = <%== JSON->new->encode($info_array) %>;
 	const const_id = "<%= $const_id %>";
 </script>
-<script src="./js/so_town.js"></script>
+<script src="./js/so_town.js?time=<%== time %>"></script>
 %= include "layouts/stylesheet"
 </head>
 <body>

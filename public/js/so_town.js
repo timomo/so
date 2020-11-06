@@ -259,7 +259,6 @@ function get_message() {
 			);
 			jQuery("#display_messages").append(p);
 		});
-		console.error(data);
 	});
 }
 
