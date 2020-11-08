@@ -98,7 +98,7 @@ get "/neighbors" => sub
 
     for my $append (@$rand)
     {
-        my $c = $self->character($append->{id});
+        my $c = $system->load_chara($append->{id});
 
         if (defined $c)
         {
@@ -126,7 +126,7 @@ app->helper(
         my $self = shift;
         my $id = shift;
 
-        my $k = $self->append_data($id);
+        my $k = $system->load_append($id);
         my @keys = (qw|id エリア スポット 距離|);
         my $query = {};
 
@@ -150,7 +150,7 @@ get "/current" => sub
     my $self = shift;
     my $json = $self->req->json;
     my $id = $json->{id};
-    my $k = $self->character($id);
+    my $k = $system->load_chara($id);
 
     if (! defined $k)
     {
@@ -239,7 +239,7 @@ post "/command" => sub
 get "/character/:id" => sub
 {
     my $self = shift;
-    my $k = $self->character($self->param("id"));
+    my $k = $system->load_chara($self->param("id"));
     return $self->render(json => $k);
 };
 
@@ -385,7 +385,6 @@ app->helper(
         {
             my $result = $self->dbi("main")->model("キャラ")->select(["*"], where => {id => $k->{id}});
             my $row = $result->fetch_hash_one;
-
             my $ref = {};
 
             if (defined $row)
@@ -399,9 +398,12 @@ app->helper(
 
             eval
             {
-                if (defined $row) {
+                if (defined $row)
+                {
                     $self->dbi("main")->model("キャラ")->update($ref, where => {id => $ref->{id}}, mtime => "mtime");
-                } else {
+                }
+                else
+                {
                     $self->dbi("main")->model("キャラ")->insert($ref, ctime => "ctime");
                 }
             };
@@ -413,7 +415,7 @@ app->helper(
 
             $system->save_chara($ref);
 
-            my $append = $self->append_data($ref->{id});
+            my $append = $system->load_append($ref->{id});
 
             if (! defined $append)
             {
@@ -426,14 +428,14 @@ app->helper(
                     $k->{距離},
                     time
                 );
-                $self->save_append($append);
+                $system->save_append($append);
             }
             else
             {
                 $append = $system->load_append($k->{id});
                 if (defined $append)
                 {
-                    $self->save_append($append);
+                    $system->save_append($append);
                 }
             }
         }
@@ -447,32 +449,6 @@ app->helper(
         $file3->spurt(join($new_line, @raw3));
 
         warn "##### saved!!!!";
-    },
-);
-
-app->helper(
-    save_append => sub
-    {
-        my $self = shift;
-        my $ref  = shift;
-        my $result = $self->dbi("main")->model("キャラ追加情報1")->select(["*"], where => {id => $ref->{id}});
-        my $row = $result->fetch_hash_one;
-
-        eval
-        {
-            if (defined $row) {
-                $self->dbi("main")->model("キャラ追加情報1")->update($ref, where => {id => $ref->{id}}, mtime => "mtime");
-            } else {
-                $self->dbi("main")->model("キャラ追加情報1")->insert($ref, ctime => "ctime");
-            }
-        };
-        if ($@)
-        {
-            warn $@;
-            die $self->dump($ref);
-        }
-
-        $system->save_append($ref);
     },
 );
 
@@ -493,38 +469,6 @@ app->helper(
         my $self = shift;
         my $path = File::Spec->catfile($FindBin::Bin, qw|save chara_type.dat|);
         my $ret = $self->load_ini($path, \@keys3);
-        return $ret;
-    },
-);
-
-app->helper(
-    load_append => sub
-    {
-        my $self = shift;
-        my $path = File::Spec->catfile($FindBin::Bin, qw|save append.dat|);
-        my $ret = $self->load_ini($path, \@keys2);
-
-        for my $d (@$ret)
-        {
-            $system->modify_append_data($d);
-        }
-
-        return $ret;
-    },
-);
-
-app->helper(
-    characters => sub
-    {
-        my $self = shift;
-        my $path = File::Spec->catfile($FindBin::Bin, qw|save chara.dat|);
-        my $ret = $self->load_ini($path, \@keys);
-
-        for my $d (@$ret)
-        {
-            $system->modify_chara_data($d);
-        }
-
         return $ret;
     },
 );
@@ -597,7 +541,7 @@ app->helper(
         push(@$character_types, $t);
         push(@$characters, $n);
 
-        $self->save_append($append);
+        $system->save_append($append);
         $self->save;
 
         # $self->save;
@@ -618,12 +562,12 @@ app->helper(
         my $self = shift;
         my $id = shift;
         my $mode = shift;
-        my $tmp = Mojo::Collection->new(@{$self->load_append});
+        my $tmp = Mojo::Collection->new(@{$system->load_appends});
         my $hit = $tmp->first(sub { return $_->{id} eq $id });
 
         if (! defined $hit)
         {
-            my $k = $self->character($id);
+            my $k = $system->load_chara($id);
 
             if (defined $k)
             {
@@ -644,7 +588,7 @@ app->helper(
         if (defined $mode)
         {
             $hit->{最終コマンド} = $mode;
-            $self->save_append($hit);
+            $system->save_append($hit);
         }
 
         return $hit->{最終コマンド};
@@ -657,7 +601,7 @@ app->helper(
         my $self = shift;
         my $command = shift;
         my $id = $command->{id};
-        my $k = $self->character($id);
+        my $k = $system->load_chara($id);
 
         if (! defined $k)
         {
@@ -747,7 +691,7 @@ app->helper(
                 next;
             }
 
-            my $append = $self->append_data($type->{id});
+            my $append = $system->load_append($type->{id});
 
             if (! defined $append || ! exists $append->{id})
             {
@@ -780,7 +724,7 @@ app->helper(
                 $self->command({ const_id => $id, data => $npc_command });
 
                 $append->{最終実行時間} = time();
-                $self->save_append($append);
+                $system->save_append($append);
 
                 {
                     my $time2 = $append->{最終実行時間} - time() + $timer;
@@ -1082,11 +1026,11 @@ app->helper(
         push(@$character_types, @$types);
 
         $appends = Mojo::Collection->new;
-        my $tmp = app->load_append;
+        my $tmp = $system->load_appends;
         push(@$appends, @$tmp);
 
         $characters = Mojo::Collection->new;
-        my $all = app->characters;
+        my $all = $system->characters;
         push(@$characters, @$all);
 
         $messages = Mojo::Collection->new;

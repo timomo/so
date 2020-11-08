@@ -9,7 +9,7 @@
 %== join("\n", @$mesid);
 </select>
 <input type="button" value="送信" id="send_message" /><br>
-<input type="text" name="mes" size="25" />
+<input type="text" name="mes" size="35" autocomplete="off" />
 <div class="text_detail">他のキャラクターへメッセージを送ることができます。</div>
 </form>
 

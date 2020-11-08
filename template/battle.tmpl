@@ -1,7 +1,7 @@
 <a class="btn-first" href="javascript:page(1)"><<最初</a>&nbsp;&nbsp;<a class="btn-back" href="javascript:page(2)"><戻る</a>
 <a class="btn-next" href="javascript:page(3)">次へ></a>&nbsp;&nbsp;<a class="btn-last" href="javascript:page(4)">最後>></a>
 
-<DIV id="sel0">
+<DIV id="sel0" style="display: none;">
 <div class="blackboard question">
 [% FOREACH log IN battle_header %]
 [% log %]
@@ -15,7 +15,7 @@
 
 [% IF is_finished == 1 %]
 
-<DIV id="sel[% battle_date.size %]">
+<DIV id="sel[% battle_date.size %]" style="display: none;">
 <div class="blackboard question">
 [% FOREACH log IN battle_footer %]
 [% log %]

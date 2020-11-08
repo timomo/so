@@ -161,6 +161,24 @@ sub save_raw_ini
     $file->spurt(join($self->context->config->{new_line}, @save));
 }
 
+sub characters
+{
+    my $self = shift;
+    my $result = $self->dbi("main")->model("キャラ")->select(["*"]);
+    my $rows = $result->fetch_hash_all;
+
+    return $rows;
+}
+
+sub load_appends
+{
+    my $self = shift;
+    my $result = $self->dbi("main")->model("キャラ追加情報1")->select(["*"]);
+    my $rows = $result->fetch_hash_all;
+
+    return $rows;
+}
+
 sub load_append
 {
     my $self = shift;
