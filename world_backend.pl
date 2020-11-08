@@ -1097,6 +1097,14 @@ app->helper(
     },
 );
 
+app->helper(
+    range_rand => sub
+    {
+        my ($self) = @_;
+        return $system->range_rand(@_);
+    },
+);
+
 helper events => sub {
     state $events = Mojo::EventEmitter->new
 };
