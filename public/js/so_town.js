@@ -105,8 +105,8 @@ function setup_message()
 		const to = form.find("select[name='mesid']").val();
 		const message = form.find("input[name='mes']").val();
 
-		jQuery.post("./message", { "送付元id": to, "メッセージ": message }, (data) => {
-			// noop
+		jQuery.post("./message", { "送付先id": to, "メッセージ": message }, (data) => {
+			form.find("input[name='mes']").val("");
 		});
 	});
 }

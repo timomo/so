@@ -43,8 +43,7 @@ app->helper(
         my $res;
         eval
         {
-            warn "------------------------->$url";
-            $res = $ua->$method("127.0.0.1:3001$url" => json => $data)->result;
+            $res = $ua->$method($self->config->{url_of_world_server}. $url => json => $data)->result;
         };
         if ($@)
         {
@@ -112,29 +111,24 @@ plugin 'authentication',
     },
 };
 
-get "/message" => sub
+any "/message" => sub
 {
     my $self = shift;
     my $k = $self->current_user;
 
     return $self->reply->not_found unless ($k);
 
-    my $utf8 = $self->backend_request("get", "/message", { id => $k->{id} });
-
-    return $self->render(json => $utf8);
-};
-
-post "/message" => sub
-{
-    my $self = shift;
-    my $k = $self->current_user;
-    my $json = $self->req->body_params->to_hash;
-
-    return $self->reply->not_found unless ($k);
-
-    my $utf8 = $self->backend_request("post", "/message", { id => $k->{id}, %$json });
-
-    return $self->render(json => $utf8);
+    if ($self->req->method eq "GET")
+    {
+        my $utf8 = $self->backend_request("get", "/message", { id => $k->{id} });
+        return $self->render(json => $utf8);
+    }
+    else
+    {
+        my $json = $self->req->body_params->to_hash;
+        my $utf8 = $self->backend_request("post", "/message", { id => $k->{id}, %$json });
+        return $self->render(json => $utf8);
+    }
 };
 
 get "/neighbors" => sub

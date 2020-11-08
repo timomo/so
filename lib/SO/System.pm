@@ -15,6 +15,7 @@ has id => undef;
 has watch_hook => sub {{}};
 has context => undef;
 has log_level => undef;
+has dbis => sub { {} };
 
 sub close
 {
@@ -29,6 +30,38 @@ sub open
     $self->log_level($self->context->log->level);
     # my $k = $self->context->character($self->id);
     # $self->data($k);
+}
+
+sub dbi
+{
+    my $self = shift;
+    my $type = shift;
+
+    if ($type eq "main")
+    {
+        if (defined $self->dbis->{$type})
+        {
+            return $self->dbis->{$type};
+        }
+
+        my $dbFile = File::Spec->catfile($FindBin::Bin, "so.sqlite");
+        my $dbi = DBIx::Custom->connect(
+            "dbi:SQLite:dbname=$dbFile",
+            undef,
+            undef,
+            { sqlite_unicode => 1 }
+        );
+
+        $dbi = $dbi->safety_character("\x{2E80}-\x{2FDF}々〇〻\x{3400}-\x{4DBF}\x{4E00}-\x{9FFF}\x{F900}-\x{FAFF}\x{20000}-\x{2FFFF}ーぁ-んァ-ヶa-zA-Z0-9_");
+        $dbi->create_model("コマンド結果");
+        $dbi->create_model("キャラ");
+        $dbi->create_model("キャラ追加情報1");
+        $dbi->create_model("メッセージ");
+
+        $self->dbis->{$type} = $dbi;
+
+        return $dbi;
+    }
 }
 
 sub debug_trace
@@ -52,6 +85,22 @@ sub debug_trace
     }
 
     warn join("\n", @ret);
+}
+
+sub range_rand
+{
+    my ($self, $min, $max) = @_;
+
+    if ($max < $min) {
+        ($max, $min) = ($min, $max);
+    }
+    elsif ($max == $min) {
+        return int($max);
+    }
+
+    my $rand = $min + int(rand($max - $min)) + 1;
+
+    return $rand;
 }
 
 sub load_raw_ini
@@ -115,48 +164,43 @@ sub save_raw_ini
 sub load_append
 {
     my $self = shift;
-    my $path = $self->context->config->{append_file};
     my $id = shift;
-    my $list = $self->load_ini($path, $self->context->config->{keys2});
-    for my $k (@$list)
-    {
-        if ($k->{id} eq $id) {
-            $self->modify_append_data($k);
-            return $k;
-        }
-    }
-    return undef;
+
+    my $result = $self->dbi("main")->model("キャラ追加情報1")->select(["*"], where => { id => $id });
+    my $row = $result->fetch_hash_one;
+
+    return $row;
 }
 
 sub load_chara
 {
     my $self = shift;
-    my $path = $self->context->config->{chara_file};
     my $id = shift;
-    my $list = $self->load_ini($path, $self->context->config->{keys});
-    for my $k (@$list)
-    {
-        if ($k->{id} eq $id) {
-            $self->modify_chara_data($k);
-            return $k;
-        }
-    }
-    return undef;
+
+    my $result = $self->dbi("main")->model("キャラ")->select(["*"], where => { id => $id });
+    my $row = $result->fetch_hash_one;
+
+    return $row;
+}
+
+sub load_message
+{
+    my ($self, $from) = @_;
+    my $where = "送付元id = :送付元id or 送付先id = :送付先id";
+    my $query = { 送付元id => $from, 送付先id => $from };
+    my $result = $self->dbi("main")->model("メッセージ")->select(["*"], where => [$where, $query], append => "order by 受信日時 desc limit 5");
+    return $result->fetch_hash_all;
 }
 
 sub load_chara_by_name
 {
     my $self = shift;
-    my $path = $self->context->config->{chara_file};
-    my $name = shift;
-    my $list = $self->load_ini($path, $self->context->config->{keys});
-    for my $k (@$list)
-    {
-        if ($k->{名前} eq $name) {
-            return $k;
-        }
-    }
-    return undef;
+    my $id = shift;
+
+    my $result = $self->dbi("main")->model("キャラ")->select(["*"], where => { 名前 => $id });
+    my $row = $result->fetch_hash_one;
+
+    return $row;
 }
 
 sub modify_append_data
@@ -191,7 +235,110 @@ sub modify_chara_data
     }
 }
 
+sub modify_message_data
+{
+    my $self = shift;
+    my $new = shift;
+
+    $new->{送付元名前} ||= $self->load_chara($new->{送付元id})->{名前} || "";
+    $new->{送付先名前} ||= $self->load_chara($new->{送付先id})->{名前} || "";
+    $new->{受信日時} ||= DateTime->now(time_zone => "Asia/Tokyo")->datetime;
+
+    if (! defined $new->{id})
+    {
+        delete $new->{id};
+    }
+}
+
 sub save_chara
+{
+    my $self = shift;
+    my $new = shift;
+    return $self->save_chara_db($new);
+}
+
+sub save_append
+{
+    my $self = shift;
+    my $new = shift;
+    return $self->save_append_db($new);
+}
+
+sub save_message
+{
+    my $self = shift;
+    my $new = shift;
+    return $self->save_message_db($new);
+}
+
+sub save_chara_db
+{
+    my $self = shift;
+    my $new = shift;
+
+    $self->modify_chara_data($new);
+
+    my $result = $self->dbi("main")->model("キャラ")->select(["*"], where => { id => $new->{id} });
+    my $row = $result->fetch_hash_one;
+
+    if (defined $row)
+    {
+        $self->dbi("main")->model("キャラ")->update($new, where => {id => $new->{id}}, mtime => "mtime");
+    }
+    else
+    {
+        $self->dbi("main")->model("キャラ")->insert($new, ctime => "ctime");
+    }
+}
+
+sub save_append_db
+{
+    my $self = shift;
+    my $new = shift;
+
+    $self->modify_append_data($new);
+
+    my $result = $self->dbi("main")->model("キャラ追加情報1")->select(["*"], where => { id => $new->{id} });
+    my $row = $result->fetch_hash_one;
+
+    if (defined $row)
+    {
+        $self->dbi("main")->model("キャラ追加情報1")->update($new, where => {id => $new->{id}}, mtime => "mtime");
+    }
+    else
+    {
+        $self->dbi("main")->model("キャラ追加情報1")->insert($new, ctime => "ctime");
+    }
+}
+
+sub save_message_db
+{
+    my $self = shift;
+    my $new = shift;
+
+    $self->modify_message_data($new);
+
+    my $result;
+    my $row;
+
+    if (defined $new->{id})
+    {
+        $result = $self->dbi("main")->model("メッセージ")->select(["*"], where => { id => $new->{id} });
+        $row = $result->fetch_hash_one;
+    }
+
+    if (defined $row)
+    {
+        $self->dbi("main")->model("メッセージ")->update($new, where => {id => $new->{id}}, mtime => "mtime");
+    }
+    else
+    {
+        $self->dbi("main")->model("メッセージ")->insert($new, ctime => "ctime");
+        return $self->dbi("main")->dbh->sqlite_last_insert_rowid;
+    }
+}
+
+sub save_chara_file
 {
     my $self = shift;
     my $path = $self->context->config->{chara_file};
@@ -223,7 +370,7 @@ sub save_chara
     $self->save_raw_ini($path, $self->context->config->{keys}, $list);
 }
 
-sub save_append
+sub save_append_file
 {
     my $self = shift;
     my $path = $self->context->config->{append_file};

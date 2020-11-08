@@ -65,85 +65,27 @@ $system->open;
 
 app->log->level(app->config->{log_level});
 
-post "/message" => sub
+any "/message" => sub
 {
     my $self = shift;
     my $json = $self->req->json;
-    my $id = $self->send_message(@$json{qw|id 送付元id メッセージ|});
-    return $self->render(json => { result => $id });
-};
 
-get "/message" => sub
-{
-    my $self = shift;
-    my $json = $self->req->json;
-    my $rows = $self->get_message($json->{id});
-    return $self->render(json => { result => $rows });
-};
-
-app->helper(
-    get_message => sub
+    if ($self->req->method eq "POST")
     {
-        my ($self, $from) = @_;
-        my $where = "送付元id = :送付元id or 送付先id = :送付先id";
-        my $query = { 送付元id => $from, 送付先id => $from };
-        my $result = $self->dbi("main")->model("メッセージ")->select(["*"], where => [$where, $query], append => "order by 受信日時 desc limit 5");
-        return $result->fetch_hash_all;
-    },
-);
-
-app->helper(
-    send_message => sub
-    {
-        my ($self, $from, $to, $message) = @_;
-        my $c1 = $self->character($from);
-        my $c2 = $self->character($to);
         my $dat = {};
-
-        @$dat{@{$self->config->{keys4}}} = (
-            undef,
-            $from,
-            $c1->{名前},
-            $to,
-            $c2->{名前},
-            $message,
-            DateTime->now(time_zone => "Asia/Tokyo")->datetime,
-        );
-
-        delete $dat->{id};
-
-        $self->dbi("main")->model("メッセージ")->insert($dat, ctime => "ctime");
-
+        $dat->{送付元id} = $json->{id};
+        $dat->{送付先id} = $json->{送付先id};
+        $dat->{メッセージ} = $json->{メッセージ};
+        my $id = $system->save_message($dat);
         my $mes = { method => "message", data => 1 };
-        $self->unicast_send($mes, $from, $to);
-
-        return $self->dbi("main")->dbh->sqlite_last_insert_rowid;
-    },
-);
-
-app->helper(
-    range_rand => sub {
-        my ($self, $min, $max) = @_;
-
-        if ($max < $min) {
-            ($max, $min) = ($min, $max);
-        }
-        elsif ($max == $min) {
-            return int($max);
-        }
-
-        my $rand = $min + int(rand($max - $min)) + 1;
-
-        return $rand;
+        $self->unicast_send($mes, $json->{id}, $json->{送付先id});
+        return $self->render(json => { result => $id });
     }
-);
-
-post "/append" => sub
-{
-    my $self = shift;
-    my $json = $self->req->json;
-    $self->save_append($json);
-    return $self->render(json => { result => 1 });
+    else
+    {
+        my $rows = $system->load_message($json->{id});
+        return $self->render(json => { result => $rows });
+    }
 };
 
 get "/neighbors" => sub
@@ -308,7 +250,6 @@ app->helper(
         my $json = shift;
         my $accept = $self->get_time_of_day;
         my $ret = { accept => $accept };
-        my $c = $self->get_connection($json);
 
         push(@$queue, { id => $json->{const_id}, param => $json->{data}, "accept" => $accept });
 
@@ -755,10 +696,6 @@ app->helper(
 
         $self->reset_ini_all;
 
-        # TODO: もしPVPなら、コマンド結果が2つ？
-
-        # warn Dump($param);
-
         my @ids = ($id);
 
         if ($param->{mode} eq "pvp")
@@ -1014,32 +951,7 @@ app->helper(
     {
         my $self = shift;
         my $type = shift;
-
-        if ($type eq "main")
-        {
-            if (defined $dbis->{$type})
-            {
-                return $dbis->{$type};
-            }
-
-            my $dbFile = File::Spec->catfile($FindBin::Bin, "so.sqlite");
-            my $dbi = DBIx::Custom->connect(
-                "dbi:SQLite:dbname=$dbFile",
-                undef,
-                undef,
-                { sqlite_unicode => 1 }
-            );
-
-            $dbi = $dbi->safety_character("\x{2E80}-\x{2FDF}々〇〻\x{3400}-\x{4DBF}\x{4E00}-\x{9FFF}\x{F900}-\x{FAFF}\x{20000}-\x{2FFFF}ーぁ-んァ-ヶa-zA-Z0-9_");
-            $dbi->create_model("コマンド結果");
-            $dbi->create_model("キャラ");
-            $dbi->create_model("キャラ追加情報1");
-            $dbi->create_model("メッセージ");
-
-            $dbis->{$type} = $dbi;
-
-            return $dbi;
-        }
+        return $system->dbi($type);
     },
 );
 
