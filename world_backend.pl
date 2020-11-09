@@ -1060,6 +1060,28 @@ app->helper(
 );
 
 app->helper(
+    load_master_data => sub
+    {
+        my ($self) = @_;
+        my $raws = $system->load_raw_ini(File::Spec->catfile($FindBin::Bin, "master", "item.mst"));
+        my $rows = [];
+        my @item_mst_keys = @{$self->config->{マスタデータ_アイテム}};
+        shift(@item_mst_keys);
+
+        for my $raw (@$raws)
+        {
+            my $row = {};
+            @$row{@item_mst_keys} = @$raw;
+            $row->{アイテムid} = sprintf("%04s", $raw->[0]);
+            $row->{アイテム種別} = sprintf("%02s", $raw->[4]);
+            push(@$rows, $row);
+        }
+
+        $system->save_master_item_db($rows);
+    },
+);
+
+app->helper(
     reset_ini_all => sub
     {
         my ($self) = @_;
@@ -1163,10 +1185,8 @@ websocket '/channel' => sub {
     });
 };
 
-$loop->timer(1, sub {
-    app->reset_ini_all
-});
-
+$loop->timer(1, sub { app->reset_ini_all });
+$loop->timer(1, sub { app->load_master_data });
 $loop->recurring(60, sub { app->detach_history });
 $loop->recurring(60, sub { app->save });
 $loop->timer(3, sub { app->manage });

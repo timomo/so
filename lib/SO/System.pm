@@ -63,6 +63,7 @@ sub dbi
         $dbi->create_model("キャラバフ");
         $dbi->create_model("キャラ所持品");
         $dbi->create_model("出品データ");
+        $dbi->create_model("マスタデータ_アイテム");
 
         $self->dbis->{$type} = $dbi;
 
@@ -373,6 +374,37 @@ sub save_chara
     my $self = shift;
     my $new = shift;
     return $self->save_chara_db($new);
+}
+
+
+sub save_master_item_db
+{
+    my $self = shift;
+    my $rows = shift;
+
+    for my $item (@$rows)
+    {
+        my $result = $self->dbi("main")->model("マスタデータ_アイテム")->select(["*"], where => { アイテムid => $item->{アイテムid} });
+        my $row = $result->fetch_hash_one;
+
+        if (defined $row)
+        {
+            $self->dbi("main")->model("マスタデータ_アイテム")->update($item, where => {アイテムid => $item->{アイテムid}}, mtime => "mtime");
+        }
+        else
+        {
+            delete $item->{id};
+            $self->dbi("main")->model("マスタデータ_アイテム")->insert($item, ctime => "ctime");
+        }
+    }
+}
+
+sub load_master_item_db
+{
+    my $self = shift;
+    my $result = $self->dbi("main")->model("マスタデータ_アイテム")->select(["*"]);
+    my $rows = $result->fetch_hash_all;
+    return $rows;
 }
 
 sub save_item_db

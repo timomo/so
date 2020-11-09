@@ -219,3 +219,24 @@ CREATE TABLE 出品データ (
         ctime DATETIME,
 	    mtime DATETIME
  );
+
+DROP TABLE IF EXISTS マスタデータ_アイテム;
+
+CREATE TABLE マスタデータ_アイテム (
+        id INTEGER PRIMARY KEY,
+        アイテムid TEXT NOT NULL,
+        名前 TEXT NOT NULL,
+        効果 INTEGER NOT NULL,
+        価値 INTEGER NOT NULL,
+        アイテム種別 TEXT NOT NULL,
+        攻撃属性 INTEGER NOT NULL,
+        属性 INTEGER NOT NULL,
+        使用 INTEGER NOT NULL,
+        耐久 INTEGER NOT NULL,
+        装備条件 INTEGER NOT NULL,
+        品質 INTEGER NOT NULL,
+        作成者 TEXT NOT NULL,
+        所持数 INTEGER NOT NULL,
+        ctime DATETIME,
+	    mtime DATETIME
+ );
