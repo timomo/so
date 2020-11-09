@@ -57,6 +57,11 @@ sub dbi
         $dbi->create_model("キャラ");
         $dbi->create_model("キャラ追加情報1");
         $dbi->create_model("メッセージ");
+        $dbi->create_model("キャラスキル現状値");
+        $dbi->create_model("キャラスキル設定値");
+        $dbi->create_model("キャラスキル最大値");
+        $dbi->create_model("キャラバフ");
+        $dbi->create_model("キャラ所持品");
 
         $self->dbis->{$type} = $dbi;
 
@@ -201,6 +206,47 @@ sub load_chara
     return $row;
 }
 
+sub load_buff_db
+{
+    my $self = shift;
+    my $id = shift;
+
+    my $result = $self->dbi("main")->model("キャラバフ")->select(["*"], where => { id => $id });
+    my $row = $result->fetch_hash_one || {};
+
+    $self->modify_buff_data($row);
+
+    return $row;
+}
+
+sub load_item_db
+{
+    my $self = shift;
+    my $id = shift;
+
+    my $result = $self->dbi("main")->model("キャラ所持品")->select(["*"], where => { キャラid => $id });
+    my $rows = $result->fetch_hash_all;
+
+    $self->modify_buff_data($_) for @$rows;
+
+    return $rows;
+}
+
+sub modify_item_data
+{
+    my $self = shift;
+    my $new = shift;
+
+    if (! utf8::is_utf8($new->{名前}))
+    {
+        $new->{名前} = Encode::decode_utf8($new->{名前});
+    }
+    if (! utf8::is_utf8($new->{作成者}))
+    {
+        $new->{作成者} = Encode::decode_utf8($new->{作成者});
+    }
+}
+
 sub load_message
 {
     my ($self, $from) = @_;
@@ -219,6 +265,18 @@ sub load_chara_by_name
     my $row = $result->fetch_hash_one;
 
     return $row;
+}
+
+sub modify_buff_data
+{
+    my $self = shift;
+    my $new = shift;
+    my $keys = $self->context->config->{キャラバフ};
+
+    for my $key (@$keys)
+    {
+        $new->{$key} ||= 0;
+    }
 }
 
 sub modify_append_data
@@ -268,11 +326,89 @@ sub modify_message_data
     }
 }
 
+sub modify_skill_data
+{
+    my $self = shift;
+    my $key = shift;
+    my $new = shift;
+
+    for my $name (@{ $self->context->config->{$key} })
+    {
+        if ($name eq "id")
+        {
+            next;
+        }
+
+        if (! defined $new->{$name})
+        {
+            if ($key eq "キャラスキル最大値")
+            {
+                $new->{$name} = 1000;
+
+                if ($name eq "合計MAX値")
+                {
+                    $new->{$name} = 5000;
+                }
+            }
+            else
+            {
+                $new->{$name} = 0;
+            }
+        }
+        elsif ($key eq "キャラスキル最大値" && $new->{$name} == 0)
+        {
+            $new->{$name} = 1000;
+
+            if ($name eq "合計MAX値")
+            {
+                $new->{$name} = 5000;
+            }
+        }
+    }
+}
+
 sub save_chara
 {
     my $self = shift;
     my $new = shift;
     return $self->save_chara_db($new);
+}
+
+sub save_item_db
+{
+    my $self = shift;
+    my $id = shift;
+    my $rows = shift;
+
+    for my $no (0 .. $#$rows)
+    {
+        my $item = $rows->[$no];
+
+        $self->modify_item_data($item);
+
+        if ($item->{所持数} != 0)
+        {
+            my $result = $self->dbi("main")->model("キャラ所持品")->select(["*"], where => { id => $item->{id} });
+            my $row = $result->fetch_hash_one;
+
+            if (defined $row)
+            {
+                $self->dbi("main")->model("キャラ所持品")->update($item, where => {id => $item->{id}}, mtime => "mtime");
+            }
+            else
+            {
+                $item->{キャラid} = $id;
+                delete $item->{id};
+                $self->dbi("main")->model("キャラ所持品")->insert($item, ctime => "ctime");
+            }
+        }
+        else
+        {
+            splice(@$rows, $no, 1);
+            $no--;
+            $self->dbi("main")->model("キャラ所持品")->delete(where => { id => $item->{id} });
+        }
+    }
 }
 
 sub save_append
@@ -287,6 +423,73 @@ sub save_message
     my $self = shift;
     my $new = shift;
     return $self->save_message_db($new);
+}
+
+sub load_skill_db
+{
+    my $self = shift;
+    my $id = shift;
+    my $skills = {};
+    my @keys = (qw|キャラスキル現状値 キャラスキル設定値 キャラスキル最大値|);
+
+    for my $key (@keys)
+    {
+        my $result = $self->dbi("main")->model($key)->select(["*"], where => { id => $id });
+        my $row = $result->fetch_hash_one;
+        $skills->{$key} = $row;
+
+        $self->modify_skill_data( $key, $skills->{$key} );
+    }
+
+    return $skills;
+}
+
+sub save_skill_db
+{
+    my $self = shift;
+    my $id = shift;
+    my $skills = shift || {};
+
+    for my $key (keys %$skills)
+    {
+        $self->modify_skill_data( $key,  $skills->{$key} );
+
+        my $result = $self->dbi("main")->model($key)->select(["*"], where => { id => $id });
+        my $row = $result->fetch_hash_one;
+        my %data = %{ $skills->{$key} };
+        $data{id} = $id;
+
+        if (defined $row)
+        {
+            $self->dbi("main")->model($key)->update(\%data, where => {id => $id}, mtime => "mtime");
+        }
+        else
+        {
+            $self->dbi("main")->model($key)->insert(\%data, ctime => "ctime");
+        }
+    }
+}
+
+sub save_buff_db
+{
+    my $self = shift;
+    my $id = shift;
+    my $new = shift;
+
+    $self->modify_buff_data($new);
+
+    my $result = $self->dbi("main")->model("キャラバフ")->select(["*"], where => { id => $id });
+    my $row = $result->fetch_hash_one;
+
+    if (defined $row)
+    {
+        $self->dbi("main")->model("キャラバフ")->update($new, where => {id => $id}, mtime => "mtime");
+    }
+    else
+    {
+        $new->{id} = $id;
+        $self->dbi("main")->model("キャラバフ")->insert($new, ctime => "ctime");
+    }
 }
 
 sub save_chara_db

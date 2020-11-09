@@ -4,16 +4,19 @@ use utf8;
 #--------------#
 sub skill_regist
 {
-	@skill = &load_ini($skill_path. $kid);
+	my @skill_new = ();
+	my $skills = {};
+	$skills->{キャラスキル現状値} ||= {};
+	$skills->{キャラスキル設定値} ||= {};
+	$skills->{キャラスキル最大値} ||= {};
 
-	@skill_new=();
-	unshift(@skill_new,"$kmx[0]<>$kmx[1]<>$kmx[2]<>$kmx[3]<>$kmx[4]<>$kmx[5]<>$kmx[6]<>$kmx[7]<>$kmx[8]<>$kmx[9]<>$kmx[10]<>$kmx[11]<>$kmx[12]<>$kmx[13]<>$kmx[14]<>$kmx[15]<>$kmx[16]<>$kmx[17]<>$kmx[18]<>$kmx[19]<>$kmx[20]<>$kmx[21]<>$kmax<>\n");
-	unshift(@skill_new,"$kmg[0]<>$kmg[1]<>$kmg[2]<>$kmg[3]<>$kmg[4]<>$kmg[5]<>$kmg[6]<>$kmg[7]<>$kmg[8]<>$kmg[9]<>$kmg[10]<>$kmg[11]<>$kmg[12]<>$kmg[13]<>$kmg[14]<>$kmg[15]<>$kmg[16]<>$kmg[17]<>$kmg[18]<>$kmg[19]<>$kmg[20]<>$kmg[21]<>\n");
-	unshift(@skill_new,"$ksk[0]<>$ksk[1]<>$ksk[2]<>$ksk[3]<>$ksk[4]<>$ksk[5]<>$ksk[6]<>$ksk[7]<>$ksk[8]<>$ksk[9]<>$ksk[10]<>$ksk[11]<>$ksk[12]<>$ksk[13]<>$ksk[14]<>$ksk[15]<>$ksk[16]<>$ksk[17]<>$ksk[18]<>$ksk[19]<>$ksk[20]<>$ksk[21]<>\n");
+	if($in{'new'} eq 'new')
+	{
+		my $cnt=0;
+		my @sk=();
 
-	if($in{'new'} eq 'new'){
-		$cnt=0;@sk=();@skill_new=();
-		foreach (0 .. @chara_skill) {
+		foreach (0 .. @chara_skill)
+		{
 			$sk[$cnt] = 0;
 			if($cnt eq $in{'skill1'}){
 				$sk[$cnt] = 100;
@@ -24,16 +27,30 @@ sub skill_regist
 			}
 			$cnt++;
 		}
+
 		$kid = $in{'id'};
-		unshift(@skill_new,"1000<>1000<>1000<>1000<>1000<>1000<>1000<>1000<>1000<>1000<>1000<>1000<>1000<>1000<>1000<>1000<>1000<>1000<>1000<>1000<>1000<>1000<>5000<>\n");
-		unshift(@skill_new,"0<>0<>0<>0<>0<>0<>0<>0<>0<>0<>0<>0<>0<>0<>0<>0<>0<>0<>0<>0<>0<>0<>\n");
-		unshift(@skill_new,"$sk[0]<>$sk[1]<>$sk[2]<>$sk[3]<>$sk[4]<>$sk[5]<>$sk[6]<>$sk[7]<>$sk[8]<>$sk[9]<>$sk[10]<>$sk[11]<>$sk[12]<>$sk[13]<>$sk[14]<>$sk[15]<>$sk[16]<>$sk[17]<>$sk[18]<>$sk[19]<>$sk[20]<>$sk[21]<>\n");
+		# unshift(@skill_new,"1000<>1000<>1000<>1000<>1000<>1000<>1000<>1000<>1000<>1000<>1000<>1000<>1000<>1000<>1000<>1000<>1000<>1000<>1000<>1000<>1000<>1000<>5000<>\n");
+		# unshift(@skill_new,"0<>0<>0<>0<>0<>0<>0<>0<>0<>0<>0<>0<>0<>0<>0<>0<>0<>0<>0<>0<>0<>0<>\n");
+		# unshift(@skill_new,"$sk[0]<>$sk[1]<>$sk[2]<>$sk[3]<>$sk[4]<>$sk[5]<>$sk[6]<>$sk[7]<>$sk[8]<>$sk[9]<>$sk[10]<>$sk[11]<>$sk[12]<>$sk[13]<>$sk[14]<>$sk[15]<>$sk[16]<>$sk[17]<>$sk[18]<>$sk[19]<>$sk[20]<>$sk[21]<>\n");
+
+		for my $no (0 .. 21)
+		{
+			$kmx[$no] = 1000;
+			$kmg[$no] = 0;
+			$kmx[$no] = $sk[$no];
+		}
+		$kmx[22] = 5000;
 	}
 
-	open(OUT,">$skill_path$kid");
-	print OUT @skill_new;
-	close(OUT);
+	@{$skills->{キャラスキル現状値}}{@{$controller->config->{キャラスキル現状値}}} = @ksk;
+	@{$skills->{キャラスキル設定値}}{@{$controller->config->{キャラスキル設定値}}} = @kmg;
+	@{$skills->{キャラスキル最大値}}{@{$controller->config->{キャラスキル最大値}}} = (@kmx, $kmax);
 
+	$system->save_skill_db($kid, $skills);
+
+	# open(OUT,">", $skill_path. $kid);
+	# print OUT @skill_new;
+	# close(OUT);
 }
 
 #--------------#
@@ -41,12 +58,23 @@ sub skill_regist
 #--------------#
 sub skill_load
 {
-	@kskill = &load_ini($skill_path. $kid);
-
+	my $skills = $system->load_skill_db($kid);
 	@ksk=();@kmg=();@kmx=();
-	($ksk[0],$ksk[1],$ksk[2],$ksk[3],$ksk[4],$ksk[5],$ksk[6],$ksk[7],$ksk[8],$ksk[9],$ksk[10],$ksk[11],$ksk[12],$ksk[13],$ksk[14],$ksk[15],$ksk[16],$ksk[17],$ksk[18],$ksk[19],$ksk[20],$ksk[21]) = split(/<>/,$kskill[0]);
-	($kmg[0],$kmg[1],$kmg[2],$kmg[3],$kmg[4],$kmg[5],$kmg[6],$kmg[7],$kmg[8],$kmg[9],$kmg[10],$kmg[11],$kmg[12],$kmg[13],$kmg[14],$kmg[15],$kmg[16],$kmg[17],$kmg[18],$kmg[19],$kmg[20],$kmg[21]) = split(/<>/,$kskill[1]);
-	($kmx[0],$kmx[1],$kmx[2],$kmx[3],$kmx[4],$kmx[5],$kmx[6],$kmx[7],$kmx[8],$kmx[9],$kmx[10],$kmx[11],$kmx[12],$kmx[13],$kmx[14],$kmx[15],$kmx[16],$kmx[17],$kmx[18],$kmx[19],$kmx[20],$kmx[21],$kmax) = split(/<>/,$kskill[2]);
+
+	if (! defined $skills->{キャラスキル現状値})
+	{
+		my @kskill = &load_ini($skill_path. $kid);
+
+		($ksk[0],$ksk[1],$ksk[2],$ksk[3],$ksk[4],$ksk[5],$ksk[6],$ksk[7],$ksk[8],$ksk[9],$ksk[10],$ksk[11],$ksk[12],$ksk[13],$ksk[14],$ksk[15],$ksk[16],$ksk[17],$ksk[18],$ksk[19],$ksk[20],$ksk[21]) = split(/<>/,$kskill[0]);
+		($kmg[0],$kmg[1],$kmg[2],$kmg[3],$kmg[4],$kmg[5],$kmg[6],$kmg[7],$kmg[8],$kmg[9],$kmg[10],$kmg[11],$kmg[12],$kmg[13],$kmg[14],$kmg[15],$kmg[16],$kmg[17],$kmg[18],$kmg[19],$kmg[20],$kmg[21]) = split(/<>/,$kskill[1]);
+		($kmx[0],$kmx[1],$kmx[2],$kmx[3],$kmx[4],$kmx[5],$kmx[6],$kmx[7],$kmx[8],$kmx[9],$kmx[10],$kmx[11],$kmx[12],$kmx[13],$kmx[14],$kmx[15],$kmx[16],$kmx[17],$kmx[18],$kmx[19],$kmx[20],$kmx[21],$kmax) = split(/<>/,$kskill[2]);
+	}
+	else
+	{
+		@ksk = @{$skills->{キャラスキル現状値}}{@{$controller->config->{キャラスキル現状値}}};
+		@kmg = @{$skills->{キャラスキル設定値}}{@{$controller->config->{キャラスキル設定値}}};
+		(@kmx, $kmax) = @{$skills->{キャラスキル最大値}}{@{$controller->config->{キャラスキル最大値}}};
+	}
 }
 
 #--------------#

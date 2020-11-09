@@ -4,14 +4,13 @@ use utf8;
 #----------------#
 sub item_check
 {
-	@user_item = &load_ini($item_path. $in{'id'});
-
-	$rid = $kid;
+	my @user_item = &item_load($kid);
+	our $rid = $kid;
 	&read_bank;
-	$space_price = int($kpitem / 5) + 1;
+	my $space_price = int($kpitem / 5) + 1;
 
 	#割増率の設定
-	$plus = 1 + $kn_6 / 200;
+	my $plus = 1 + $kn_6 / 200;
 
 	&header;
 
@@ -22,19 +21,35 @@ $msg<B><FONT COLOR="#FF9933">$error</FONT></B>
 <p>
 <form action="$script" method="post">
 使用・装備したいアイテムをチェックしてください。<BR>
-<BR>
+<BR />
 <B>所持アイテム数</B> $kitem / $max_item<BR>
-<BR>
+<BR />
 
 <div class="blackboard question">
 
-<table border=0>
+<table border="0">
 <tr>
-<th></th><th>装備</th><th>種別</th><th>名前</th><th>効果</th><th>価値</th><th>使用</th><th>装備条件</th><th>属性</th><th>耐久</th><th>品質</th><th>作成者</th><th>所持数</th>
+<th>&nbsp;</th>
+<th>装備</th>
+<th>種別</th>
+<th>名前</th>
+<th>効果</th>
+<th>価値</th>
+<th>使用</th>
+<th>装備条件</th>
+<th>属性</th>
+<th>耐久</th>
+<th>品質</th>
+<th>作成者</th>
+<th>所持数</th>
+</tr>
 EOM
-	$msg = "";$error = "";
-	foreach(@user_item){
-		($iid,$ino,$iname,$idmg,$igold,$imode,$iuelm,$ieelm,$ihand,$idef,$ireq,$iqlt,$imake,$irest,$ieqp) = split(/<>/);
+	$msg = "";
+	$error = "";
+
+	for my $ary (@user_item)
+	{
+		my ($iid,$ino,$iname,$idmg,$igold,$imode,$iuelm,$ieelm,$ihand,$idef,$ireq,$iqlt,$imake,$irest,$ieqp) = @$ary;
 		$igold = int($igold * $plus / 2);
 		&check_limit;
 		# アイテム種別により処理変更
@@ -78,7 +93,7 @@ EOM
 			$idmg = "<font color=$efcolor[0]>攻撃：$idmg</font>";
 			$ireq = "<font color=$reqcolor>$item_uelm[$iuelm]：$ireq</font>";
 		} else {
-			$idmg = "&nbsp";
+			$idmg = "&nbsp;";
 			$ireq = "&nbsp;";
 		}
 		print "<tr>\n";
@@ -87,7 +102,6 @@ EOM
 	}
 
 	print <<"EOM";
-</tr>
 </table>
 
 </div>
@@ -114,12 +128,15 @@ if($kspot == 0 && $kpst == 0){
 <option value="">送る相手を選択
 EOM
 
-	@MESSAGE = &load_ini($chara_file);
+	my $characters = $system->characters;
 
-	foreach(@MESSAGE) {
-		($did,$dpass,$dname,$dsex,$dchara,$dn_0,$dn_1,$dn_2,$dn_3,$dn_4,$dn_5,$dn_6,$dhp,$dmaxhp,$dex,$dlv,$dap,$dgold,$dlp,$dtotal,$dkati,$dhost,$ddate,$darea,$dspot,$dpst,$ditem) = split(/<>/);
-		if($kid eq $did) { next; }
-		print "<option value=$did>$dname\n";
+	for my $to (@$characters)
+	{
+		if($kid eq $to->{id})
+		{
+			next;
+		}
+		printf("<option value='%s'>%s</option>\n", $to->{id}, $to->{名前});
 	}
 
 	print <<"EOM";
@@ -129,21 +146,24 @@ EOM
 個数&nbsp;
 <select name="item">
 EOM
-	$i=1;
-	foreach(1..$max_itemcnt){
-		print "<option value=\"$i\">$i\n";
+	my $i = 1;
+
+	foreach(1 .. $max_itemcnt)
+	{
+		printf("<option value='%s'>%s</option>\n", $i, $i);
 		$i++;
 	}
-		print <<"EOM";
+
+	print <<"EOM";
 </select>&nbsp;個
 &nbsp;金額&nbsp;<input type=text name=gold  size="11" value="">&nbsp;G&nbsp;/&nbsp;$kgold&nbsp;G
 <br>
-※ショップで売却する場合は各アイテムの「価値」で買い取られます。<br>
-　自由市場に出品の際は、「金額」は単価になります。<br>
+※ショップで売却する場合は各アイテムの「価値」で買い取られます。<br />
+　自由市場に出品の際は、「金額」は単価になります。<br />
 　現在の貸し金庫の手数料は「価値」の<b> $space_price </b>% です。
 </form>
-<p>
-		<script>
+
+<script>
 const spot = "$spot";
 </script>
 EOM
@@ -159,26 +179,34 @@ EOM
 #----------------#
 sub item_drop
 {
-	$mrand = int(rand(5));
+	my $mrand = int(rand(5));
+	my @drop = &load_ini($drop_file);
+	my $hit = 0;
+	my $g_no;
+	my $g_qlt;
 
-	@drop = &load_ini($drop_file);
-
-	$hit=0;
-	foreach(@drop){
-		($g_type,$g_rnd,$g_no,$g_name,$g_qlt) = split(/<>/);
-		if($g_type == $mdrop && $g_rnd == $mrand){
-			$hit=1;
+	foreach(@drop)
+	{
+		my ($type, $rnd, $no, $name, $qlt) = split(/<>/);
+		if($type == $mdrop && $rnd == $mrand)
+		{
+			$hit = 1;
+			$g_no = $no;
+			$g_qlt = $qlt;
 			last;
 		}
 	}
 
-	if(!$hit) { &error("アイテム取得エラー"); }
+	if ($hit == 0) { &error("アイテム取得エラー"); }
 
-	@get = &load_ini($item_file);
+	my @get = &load_ini($item_file);
 
-	$hit=0;
-	foreach(@get){
+	$hit = 0;
+
+	foreach(@get)
+	{
 		($i_no,$i_name,$i_dmg,$i_gold,$i_mode,$i_uelm,$i_eelm,$i_hand,$i_def,$i_req,$i_qlt,$i_make) = split(/<>/);
+
 		if($i_no == $g_no && $i_qlt == $g_qlt){
 			$kcnt = 1;
 			&item_regist;
@@ -187,7 +215,7 @@ sub item_drop
 		}
 	}
 
-	if(!$hit) { &error("アイテム書き込みエラー"); }
+	if($hit == 0) { &error("アイテム書き込みエラー"); }
 }
 
 #----------------#
@@ -195,14 +223,16 @@ sub item_drop
 #----------------#
 sub stone_drop
 {
-	$srand = int(rand(@chara_skill));
+	my $srand = int(rand(@chara_skill));
+	my @get = &load_ini($item_file);
+	my $hit = 0;
 
-	@get = &load_ini($item_file);
-
-	$hit=0;
-	foreach(@get){
+	foreach(@get)
+	{
 		($i_no,$i_name,$i_dmg,$i_gold,$i_mode,$i_uelm,$i_eelm,$i_hand,$i_def,$i_req,$i_qlt,$i_make) = split(/<>/);
-		if($i_no eq $stone_no){
+
+		if($i_no eq $stone_no)
+		{
 			$i_dmg = $srand;
 
 			if(int(rand(5)) > 0){
@@ -226,7 +256,7 @@ sub stone_drop
 		}
 	}
 
-	if(!$hit) { &error("アイテム書き込みエラー"); }
+	if($hit == 0) { &error("アイテム書き込みエラー"); }
 }
 
 #----------------#
@@ -234,56 +264,95 @@ sub stone_drop
 #----------------#
 sub item_regist
 {
-	@user_item = &load_ini($item_path. $kid);
-
-	$u_flag = 0;$u_cnt = 0;$i_eqp = 0;$over = 0;
-	@new_user_item=();
+	my @user_item = &item_load($in{'id'});
+	my $u_flag = 0;
+	my $u_cnt = 0;
+	my $i_eqp = 0;
+	my $over = 0;
+	my @new_user_item = ();
+	my @new = ();
+	my $uniq_key = sprintf("%s%s%s", $i_no, $i_qlt, $i_make);
 
 	foreach(@user_item)
 	{
-		($u_id,$u_no,$u_name,$u_dmg,$u_gold,$u_mode,$u_uelm,$u_eelm,$u_hand,$u_def,$u_req,$u_qlt,$u_make,$u_rest,$u_eqp) = split(/<>/);
-		if("$u_no$u_qlt$u_make" eq "$i_no$i_qlt$i_make") {
+		my ($u_id,$u_no,$u_name,$u_dmg,$u_gold,$u_mode,$u_uelm,$u_eelm,$u_hand,$u_def,$u_req,$u_qlt,$u_make,$u_rest,$u_eqp) = @$_;
+		my $tmp_uniq_key = sprintf("%s%s%s", $u_no, $u_qlt, $u_make);
+
+		if($uniq_key eq $tmp_uniq_key)
+		{
 			$u_rest += $kcnt;
-			if($u_rest > $max_itemcnt && $mode eq 'item_buy') {
+			if ($u_rest > $max_itemcnt && $mode eq 'item_buy')
+			{
 				$error = "$max_itemcnt 個までしか所持できません";
 				&item_shop;
-			}elsif($u_rest > $max_itemcnt && $mode eq 'user_buy') {
+			}
+			elsif ($u_rest > $max_itemcnt && $mode eq 'user_buy')
+			{
 				$error = "$max_itemcnt 個までしか所持できません";
 				&user_shop;
-			}elsif($u_rest > $max_itemcnt) {
+			}
+			elsif ($u_rest > $max_itemcnt)
+			{
 				$u_rest = $max_itemcnt;
 				$over = 1;
 			}
 			$u_flag = 1;
+
+			my $mes = "$u_id<>$u_no<>$u_name<>$u_dmg<>$u_gold<>$u_mode<>$u_uelm<>$u_eelm<>$u_hand<>$u_def<>$u_req<>$u_qlt<>$u_make<>$u_rest<>$u_eqp<>\n";
+			my $utf8 = Encode::encode_utf8($mes);
+			unshift(@new, $utf8);
 		}
-
-		my $mes = "$u_id<>$u_no<>$u_name<>$u_dmg<>$u_gold<>$u_mode<>$u_uelm<>$u_eelm<>$u_hand<>$u_def<>$u_req<>$u_qlt<>$u_make<>$u_rest<>$u_eqp<>\n";
-		my $utf8 = Encode::encode_utf8($mes);
-
-		unshift(@new_user_item, $utf8);
-
+		else
+		{
+			my $mes = "$u_id<>$u_no<>$u_name<>$u_dmg<>$u_gold<>$u_mode<>$u_uelm<>$u_eelm<>$u_hand<>$u_def<>$u_req<>$u_qlt<>$u_make<>$u_rest<>$u_eqp<>\n";
+			my $utf8 = Encode::encode_utf8($mes);
+			unshift(@new_user_item, $utf8);
+		}
 		$u_cnt++;
 	}
 
 	if($u_flag eq 0 && $in{'new'} ne 'new'){
 		my $mes = "$u_cnt<>$i_no<>$i_name<>$i_dmg<>$i_gold<>$i_mode<>$i_uelm<>$i_eelm<>$i_hand<>$i_def<>$i_req<>$i_qlt<>$i_make<>$kcnt<>$i_eqp<>\n";
 		my $utf8 = Encode::encode_utf8($mes);
-		unshift(@new_user_item,$mes);
+		unshift(@new, $mes);
 		$u_cnt++;
 	}
 
 	if($in{'new'} eq 'new'){
-		unshift(@new_user_item,$newbie_equip[$in{'skill1'}]);
-		unshift(@new_user_item,$newbie_equip[99]);
+		unshift(@new, $newbie_equip[$in{'skill1'}]);
+		unshift(@new, $newbie_equip[99]);
 		$u_flag = 1;
 	}
 
-	open(OUT,">$item_path$kid");
-	print OUT @new_user_item;
-	close(OUT);
+	# TODO: !!!!
+	my @items = ();
+	for my $line (@new)
+	{
+		$line =~ s/(?:\r\n|\r|\n)$//g;
+		my @tmp = split("<>", $line);
+		my $item = {};
+		@$item{@{$controller->config->{キャラ所持品}}} = @tmp;
+		push(@items, $item);
+	}
+
+	$system->save_item_db($kid, \@items);
 
 	&item_sort;
+}
 
+sub item_load
+{
+	my $kid = shift;
+	my $rows = $system->load_item_db($kid);
+	my @items;
+
+	for my $row (@$rows)
+	{
+		my @tmp = @$row{@{$controller->config->{キャラ所持品}}};
+		push(@items, \@tmp);
+	}
+
+	return @items;
 }
 
 #----------------#
@@ -291,35 +360,26 @@ sub item_regist
 #----------------#
 sub item_use
 {
-	@user_item = &load_ini($item_path. $in{'id'});
+	my @user_item = &item_load($in{'id'});
 
-	if($in{'item_no'} eq ""){
+	if($in{'item_no'} eq "")
+	{
 		$error = "アイテムを選んでください。";
 		&item_check;
 	}
 
-	@item_chara = &load_ini($chara_file);
+	my $hit = 0;
 
-	$hit=0;
-	foreach(@item_chara){
-		($kid,$kpass,$kname,$ksex,$kchara,$kn_0,$kn_1,$kn_2,$kn_3,$kn_4,$kn_5,$kn_6,$khp,$kmaxhp,$kex,$klv,$kap,$kgold,$klp,$ktotal,$kkati,$khost,$kdate,$karea,$kspot,$kpst,$kitem) = split(/<>/);
-		if($in{'id'} eq "$kid" and $in{'pass'} eq "$kpass") {
-			$hit=1;
+	foreach(@user_item)
+	{
+		($i_id,$i_no,$i_name,$i_dmg,$i_gold,$i_mode,$i_uelm,$i_eelm,$i_hand,$i_def,$i_req,$i_qlt,$i_make,$i_rest,$i_eqp) = @$_;
+		if($in{item_no} eq $i_id) {
+			$hit = 1;
 			last;
 		}
 	}
-
-	if(!$hit) { &error("入力されたIDは登録されていません。又はパスワードが違います。"); }
-
-	$hit=0;
-	foreach(@user_item){
-		($i_id,$i_no,$i_name,$i_dmg,$i_gold,$i_mode,$i_uelm,$i_eelm,$i_hand,$i_def,$i_req,$i_qlt,$i_make,$i_rest,$i_eqp) = split(/<>/);
-		if($in{'item_no'} eq $i_id) {
-			$hit=1;
-			last;
-		}
-	}
-	if(!$hit){
+	if($hit == 0)
+	{
 		$error = "アイテムが存在しません。";
 		&item_check;
 	}
@@ -396,52 +456,74 @@ sub item_use
 	}
 }
 
+sub item_db_save
+{
+	my $kid = shift;
+	my @new_equip_item = @_;
+
+	my @items = ();
+	for my $line (@new_equip_item)
+	{
+		$line =~ s/(?:\r\n|\r|\n)$//g;
+		my @tmp = split("<>", $line);
+		my $item = {};
+		@$item{@{$controller->config->{キャラ所持品}}} = @tmp;
+		push(@items, $item);
+	}
+
+	$system->save_item_db($kid, \@items);
+}
+
 #----------------#
 #  アイテム装備  #
 #----------------#
 sub item_equip
 {
-	# ファイルロック
-	if ($lockkey == 1) { &lock1; }
-	elsif ($lockkey == 2) { &lock2; }
-	elsif ($lockkey == 3) { &file'lock; }
+	my @user_item = &item_load($in{'id'});
 
-	@item_chara = &load_ini($chara_file);
-
-	$hit=0;
-	foreach(@item_chara){
-		($kid,$kpass,$kname,$ksex,$kchara,$kn_0,$kn_1,$kn_2,$kn_3,$kn_4,$kn_5,$kn_6,$khp,$kmaxhp,$kex,$klv,$kap,$kgold,$klp,$ktotal,$kkati,$khost,$kdate,$karea,$kspot,$kpst,$kitem) = split(/<>/);
-		if($in{'id'} eq "$kid" and $in{'pass'} eq "$kpass") {
-			$hit=1;
-			last;
+	if (scalar @user_item == 0)
+	{
+		my @equip_item = &load_ini($item_path. $kid);
+		@user_item = ();
+		for my $item (@equip_item)
+		{
+			my @tmp = split("<>", $item);
+			push(@user_item, \@tmp);
 		}
 	}
 
-	if(!$hit) { &error("入力されたIDは登録されていません。又はパスワードが違います。"); }
+	my $d_eqp = 0;
+	my $eqp_flag = 0;
+	my $eqp_name = "";
+	my @new_equip_item = ();
 
-	@equip_item = &load_ini($item_path. $kid);
+	foreach(@user_item)
+	{
+		my ($u_id, $u_no, $u_name, $u_dmg, $u_gold, $u_mode, $u_uelm, $u_eelm, $u_hand, $u_def, $u_req, $u_qlt, $u_make, $u_rest, $u_eqp) = @$_;
 
-	$d_eqp = 0;
-	$eqp_flag = 0;
-	$eqp_name = "";
-	@new_equip_item=();
-	foreach(@equip_item){
-		($u_id,$u_no,$u_name,$u_dmg,$u_gold,$u_mode,$u_uelm,$u_eelm,$u_hand,$u_def,$u_req,$u_qlt,$u_make,$u_rest,$u_eqp) = split(/<>/);
 		if($u_eqp eq $k_eqp){
 			unshift(@new_equip_item,"$u_id<>$u_no<>$u_name<>$u_dmg<>$u_gold<>$u_mode<>$u_uelm<>$u_eelm<>$u_hand<>$u_def<>$u_req<>$u_qlt<>$u_make<>$u_rest<>$d_eqp<>\n");
 			$eqp_flag += 1;
-			if(!$eqp_name){
+			if(! defined $eqp_name)
+			{
 				$eqp_name = $u_name;
 			}
-		} elsif($u_id eq $k_id) {
+		}
+		elsif($u_id eq $k_id)
+		{
 			unshift(@new_equip_item,"$u_id<>$u_no<>$u_name<>$u_dmg<>$u_gold<>$u_mode<>$u_uelm<>$u_eelm<>$u_hand<>$u_def<>$u_req<>$u_qlt<>$u_make<>$u_rest<>$k_eqp<>\n");
 			$eqp_flag += 2;
 			$eqp_name = $u_name;
-		} else {
+		}
+		else
+		{
 			unshift(@new_equip_item,"$u_id<>$u_no<>$u_name<>$u_dmg<>$u_gold<>$u_mode<>$u_uelm<>$u_eelm<>$u_hand<>$u_def<>$u_req<>$u_qlt<>$u_make<>$u_rest<>$u_eqp<>\n");
 		}
 	}
-	open(OUT,">$item_path$kid");
+
+	&item_db_save($kid, @new_equip_item);
+
+	open(OUT,">", $item_path. $kid);
 	print OUT @new_equip_item;
 	close(OUT);
 
@@ -466,13 +548,15 @@ sub item_equip
 #----------------#
 sub equip_check
 {
-	@check_equip = &load_ini($item_path. $kid);
+	my @check_equip = &item_load($kid);
 
 	$over_flag = 0;
 	$wep_hand = 0;
 	$def_hand = 0;
-	foreach(@check_equip){
-		($c_id,$c_no,$c_name,$c_dmg,$c_gold,$c_mode,$c_uelm,$c_eelm,$c_hand,$c_def,$c_req,$c_qlt,$c_make,$c_rest,$c_eqp) = split(/<>/);
+
+	foreach(@check_equip)
+	{
+		($c_id,$c_no,$c_name,$c_dmg,$c_gold,$c_mode,$c_uelm,$c_eelm,$c_hand,$c_def,$c_req,$c_qlt,$c_make,$c_rest,$c_eqp) = @$_;
 		if($c_id eq $k_id){
 			if($c_eqp ne $k_eqp){
 				# アイテム種別により処理変更
@@ -556,114 +640,71 @@ sub check_limit
 #----------------#
 sub item_sell
 {
-	#入国ＩＤ
-	$kid = $in{'id'};
-	$kpass = $in{'pass'};
-	if($btl_flg == 0){
-		$use_item = $in{'item'};
-	} else {
+	my @user_item = &item_load($kid);
+    my $sell_name;
+	my $sell_flag = 0;
+	my $select_id = "";
+	my $select_price = 0;
+	my $use_item;
+
+	if ($btl_flg == 0)
+	{
+		$use_item = $in{item};
+	}
+	else
+	{
 		$use_item = 1;
 	}
 
-	# ファイルロック
-	if ($lockkey == 1) { &lock1; }
-	elsif ($lockkey == 2) { &lock2; }
-	elsif ($lockkey == 3) { &file'lock; }
-
-	@delete_item = &load_ini($item_path. $kid);
-
-	$item_count = 0;
-	$sell_flag = 0;
-	$select_id   = "";
-	$select_item = "";
-	$select_price = 0;
-
-	@new_delete_item=();
-	foreach(@delete_item){
-		($u_id,$u_no,$u_name,$u_dmg,$u_gold,$u_mode,$u_uelm,$u_eelm,$u_hand,$u_def,$u_req,$u_qlt,$u_make,$u_rest,$u_eqp) = split(/<>/);
-		if($u_id eq $k_id){
-			$sell_flag = 1;
-			$sell_name = $u_name;
-			$select_id   = "$u_no$u_qlt$u_make";
-			$select_item = "$u_no<>$u_name<>$u_dmg<>$u_gold<>$u_mode<>$u_uelm<>$u_eelm<>$u_hand<>$u_def<>$u_req<>$u_qlt<>$u_make<>$use_item<>\n";
-			$select_price   = $u_gold;
-			if($u_rest < $use_item) {
-				$error = "所持アイテムが足りません。";
-				&item_check;
-			}
-			if($u_rest > $use_item){
-				$u_rest -= $use_item;
-
-				my $mes = "$item_count<>$u_no<>$u_name<>$u_dmg<>$u_gold<>$u_mode<>$u_uelm<>$u_eelm<>$u_hand<>$u_def<>$u_req<>$u_qlt<>$u_make<>$u_rest<>$u_eqp<>\n";
-				my $utf8 = Encode::encode_utf8($mes);
-
-				unshift(@new_delete_item,$utf8);
-				$item_count++;
-			}
-		} else {
-			my $mes = "$item_count<>$u_no<>$u_name<>$u_dmg<>$u_gold<>$u_mode<>$u_uelm<>$u_eelm<>$u_hand<>$u_def<>$u_req<>$u_qlt<>$u_make<>$u_rest<>$u_eqp<>\n";
-			my $utf8 = Encode::encode_utf8($mes);
-
-			unshift(@new_delete_item,$utf8);
-			$item_count++;
+	for my $ary (@user_item)
+	{
+		if ($ary->[0] ne $k_id)
+		{
+			next;
 		}
+
+		my $row = {};
+		@$row{@{$controller->config->{キャラ所持品}}} = @$ary;
+
+		if ($row->{所持数} < $use_item)
+		{
+			$error = "所持アイテムが足りません。";
+			&item_check;
+		}
+
+		$row->{所持数} -= $use_item;
+
+		$sell_name = $row->{名前};
+		$sell_flag = 1;
+		$select_id = sprintf("%s%s%s", @$row{qw|アイテムid 品質 作成者|});
+		$select_price = $row->{価値};
+
+		$system->save_item_db($kid, [ $row ]);
 	}
 
-	@item_chara = &load_ini($chara_file);
+	my $plus = 1 + $kn_6 / 200;
+	my $sell_price = int($select_price * $plus / 2) * $use_item;
+	$kgold += $sell_price;
+	$kitem = scalar @user_item;
 
-	$hit=0;@item_new=();
-	foreach(@item_chara){
-		($iid,$ipass,$iname,$isex,$ichara,$in_0,$in_1,$in_2,$in_3,$in_4,$in_5,$in_6,$ihp,$imaxhp,$iex,$ilv,$iap,$igold,$ilp,$itotal,$ikati,$ihost,$idate,$iarea,$ispot,$ipst,$iitem) = split(/<>/);
-		if($kid eq "$iid"){
-			if($btl_flg == 0){
-				$kspot = $ispot;
-				$kpst  = $ipst;
-				if($kspot == 0 && $kpst == 0){
-					#割増率の設定
-					$plus = 1 + $in_6 / 200;
-					$sell_price = int($select_price * $plus / 2) * $use_item;
-					$igold = $igold + $sell_price;
-				}
-			}
-			$iitem = $item_count;
-
-			my $mes = "$iid<>$ipass<>$iname<>$isex<>$ichara<>$in_0<>$in_1<>$in_2<>$in_3<>$in_4<>$in_5<>$in_6<>$ihp<>$imaxhp<>$iex<>$ilv<>$iap<>$igold<>$ilp<>$itotal<>$ikati<>$ihost<>$idate<>$iarea<>$ispot<>$ipst<>$iitem<>\n";
-			my $utf8 = Encode::encode_utf8($mes);
-
-			unshift(@item_new,$utf8);
-			$hit=1;
-		}else{
-			my $utf8 = Encode::encode_utf8($_);
-			push(@item_new,"$utf8\n");
-		}
-	}
-
-	if(!$hit) { &error("キャラクターが見つかりません。"); }
-
-	open(OUT,">$chara_file");
-	print OUT @item_new;
-	close(OUT);
-
-	open(OUT,">$item_path$kid");
-	print OUT @new_delete_item;
-	close(OUT);
-
-	&item_sort;
-
-	# ロック解除
-	if ($lockkey == 3) { &file'unlock; }
-	else { if(-e $lockfile) { unlink($lockfile); } }
+	&regist;
 
 	$msg = "";
-	if($sell_flag == 1 && $btl_flg == 0){
-		if($kspot == 0 && $kpst == 0){
-			$msg = "$sell_nameをを$use_item 個$sell_price Gで売却しました。";
-		} else {
-			$msg = "$sell_nameを$use_item 個捨てました。";
+
+	if ($sell_flag == 1 && $btl_flg == 0)
+	{
+		if ($kspot == 0 && $kpst == 0)
+		{
+			$msg = "$sell_name を$use_item 個$sell_price Gで売却しました。";
+		}
+		else
+		{
+			$msg = "$sell_name を$use_item 個捨てました。";
 		}
 	}
 
-	if($btl_flg == 0){
+	if ($btl_flg == 0)
+	{
 		&item_check;
 	}
 }
@@ -673,127 +714,100 @@ sub item_sell
 #----------------#
 sub user_sell
 {
-	#入国ＩＤ
-	$kid = $in{'id'};
-	$kpass = $in{'pass'};
-	$kitem = $in{'item'};
-	$sell_gold = $in{'gold'};
+	my @user_item = &item_load($kid);
+	my $sell_gold = $in{gold};
+	my $select_id = "";
+	my $sell_name;
+	my $sell_flag = 0;
+	my $select_price = 0;
+	my $use_item = $in{item};
+	my $sell;
 
-	if ($sell_gold =~ m/[^0-9]/ || $sell_gold eq ""){
+	if ($sell_gold !~ /^\d+$/)
+	{
 		$error = "金額は数字で入力してください。";
 		&item_check;
 	}
 
-	# ファイルロック
-	if ($lockkey == 1) { &lock1; }
-	elsif ($lockkey == 2) { &lock2; }
-	elsif ($lockkey == 3) { &file'lock; }
-
-	@delete_item = &load_ini($item_path. $kid);
-
-	$item_count = 0;
-	$sell_flag = 0;
-	$select_id   = "";
-	$select_item = "";
-	$select_price = 0;
-
-	@new_delete_item=();
-	foreach(@delete_item){
-		($u_id,$u_no,$u_name,$u_dmg,$u_gold,$u_mode,$u_uelm,$u_eelm,$u_hand,$u_def,$u_req,$u_qlt,$u_make,$u_rest,$u_eqp) = split(/<>/);
-		if($u_id eq $k_id){
-			$sell_flag = 1;
-			$sell_name = $u_name;
-			$select_id   = "$u_no$u_qlt$u_make$kid";
-			$select_item = "$u_no<>$u_name<>$u_dmg<>$sell_gold<>$u_mode<>$u_uelm<>$u_eelm<>$u_hand<>$u_def<>$u_req<>$u_qlt<>$u_make<>$kitem<>$kid<>\n";
-			$select_price   = $sell_gold;
-			if($u_rest < $kitem) {
-				$error = "所持アイテムが足りません。";
-				&item_check;
-			}
-			if($u_rest > $kitem){
-				$u_rest -= $kitem;
-
-				my $mes = "$item_count<>$u_no<>$u_name<>$u_dmg<>$u_gold<>$u_mode<>$u_uelm<>$u_eelm<>$u_hand<>$u_def<>$u_req<>$u_qlt<>$u_make<>$u_rest<>$u_eqp<>\n";
-				my $utf8 = Encode::encode_utf8($mes);
-
-				unshift(@new_delete_item,$utf8);
-				$item_count++;
-			}
-		} else {
-			my $mes = "$item_count<>$u_no<>$u_name<>$u_dmg<>$u_gold<>$u_mode<>$u_uelm<>$u_eelm<>$u_hand<>$u_def<>$u_req<>$u_qlt<>$u_make<>$u_rest<>$u_eqp<>\n";
-			my $utf8 = Encode::encode_utf8($mes);
-			unshift(@new_delete_item,$utf8);
-			$item_count++;
+	for my $ary (@user_item)
+	{
+		if ($ary->[0] ne $k_id)
+		{
+			next;
 		}
+
+		my $row = {};
+		@$row{@{$controller->config->{キャラ所持品}}} = @$ary;
+
+		if ($row->{所持数} < $use_item)
+		{
+			$error = "所持アイテムが足りません。";
+			&item_check;
+		}
+
+		$row->{所持数} -= $use_item;
+
+		$sell_name = $row->{名前};
+		$sell_flag = 1;
+		$select_id = sprintf("%s%s%s", @$row{qw|アイテムid 品質 作成者|});
+		$select_price = $row->{価値};
+
+		$sell = $ary;
+
+		$system->save_item_db($kid, [ $row ]);
 	}
 
-	@item_chara = &load_ini($chara_file);
+	$kitem = scalar @user_item;
+	&regist;
+	my @sell_item = &load_ini($user_shop[$karea]);
+	my $hit = 0;
+	my @new_list;
 
-	$hit=0;@item_new=();
-	foreach(@item_chara){
-		($iid,$ipass,$iname,$isex,$ichara,$in_0,$in_1,$in_2,$in_3,$in_4,$in_5,$in_6,$ihp,$imaxhp,$iex,$ilv,$iap,$igold,$ilp,$itotal,$ikati,$ihost,$idate,$iarea,$ispot,$ipst,$iitem) = split(/<>/);
-		if($kid eq "$iid"){
-			$kspot = $ispot;
-			$kpst  = $ipst;
-			open(IN,"$user_shop[$iarea]");
-			@item_array = <IN>;
-			close(IN);
-
-			@sell_item=();
-			$new_item = 0;
-			foreach(@item_array){
-				($i_no,$i_name,$i_dmg,$i_gold,$i_mode,$i_uelm,$i_eelm,$i_hand,$i_def,$i_req,$i_qlt,$i_make,$i_rest,$i_id) = split(/<>/);
-				if($select_id eq "$i_no$i_qlt$i_make$i_id") {
-					$i_rest += $kitem;
-					$new_item=1;
-					$i_gold = $select_price;
-					$i_id = $kid;
-				}
-
-				my $mes = "$i_no<>$i_name<>$i_dmg<>$i_gold<>$i_mode<>$i_uelm<>$i_eelm<>$i_hand<>$i_def<>$i_req<>$i_qlt<>$i_make<>$i_rest<>$i_id<>\n";
-				my $utf8 = Encode::encode_utf8($mes);
-
-				unshift(@sell_item,$utf8);
-			}
-			if($new_item == 0) {
-				unshift(@sell_item,$select_item);
-			}
-			open(OUT,">$user_shop[$iarea]");
-			print OUT @sell_item;
-			close(OUT);
-
-			&shop_sort;
-			$iitem = $item_count;
-
-			my $mes = "$iid<>$ipass<>$iname<>$isex<>$ichara<>$in_0<>$in_1<>$in_2<>$in_3<>$in_4<>$in_5<>$in_6<>$ihp<>$imaxhp<>$iex<>$ilv<>$iap<>$igold<>$ilp<>$itotal<>$ikati<>$ihost<>$idate<>$iarea<>$ispot<>$ipst<>$iitem<>\n";
-			my $utf8 = Encode::encode_utf8($mes);
-
-			unshift(@item_new,$utf8);
-			$hit=1;
-		}else{
-			push(@item_new,"$_\n");
-		}
+	for my $no (0 .. $#sell_item)
+	{
+		my $data = $sell_item[$no];
+		my @data = split(/<>/, $data);
+		my $item = {};
+		@$item{qw|アイテムid 名前 効果 価値 アイテム種別 攻撃属性 属性 使用 耐久 装備条件 品質 作成者 所持数 キャラid|} = @data;
+		push(@new_list, $item);
 	}
 
-	if(!$hit) { &error("キャラクターが見つかりません。"); }
+	@sell_item = @new_list;
 
-	open(OUT,">$chara_file");
-	print OUT @item_new;
-	close(OUT);
+	for my $no (0 .. $#sell_item)
+	{
+		my $item = $sell_item[$no];
+		my $tmp_uniq_key = sprintf("%s%s%s", @$item{qw|アイテムid 品質 作成者|});
 
-	open(OUT,">$item_path$kid");
-	print OUT @new_delete_item;
+		if ($tmp_uniq_key ne $select_id)
+		{
+			next;
+		}
+
+		my @tmp = (@$sell[1 .. 14], $kid);
+		my $mes = join("<>", @tmp);
+		my $utf8 = Encode::encode_utf8($mes);
+		$sell_item[$no] = $utf8;
+	}
+
+	if ($hit == 0)
+	{
+		my @tmp = (@$sell[1 .. 14], $kid);
+		my $mes = join("<>", @tmp);
+		my $utf8 = Encode::encode_utf8($mes);
+		unshift(@sell_item, $utf8);
+	}
+
+	open(OUT,">", $user_shop[$karea]);
+	print OUT @sell_item;
 	close(OUT);
 
 	&item_sort;
 
-	# ロック解除
-	if ($lockkey == 3) { &file'unlock; }
-	else { if(-e $lockfile) { unlink($lockfile); } }
-
 	$msg = "";
-	if($sell_flag == 1){
-		$msg = "$sell_nameを$kitem 個$select_price Gで出品しました。";
+	if($sell_flag == 1)
+	{
+		$msg = "$sell_name を$kitem 個$select_price Gで出品しました。";
 	}
 
 	&item_check;
@@ -1207,126 +1221,95 @@ sub item_sort
 #----------------#
 sub item_delete
 {
-	#入国ＩＤ
-	$kid = $in{'id'};
-	$kpass = $in{'pass'};
+	my @user_item = &item_load($kid);
+	my $use;
 
-	# ファイルロック
-	if ($lockkey == 1) { &lock1; }
-	elsif ($lockkey == 2) { &lock2; }
-	elsif ($lockkey == 3) { &file'lock; }
-
-	@use_item = &load_ini($item_path. $kid);
-
-	$item_count = 0;
-	$use_flag = 1;
-	$use_name = "";
-	$use_pow  = 0;
-	$use_mode = "";
-
-	@new_use_item=();
-	foreach(@use_item){
-		($u_id,$u_no,$u_name,$u_dmg,$u_gold,$u_mode,$u_uelm,$u_eelm,$u_hand,$u_def,$u_req,$u_qlt,$u_make,$u_rest,$u_eqp) = split(/<>/);
-		if($u_id eq $k_id){
-			$use_flag = 1;
-			$use_name = $u_name;
-			$use_pow  = $u_dmg;
-			$use_mode = $u_mode;
-			$use_qlt  = $u_qlt;
-			if($u_rest > 1){
-				$u_rest -= 1;
-
-				my $mes = "$item_count<>$u_no<>$u_name<>$u_dmg<>$u_gold<>$u_mode<>$u_uelm<>$u_eelm<>$u_hand<>$u_def<>$u_req<>$u_qlt<>$u_make<>$u_rest<>$u_eqp<>\n";
-				my $utf8 = Encode::encode_utf8($mes);
-
-				unshift(@new_use_item,$utf8);
-				$item_count++;
-			}
-		} else {
-			my $mes = "$item_count<>$u_no<>$u_name<>$u_dmg<>$u_gold<>$u_mode<>$u_uelm<>$u_eelm<>$u_hand<>$u_def<>$u_req<>$u_qlt<>$u_make<>$u_rest<>$u_eqp<>\n";
-			my $utf8 = Encode::encode_utf8($mes);
-
-			unshift(@new_use_item,$utf8);
-			$item_count++;
+	for my $ary (@user_item)
+	{
+		if ($ary->[0] ne $k_id)
+		{
+			next;
 		}
+
+		my $row = {};
+		@$row{@{$controller->config->{キャラ所持品}}} = @$ary;
+		$row->{所持数} -= 1;
+		$use = $row;
+		$system->save_item_db($kid, [ $row ]);
 	}
 
-	@item_chara = &load_ini($chara_file);
+	my $use_name = $use->{名前};
+	my $use_mode = $use->{アイテム種別};
+	my $use_flag = 1;
+	my $use_pow  = $use->{効果};
+	my $use_qlt  = $use->{品質};
 
-	$hit=0;@item_new=();
-	foreach(@item_chara){
-		($iid,$ipass,$iname,$isex,$ichara,$in_0,$in_1,$in_2,$in_3,$in_4,$in_5,$in_6,$ihp,$imaxhp,$iex,$ilv,$iap,$igold,$ilp,$itotal,$ikati,$ihost,$idate,$iarea,$ispot,$ipst,$iitem) = split(/<>/);
-		if($kid eq "$iid"){
-			if($use_mode eq "01"){
-				$ihp = $ihp + $use_pow;
-				if($ihp > $imaxhp){$ihp = $imaxhp;}
-			}elsif($use_mode eq "02"){
-				$ilp = $ilp + $use_pow;
-				if($ilp > $max_lp){$ilp = $max_lp;}
-			} elsif($use_mode eq "03") {
-				$iarea = $use_pow;
-				$ispot = 0;
-				$ipst  = 0;
-			} elsif($use_mode eq "04") {
-				&skill_gain($use_pow,$use_qlt);
-			} elsif($use_mode eq "07"){
-				$rcvhp = int($use_pow * ($ksk[20]/ 1000 + rand(2) / 5 + 1) / 2);
-				&skill_up(20,($imaxhp - $ihp) / 10);
-				$ihp = $ihp + $rcvhp;
-				if($ihp > $imaxhp){$ihp = $imaxhp;}
-			}
-			$iitem = $item_count;
-
-			my $mes = "$iid<>$ipass<>$iname<>$isex<>$ichara<>$in_0<>$in_1<>$in_2<>$in_3<>$in_4<>$in_5<>$in_6<>$ihp<>$imaxhp<>$iex<>$ilv<>$iap<>$igold<>$ilp<>$itotal<>$ikati<>$ihost<>$idate<>$iarea<>$ispot<>$ipst<>$iitem<>\n";
-			my $utf8 = Encode::encode_utf8($mes);
-
-			unshift(@item_new,$utf8);
-			$hit=1;
-		}else{
-			push(@item_new,"$_\n");
-		}
+	if($use_mode eq "01")
+	{
+		$khp = $khp + $use_pow;
+		if($khp > $kmaxhp){$khp = $kmaxhp;}
+	}
+	elsif($use_mode eq "02")
+	{
+		$klp = $klp + $use_pow;
+		if($klp > $max_lp){$klp = $max_lp;}
+	}
+	elsif($use_mode eq "03")
+	{
+		$karea = $use_pow;
+		$kspot = 0;
+		$kpst  = 0;
+	}
+	elsif($use_mode eq "04")
+	{
+		&skill_gain($use_pow, $use_qlt);
+	}
+	elsif($use_mode eq "07")
+	{
+		my $rcvhp = int($use_pow * ($ksk[20]/ 1000 + rand(2) / 5 + 1) / 2);
+		&skill_up(20,($kmaxhp - $khp) / 10);
+		$khp = $khp + $rcvhp;
+		if($khp > $kmaxhp){$khp = $kmaxhp;}
 	}
 
-	if(!$hit) { &error("キャラクターが見つかりません。"); }
+	$kitem = scalar @user_item;
 
-	open(OUT,">$chara_file");
-	print OUT @item_new;
-	close(OUT);
-
-	open(OUT,">$item_path$kid");
-	print OUT @new_use_item;
-	close(OUT);
-
-	&item_sort;
-
-	# ロック解除
-	if ($lockkey == 3) { &file'unlock; }
-	else { if(-e $lockfile) { unlink($lockfile); } }
+	&regist;
 
 	$msg = "";
-	if($use_flag == 1){
-		if($use_mode eq "01"){
-			$msg = "$use_nameを使用し、HPが<b>$use_pow</b>回復しました。";
-		} elsif($use_mode eq "02"){
-			$msg = "$use_nameを使用し、LPが<b>$use_pow</b>回復しました。";
-		} elsif($use_mode eq "03"){
-			$movemsg = "$use_nameを手に念じると、$town_name[$use_pow]の風景が浮かんで来て・・・<p>$town_name[$use_pow]の入り口に立っていました。";
+
+	if($use_flag == 1)
+	{
+		if($use_mode eq "01")
+		{
+			$msg = "$use_name を使用し、HPが<b>$use_pow</b>回復しました。";
+		}
+		elsif($use_mode eq "02")
+		{
+			$msg = "$use_name を使用し、LPが<b>$use_pow</b>回復しました。";
+		}
+		elsif($use_mode eq "03")
+		{
+			$movemsg = "$use_name を手に念じると、$town_name[$use_pow]の風景が浮かんで来て・・・<p>$town_name[$use_pow]の入り口に立っていました。";
 			$mode = "log_in";
 			&log_in;
 			exit;
-		} elsif($use_mode eq "04"){
+		}
+		elsif($use_mode eq "04")
+		{
 			if($use_qlt > 0){
-				$msg = "$use_nameを使用すると、$chara_skill[$use_pow]の最大値と、最大合計スキルが<b>5</b>上昇しました。";
+				$msg = "$use_name を使用すると、$chara_skill[$use_pow]の最大値と、最大合計スキルが<b>5</b>上昇しました。";
 			} else {
-				$msg = "$use_nameを使用すると、$chara_skill[$use_pow]の最大値が<b>5</b>上昇しました。";
+				$msg = "$use_name を使用すると、$chara_skill[$use_pow]の最大値が<b>5</b>上昇しました。";
 			}
-		} elsif($use_mode eq "07"){
-			$msg = "$kskm$use_nameを使用し、HPが<b>$rcvhp</b>回復しました。";
+		}
+		elsif($use_mode eq "07")
+		{
+			$msg = "$kskm $use_name を使用し、HPが<b>$rcvhp</b>回復しました。";
 		}
 	}
 
 	&item_check;
-
 }
 
 #--------------------#

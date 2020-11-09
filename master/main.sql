@@ -59,10 +59,6 @@ CREATE TABLE キャラ追加情報1 (
 
 DROP TABLE IF EXISTS メッセージ;
 
-/*
-2PdnIdMvpZ<>BYpqoaTNSU<>NPC:1<>これはNPC NPC:1 からのメッセージ送信テストです。絶賛開発中です。<>NPC:2<>2020/11/02 19:25<>
-*/
-
 CREATE TABLE メッセージ (
         id INTEGER PRIMARY KEY,
         送付元id TEXT NOT NULL,
@@ -71,6 +67,132 @@ CREATE TABLE メッセージ (
         送付先名前 TEXT,
         メッセージ TEXT NOT NULL,
         受信日時 DATETIME,
+        ctime DATETIME,
+	    mtime DATETIME
+ );
+
+DROP TABLE IF EXISTS キャラスキル最大値; /* @kmx */
+
+CREATE TABLE キャラスキル最大値 (
+        id TEXT PRIMARY KEY,
+        剣術 INTEGER NOT NULL,
+        棍棒 INTEGER NOT NULL,
+        槍術 INTEGER NOT NULL,
+        弓術 INTEGER NOT NULL,
+        銃 INTEGER NOT NULL,
+        格闘 INTEGER NOT NULL,
+        魔術 INTEGER NOT NULL,
+        法術 INTEGER NOT NULL,
+        符術 INTEGER NOT NULL,
+        錬金術 INTEGER NOT NULL,
+        近接戦闘 INTEGER NOT NULL,
+        狙撃 INTEGER NOT NULL,
+        集中力 INTEGER NOT NULL,
+        暗黒 INTEGER NOT NULL,
+        騎士道 INTEGER NOT NULL,
+        忍術 INTEGER NOT NULL,
+        採掘 INTEGER NOT NULL,
+        採集 INTEGER NOT NULL,
+        釣り INTEGER NOT NULL,
+        野営 INTEGER NOT NULL,
+        治療 INTEGER NOT NULL,
+        盾防御 INTEGER NOT NULL,
+        合計MAX値 INTEGER NOT NULL,
+        ctime DATETIME,
+	    mtime DATETIME
+ );
+
+DROP TABLE IF EXISTS キャラスキル現状値; /* @ksk */
+
+CREATE TABLE キャラスキル現状値 (
+        id TEXT PRIMARY KEY,
+        剣術 INTEGER NOT NULL,
+        棍棒 INTEGER NOT NULL,
+        槍術 INTEGER NOT NULL,
+        弓術 INTEGER NOT NULL,
+        銃 INTEGER NOT NULL,
+        格闘 INTEGER NOT NULL,
+        魔術 INTEGER NOT NULL,
+        法術 INTEGER NOT NULL,
+        符術 INTEGER NOT NULL,
+        錬金術 INTEGER NOT NULL,
+        近接戦闘 INTEGER NOT NULL,
+        狙撃 INTEGER NOT NULL,
+        集中力 INTEGER NOT NULL,
+        暗黒 INTEGER NOT NULL,
+        騎士道 INTEGER NOT NULL,
+        忍術 INTEGER NOT NULL,
+        採掘 INTEGER NOT NULL,
+        採集 INTEGER NOT NULL,
+        釣り INTEGER NOT NULL,
+        野営 INTEGER NOT NULL,
+        治療 INTEGER NOT NULL,
+        盾防御 INTEGER NOT NULL,
+        ctime DATETIME,
+	    mtime DATETIME
+ );
+
+DROP TABLE IF EXISTS キャラスキル設定値; /* @kmg */ /* NULL...未設定、0...上昇、1...下降、2...維持 */
+
+CREATE TABLE キャラスキル設定値 (
+        id TEXT PRIMARY KEY,
+        剣術 INTEGER NOT NULL,
+        棍棒 INTEGER NOT NULL,
+        槍術 INTEGER NOT NULL,
+        弓術 INTEGER NOT NULL,
+        銃 INTEGER NOT NULL,
+        格闘 INTEGER NOT NULL,
+        魔術 INTEGER NOT NULL,
+        法術 INTEGER NOT NULL,
+        符術 INTEGER NOT NULL,
+        錬金術 INTEGER NOT NULL,
+        近接戦闘 INTEGER NOT NULL,
+        狙撃 INTEGER NOT NULL,
+        集中力 INTEGER NOT NULL,
+        暗黒 INTEGER NOT NULL,
+        騎士道 INTEGER NOT NULL,
+        忍術 INTEGER NOT NULL,
+        採掘 INTEGER NOT NULL,
+        採集 INTEGER NOT NULL,
+        釣り INTEGER NOT NULL,
+        野営 INTEGER NOT NULL,
+        治療 INTEGER NOT NULL,
+        盾防御 INTEGER NOT NULL,
+        ctime DATETIME,
+	    mtime DATETIME
+ );
+
+DROP TABLE IF EXISTS キャラバフ;
+
+CREATE TABLE キャラバフ (
+        id TEXT PRIMARY KEY,
+        リスク INTEGER NOT NULL,
+        攻撃力 INTEGER NOT NULL,
+        防御力 INTEGER NOT NULL,
+        素早さ INTEGER NOT NULL,
+        ctime DATETIME,
+	    mtime DATETIME
+ );
+
+DROP TABLE IF EXISTS キャラ所持品;
+
+CREATE TABLE キャラ所持品 (
+        id INTEGER PRIMARY KEY,
+        キャラid id TEXT NOT NULL,
+        アイテムid TEXT NOT NULL,
+        名前 TEXT NOT NULL,
+        効果 INTEGER NOT NULL,
+        価値 INTEGER NOT NULL,
+        アイテム種別 TEXT NOT NULL,
+        攻撃属性 INTEGER NOT NULL,
+        属性 INTEGER NOT NULL,
+        使用 INTEGER NOT NULL,
+        耐久 INTEGER NOT NULL,
+        装備条件 INTEGER NOT NULL,
+        品質 INTEGER NOT NULL,
+        作成者 TEXT NOT NULL,
+        所持数 INTEGER NOT NULL,
+        装備 INTEGER NOT NULL,
         ctime DATETIME,
 	    mtime DATETIME
  );

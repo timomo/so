@@ -224,16 +224,23 @@ sub user_shop
 			$idmg = "&nbsp";
 			$ireq = "&nbsp;";
 		}
-		my ($bid,$bpass,$bname);
 
-		foreach(@item_chara){
-			($bid,$bpass,$bname) = split(/<>/);
-			if($iid eq "$bid") { last; }
+		my $name = "";
+
+		foreach(@item_chara)
+		{
+			my ($bid, $bpass, $bname) = split(/<>/);
+
+			if($iid eq "$bid")
+			{
+				$name = $bname;
+				last;
+			}
 		}
 
 		if($iid eq "$kid"){ $igold = 0; }
 
-		my $mes = "<tr><td><input type=radio name=item_no value=\"$ino$iqlt$imake$iid\"></td><td>$bname</td><td align=center>$item_mode[$imode]</td><td>$iname</td><td align=center>$idmg</td><td align=center>$igold G</td><td align=center>$item_hand[$ihand]</td><td align=center>$ireq</td><td align=center><font color=$elmcolor[$ieelm]>$item_eelm[$ieelm]</font></td><td align=center>$item_def[$idef]</td><td align=center>$item_qlt[$iqlt]</td><td align=center>$imake</td><td align=center>$irest 個</td></tr>";
+		my $mes = "<tr><td><input type=radio name=item_no value=\"$ino$iqlt$imake$iid\"></td><td>$name</td><td align=center>$item_mode[$imode]</td><td>$iname</td><td align=center>$idmg</td><td align=center>$igold G</td><td align=center>$item_hand[$ihand]</td><td align=center>$ireq</td><td align=center><font color=$elmcolor[$ieelm]>$item_eelm[$ieelm]</font></td><td align=center>$item_def[$idef]</td><td align=center>$item_qlt[$iqlt]</td><td align=center>$imake</td><td align=center>$irest 個</td></tr>";
 
 		push(@item_list, $mes);
 	}
@@ -400,7 +407,7 @@ sub item_buy
 	my @item_array = &load_ini($item_file);
 	my $hit = 0;
 	my $item_no_id = Encode::encode_utf8($in{'item_no'});
-	my ($i_no,$i_name,$i_dmg,$i_gold,$i_mode,$i_uelm,$i_eelm,$i_hand,$i_def,$i_req,$i_qlt,$i_make,$i_rest);
+	our ($i_no, $i_name, $i_dmg, $i_gold, $i_mode, $i_uelm, $i_eelm, $i_hand, $i_def, $i_req, $i_qlt, $i_make, $i_rest);
 
 	foreach(@item_array)
 	{
@@ -416,8 +423,6 @@ sub item_buy
 	my $date = time();
 
 	@item_chara = &load_ini($chara_file);
-	@item_array = &load_ini($town_shop[$item_area]);
-
 	$buy_gold = 0;
 	$buy_name = "";
 	$hit=0;@item_new=();

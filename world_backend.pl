@@ -484,6 +484,45 @@ app->helper(
 );
 
 app->helper(
+    setting_parameter => sub
+    {
+        my $self = shift;
+        my $k = shift;
+        my $bonus = shift;
+        # 3:3:4の確率で、素早さ重視、賢さ・信仰心重視、体力重視に分かれる
+        my $per = $system->range_rand(0, 100);
+
+        if ($per >= 0 && $per <= 30)
+        {
+            $k->{素早さ} += $bonus;
+        }
+        elsif ($per > 30 && $per <= 60)
+        {
+            my $haibun1 = int($bonus / 2);
+            my $haibun2 = $bonus - $haibun1;
+            $k->{賢さ} += $haibun1;
+            $k->{信仰心重視} += $haibun2;
+        }
+        else
+        {
+            $k->{体力} += $bonus;
+        }
+    },
+);
+
+app->helper(
+    setting_skills => sub
+    {
+        my $self = shift;
+        my $k = shift;
+        my $skill1 = $self->config->{スキル}->[$self->range_rand(0, 21)];
+        my $skill2 = $self->config->{スキル}->[$self->range_rand(0, 21)];
+
+
+    },
+);
+
+app->helper(
     spawn => sub
     {
         my $self = shift;
@@ -520,6 +559,10 @@ app->helper(
             0, # 距離
             0, # アイテム
         );
+
+        $self->setting_parameter($n, $self->range_rand(7, 14));
+
+
 
         my $t = {};
         @$t{@keys3} = (

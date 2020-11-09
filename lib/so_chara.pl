@@ -55,9 +55,11 @@ EOM
 	</tr>
 	<tr>
 EOM
-	$point+=7;
+	my $point = $system->range_rand(7, 14);
 
-	$i=0;$j=0;
+	my $i=0;
+	my $j=0;
+
 	foreach(0..6){
 		print "<td>$kiso_nouryoku[$i] + <select name=n_$i>\n";
 		foreach(0..$point){

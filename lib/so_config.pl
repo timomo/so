@@ -3,29 +3,46 @@ use utf8;
 #------------------#
 #  buffデータ読込  #
 #------------------#
-sub read_buff {
-	@buff = &load_ini($buff_file);
+sub read_buff
+{
+	my $buff = $system->load_buff_db($rid);
 
-	$hit=0;@buff_new=();@rbuf=();
-	foreach(@buff){
-		($bid,$brsk,$batc,$bdef,$bspd) = split(/<>/);
-		if($rid eq "$bid") {
-			$rrsk = $brsk;
-			$rbuf[0] = $batc / 100;
-			$rbuf[1] = $bdef / 100;
-			$rbuf[2] = $bspd / 100;
-			$hit=1;
-			last;
+	if (! defined $buff->{id})
+	{
+		@buff = &load_ini($buff_file);
+
+		$hit=0;@buff_new=();@rbuf=();
+		foreach(@buff){
+			my ($bid,$brsk,$batc,$bdef,$bspd) = split(/<>/);
+			if($rid eq "$bid") {
+				$rrsk = $brsk;
+				$rbuf[0] = $batc / 100;
+				$rbuf[1] = $bdef / 100;
+				$rbuf[2] = $bspd / 100;
+				$hit=1;
+				last;
+			}
 		}
-	}
 
-	if(!$hit){@rbuf = (1,1,1);}
+		if(!$hit){@rbuf = (1,1,1);}
+	}
+	else
+	{
+		($rrsk, @rbuf) = @$buff{@{$controller->config->{キャラバフ}}};
+	}
+}
+
+sub regist_buff
+{
+	my $buff = {};
+	@$buff{@{$controller->config->{キャラバフ}}} = ($krsk, @kbuf);
+	$system->save_buff_db($kid, $buff);
 }
 
 #------------------#
 #  buffデータ書込  #
 #------------------#
-sub regist_buff {
+sub _regist_buff {
 
 	# ファイルロック
 	if ($lockkey == 1) { &lock1; }
