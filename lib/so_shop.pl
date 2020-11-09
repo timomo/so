@@ -469,10 +469,10 @@ sub user_buy
 		$error = "アイテムを選んでください。";
 		&user_shop;
 	}
+	if($kspot != 0 || $kpst != 0) { &error("不正なパラメータです"); }
 
 	my $exhibits = $system->load_exhibit_db($karea);
-	my $item_no_id = Encode::encode_utf8($in{'item_no'});
-	our ($i_no,$i_name,$i_dmg,$i_gold,$i_mode,$i_uelm,$i_eelm,$i_hand,$i_def,$i_req,$i_qlt,$i_make,$i_rest,$i_id);
+	my $item_no_id = $in{'item_no'};
 	my $hit = 0;
 	my $sell;
 
@@ -485,6 +485,7 @@ sub user_buy
 			last;
 		}
 	}
+
 	if($hit == 0) { &error("アイテムが存在しません。"); }
 
 	&get_host;
@@ -496,15 +497,14 @@ sub user_buy
 	my $buy_name = "";
 	my $rtn_flag = 0;
 	$hit = 0;
-	my @item_new=();
-	my @buy_item = ();
 
-	if($kitem eq $max_item) {
+	if($kitem eq $max_item)
+	{
 		$error = "所持アイテムが多すぎます。";
 		&user_shop;
 	}
-	$buy_gold =$i_gold * $item_cnt;
-	if($kid eq "$i_id")
+	$buy_gold = $sell->{価値} * $item_cnt;
+	if($kid eq $sell->{キャラid})
 	{
 		$buy_gold = 0;
 		$rtn_flag = 1;
@@ -519,8 +519,6 @@ sub user_buy
 		$kgold -= $buy_gold;
 	}
 
-	(my $dummy, my $dummy2, $i_no,$i_name,$i_dmg,$i_gold,$i_mode,$i_uelm,$i_eelm,$i_hand,$i_def,$i_req,$i_qlt,$i_make,$i_rest,$i_id) = @$sell{@{$controller->config->{出品データ}}};
-
 	if($sell->{所持数} < $item_cnt)
 	{
 		$error = "在庫が足りません。";
@@ -528,9 +526,12 @@ sub user_buy
 	}
 
 	$sell->{所持数} -= $item_cnt;
-	&item_price;
+	my $kprice = &item_price($sell);
 	$sell->{価値} = $kprice;
 	$system->save_exhibit_db($karea, $exhibits);
+
+	# 以降、アイテム用に使うのでid削除
+	delete $sell->{id};
 
 	my $items = $system->load_item_db($kid);
 	my $key = sprintf("%s%s%s", @$sell{qw|アイテムid 品質 作成者|});
@@ -555,7 +556,6 @@ sub user_buy
 	{
 		my $item = {};
 		@$item{@{$controller->config->{キャラ所持品}}} = @$sell{@{$controller->config->{キャラ所持品}}};
-		delete $item->{id};
 		$item->{所持数} = $item_cnt;
 		$item->{キャラid} = $kid;
 		$item->{装備} ||= 0;
@@ -564,57 +564,16 @@ sub user_buy
 
 	$system->save_item_db($kid, $items);
 
-=begin
-	$buy_name = $i_name;
-	$kid = $iid;
-	$kpass = $ipass;
-	$kcnt = $item_cnt;
-	&item_regist;
+	# 銀行
+	$krgold = $buy_gold;
+	$kpgold = 0;
+	$kpitem = 0;
+	$kmsg = "「$iname の チュパフリマ $town_name[$karea] における $buy_name 購入 」 <b>$buy_gold</b> G";
+	$bflag = 1;
+	&regist_bank;
 
-					$kid = $i_id;
-					$krgold = $buy_gold;
-					$kpgold = 0;$kpitem = 0;
-					$kmsg = "「$iname の チュパフリマ $town_name[$karea] における $buy_name 購入 」 <b>$buy_gold</b> G";
-					$bflag = 1;
-					&regist_bank;
-
-					$kid = $iid;
-					$kspot = $ispot;
-					$kpst = $ipst;
-
-					$iitem = $u_cnt;
-
-					if($i_rest > $item_cnt) {
-						$i_rest -= $item_cnt;
-
-						my $mes = "$i_no<>$i_name<>$i_dmg<>$i_gold<>$i_mode<>$i_uelm<>$i_eelm<>$i_hand<>$i_def<>$i_req<>$i_qlt<>$i_make<>$i_rest<>$i_id<>\n";
-						my $utf8 = Encode::encode_utf8($mes);
-
-						unshift(@buy_item,$utf8);
-					}
-				}else{
-					my $mes = "$i_no<>$i_name<>$i_dmg<>$i_gold<>$i_mode<>$i_uelm<>$i_eelm<>$i_hand<>$i_def<>$i_req<>$i_qlt<>$i_make<>$i_rest<>$i_id<>\n";
-					my $utf8 = Encode::encode_utf8($mes);
-
-					unshift(@buy_item,$utf8);
-				}
-			}
-
-			my $mes = "$iid<>$ipass<>$iname<>$isex<>$ichara<>$in_0<>$in_1<>$in_2<>$in_3<>$in_4<>$in_5<>$in_6<>$ihp<>$imaxhp<>$iex<>$ilv<>$iap<>$igold<>$ilp<>$itotal<>$ikati<>$host<>$idate<>$iarea<>$ispot<>$ipst<>$iitem<>\n";
-			my $utf8 = Encode::encode_utf8($mes);
-
-			unshift(@item_new,$utf8);
-			$hit=1;
-		}else{
-			push(@item_new,"$_\n");
-		}
-	}
-=cut
-	# if($hit == 0) { &error("キャラクターが見つかりません。"); }
-	if($kspot != 0 || $kpst != 0) { &error("不正なパラメータです"); }
-
-	$iarea = $item_area;
-	&shop_sort;
+	# $iarea = $item_area;
+	# &shop_sort;
 
 	$buy_msg = "$buy_gold Gで買いました。";
 	if($rtn_flag == 1){

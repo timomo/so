@@ -1295,24 +1295,37 @@ sub item_delete
 #--------------------#
 sub item_price
 {
-	#価格を算出
-	open(IN,"$item_file");
-	@item_price = <IN>;
-	close(IN);
+	my $item = shift;
 
-	if($i_mode eq "04"){
+	if(! defined $item) { &error("アイテムの価格の引数が不正です"); }
+
+	#価格を算出
+	my @item_price = &load_ini($item_file);
+	my $price_no;
+
+	if($item->{アイテム種別} eq "04")
+	{
 		$price_no = $stone_no;
 	} else {
-		$price_no = $i_no;
+		$price_no = $item->{アイテムid};
 	}
 
-	$hit=0;$kprice=0;
+	my $hit = 0;
+	my $kprice = 0;
+
 	foreach(@item_price){
-		($p_no,$p_name,$p_dmg,$p_gold,$p_mode,$p_uelm,$p_eelm,$p_hand,$p_def,$p_req,$p_qlt,$p_make,$p_rest) = split(/<>/);
-		if("$price_no$i_qlt" eq "$p_no$p_qlt") { $hit=1; $kprice = $p_gold; last; }
-	}
-	if(!$hit) { &error("アイテムが存在しません。"); }
+		my ($p_no,$p_name,$p_dmg,$p_gold,$p_mode,$p_uelm,$p_eelm,$p_hand,$p_def,$p_req,$p_qlt,$p_make,$p_rest) = split("<>");
 
+		if($price_no. $item->{品質} eq "$p_no$p_qlt")
+		{
+			$hit=1;
+			$kprice = $p_gold;
+			last;
+		}
+	}
+	if($hit == 0) { &error("アイテムが存在しません。"); }
+
+	return $kprice;
 }
 
 1;
