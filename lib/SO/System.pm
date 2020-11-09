@@ -62,6 +62,7 @@ sub dbi
         $dbi->create_model("キャラスキル最大値");
         $dbi->create_model("キャラバフ");
         $dbi->create_model("キャラ所持品");
+        $dbi->create_model("出品データ");
 
         $self->dbis->{$type} = $dbi;
 
@@ -227,7 +228,7 @@ sub load_item_db
     my $result = $self->dbi("main")->model("キャラ所持品")->select(["*"], where => { キャラid => $id });
     my $rows = $result->fetch_hash_all;
 
-    $self->modify_buff_data($_) for @$rows;
+    $self->modify_item_data($_) for @$rows;
 
     return $rows;
 }
@@ -407,6 +408,52 @@ sub save_item_db
             splice(@$rows, $no, 1);
             $no--;
             $self->dbi("main")->model("キャラ所持品")->delete(where => { id => $item->{id} });
+        }
+    }
+}
+
+sub load_exhibit_db
+{
+    my $self = shift;
+    my $area = shift;
+    my $result = $self->dbi("main")->model("出品データ")->select(["*"], where => { エリア => $area });
+    my $rows = $result->fetch_hash_all;
+    return $rows;
+}
+
+sub save_exhibit_db
+{
+    my $self = shift;
+    my $area = shift;
+    my $rows = shift;
+
+    for my $no (0 .. $#$rows)
+    {
+        my $item = $rows->[$no];
+        $item->{エリア} = $area;
+
+        $self->modify_item_data($item);
+
+        if ($item->{所持数} != 0)
+        {
+            my $result = $self->dbi("main")->model("出品データ")->select(["*"], where => { id => $item->{id} });
+            my $row = $result->fetch_hash_one;
+
+            if (defined $row)
+            {
+                $self->dbi("main")->model("出品データ")->update($item, where => {id => $item->{id}}, mtime => "mtime");
+            }
+            else
+            {
+                delete $item->{id};
+                $self->dbi("main")->model("出品データ")->insert($item, ctime => "ctime");
+            }
+        }
+        else
+        {
+            splice(@$rows, $no, 1);
+            $no--;
+            $self->dbi("main")->model("出品データ")->delete(where => { id => $item->{id} });
         }
     }
 }

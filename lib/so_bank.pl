@@ -79,7 +79,8 @@ sub regist_bank {
 	@bank = &load_ini($bank_file);
 
 	$hit=0;@bank_new=();
-	foreach(@bank){
+	foreach(@bank)
+	{
 		($bid,$bpgold,$brgold,$bpitem,$bmsg) = split(/<>/);
 		if($kid eq "$bid") {
 			# 支払い完了

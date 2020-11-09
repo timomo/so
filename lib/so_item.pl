@@ -312,7 +312,7 @@ sub item_regist
 	}
 
 	if($u_flag eq 0 && $in{'new'} ne 'new'){
-		my $mes = "$u_cnt<>$i_no<>$i_name<>$i_dmg<>$i_gold<>$i_mode<>$i_uelm<>$i_eelm<>$i_hand<>$i_def<>$i_req<>$i_qlt<>$i_make<>$kcnt<>$i_eqp<>\n";
+		my $mes = "<>$i_no<>$i_name<>$i_dmg<>$i_gold<>$i_mode<>$i_uelm<>$i_eelm<>$i_hand<>$i_def<>$i_req<>$i_qlt<>$i_make<>$kcnt<>$i_eqp<>\n";
 		my $utf8 = Encode::encode_utf8($mes);
 		unshift(@new, $mes);
 		$u_cnt++;
@@ -326,6 +326,7 @@ sub item_regist
 
 	# TODO: !!!!
 	my @items = ();
+
 	for my $line (@new)
 	{
 		$line =~ s/(?:\r\n|\r|\n)$//g;
@@ -746,63 +747,40 @@ sub user_sell
 		}
 
 		$row->{所持数} -= $use_item;
-
 		$sell_name = $row->{名前};
 		$sell_flag = 1;
-		$select_id = sprintf("%s%s%s", @$row{qw|アイテムid 品質 作成者|});
+		$select_id = sprintf("%s%s%s", @$row{qw|アイテムid 品質 作成者|}, $kid);
 		$select_price = $row->{価値};
-
-		$sell = $ary;
-
+		$sell = $row;
 		$system->save_item_db($kid, [ $row ]);
+	}
+
+	if (! defined $sell)
+	{
+		$error = "アイテムがありません。";
+		&item_check;
 	}
 
 	$kitem = scalar @user_item;
 	&regist;
-	my @sell_item = &load_ini($user_shop[$karea]);
+	my $exhibits = $system->load_exhibit_db($karea); # 出品データ
 	my $hit = 0;
-	my @new_list;
-
-	for my $no (0 .. $#sell_item)
-	{
-		my $data = $sell_item[$no];
-		my @data = split(/<>/, $data);
-		my $item = {};
-		@$item{qw|アイテムid 名前 効果 価値 アイテム種別 攻撃属性 属性 使用 耐久 装備条件 品質 作成者 所持数 キャラid|} = @data;
-		push(@new_list, $item);
-	}
-
-	@sell_item = @new_list;
-
-	for my $no (0 .. $#sell_item)
-	{
-		my $item = $sell_item[$no];
-		my $tmp_uniq_key = sprintf("%s%s%s", @$item{qw|アイテムid 品質 作成者|});
-
-		if ($tmp_uniq_key ne $select_id)
-		{
-			next;
-		}
-
-		my @tmp = (@$sell[1 .. 14], $kid);
-		my $mes = join("<>", @tmp);
-		my $utf8 = Encode::encode_utf8($mes);
-		$sell_item[$no] = $utf8;
-	}
 
 	if ($hit == 0)
 	{
-		my @tmp = (@$sell[1 .. 14], $kid);
-		my $mes = join("<>", @tmp);
-		my $utf8 = Encode::encode_utf8($mes);
-		unshift(@sell_item, $utf8);
+		my $exhibit = {};
+		my @key = (qw|アイテムid 名前 効果 価値 アイテム種別 攻撃属性 属性 使用 耐久 装備条件 品質 作成者 所持数|);
+		@$exhibit{@key} = @$sell{@key};
+		$exhibit->{価値} = $sell_gold;
+		$exhibit->{所持数} = $use_item;
+		$exhibit->{エリア} = $karea;
+		$exhibit->{キャラid} = $kid;
+		push(@$exhibits, $exhibit);
 	}
 
-	open(OUT,">", $user_shop[$karea]);
-	print OUT @sell_item;
-	close(OUT);
+	$system->save_exhibit_db($karea, $exhibits);
 
-	&item_sort;
+	# &item_sort;
 
 	$msg = "";
 	if($sell_flag == 1)

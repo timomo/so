@@ -105,11 +105,11 @@ get "/neighbors" => sub
             my $string = "";
             if ($self->is_battle($append->{id}))
             {
-                $string = "(モンスター戦闘中)";
+                $string = "（モンスター戦闘中）";
             }
             elsif ($self->is_pvp($append->{id}))
             {
-                $string = "(PVP戦闘中)";
+                $string = "（PVP戦闘中）";
             }
             my $name = sprintf("%s Lv: %d%s", $c->{名前}, $c->{レベル}, $string);
 

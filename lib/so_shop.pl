@@ -164,6 +164,8 @@ sub item_shop
 #----------------#
 sub user_shop
 {
+	my $exhibits = $system->load_exhibit_db($karea);
+
 	my @item_array = &load_ini($user_shop[$in{'area'}]);
 	my @item_chara = &load_ini($chara_file);
 
@@ -176,9 +178,9 @@ sub user_shop
 	my @item_list;
 	my @item_count;
 
-	foreach(@item_array)
+	for my $exhibit (@$exhibits)
 	{
-		my ($ino,$iname,$idmg,$igold,$imode,$iuelm,$ieelm,$ihand,$idef,$ireq,$iqlt,$imake,$irest,$iid) = split(/<>/);
+		my ($id, $iarea, $ino,$iname,$idmg,$igold,$imode,$iuelm,$ieelm,$ihand,$idef,$ireq,$iqlt,$imake,$irest,$iid) = @$exhibit{@{$controller->config->{出品データ}}};
 		# アイテム種別により処理変更
 		&check_limit;
 		if ($imode == 01) {
@@ -240,7 +242,7 @@ sub user_shop
 
 		if($iid eq "$kid"){ $igold = 0; }
 
-		my $mes = "<tr><td><input type=radio name=item_no value=\"$ino$iqlt$imake$iid\"></td><td>$name</td><td align=center>$item_mode[$imode]</td><td>$iname</td><td align=center>$idmg</td><td align=center>$igold G</td><td align=center>$item_hand[$ihand]</td><td align=center>$ireq</td><td align=center><font color=$elmcolor[$ieelm]>$item_eelm[$ieelm]</font></td><td align=center>$item_def[$idef]</td><td align=center>$item_qlt[$iqlt]</td><td align=center>$imake</td><td align=center>$irest 個</td></tr>";
+		my $mes = "<tr><td><input type=radio name=item_no value=\"$id\"></td><td>$name</td><td align=center>$item_mode[$imode]</td><td>$iname</td><td align=center>$idmg</td><td align=center>$igold G</td><td align=center>$item_hand[$ihand]</td><td align=center>$ireq</td><td align=center><font color=$elmcolor[$ieelm]>$item_eelm[$ieelm]</font></td><td align=center>$item_def[$idef]</td><td align=center>$item_qlt[$iqlt]</td><td align=center>$imake</td><td align=center>$irest 個</td></tr>";
 
 		push(@item_list, $mes);
 	}
@@ -394,15 +396,14 @@ sub bank
 #----------------#
 sub item_buy
 {
-	my $item_id = $in{'id'};
-	my $item_area = $in{'area'};
-	my $item_cnt = $in{'item'};
+	my $item_cnt = $in{item};
 
-	if ($in{'item_no'} eq "")
+	if ($in{item_no} eq "")
 	{
 		$error = "アイテムを選んでください。";
 		&item_shop;
 	}
+	if($kspot != 0 || $kpst != 0) { &error("不正なパラメータです"); }
 
 	my @item_array = &load_ini($item_file);
 	my $hit = 0;
@@ -411,69 +412,47 @@ sub item_buy
 
 	foreach(@item_array)
 	{
-		($i_no,$i_name,$i_dmg,$i_gold,$i_mode,$i_uelm,$i_eelm,$i_hand,$i_def,$i_req,$i_qlt,$i_make,$i_rest) = split(/<>/);
-		my $tmp = Encode::encode_utf8("$i_no$i_qlt$i_make");
+		($i_no, $i_name, $i_dmg, $i_gold, $i_mode, $i_uelm, $i_eelm, $i_hand, $i_def, $i_req, $i_qlt, $i_make, $i_rest) = split(/<>/);
+		my $tmp = Encode::encode_utf8(sprintf("%s%s%s", $i_no, $i_qlt, $i_make));
 		if($item_no_id eq $tmp) { $hit=1;last; }
 	}
 
 	if ($hit == 0) { &error("アイテムが存在しません。"); }
 
 	&get_host;
-
+	$khost = $host;
 	my $date = time();
+	$kdate = $date;
 
-	@item_chara = &load_ini($chara_file);
-	$buy_gold = 0;
-	$buy_name = "";
-	$hit=0;@item_new=();
-	foreach(@item_chara){
-		($iid,$ipass,$iname,$isex,$ichara,$in_0,$in_1,$in_2,$in_3,$in_4,$in_5,$in_6,$ihp,$imaxhp,$iex,$ilv,$iap,$igold,$ilp,$itotal,$ikati,$ihost,$idate,$iarea,$ispot,$ipst,$iitem) = split(/<>/);
-		if($iid eq "$item_id") {
-			if($iitem eq $max_item) {
-				$error = "所持アイテムが多すぎます。";
-				&item_shop;
-			}
-			#割引率の設定
-			$cut = 1 - $in_6 / 200;
-			$buy_gold =int($i_gold * $cut) * $item_cnt;
-			if($igold < $buy_gold) {
-				$error = "所持金が足りません。";
-				&item_shop;
-			}
-			else { $igold = $igold - $buy_gold; }
-			$buy_name = $i_name;
-			$kid = $iid;
-			$kpass = $ipass;
-			$kcnt = $item_cnt;
-			$kspot = $ispot;
-			$kpst = $ipst;
-			&item_regist;
-			$iitem = $u_cnt;
-
-			my $mes = "$iid<>$ipass<>$iname<>$isex<>$ichara<>$in_0<>$in_1<>$in_2<>$in_3<>$in_4<>$in_5<>$in_6<>$ihp<>$imaxhp<>$iex<>$ilv<>$iap<>$igold<>$ilp<>$itotal<>$ikati<>$host<>$idate<>$iarea<>$ispot<>$ipst<>$iitem<>\n";
-			my $utf8 = Encode::encode_utf8($mes);
-
-			unshift(@item_new,$utf8);
-			$hit=1;
-		}else{
-			push(@item_new,"$_\n");
-		}
+	if ($kitem eq $max_item) {
+		$error = "所持アイテムが多すぎます。";
+		&item_shop;
 	}
+	#割引率の設定
+	my $cut = 1 - $kn_6 / 200;
+	my $buy_gold = int($i_gold * $cut) * $item_cnt;
+	if ($kgold < $buy_gold)
+	{
+		$error = "所持金が足りません。";
+		&item_shop;
+	}
+	else
+	{
+		$kgold -= $buy_gold;
+	}
+	my $buy_name = $i_name;
+	$kcnt = $item_cnt;
+	&item_regist;
+	$kitem = $u_cnt;
 
-	if(!$hit) { &error("キャラクターが見つかりません。"); }
-	if($kspot != 0 || $kpst != 0) { &error("不正なパラメータです"); }
+	&regist;
 
-	open(OUT,">$chara_file");
-	print OUT @item_new;
-	close(OUT);
-
-	$karea=$item_area;
 	&town_load;
 
-	$get_area=$item_area;$get_id="02";$get_cnt="1";
+	$get_area=$karea;$get_id="02";$get_cnt="1";
 	&get_msg;
 
-	$buy_msg = "$buy_nameを$item_cnt 個$buy_gold Gで買いました。";
+	$buy_msg = "$buy_name を$item_cnt 個$buy_gold Gで買いました。";
 
 	&item_shop;
 }
@@ -483,8 +462,6 @@ sub item_buy
 #----------------#
 sub user_buy
 {
-	my $item_id = $in{'id'};
-	my $item_area = $in{'area'};
 	my $item_cnt = $in{'item'};
 
 	if($in{'item_no'} eq "")
@@ -493,25 +470,27 @@ sub user_buy
 		&user_shop;
 	}
 
-	my @item_array = &load_ini($user_shop[$item_area]);
-
+	my $exhibits = $system->load_exhibit_db($karea);
 	my $item_no_id = Encode::encode_utf8($in{'item_no'});
-
-	my ($i_no,$i_name,$i_dmg,$i_gold,$i_mode,$i_uelm,$i_eelm,$i_hand,$i_def,$i_req,$i_qlt,$i_make,$i_rest,$i_id);
+	our ($i_no,$i_name,$i_dmg,$i_gold,$i_mode,$i_uelm,$i_eelm,$i_hand,$i_def,$i_req,$i_qlt,$i_make,$i_rest,$i_id);
 	my $hit = 0;
+	my $sell;
 
-	foreach(@item_array){
-		($i_no,$i_name,$i_dmg,$i_gold,$i_mode,$i_uelm,$i_eelm,$i_hand,$i_def,$i_req,$i_qlt,$i_make,$i_rest,$i_id) = split(/<>/);
-		my $tmp = Encode::encode_utf8("$i_no$i_qlt$i_make$i_id");
-		if($item_no_id eq $tmp) { $hit=1;last; }
+	for my $exhibit (@$exhibits)
+	{
+		if($exhibit->{id} eq $item_no_id)
+		{
+			$sell = $exhibit;
+			$hit = 1;
+			last;
+		}
 	}
 	if($hit == 0) { &error("アイテムが存在しません。"); }
 
 	&get_host;
-
+	$khost = $host;
 	my $date = time();
-
-	my @item_chara = &load_ini($chara_file);
+	$kdate = $date;
 
 	my $buy_gold = 0;
 	my $buy_name = "";
@@ -520,41 +499,77 @@ sub user_buy
 	my @item_new=();
 	my @buy_item = ();
 
-	foreach(@item_chara)
+	if($kitem eq $max_item) {
+		$error = "所持アイテムが多すぎます。";
+		&user_shop;
+	}
+	$buy_gold =$i_gold * $item_cnt;
+	if($kid eq "$i_id")
 	{
-		my ($iid,$ipass,$iname,$isex,$ichara,$in_0,$in_1,$in_2,$in_3,$in_4,$in_5,$in_6,$ihp,$imaxhp,$iex,$ilv,$iap,$igold,$ilp,$itotal,$ikati,$ihost,$idate,$iarea,$ispot,$ipst,$iitem) = split(/<>/);
-		if($iid eq $item_id) {
-			if($iitem eq $max_item) {
-				$error = "所持アイテムが多すぎます。";
-				&user_shop;
-			}
-			$buy_gold =$i_gold * $item_cnt;
-			if($iid eq "$i_id"){
-				$buy_gold = 0;
-				$rtn_flag = 1;
-			}
-			if($igold < $buy_gold) {
-				$error = "所持金が足りません。";
-				&user_shop;
-			}
-			else { $igold = $igold - $buy_gold; }
-			@buy_item=();
-			foreach(@item_array){
-				($i_no,$i_name,$i_dmg,$i_gold,$i_mode,$i_uelm,$i_eelm,$i_hand,$i_def,$i_req,$i_qlt,$i_make,$i_rest,$i_id) = split(/<>/);
-				if($item_no_id eq "$i_no$i_qlt$i_make$i_id") {
-					if($i_rest < $item_cnt) {
-						$error = "在庫が足りません。";
-						&user_shop;
-					}
+		$buy_gold = 0;
+		$rtn_flag = 1;
+	}
+	if($kgold < $buy_gold)
+	{
+		$error = "所持金が足りません。";
+		&user_shop;
+	}
+	else
+	{
+		$kgold -= $buy_gold;
+	}
 
-					&item_price;
-					$i_gold = $kprice;
+	(my $dummy, my $dummy2, $i_no,$i_name,$i_dmg,$i_gold,$i_mode,$i_uelm,$i_eelm,$i_hand,$i_def,$i_req,$i_qlt,$i_make,$i_rest,$i_id) = @$sell{@{$controller->config->{出品データ}}};
 
-					$buy_name = $i_name;
-					$kid = $iid;
-					$kpass = $ipass;
-					$kcnt = $item_cnt;
-					&item_regist;
+	if($sell->{所持数} < $item_cnt)
+	{
+		$error = "在庫が足りません。";
+		&user_shop;
+	}
+
+	$sell->{所持数} -= $item_cnt;
+	&item_price;
+	$sell->{価値} = $kprice;
+	$system->save_exhibit_db($karea, $exhibits);
+
+	my $items = $system->load_item_db($kid);
+	my $key = sprintf("%s%s%s", @$sell{qw|アイテムid 品質 作成者|});
+	$hit = 0;
+
+	for my $item (@$items)
+	{
+		my $tmp_key = sprintf("%s%s%s", @$item{qw|アイテムid 品質 作成者|});
+
+		if ($key eq $tmp_key)
+		{
+			$hit = 1;
+			@$item{@{$controller->config->{キャラ所持品}}} = @$sell{@{$controller->config->{キャラ所持品}}};
+			$item->{所持数} = $item_cnt;
+			$item->{キャラid} = $kid;
+			$item->{装備} ||= 0;
+			last;
+		}
+	}
+
+	if ($hit == 0)
+	{
+		my $item = {};
+		@$item{@{$controller->config->{キャラ所持品}}} = @$sell{@{$controller->config->{キャラ所持品}}};
+		delete $item->{id};
+		$item->{所持数} = $item_cnt;
+		$item->{キャラid} = $kid;
+		$item->{装備} ||= 0;
+		push(@$items, $item);
+	}
+
+	$system->save_item_db($kid, $items);
+
+=begin
+	$buy_name = $i_name;
+	$kid = $iid;
+	$kpass = $ipass;
+	$kcnt = $item_cnt;
+	&item_regist;
 
 					$kid = $i_id;
 					$krgold = $buy_gold;
@@ -594,20 +609,12 @@ sub user_buy
 			push(@item_new,"$_\n");
 		}
 	}
-
-	if($hit == 0) { &error("キャラクターが見つかりません。"); }
+=cut
+	# if($hit == 0) { &error("キャラクターが見つかりません。"); }
 	if($kspot != 0 || $kpst != 0) { &error("不正なパラメータです"); }
-
-	open(OUT,">$user_shop[$item_area]");
-	print OUT @buy_item;
-	close(OUT);
 
 	$iarea = $item_area;
 	&shop_sort;
-
-	open(OUT,">$chara_file");
-	print OUT @item_new;
-	close(OUT);
 
 	$buy_msg = "$buy_gold Gで買いました。";
 	if($rtn_flag == 1){

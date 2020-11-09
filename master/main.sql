@@ -196,3 +196,26 @@ CREATE TABLE キャラ所持品 (
         ctime DATETIME,
 	    mtime DATETIME
  );
+
+DROP TABLE IF EXISTS 出品データ;
+
+CREATE TABLE 出品データ (
+        id INTEGER PRIMARY KEY,
+        エリア INTEGER NOT NULL,
+        アイテムid TEXT NOT NULL,
+        名前 TEXT NOT NULL,
+        効果 INTEGER NOT NULL,
+        価値 INTEGER NOT NULL,
+        アイテム種別 TEXT NOT NULL,
+        攻撃属性 INTEGER NOT NULL,
+        属性 INTEGER NOT NULL,
+        使用 INTEGER NOT NULL,
+        耐久 INTEGER NOT NULL,
+        装備条件 INTEGER NOT NULL,
+        品質 INTEGER NOT NULL,
+        作成者 TEXT NOT NULL,
+        所持数 INTEGER NOT NULL,
+        キャラid TEXT NOT NULL,
+        ctime DATETIME,
+	    mtime DATETIME
+ );
