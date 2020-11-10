@@ -33,6 +33,9 @@
 
 </div>
 
+<div class="blackboard question select-item-menu" style="display: none; position: absolute; z-index: 99">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+<p>
 <input type="hidden" name="id" value="<%= $kid %>">
 <select name="mode">
 <option value="item_use">使うor装備or装備解除</option>
@@ -53,14 +56,19 @@
 % }
 
 </select>
-&nbsp;<select name="sendid">
+</p>
+<p>
+<select name="sendid">
 <option value="">送る相手を選択
 
 %== join("", @$send_id);
 
 </select>
+</p>
+<p>
 <input type=submit value="OK">
-<br>
+</p>
+<p>
 個数&nbsp;
 <select name="item">
 
@@ -68,12 +76,35 @@
 
 </select>&nbsp;個
 &nbsp;金額&nbsp;<input type=text name=gold  size="11" value="">&nbsp;G&nbsp;/&nbsp;<%= $kgold %>&nbsp;G
-<br>
+</p>
+<p>
+<small>
 ※ショップで売却する場合は各アイテムの「価値」で買い取られます。<br />
 　自由市場に出品の際は、「金額」は単価になります。<br />
 　現在の貸し金庫の手数料は「価値」の<b> <%= $space_price %> </b>% です。
+</small>
+</p>
+</div>
+
 </form>
 
 <script>
 const spot = "<%= $spot %>";
+
+jQuery("div.menu-close").bind("click", (event) => {
+    jQuery(event.target).closest("div.blackboard").hide();
+});
+jQuery("td.iname").bind("click", (event) => {
+    const td = jQuery(event.target);
+    td.siblings("td").first().find("input").prop("checked", true).trigger("change");
+});
+jQuery("input[name='item_no']").bind("change", (event) => {
+    const menu = jQuery(".select-item-menu");
+    const input = jQuery(event.target);
+    const offset = input.offset();
+    offset.top += 16;
+    menu.show();
+    menu.offset(offset);
+});
+jQuery(".select-item-menu").draggable();
 </script>

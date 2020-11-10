@@ -144,9 +144,11 @@ jQuery(document).ready(() => {
 					jQuery(event.target).closest("tr").addClass("blink-before");
 				});
 
+				/*
 				window_item.bind("mouseleave", (event) => {
 					window_item.html("");
 				});
+				 */
 
 				window_item.offset(command.offset());
 			});

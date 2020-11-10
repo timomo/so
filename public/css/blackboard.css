@@ -50,6 +50,7 @@ see https://fantastech.net/dragon-quest-text
 .blackboard tr:last-of-type
 {
     margin-bottom: 0;
+    content: '×' !important;
 }
 /* 回り込み */
 .float-r {

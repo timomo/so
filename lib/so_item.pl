@@ -178,7 +178,7 @@ sub _item_check
 			$ireq = "&nbsp;";
 		}
 
-		my $mes = "<tr><td><input type=radio name=item_no value=\"$iid\"></td><td align=center>$item_eqp[$ieqp]</td><td align=center>$item_mode[$imode]</td><td>$iname</td><td align=center>$idmg</td><td align=center>$igold G</td><td align=center>$item_hand[$ihand]</td><td align=center>$ireq</td><td align=center><font color=$elmcolor[$ieelm]>$item_eelm[$ieelm]</font></td><td align=center>$item_def[$idef]</td><td align=center>$item_qlt[$iqlt]</td><td align=center>$imake</td><td align=center>$irest 個</td></tr>\n";
+		my $mes = "<tr><td><input type=radio name=item_no value=\"$iid\"></td><td align=center>$item_eqp[$ieqp]</td><td align=center>$item_mode[$imode]</td><td class=iname>$iname</td><td align=center>$idmg</td><td align=center>$igold G</td><td align=center>$item_hand[$ihand]</td><td align=center>$ireq</td><td align=center><font color=$elmcolor[$ieelm]>$item_eelm[$ieelm]</font></td><td align=center>$item_def[$idef]</td><td align=center>$item_qlt[$iqlt]</td><td align=center>$imake</td><td align=center>$irest 個</td></tr>\n";
 		push(@items, $mes);
 	}
 
