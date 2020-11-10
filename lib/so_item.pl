@@ -204,8 +204,8 @@ sub _item_check
 	}
 
 	my $html = $controller->render_to_string(
-		template    => "window/item_check",
-		script      => "/window/item",
+		template    => "item_check",
+		script      => $script,
 		item_count  => \@item_count,
 		spot        => $spot,
 		space_price => $space_price,
