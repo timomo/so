@@ -1,5 +1,5 @@
 <div class="blackboard answer float-l">
-
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
 <table border="0" class="item_table">
 <tr>
 <th>装備</th>

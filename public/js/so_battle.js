@@ -144,6 +144,10 @@ jQuery(document).ready(() => {
 					jQuery(event.target).closest("tr").addClass("blink-before");
 				});
 
+				window_item.find("div.menu-close").bind("click", (event) => {
+					jQuery(event.target).closest("div.blackboard").hide();
+				});
+
 				/*
 				window_item.bind("mouseleave", (event) => {
 					window_item.html("");
