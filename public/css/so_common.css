@@ -66,3 +66,15 @@ table
     font-weight: bold;
     font-size: 12pt;
 }
+
+.item_table td,
+.item_table th
+{
+    font-size: 6pt;
+}
+
+.item_table td.iname
+{
+    font-size: 10pt;
+    cursor: pointer;
+}

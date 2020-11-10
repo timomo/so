@@ -20,7 +20,8 @@ see https://fantastech.net/dragon-quest-text
     box-shadow: 0 0 0 4px #fff inset;
     background-color: rgba(0,0,0,0.9);
 }
-.blackboard.answer p {
+.blackboard.answer p
+{
     margin-left: 1.7rem;
 }
 .blackboard .blink-before {
@@ -33,13 +34,21 @@ see https://fantastech.net/dragon-quest-text
     text-decoration: none;
     color: #fff;
 }
+.blackboard.answer tr::before
+{
+    content: '　';
+    position: absolute;
+    left: 1rem;
+}
 .blackboard .blink-before::before {
-    content: '▶';
+    content: '▶' !important;
     position: absolute;
     left: 1rem;
     animation: blink 1.4s infinite;
 }
-.blackboard p:last-of-type {
+.blackboard p:last-of-type,
+.blackboard tr:last-of-type
+{
     margin-bottom: 0;
 }
 /* 回り込み */

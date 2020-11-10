@@ -48,6 +48,7 @@ require './lib/so_system.pl';
 require './lib/so_town.pl';
 require './lib/so_config.pl';
 require './lib/so_pvp.pl';
+require "./lib/so_ajax.pl";
 
 our $tt = Template->new(
 	ENCODING => 'utf8',
@@ -102,30 +103,32 @@ if ($require_login == 1)
 	{
 		&chara_load($in{'id'});
 
-		if (&is_continue_monster)
+		if ($mode !~ /_window$/)
 		{
-			&monster;
-			exit;
-		}
-
-		if (defined $in{k1id})
-		{
-			$k1id = $in{k1id};
-		}
-		if (defined $in{k2id})
-		{
-			$k2id = $in{k2id};
-		}
-
-		if (defined $k1id && defined $k2id)
-		{
-			if (&is_continue_pvp)
+			if (&is_continue_monster)
 			{
-				&pvp;
+				&monster;
 				exit;
 			}
-		}
 
+			if (defined $in{k1id})
+			{
+				$k1id = $in{k1id};
+			}
+			if (defined $in{k2id})
+			{
+				$k2id = $in{k2id};
+			}
+
+			if (defined $k1id && defined $k2id)
+			{
+				if (&is_continue_pvp)
+				{
+					&pvp;
+					exit;
+				}
+			}
+		}
 	}
 }
 
@@ -150,6 +153,11 @@ elsif($mode eq 'item_shop') { &item_shop; }
 elsif($mode eq 'item_buy') { &item_buy; }
 elsif($mode eq 'user_shop') { &user_shop; }
 elsif($mode eq 'user_buy') { &user_buy; }
+elsif($mode eq 'item_check_window')
+{
+	print &item_check_window;
+	exit;
+}
 elsif($mode eq 'item_check') { &item_check; }
 elsif($mode eq 'item_use') { &item_use; }
 elsif($mode eq 'item_battle') { &item_use; }

@@ -124,7 +124,33 @@ jQuery(document).ready(() => {
 	});
 
 	jQuery(".select-command").bind("click", (event) => {
+		const command = jQuery(event.target);
+		if (command.text() === "アイテム")
+		{
+			jQuery.get("/window/item", {}, (data) => {
+				let window_item = jQuery("div#window_item");
+
+				if (window_item.length === 0) {
+					window_item = jQuery("<div></div>");
+					window_item.attr("id", "window_item");
+					window_item.html(data);
+					window_item.draggable();
+					jQuery("body").append(window_item);
+				}
+
+				window_item.find("tr td").bind("mouseenter", (event) => {
+					jQuery(".item_table tr").removeClass("blink-before");
+					jQuery(event.target).closest("tr").addClass("blink-before");
+				});
+
+				window_item.offset(command.offset());
+			});
+
+			return false;
+		}
+
 		const formObj = jQuery("form[name='command']");
+		formObj.find("input:hidden[name='command']").val();
 		formObj.submit();
 	});
 });

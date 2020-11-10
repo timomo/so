@@ -65,6 +65,29 @@ $system->open;
 
 app->log->level(app->config->{log_level});
 
+any "/window/item" => sub
+{
+    my $self = shift;
+    my $json = $self->req->json;
+    my $id = $json->{id};
+    my $k = $system->load_chara($id);
+
+    if ($self->req->method eq "POST")
+    {
+
+    }
+    else
+    {
+        my $env = $self->tx->req->env || {};
+        my $url = Mojo::URL->new;
+        $url->query({ mode => "item_check_window", id => $k->{id}, pass => $k->{パスワード} });
+        $env->{QUERY_STRING} = $url->to_string;
+        $env->{QUERY_STRING} =~ s/^\?//;
+        my $utf8 = $self->emulate_cgi($env);
+        return $self->render(text => $utf8, format => "html");
+    }
+};
+
 any "/message" => sub
 {
     my $self = shift;
@@ -630,8 +653,11 @@ app->helper(
         # set
         if (defined $mode)
         {
-            $hit->{最終コマンド} = $mode;
-            $system->save_append($hit);
+            if ($mode !~ /^_window$/)
+            {
+                $hit->{最終コマンド} = $mode;
+                $system->save_append($hit);
+            }
         }
 
         return $hit->{最終コマンド};

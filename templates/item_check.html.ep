@@ -1,0 +1,79 @@
+<b><%= $kname %> の所持品</b>
+<hr size="0">
+<%== $msg %><B><span COLOR="#FF9933"><%== $error %></span></B>
+<p>
+<form action="<%== $script %>" method="post">
+使用・装備したいアイテムをチェックしてください。<BR>
+<BR />
+<B>所持アイテム数</B> <%= $kitem %> / <%= $max_item %><BR>
+<BR />
+
+<div class="blackboard question">
+
+<table border="0" class="item_table">
+<tr>
+<th>&nbsp;</th>
+<th>装備</th>
+<th>種別</th>
+<th>名前</th>
+<th>効果</th>
+<th>価値</th>
+<th>使用</th>
+<th>装備条件</th>
+<th>属性</th>
+<th>耐久</th>
+<th>品質</th>
+<th>作成者</th>
+<th>所持数</th>
+</tr>
+
+%== join("", @$items);
+
+</table>
+
+</div>
+
+<input type="hidden" name="id" value="<%= $kid %>">
+<select name="mode">
+<option value="item_use">使うor装備or装備解除</option>
+<option value="item_battle">薬・治療アイテムを戦闘用に携帯</option>
+
+% if ($kspot == 0 && $kpst == 0) {
+
+<option value=item_sell>ショップに売却</option>
+<option value=user_sell>自由市場に出品</option>
+<option value=bank_in>貸し金庫に預ける</option>
+<option value=bank_send>アイテムを他人に送る</option>
+<option value=bank_money>お金を他人に送る</option>
+
+% } else {
+
+<option value=item_sell>アイテムを捨てる</option>
+
+% }
+
+</select>
+&nbsp;<select name="sendid">
+<option value="">送る相手を選択
+
+%== join("", @$send_id);
+
+</select>
+<input type=submit value="OK">
+<br>
+個数&nbsp;
+<select name="item">
+
+%== join("", @$item_count);
+
+</select>&nbsp;個
+&nbsp;金額&nbsp;<input type=text name=gold  size="11" value="">&nbsp;G&nbsp;/&nbsp;<%= $kgold %>&nbsp;G
+<br>
+※ショップで売却する場合は各アイテムの「価値」で買い取られます。<br />
+　自由市場に出品の際は、「金額」は単価になります。<br />
+　現在の貸し金庫の手数料は「価値」の<b> <%= $space_price %> </b>% です。
+</form>
+
+<script>
+const spot = "<%= $spot %>";
+</script>

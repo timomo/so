@@ -2,7 +2,8 @@ use utf8;
 #----------------#
 #  所持アイテム  #
 #----------------#
-sub item_check
+
+sub item_check_window
 {
 	my @user_item = &item_load($kid);
 	our $rid = $kid;
@@ -12,40 +13,9 @@ sub item_check
 	#割増率の設定
 	my $plus = 1 + $kn_6 / 200;
 
-	&header;
-
-	print <<"EOM";
-<b>$kname の所持品</b>
-<hr size=0>
-$msg<B><FONT COLOR="#FF9933">$error</FONT></B>
-<p>
-<form action="$script" method="post">
-使用・装備したいアイテムをチェックしてください。<BR>
-<BR />
-<B>所持アイテム数</B> $kitem / $max_item<BR>
-<BR />
-
-<div class="blackboard question">
-
-<table border="0">
-<tr>
-<th>&nbsp;</th>
-<th>装備</th>
-<th>種別</th>
-<th>名前</th>
-<th>効果</th>
-<th>価値</th>
-<th>使用</th>
-<th>装備条件</th>
-<th>属性</th>
-<th>耐久</th>
-<th>品質</th>
-<th>作成者</th>
-<th>所持数</th>
-</tr>
-EOM
 	$msg = "";
 	$error = "";
+	my @items;
 
 	for my $ary (@user_item)
 	{
@@ -96,39 +66,13 @@ EOM
 			$idmg = "&nbsp;";
 			$ireq = "&nbsp;";
 		}
-		print "<tr>\n";
-		print "<td><input type=radio name=item_no value=\"$iid\"></td><td align=center>$item_eqp[$ieqp]</td><td align=center>$item_mode[$imode]</td><td>$iname</td><td align=center>$idmg</td><td align=center>$igold G</td><td align=center>$item_hand[$ihand]</td><td align=center>$ireq</td><td align=center><font color=$elmcolor[$ieelm]>$item_eelm[$ieelm]</font></td><td align=center>$item_def[$idef]</td><td align=center>$item_qlt[$iqlt]</td><td align=center>$imake</td><td align=center>$irest 個</td>\n";
-		print "</tr>\n";
+
+		my $mes = "<tr><td align=center>$item_eqp[$ieqp]</td><td align=center>$item_mode[$imode]</td><td class=iname>$iname<input type=hidden name=item_no value=\"$iid\"></td><td align=center>$idmg</td><td align=center>$igold G</td><td align=center>$item_hand[$ihand]</td><td align=center>$ireq</td><td align=center><font color=$elmcolor[$ieelm]>$item_eelm[$ieelm]</font></td><td align=center>$item_def[$idef]</td><td align=center>$item_qlt[$iqlt]</td><td align=center>$imake</td><td align=center>$irest 個</td></tr>\n";
+		push(@items, $mes);
 	}
 
-	print <<"EOM";
-</table>
-
-</div>
-
-<p>
-<input type=hidden name=id   value=$in{'id'}>
-<input type=hidden name=pass value=$in{'pass'}>
-<select name=mode>
-	<option value=item_use>使うor装備or装備解除
-	<option value=item_battle>薬・治療アイテムを戦闘用に携帯
-EOM
-if($kspot == 0 && $kpst == 0){
-	print "<option value=item_sell>ショップに売却\n";
-	print "<option value=user_sell>自由市場に出品\n";
-	print "<option value=bank_in>貸し金庫に預ける\n";
-	print "<option value=bank_send>アイテムを他人に送る\n";
-	print "<option value=bank_money>お金を他人に送る\n";
-} else {
-	print "<option value=item_sell>アイテムを捨てる\n";
-}
-	print <<"EOM";
-</select>
-&nbsp;<select name=sendid>
-<option value="">送る相手を選択
-EOM
-
 	my $characters = $system->characters;
+	my @send_id;
 
 	for my $to (@$characters)
 	{
@@ -136,41 +80,157 @@ EOM
 		{
 			next;
 		}
-		printf("<option value='%s'>%s</option>\n", $to->{id}, $to->{名前});
+		push(@send_id, sprintf("<option value='%s'>%s</option>\n", $to->{id}, $to->{名前}));
 	}
 
-	print <<"EOM";
-</select>
-<input type=submit value="OK">
-<br>
-個数&nbsp;
-<select name="item">
-EOM
 	my $i = 1;
+	my @item_count;
 
 	foreach(1 .. $max_itemcnt)
 	{
-		printf("<option value='%s'>%s</option>\n", $i, $i);
+		push(@item_count, sprintf("<option value='%s'>%s</option>\n", $i, $i));
 		$i++;
 	}
 
-	print <<"EOM";
-</select>&nbsp;個
-&nbsp;金額&nbsp;<input type=text name=gold  size="11" value="">&nbsp;G&nbsp;/&nbsp;$kgold&nbsp;G
-<br>
-※ショップで売却する場合は各アイテムの「価値」で買い取られます。<br />
-　自由市場に出品の際は、「金額」は単価になります。<br />
-　現在の貸し金庫の手数料は「価値」の<b> $space_price </b>% です。
-</form>
+	my $html = $controller->render_to_string(
+		template    => "window/item_check",
+		script      => "/window/item",
+		item_count  => \@item_count,
+		spot        => $spot,
+		space_price => $space_price,
+		kgold       => $kgold,
+		kid         => $kid,
+		items       => \@items,
+		kitem       => $kitem,
+		max_item    => $max_item,
+		error       => $error,
+		msg         => $msg,
+		kname       => $kname,
+		send_id     => \@send_id,
+		kpst        => $kpst,
+		kspot       => $kspot,
+	);
 
-<script>
-const spot = "$spot";
-</script>
-EOM
+	return Encode::encode_utf8($html);
+}
 
+sub _item_check
+{
+	my @user_item = &item_load($kid);
+	our $rid = $kid;
+	&read_bank;
+	my $space_price = int($kpitem / 5) + 1;
+
+	#割増率の設定
+	my $plus = 1 + $kn_6 / 200;
+
+	$msg = "";
+	$error = "";
+	my @items;
+
+	for my $ary (@user_item)
+	{
+		my ($iid,$ino,$iname,$idmg,$igold,$imode,$iuelm,$ieelm,$ihand,$idef,$ireq,$iqlt,$imake,$irest,$ieqp) = @$ary;
+		$igold = int($igold * $plus / 2);
+		&check_limit;
+		# アイテム種別により処理変更
+		if ($imode == 01) {
+			$idmg = "<font color=$efcolor[2]>HP回復：$idmg</font>";
+			$ireq = "&nbsp;";
+		} elsif ($imode == 02) {
+			$idmg = "<font color=$efcolor[2]>LP回復：$idmg</font>";
+			$ireq = "&nbsp;";
+		} elsif ($imode == 03) {
+			$idmg = "移動する";
+			$ireq = "&nbsp;";
+		} elsif ($imode == 04) {
+			$idmg = "<font color=$efcolor[2]>$chara_skill[$idmg]</font>";
+			$ireq = "&nbsp;";
+		} elsif ($imode == 05) {
+			$idmg = "素材";
+			$ireq = "&nbsp;";
+		} elsif ($imode == 07) {
+			$idmg = "<font color=$efcolor[2]>治療：$idmg</font>";
+			$ireq = "&nbsp;";
+		} elsif (10 <= $imode && $imode < 20) {
+			$idmg = "<font color=$efcolor[0]>攻撃：$idmg</font>";
+			$ireq = "<font color=$reqcolor>$item_uelm[$iuelm]：$ireq</font>";
+		} elsif (20 <= $imode && $imode < 30) {
+			$idmg = "<font color=$efcolor[0]>攻撃：$idmg</font>";
+			$ireq = "<font color=$reqcolor>$item_uelm[$iuelm]：$ireq</font>";
+		} elsif (30 <= $imode && $imode < 40) {
+			$idmg = "<font color=$efcolor[1]>防御：$idmg</font>";
+			$ireq = "<font color=$reqcolor>力：$ireq</font>";
+		} elsif (40 <= $imode && $imode < 50) {
+			$idmg = "<font color=$efcolor[1]>防御：$idmg</font>";
+			$ireq = "<font color=$reqcolor>力：$ireq</font>";
+		} elsif (50 <= $imode && $imode < 60) {
+			$idmg = "<font color=$efcolor[1]>回避：$idmg</font>";
+			$ireq = "<font color=$reqcolor>力：$ireq</font>";
+		} elsif (60 <= $imode && $imode < 70) {
+			$idmg = "<font color=$efcolor[2]>補助：$idmg</font>";
+			$ireq = "<font color=$reqcolor>$item_uelm[$iuelm]：$ireq</font>";
+		} elsif (70 <= $imode && $imode < 80) {
+			$idmg = "<font color=$efcolor[0]>攻撃：$idmg</font>";
+			$ireq = "<font color=$reqcolor>$item_uelm[$iuelm]：$ireq</font>";
+		} else {
+			$idmg = "&nbsp;";
+			$ireq = "&nbsp;";
+		}
+
+		my $mes = "<tr><td><input type=radio name=item_no value=\"$iid\"></td><td align=center>$item_eqp[$ieqp]</td><td align=center>$item_mode[$imode]</td><td>$iname</td><td align=center>$idmg</td><td align=center>$igold G</td><td align=center>$item_hand[$ihand]</td><td align=center>$ireq</td><td align=center><font color=$elmcolor[$ieelm]>$item_eelm[$ieelm]</font></td><td align=center>$item_def[$idef]</td><td align=center>$item_qlt[$iqlt]</td><td align=center>$imake</td><td align=center>$irest 個</td></tr>\n";
+		push(@items, $mes);
+	}
+
+	my $characters = $system->characters;
+	my @send_id;
+
+	for my $to (@$characters)
+	{
+		if($kid eq $to->{id})
+		{
+			next;
+		}
+		push(@send_id, sprintf("<option value='%s'>%s</option>\n", $to->{id}, $to->{名前}));
+	}
+
+	my $i = 1;
+	my @item_count;
+
+	foreach(1 .. $max_itemcnt)
+	{
+		push(@item_count, sprintf("<option value='%s'>%s</option>\n", $i, $i));
+		$i++;
+	}
+
+	my $html = $controller->render_to_string(
+		template    => "window/item_check",
+		script      => "/window/item",
+		item_count  => \@item_count,
+		spot        => $spot,
+		space_price => $space_price,
+		kgold       => $kgold,
+		kid         => $kid,
+		items       => \@items,
+		kitem       => $kitem,
+		max_item    => $max_item,
+		error       => $error,
+		msg         => $msg,
+		kname       => $kname,
+		send_id     => \@send_id,
+		kpst        => $kpst,
+		kspot       => $kspot,
+	);
+
+	return Encode::encode_utf8($html);
+}
+
+sub item_check
+{
+	&header;
+	print &_item_check;
 	&footer;
 	&save_dat_append;
-
 	exit;
 }
 
