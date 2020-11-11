@@ -164,6 +164,21 @@ get "/neighbors" => sub
     return $self->render(json => $utf8);
 };
 
+get "/location" => sub
+{
+    my $self = shift;
+    my $k = $self->current_user;
+
+    return $self->reply->not_found unless ($k);
+
+    return $self->render(
+        template => "window/location",
+        kgold    => $k->{所持金},
+        area     => $self->config->{街}->[$k->{エリア}],
+        spot     => $self->config->{フィールド}->[$k->{スポット}],
+    );
+};
+
 get "/status" => sub
 {
     my $self = shift;
@@ -180,7 +195,7 @@ get "/status" => sub
         khp      => $k->{HP},
         kmaxhp   => $k->{最大HP},
         kex      => $k->{経験値},
-        rrsk     => 0,
+        rrsk     => $k->{リスク},
     );
 };
 
@@ -267,19 +282,18 @@ get "/main" => sub
 
     return $self->reply->not_found unless ($k);
 
-
     return $self->render(
         template    => "log_in_frame",
         kgold       => $k->{所持金},
-        area        => $k->{エリア},
-        spot        => $k->{スポット},
+        area     => $self->config->{街}->[$k->{エリア}],
+        spot     => $self->config->{フィールド}->[$k->{スポット}],
         klv         => $k->{レベル},
         klp         => $k->{LP},
         max_lp      => 0,
         khp         => $k->{HP},
         kmaxhp      => $k->{最大HP},
         kex         => $k->{経験値},
-        rrsk        => 0,
+        rrsk        => $k->{リスク},
         kid         => $k->{id},
         kname       => $k->{名前},
         const_id    => $k->{id},

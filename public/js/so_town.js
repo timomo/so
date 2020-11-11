@@ -366,6 +366,9 @@ function setup_websocket(timer) {
 		jQuery.get("/status", {}, (data) => {
 			jQuery("#status").html(data);
 		});
+		jQuery.get("/location", {}, (data) => {
+			jQuery("#location").html(data);
+		});
 	};
 
 	ws.onmessage = function (e) {

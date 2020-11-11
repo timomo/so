@@ -1,6 +1,6 @@
 %== include 'layouts/header'
 %== include 'layouts/meta'
-<meta http-equiv="refresh" content="5;URL=./current" />
+<meta http-equiv="refresh" content="5;URL=./main" />
 %== include 'layouts/javascript'
 %== include 'layouts/sound'
 %== include 'layouts/javascript_info'

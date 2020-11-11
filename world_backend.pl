@@ -262,7 +262,7 @@ post "/command" => sub
 get "/character/:id" => sub
 {
     my $self = shift;
-    my $k = $system->load_chara($self->param("id"));
+    my $k = $self->character($self->param("id"));
     return $self->render(json => $k);
 };
 
@@ -388,8 +388,12 @@ app->helper(
         my $self = shift;
         my $id = shift;
         my $result = $self->dbi("main")->model("キャラ")->select(["*"], where => {id => $id});
-        my $row = $result->fetch_hash_one;
-        return $row;
+        my $row = $result->fetch_hash_one || {};
+        my $result2 = $self->dbi("main")->model("キャラバフ")->select(["*"], where => {id => $id});
+        my $row2 = $result2->fetch_hash_one || {};
+        my $result3 = $self->dbi("main")->model("キャラ追加情報1")->select(["*"], where => {id => $id});
+        my $row3 = $result3->fetch_hash_one || {};
+        return { %$row, %$row2, %$row3 };
     },
 );
 
@@ -727,7 +731,7 @@ app->helper(
 
         $self->unicast_send($mes, @ids);
 
-        $mes = { method => "status", data => { 1 } };
+        $mes = { method => "status", data => 1 };
 
         $self->unicast_send($mes, @ids);
     },
