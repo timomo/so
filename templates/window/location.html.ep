@@ -1,0 +1,13 @@
+<div class="blackboard question" id="location_area">
+    <table border="0">
+        <tr>
+            <td class="b1">所持金</td>
+            <td><%== $kgold %></td>
+            <td class="b1">地名</td>
+            <td><%== $area %></td>
+            <td class="b1">場所</td>
+            <td><%== $spot %></td>
+            <td id="td_logout">ログアウト</td>
+        </tr>
+    </table>
+</div>

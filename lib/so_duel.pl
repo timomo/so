@@ -793,8 +793,6 @@ EOM
 		$win2   = 1;
 	}
 
-	&header;
-
 	print "$k1nameは、$k2nameに挑戦した！<hr size=0><p>";
 
 	$i=0;
@@ -915,13 +913,9 @@ EOM
 <input type="hidden" name=lastid value="$j">
 </form>
 <script>
-const spot = "デュエル";
+spot = "デュエル";
 </script>
 EOM
-
-	&footer;
-
-
 
 	$battle_flag=0;
 

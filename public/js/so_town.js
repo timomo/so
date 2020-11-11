@@ -80,7 +80,7 @@ function setup_take_control_form()
 {
 	let timer;
 
-	jQuery("form").bind("submit", (event) => {
+	jQuery("body").on("submit", "form", (event) => {
 		const param = jQuery(event.target).serializeArray();
 		const tmp = {};
 
@@ -132,7 +132,7 @@ function setup_select_menu()
 		.unbind("mouseenter")
 		.unbind("click");
 
-	jQuery(".select-menu").bind("mouseenter", (event) =>
+	jQuery("body").on("mouseenter", ".select-menu", (event) =>
 	{
 		const id = jQuery(event.target).attr("id");
 		const ary = id.split("_");
@@ -159,7 +159,7 @@ function setup_select_menu()
 
 	});
 
-	jQuery(".select-menu").bind("click", (event) =>
+	jQuery("body").on("click", ".select-menu", (event) =>
 	{
 		const id = jQuery(event.target).attr("id");
 		const ary = id.split("_");
@@ -187,6 +187,36 @@ function setup_select_menu()
 
 		return false;
 
+	});
+
+	jQuery("#td_logout").bind("click", (event) =>
+	{
+		/*
+		const customEO = jQuery.Event("click");
+		customEO.target = jQuery("#mode_default-select_logout");
+		jQuery(".select-menu").trigger("click", customEO);
+		 */
+		jQuery.get("/logout", {}, (data) => {
+			location.href = "/";
+		});
+	});
+
+	jQuery("body").on("click", "#td_item", (event) =>
+	{
+		jQuery.get("/window/item", {}, (data) => {
+			let window_item = jQuery("div#window_item");
+
+			if (window_item.length === 0) {
+				window_item = jQuery("<div></div>");
+				window_item.attr("id", "window_item");
+				window_item.css("position", "absolute");
+				window_item.css({ position: "fixed", width: "85%",  bottom: 500, zIndex: 999 });
+				window_item.draggable();
+				jQuery("body").append(window_item);
+			}
+
+			window_item.html(data);
+		});
 	});
 }
 
@@ -308,8 +338,8 @@ function setup_websocket(timer) {
 		if (time !== data.time)
 		{
 			console.error("更新あり！");
-			location.href = "./current";
-			location.reload();
+			// location.href = "./current";
+			// location.reload();
 		}
 		console.error("ping", data);
 	};
@@ -324,7 +354,9 @@ function setup_websocket(timer) {
 
 	const func_result = (data) => {
 		console.error("result", data);
-		location.href = "?accept=" + data.accept;
+		jQuery.get("/current?accept=" + data.accept, {}, (data) => {
+			jQuery("#stage").html(data);
+		});
 	};
 
 	const func_server_disconnect = (data) => {
@@ -335,6 +367,12 @@ function setup_websocket(timer) {
 	const func_message = (data) => {
 		jQuery.jGrowl("新着メッセージあり");
 		get_message();
+	};
+
+	const func_status = (data) => {
+		jQuery.get("/status", {}, (data) => {
+			jQuery("#status").html(data);
+		});
 	};
 
 	ws.onmessage = function (e) {
@@ -356,6 +394,9 @@ function setup_websocket(timer) {
 			case "message":
 				func_message(response.data);
 				break;
+			case "status":
+				func_status(response.data);
+				break;
 			case "battle_server_disconnect":
 				func_server_disconnect(response.data);
 				break;
@@ -366,7 +407,37 @@ function setup_websocket(timer) {
 	};
 }
 
+function fixed_bottom_location_area() {
+	const player_status = jQuery("#location_area");
+
+	if (player_status.length === 0)
+	{
+		return true;
+	}
+
+	player_status.css({ position: "sticky", top: 0, zIndex: 999, "word-break": "keep-all" });
+}
+
+function fixed_bottom_player_status_area() {
+	const player_status = jQuery("#status");
+
+	if (player_status.length === 0)
+	{
+		return true;
+	}
+
+	player_status.css({ position: "fixed", width: "85%",  bottom: 0, zIndex: 999, "word-break": "keep-all" });
+}
+
 jQuery(document).ready(() => {
+	jQuery("body").on("click", "div.menu-close", (event) => {
+		jQuery(event.target).closest("div.blackboard").hide();
+	});
+
+	jQuery("body").on("click", ".button-cancel", (event) => {
+		command({ mode: "log_in" });
+	});
+
 	if (typeof const_id !== "undefined") {
 		setup_websocket();
 	}
@@ -396,6 +467,8 @@ jQuery(document).ready(() => {
 	setup_take_control_form();
 	setup_select_menu();
 	setup_message();
+	fixed_bottom_location_area();
+	fixed_bottom_player_status_area();
 
 	jQuery(".select-menu:first").trigger("mouseenter");
 });

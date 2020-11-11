@@ -24,8 +24,9 @@
 <input type=hidden name=area value=<%= $karea %>>
 <input type=hidden name=mode value="yado_in">
 <input type=submit value="宿泊する">
+<input type="button" value="街へ戻る" class="button-cancel">
 </form>
 <p>
 	<script>
-const spot = "<%= $spot %>";
+spot = "<%= $spot %>";
 </script>

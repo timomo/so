@@ -1,15 +1,7 @@
-<b><%= $kname %> の所持品</b>
-<hr size="0">
-<%== $msg %><B><span COLOR="#FF9933"><%== $error %></span></B>
-<p>
 <form action="<%== $script %>" method="post">
-使用・装備したいアイテムをチェックしてください。<BR>
-<BR />
-<B>所持アイテム数</B> <%= $kitem %> / <%= $max_item %><BR>
-<BR />
 
 <div class="blackboard question">
-
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
 <table border="0" class="item_table">
 <tr>
 <th>&nbsp;</th>
@@ -89,11 +81,6 @@
 </form>
 
 <script>
-const spot = "<%= $spot %>";
-
-jQuery("div.menu-close").bind("click", (event) => {
-    jQuery(event.target).closest("div.blackboard").hide();
-});
 jQuery("td.iname").bind("click", (event) => {
     const td = jQuery(event.target);
     td.siblings("td").first().find("input").prop("checked", true).trigger("change");

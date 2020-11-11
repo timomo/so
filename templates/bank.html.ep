@@ -41,8 +41,10 @@
 
 <br>
 ※ここでの処理には手数料はかかりません。
+<input type="button" value="街へ戻る" class="button-cancel">
+
 </form>
 <p>
 <script>
-const spot = "<%= $spot %>";
+spot = "<%= $spot %>";
 </script>

@@ -12,6 +12,7 @@ use Encode;
 use Data::Dumper;
 use YAML::XS;
 use Mojo::JSON;
+use JSON;
 
 push @{app->static->paths}, File::Spec->catdir($FindBin::Bin, qw|public js|);
 push @{app->static->paths}, File::Spec->catdir($FindBin::Bin, qw|public css|);
@@ -163,6 +164,26 @@ get "/neighbors" => sub
     return $self->render(json => $utf8);
 };
 
+get "/status" => sub
+{
+    my $self = shift;
+    my $k = $self->current_user;
+
+    return $self->reply->not_found unless ($k);
+
+    return $self->render(
+        template => "window/status",
+        kname    => $k->{名前},
+        klv      => $k->{レベル},
+        klp      => $k->{LP},
+        max_lp   => 0,
+        khp      => $k->{HP},
+        kmaxhp   => $k->{最大HP},
+        kex      => $k->{経験値},
+        rrsk     => 0,
+    );
+};
+
 get "/current" => sub
 {
     my $self = shift;
@@ -206,7 +227,7 @@ post '/login' => sub
         return $self->redirect_to('/');
     }
     $self->flash(confirmation => 'ログインに成功しました');
-    $self->redirect_to('/current');
+    $self->redirect_to('/main');
 };
 
 get '/logout' => sub {
@@ -239,13 +260,44 @@ app->helper(
     },
 );
 
+get "/main" => sub
+{
+    my $self = shift;
+    my $k = $self->current_user;
+
+    return $self->reply->not_found unless ($k);
+
+
+    return $self->render(
+        template    => "log_in_frame",
+        kgold       => $k->{所持金},
+        area        => $k->{エリア},
+        spot        => $k->{スポット},
+        klv         => $k->{レベル},
+        klp         => $k->{LP},
+        max_lp      => 0,
+        khp         => $k->{HP},
+        kmaxhp      => $k->{最大HP},
+        kex         => $k->{経験値},
+        rrsk        => 0,
+        kid         => $k->{id},
+        kname       => $k->{名前},
+        const_id    => $k->{id},
+        mode        => "log_in",
+        info_array  => [],
+        select_menu => [],
+        script      => "./",
+        kpass       => "test",
+    );
+};
+
 any "/" => sub
 {
     my $self = shift;
     my $k = $self->current_user;
     my $mode = $self->param("mode");
 
-    return $self->redirect_to("/current") if ($k);
+    return $self->redirect_to("/main") if ($k);
 
     my $env = $self->tx->req->env;
     $env->{"psgi.input"} ||= *STDIN;

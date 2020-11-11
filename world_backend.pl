@@ -726,6 +726,10 @@ app->helper(
         my $mes = { method => "result", data => { accept => $accept, } };
 
         $self->unicast_send($mes, @ids);
+
+        $mes = { method => "status", data => { 1 } };
+
+        $self->unicast_send($mes, @ids);
     },
 );
 

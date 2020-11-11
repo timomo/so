@@ -138,7 +138,11 @@ if ($mode eq "" || ! defined $mode)
 }
 
 if($mode eq "html_top") { &html_top; }
-elsif($mode eq 'log_in') { &log_in; }
+elsif($mode eq 'log_in')
+{
+	&log_in;
+	# &log_in_frame;
+}
 elsif($mode eq 'chara_make') { &chara_make; }
 elsif($mode eq 'make_end') { &make_end; }
 elsif($mode eq 'regist') { &regist; }
@@ -155,7 +159,8 @@ elsif($mode eq 'user_shop') { &user_shop; }
 elsif($mode eq 'user_buy') { &user_buy; }
 elsif($mode eq 'item_check_window')
 {
-	print &item_check_window;
+	# print &item_check_window;
+	print &item_check;
 	exit;
 }
 elsif($mode eq 'item_check') { &item_check; }

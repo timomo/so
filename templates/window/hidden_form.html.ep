@@ -1,5 +1,5 @@
 <hr size=0>
-<form id="check_form" action="<%= $script %>" method="post">
+<form id="check_form" action="<%= $script %>" method="post" class="non">
 <select id="status-select" name="mode" onchange="javascript:selectTown(this);">
 <option value="item_check">アイテム一覧</option>
 <option value="status_check">ステータス詳細</option>
@@ -8,7 +8,7 @@
 <input id="status-select-submit" type="submit" value="行動" />
 </form>
 
-<form id="pvp_form" action="<%= $script %>" method="post">
+<form id="pvp_form" action="<%= $script %>" method="post" class="non">
 <input type="hidden" name="mode" value="pvp" />
 <input type="hidden" name="k2id" value="" />
 <input type="hidden" name="k1id" value="<%= $kid %>" />
@@ -17,5 +17,5 @@
 </form>
 
 <script>
-const spot = "<%= $spot %>";
+spot = "<%= $spot %>";
 </script>

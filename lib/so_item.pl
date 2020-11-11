@@ -177,10 +177,10 @@ sub _item_check
 
 sub item_check
 {
-	&header;
+	# &header;
 	print &_item_check;
-	&footer;
-	&save_dat_append;
+	# &footer;
+	# &save_dat_append;
 	exit;
 }
 

@@ -1227,8 +1227,6 @@ sub calc_pvp_handicap
 
 sub display_pvp_battle
 {
-	&header;
-
 	# $battle_header[$_] = Encode::decode_utf8($battle_header[$_]) for 0 .. $#battle_header;
 	# $battle_footer[$_] = Encode::decode_utf8($battle_footer[$_]) for 0 .. $#battle_footer;
 
@@ -1255,7 +1253,6 @@ sub display_pvp_battle
 
 	print Encode::encode_utf8($out);
 
-	&footer;
 }
 
 1;

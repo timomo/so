@@ -23,6 +23,8 @@
 </div>
 </DIV>
 
+<input type="button" value="戻る" class="button-cancel">
+
 [% ELSE %]
 
 <div class="clearfix">
@@ -53,7 +55,7 @@
 <input type="hidden" name="lastid" value="[% j + 1 %]" />
 </form>
 <script>
-const spot = "[% spot %]";
-const sel = [% sel + 1 %];
+spot = "[% spot %]";
+sel = [% sel + 1 %];
 </script>
 <script src="/js/so_battle.js"></script>

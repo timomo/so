@@ -18,8 +18,6 @@ sub item_shop
 		&get_msg;
 	}
 
-	&header;
-
 	my $i = 0;
 
 	my @item_array = &load_ini($item_file);
@@ -151,7 +149,6 @@ sub item_shop
 
 	print Encode::encode_utf8($html);
 
-	&footer;
 	&save_dat_append;
 
 	$buy_msg = "";$error = "";
@@ -172,8 +169,6 @@ sub user_shop
 	if($kspot != 0 || $kpst != 0) { &error("不正なパラメータです"); }
 
 	&town_load;
-
-	&header;
 
 	my @item_list;
 	my @item_count;
@@ -274,7 +269,6 @@ sub user_shop
 
 	print Encode::encode_utf8($html);
 
-	&footer;
 	&save_dat_append;
 
 	exit;
@@ -295,8 +289,6 @@ sub bank
 
 	#割増率の設定
 	my $plus = 1 + $kn_6 / 200;
-
-	&header;
 
 	$error = "";
 
@@ -385,7 +377,6 @@ sub bank
 
 	$buy_msg = ""; $error = "";
 
-	&footer;
 	&save_dat_append;
 
 	exit;

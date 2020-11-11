@@ -3,7 +3,7 @@
 	    %== join("\n", @$select_menu);
 	</div>
 </div>
-<form action="<%= $script %>" method="post" style="display: none">
+<form action="<%= $script %>" method="post" style="display: none" class="non">
 <select id="default-select" name="mode" onchange="javascript:selectTown(this);">
 <option value="item_check">アイテム一覧</option>
 <option value="status_check">ステータス詳細</option>

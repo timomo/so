@@ -1,0 +1,16 @@
+%= include "header"
+%= include "window/location"
+
+<div id="stage"></div>
+
+<div id="status">
+%= include "window/status"
+</div>
+
+<script>
+let spot = "pe";
+jQuery.get("/current", {} , (data) => {
+   jQuery("#stage").html(data);
+});
+</script>
+%= include "footer"

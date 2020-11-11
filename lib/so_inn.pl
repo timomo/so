@@ -16,8 +16,6 @@ sub yado
 	$get_area=$karea;$get_id="03";$get_cnt="0";
 	&get_msg;
 
-	&header;
-
 	my @rooms;
 
 	foreach(@inn_array){
@@ -67,7 +65,6 @@ sub yado
 
 	$error = "";
 
-	&footer;
 	&save_dat_append;
 
 	exit;
@@ -80,6 +77,7 @@ sub yado_in
 {
 	if(! exists $in{inn_no})
 	{
+		$mode = "yado";
 		$error = "部屋を選んでください。";
 		&yado;
 	}
@@ -112,6 +110,7 @@ sub yado_in
 			$cut = 1 - $yn_6 / 200;
 			$yado_gold = int($yado_gold * $cut);
 			if($ygold < $yado_gold) {
+				$mode = "yado";
 				$error = "所持金が足りません。";
 				&yado;
 			}
@@ -141,7 +140,10 @@ sub yado_in
 	}
 
 	if(!$hit) { &error("入力されたIDは登録されていません。又はパスワードが違います。"); }
-	if($kspot != 0 || $kpst != 0) { &error("不正なパラメータです。"); }
+	if($kspot != 0 || $kpst != 0) {
+		$mode = "yado";
+		&error("不正なパラメータです。");
+	}
 
 	open(OUT,">$chara_file");
 	print OUT @yado_new;
@@ -150,8 +152,6 @@ sub yado_in
 	# ロック解除
 	if ($lockkey == 3) { &file'unlock; }
 	else { if(-e $lockfile) { unlink($lockfile); } }
-
-	&header;
 
 	$get_area=$karea;$get_id="03";$get_cnt="1";
 	&get_msg;
@@ -167,7 +167,7 @@ sub yado_in
 
 	print Encode::encode_utf8($html);
 
-	&footer;
+	$mode = "yado";
 	&save_dat_append;
 
 	exit;

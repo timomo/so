@@ -35,10 +35,9 @@
  個 <input type="submit" value="アイテムを買う" />
 
 % }
-
+<input type="button" value="街へ戻る" class="button-cancel">
 </form>
 <p>
-
 <script>
-const spot = "<%= $spot %>";
+spot = "<%= $spot %>";
 </script>

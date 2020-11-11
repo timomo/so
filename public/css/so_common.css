@@ -78,3 +78,8 @@ table
     font-size: 10pt;
     cursor: pointer;
 }
+
+.non
+{
+    display: none;
+}

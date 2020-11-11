@@ -3,6 +3,38 @@ use utf8;
 #----------------#
 #   メイン画面   #
 #----------------#
+sub log_in_frame
+{
+	my $html = $controller->render_to_string(
+		template      => "log_in_frame",
+		script        => $script,
+		kid           => $kid,
+		kname         => $kname,
+		kpass         => $kpass,
+		karea         => $karea,
+		spot          => $spot,
+		kspot         => $kspot,
+		kpst          => $kpst,
+		area          => $town_name[$karea],
+		klv           => $klv,
+		klp           => $klp,
+		max_lp        => $max_lp,
+		khp           => $khp,
+		kmaxhp        => $kmaxhp,
+		kex           => $kex,
+		rrsk          => $rrsk,
+		kgold         => $kgold,
+	);
+
+	&header;
+	print Encode::encode_utf8($html);
+	&footer;
+
+	&save_dat_append;
+
+	exit;
+}
+
 sub log_in
 {
 	my $esex = "女";
@@ -13,8 +45,6 @@ sub log_in
 	$next_ex = $lv_up;
 
 	&town_load;
-
-	&header;
 
 	my @message = ();
 
@@ -244,9 +274,9 @@ sub log_in
 		error_string  => $error_string,
 	);
 
+	# &header;
 	print Encode::encode_utf8($html);
-
-	&footer;
+	# &footer;
 
 	&save_dat_append;
 

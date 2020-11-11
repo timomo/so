@@ -1,4 +1,4 @@
-<form name="town" action="<%= $script %>" method="post">
+<form name="town" action="<%= $script %>" method="post" class="non">
 <input type="hidden" name="id" value="<%= $kid %>" />
 <input type="hidden" name="pass" value="<%= $kpass %>" />
 <input type="hidden" name="area" value="<%= $karea %>" />

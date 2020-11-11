@@ -12,8 +12,6 @@ sub status_check
 
 	&town_load;
 
-	&header;
-
 	if($kspot == 0 && $kpst == 1){
 		$spot = "$town_name[$karea]郊外";
 	} elsif($kspot == 1){
@@ -347,11 +345,10 @@ EOM
 
 <hr size=0><p>
 			<script>
-const spot = "$spot";
+spot = "$spot";
 </script>
 EOM
 
-	&footer;
 	&save_dat_append;
 
 	exit;

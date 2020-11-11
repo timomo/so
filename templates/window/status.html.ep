@@ -1,7 +1,7 @@
-<div class="blackboard question">
+<div class="blackboard question" id="player_status_area">
     <table border="0">
         <tr>
-            <td>
+            <td rowspan="2">
                 <table border="0" style="width: 100%">
                     <tr>
                         <td rowspan="3" class="b2" style="white-space: nowrap; text-align: left; line-height: 20px; padding-right: 15px;">
@@ -17,26 +17,12 @@
                     <tr>
                         <td colspan="2" class="b2" style="text-align: left">Risk: <%== $rrsk %> %</td>
                     </tr>
-                    <tr>
-                        <td colspan="2" class="b2" align="center">【現在地】</td>
-                    </tr>
-                    <tr>
-                        <td class="b1" width='25%'>地名</td>
-                        <td width="75%"><%== $area %></td>
-                    </tr>
-                    <tr>
-                        <td class="b1">場所</td>
-                        <td><%== $spot %></td>
-                    </tr>
-                    <tr>
-                        <td colspan="2" class="b2" align="center">【状態】</td>
-                    </tr>
-                    <tr>
-                        <td class="b1">所持金</td>
-                        <td><%== $kgold %></td>
-                    </tr>
                 </table>
             </td>
+            <td id="td_item">アイテム</td>
+            </tr>
+            <tr>
+            <td style="vertical-align: top" id="td_status">ステータス</td>
         </tr>
     </table>
 </div>
