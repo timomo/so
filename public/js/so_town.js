@@ -408,7 +408,7 @@ function setup_websocket(timer) {
 }
 
 function fixed_bottom_location_area() {
-	const player_status = jQuery("#location_area");
+	const player_status = jQuery("#location");
 
 	if (player_status.length === 0)
 	{
@@ -445,6 +445,7 @@ jQuery(document).ready(() => {
 	get_message();
 
 	if (typeof spot !== "undefined") {
+		/*
 		if (spot === "町の中") {
 			music.request = "town1";
 		}
@@ -457,6 +458,8 @@ jQuery(document).ready(() => {
 		else {
 			music.request = "dungeon1";
 		}
+		
+		 */
 	}
 	else
 	{

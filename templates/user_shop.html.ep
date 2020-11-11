@@ -39,5 +39,5 @@
 </form>
 <p>
 <script>
-spot = "<%= $spot %>";
+player.spot = "<%= $spot %>";
 </script>

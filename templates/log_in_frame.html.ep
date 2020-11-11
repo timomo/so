@@ -1,5 +1,7 @@
 %= include "header"
+<div id="location">
 %= include "window/location"
+</div>
 
 <div id="stage"></div>
 
@@ -9,6 +11,34 @@
 
 <script>
 let spot = "pe";
+
+player = new Vue({
+    data: {
+        spot: undefined,
+    },
+    watch: {
+        spot: function (newVal, oldVal)
+        {
+            const self = this;
+
+            if (newVal === "町の中") {
+			    music.request = "town1";
+		    }
+		    else if (newVal === "モンスター" || spot === "デュエル") {
+			    music.request = "battle1";
+		    }
+		    else if (newVal === "PVP") {
+			    music.request = "battle2";
+		    }
+		    else {
+			    music.request = "dungeon1";
+		    }
+        },
+    },
+});
+
+player.spot = "町の中";
+
 jQuery.get("/current", {} , (data) => {
    jQuery("#stage").html(data);
 });

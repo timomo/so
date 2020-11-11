@@ -5,5 +5,5 @@
 <p>
 <input type="button" value="街へ戻る" class="button-cancel">
 <script>
-spot = "<%= $spot %>";
+player.spot = "<%= $spot %>";
 </script>
