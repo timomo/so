@@ -85,7 +85,7 @@ sub error {
 	# ロック解除
 	my $error = shift;
 	my $html = $controller->render_to_string(template => "exception", confirmation => $error);
-	print $html;
+	print Encode::encode_utf8($html);
 	exit;
 }
 

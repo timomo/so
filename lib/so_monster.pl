@@ -894,6 +894,8 @@ sub monster
 		&monster_initialize;
 		&monster_stage_save;
 		&display_monster_battle;
+		$khp = $khp_flg;
+		&regist;
 		exit;
 	}
 
@@ -913,6 +915,8 @@ sub monster
 		$battle_flag=0;
 		&monster_stage_save;
 		&display_monster_battle;
+		$khp = $khp_flg;
+		&regist;
 		exit;
 	}
 
@@ -1109,24 +1113,22 @@ sub display_monster_battle
 	# $battle_header[$_] = Encode::decode_utf8($battle_header[$_]) for 0 .. $#battle_header;
 	# $battle_footer[$_] = Encode::decode_utf8($battle_footer[$_]) for 0 .. $#battle_footer;
 
-	$tt->process(
-		'battle.tmpl',
-		{
-			'battle_header' => \@battle_header,
-			'battle_date'   => \@battle_date,
-			'battle_footer' => \@battle_footer,
-			j               => $j,
-			is_continue     => &is_continue_monster ? 1 : 0,
-			is_finished     => $win == 0 ? 0 : 1,
-			kid             => $kid,
-			kpass           => $kpass,
-			sel             => $in{sel} || -1,
-			spot            => "モンスター",
-			mode            => "monster",
-			rid             => "",
-		},
-		\my $out,
-		binmode => ':encoding(utf8)'
+	my $out = $controller->render_to_string(
+		template      => "battle",
+		'battle_header' => \@battle_header,
+		'battle_date'   => \@battle_date,
+		'battle_footer' => \@battle_footer,
+		j               => $j,
+		is_continue     => &is_continue_monster ? 1 : 0,
+		is_finished     => $win == 0 ? 0 : 1,
+		kid             => $kid,
+		kpass           => $kpass,
+		sel             => $in{sel} || -1,
+		spot            => "モンスター",
+		mode            => "monster",
+		rid             => "",
+		k1id             => "",
+		k2id             => "",
 	);
 
 	print Encode::encode_utf8($out);

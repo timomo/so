@@ -2,7 +2,6 @@
 
 use File::Spec;
 use FindBin;
-use Template;
 use YAML::XS;
 use CGI;
 use utf8;
@@ -50,10 +49,6 @@ require './lib/so_config.pl';
 require './lib/so_pvp.pl';
 require "./lib/so_ajax.pl";
 
-our $tt = Template->new(
-	ENCODING => 'utf8',
-	INCLUDE_PATH => File::Spec->catdir($FindBin::RealBin, 'template'),
-);
 our $mt = Mojo::Template->new(vars => 1);
 our $logger = Mojo::Log->new;
 our $config = Mojolicious::Plugin::Config->load(File::Spec->catfile($FindBin::Bin, "so.conf.pl"), $config);

@@ -1,0 +1,62 @@
+<a class="btn-first" href="javascript:page(1)"><<最初</a>&nbsp;&nbsp;<a class="btn-back" href="javascript:page(2)"><戻る</a>
+<a class="btn-next" href="javascript:page(3)">次へ></a>&nbsp;&nbsp;<a class="btn-last" href="javascript:page(4)">最後>></a>
+
+<DIV id="sel0" style="display: none;">
+<div class="blackboard question">
+% for my $log (@$battle_header) {
+    <%== $log %>
+% }
+</div>
+</DIV>
+
+% for my $log (@$battle_date) {
+    <%== $log %>
+% }
+
+% if ( $is_finished == 1 ) {
+
+<DIV id="sel<%= scalar @$battle_date %>" style="display: none;">
+<div class="blackboard question">
+
+% for my $log (@$battle_footer) {
+<%== $log %>
+% }
+</div>
+</DIV>
+
+<input type="button" value="戻る" class="button-cancel">
+
+% } else {
+
+<div class="clearfix">
+	<div class="blackboard answer float-l">
+	    <p class="blink-before select-command">戦う</p>
+	    <p class="select-command">アイテム</p>
+	    <p class="select-command">逃げる</p>
+	</div>
+</div>
+
+% }
+
+<form name="command" method="post">
+<input type="hidden" name="command" value="" />
+<input type="hidden" name="mode" value="<%= $mode %>" />
+<input type="hidden" name="sel" value="<%= $sel + 1 %>" />
+
+% if ($mode eq "pvp") {
+<input type="hidden" name="k1id" value="<%= $k1id %>" />
+<input type="hidden" name="k2id" value="<%= $k2id %>" />
+% }
+
+</form>
+
+<form name="data">
+<input type="hidden" name="backid" value="0" />
+<input type="hidden" name="nextid" value="1" />
+<input type="hidden" name="lastid" value="<%= $j + 1 %>" />
+</form>
+<script>
+player.spot = "<%= $spot %>";
+sel = <%= $sel + 1 %>;
+</script>
+<script src="/js/so_battle.js"></script>

@@ -21,10 +21,15 @@ player = new Vue({
         {
             const self = this;
 
+            if (newVal === oldVal)
+            {
+                return true;
+            }
+
             if (newVal === "町の中") {
 			    music.request = "town1";
 		    }
-		    else if (newVal === "モンスター" || spot === "デュエル") {
+		    else if (newVal === "モンスター" || newVal === "デュエル") {
 			    music.request = "battle1";
 		    }
 		    else if (newVal === "PVP") {

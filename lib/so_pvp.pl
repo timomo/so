@@ -1083,6 +1083,10 @@ sub pvp
 		&pvp_initialize;
 		&pvp_stage_save;
 		&display_pvp_battle;
+		$k1hp = $k1hp_flg;
+		$k2hp = $k2hp_flg;
+		&regist_pvp_1p;
+		&regist_pvp_2p;
 		exit;
 	}
 
@@ -1096,6 +1100,10 @@ sub pvp
 		$battle_flag=0;
 		&pvp_stage_save;
 		&display_pvp_battle;
+		$k1hp = $k1hp_flg;
+		$k2hp = $k2hp_flg;
+		&regist_pvp_1p;
+		&regist_pvp_2p;
 		exit;
 	}
 
@@ -1112,6 +1120,9 @@ sub pvp
 		$win1   = 0;
 		$win2   = 1;
 	}
+
+	$k1hp = $k1hp_flg;
+	$k2hp = $k2hp_flg;
 
 	&calc_pvp_handicap;
 	&calc_pvp_bonus;
@@ -1230,25 +1241,21 @@ sub display_pvp_battle
 	# $battle_header[$_] = Encode::decode_utf8($battle_header[$_]) for 0 .. $#battle_header;
 	# $battle_footer[$_] = Encode::decode_utf8($battle_footer[$_]) for 0 .. $#battle_footer;
 
-	$tt->process(
-		'battle.tmpl',
-		{
-			'battle_header' => \@battle_header,
-			'battle_date'   => \@battle_date,
-			'battle_footer' => \@battle_footer,
-			j               => $j,
-			is_continue     => &is_continue_pvp ? 1 : 0,
-			is_finished     => $win == 0 ? 0 : 1,
-			kid             => $kid,
-			kpass           => $kpass,
-			sel             => $in{sel} || -1,
-			spot            => "PVP",
-			mode            => "pvp",
-			k1id             => $k1id,
-			k2id             => $k2id,
-		},
-		\my $out,
-		binmode => ':encoding(utf8)'
+	my $out = $controller->render_to_string(
+		template      => "battle",
+		'battle_header' => \@battle_header,
+		'battle_date'   => \@battle_date,
+		'battle_footer' => \@battle_footer,
+		j               => $j,
+		is_continue     => &is_continue_pvp ? 1 : 0,
+		is_finished     => $win == 0 ? 0 : 1,
+		kid             => $kid,
+		kpass           => $kpass,
+		sel             => $in{sel} || -1,
+		spot            => "PVP",
+		mode            => "pvp",
+		k1id             => $k1id,
+		k2id             => $k2id,
 	);
 
 	print Encode::encode_utf8($out);

@@ -11,6 +11,10 @@ music = new Vue({
         request: function (newVal, oldVal)
         {
             const self = this;
+            if (newVal === oldVal)
+            {
+                return true;
+            }
             self.play = newVal;
         },
         play: function (newVal, oldVal)

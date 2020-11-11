@@ -175,7 +175,8 @@ get "/location" => sub
         template => "window/location",
         kgold    => $k->{所持金},
         area     => $self->config->{街}->[$k->{エリア}],
-        spot     => $self->config->{フィールド}->[$k->{スポット}],
+        spot     => $self->get_spot_name($k),
+        k        => $k,
     );
 };
 
@@ -196,6 +197,7 @@ get "/status" => sub
         kmaxhp   => $k->{最大HP},
         kex      => $k->{経験値},
         rrsk     => $k->{リスク},
+        k        => $k,
     );
 };
 
@@ -285,8 +287,8 @@ get "/main" => sub
     return $self->render(
         template    => "log_in_frame",
         kgold       => $k->{所持金},
-        area     => $self->config->{街}->[$k->{エリア}],
-        spot     => $self->config->{フィールド}->[$k->{スポット}],
+        area        => $self->config->{街}->[$k->{エリア}],
+        spot        => $self->get_spot_name($k),
         klv         => $k->{レベル},
         klp         => $k->{LP},
         max_lp      => 0,
@@ -298,10 +300,14 @@ get "/main" => sub
         kname       => $k->{名前},
         const_id    => $k->{id},
         mode        => "log_in",
-        info_array  => [],
+        info_array  => [
+            "", "", "", "", "",
+            "", "", "", "", "",
+        ],
         select_menu => [],
         script      => "./",
         kpass       => "test",
+        k           => $k,
     );
 };
 
@@ -357,6 +363,39 @@ any "/" => sub
 };
 
 my $serverTxs = {};
+
+app->helper(
+    get_spot_name => sub
+    {
+        my $self = shift;
+        my $k = shift;
+        my $spot = "";
+
+        # TODO: farea、rarea
+        if($k->{スポット} == 0 && $k->{距離} == 1)
+        {
+            $spot = sprintf("%s郊外", $self->config->{街}->[$k->{エリア}]);
+        }
+        elsif($k->{スポット} == 1)
+        {
+            $spot = sprintf("%s最深部まで残り %s", $self->config->{フィールド}->[$k->{スポット}], $k->{距離});
+        }
+        elsif($k->{スポット} == 2  && $k->{距離} > 0)
+        {
+            # $spot = "$town_name[$farea]まで残り $kpst";
+        }
+        elsif($k->{スポット} == 3  && $k->{距離} > 0)
+        {
+            # $spot = "$town_name[$rarea]まで残り $kpst";
+        }
+        else
+        {
+            $spot = "町の中";
+        }
+
+        return $spot;
+    },
+);
 
 app->helper(
     create_battle_ws => sub
