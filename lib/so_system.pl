@@ -235,6 +235,7 @@ sub initialize
 	our %in = undef;
 	our $battle_flag = undef;
 	our $spot = undef;
+	our $msg = undef;
 
 	# player
 	our $kid = undef; our $kpass = undef; our $kname = undef; our $ksex = undef; our $kchara = undef;

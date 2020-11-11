@@ -3,12 +3,10 @@ use utf8;
 #  所持アイテム  #
 #----------------#
 
-sub item_check_window
+sub item_check_tr
 {
+	my $type = shift || 1;
 	my @user_item = &item_load($kid);
-	our $rid = $kid;
-	&read_bank;
-	my $space_price = int($kpitem / 5) + 1;
 
 	#割増率の設定
 	my $plus = 1 + $kn_6 / 200;
@@ -67,10 +65,37 @@ sub item_check_window
 			$ireq = "&nbsp;";
 		}
 
-		my $mes = "<tr><td align=center>$item_eqp[$ieqp]</td><td align=center>$item_mode[$imode]</td><td class=iname>$iname<input type=hidden name=item_no value=\"$iid\"></td><td align=center>$idmg</td><td align=center>$igold G</td><td align=center>$item_hand[$ihand]</td><td align=center>$ireq</td><td align=center><font color=$elmcolor[$ieelm]>$item_eelm[$ieelm]</font></td><td align=center>$item_def[$idef]</td><td align=center>$item_qlt[$iqlt]</td><td align=center>$imake</td><td align=center>$irest 個</td></tr>\n";
-		push(@items, $mes);
+		if ($type == 1)
+		{
+			my $mes = "<tr><td align=center>$item_eqp[$ieqp]</td><td align=center>$item_mode[$imode]</td><td class=iname>$iname<input type=hidden name=item_no value=\"$iid\"></td><td align=center>$idmg</td><td align=center>$igold G</td><td align=center>$item_hand[$ihand]</td><td align=center>$ireq</td><td align=center><font color=$elmcolor[$ieelm]>$item_eelm[$ieelm]</font></td><td align=center>$item_def[$idef]</td><td align=center>$item_qlt[$iqlt]</td><td align=center>$imake</td><td align=center>$irest 個</td></tr>\n";
+			push(@items, $mes);
+		}
+		else
+		{
+			my $mes = "<tr><td><input type=radio name=item_no value=\"$iid\"></td><td align=center>$item_eqp[$ieqp]</td><td align=center>$item_mode[$imode]</td><td class=iname>$iname</td><td align=center>$idmg</td><td align=center>$igold G</td><td align=center>$item_hand[$ihand]</td><td align=center>$ireq</td><td align=center><font color=$elmcolor[$ieelm]>$item_eelm[$ieelm]</font></td><td align=center>$item_def[$idef]</td><td align=center>$item_qlt[$iqlt]</td><td align=center>$imake</td><td align=center>$irest 個</td></tr>\n";
+			push(@items, $mes);
+		}
 	}
 
+	return \@items;
+}
+
+sub item_check_option_count
+{
+	my $i = 1;
+	my @item_count;
+
+	foreach(1 .. $max_itemcnt)
+	{
+		push(@item_count, sprintf("<option value='%s'>%s</option>\n", $i, $i));
+		$i++;
+	}
+
+	return \@item_count;
+}
+
+sub item_check_option_mes_id
+{
 	my $characters = $system->characters;
 	my @send_id;
 
@@ -83,15 +108,19 @@ sub item_check_window
 		push(@send_id, sprintf("<option value='%s'>%s</option>\n", $to->{id}, $to->{名前}));
 	}
 
-	my $i = 1;
-	my @item_count;
+	return \@send_id;
+}
 
-	foreach(1 .. $max_itemcnt)
-	{
-		push(@item_count, sprintf("<option value='%s'>%s</option>\n", $i, $i));
-		$i++;
-	}
-
+sub item_check_window
+{
+	our $rid = $kid;
+	&read_bank;
+	my $space_price = int($kpitem / 5) + 1;
+	$msg = "";
+	$error = "";
+	my @items = @{&item_check_tr};
+	my @send_id = @{&item_check_option_mes_id};
+	my @item_count = @{&item_check_option_count};
 	my $html = $controller->render_to_string(
 		template    => "window/item_check",
 		script      => "/window/item",
@@ -116,93 +145,14 @@ sub item_check_window
 
 sub _item_check
 {
-	my @user_item = &item_load($kid);
 	our $rid = $kid;
 	&read_bank;
 	my $space_price = int($kpitem / 5) + 1;
-
-	#割増率の設定
-	my $plus = 1 + $kn_6 / 200;
-
 	$msg = "";
 	$error = "";
-	my @items;
-
-	for my $ary (@user_item)
-	{
-		my ($iid,$ino,$iname,$idmg,$igold,$imode,$iuelm,$ieelm,$ihand,$idef,$ireq,$iqlt,$imake,$irest,$ieqp) = @$ary;
-		$igold = int($igold * $plus / 2);
-		&check_limit;
-		# アイテム種別により処理変更
-		if ($imode == 01) {
-			$idmg = "<font color=$efcolor[2]>HP回復：$idmg</font>";
-			$ireq = "&nbsp;";
-		} elsif ($imode == 02) {
-			$idmg = "<font color=$efcolor[2]>LP回復：$idmg</font>";
-			$ireq = "&nbsp;";
-		} elsif ($imode == 03) {
-			$idmg = "移動する";
-			$ireq = "&nbsp;";
-		} elsif ($imode == 04) {
-			$idmg = "<font color=$efcolor[2]>$chara_skill[$idmg]</font>";
-			$ireq = "&nbsp;";
-		} elsif ($imode == 05) {
-			$idmg = "素材";
-			$ireq = "&nbsp;";
-		} elsif ($imode == 07) {
-			$idmg = "<font color=$efcolor[2]>治療：$idmg</font>";
-			$ireq = "&nbsp;";
-		} elsif (10 <= $imode && $imode < 20) {
-			$idmg = "<font color=$efcolor[0]>攻撃：$idmg</font>";
-			$ireq = "<font color=$reqcolor>$item_uelm[$iuelm]：$ireq</font>";
-		} elsif (20 <= $imode && $imode < 30) {
-			$idmg = "<font color=$efcolor[0]>攻撃：$idmg</font>";
-			$ireq = "<font color=$reqcolor>$item_uelm[$iuelm]：$ireq</font>";
-		} elsif (30 <= $imode && $imode < 40) {
-			$idmg = "<font color=$efcolor[1]>防御：$idmg</font>";
-			$ireq = "<font color=$reqcolor>力：$ireq</font>";
-		} elsif (40 <= $imode && $imode < 50) {
-			$idmg = "<font color=$efcolor[1]>防御：$idmg</font>";
-			$ireq = "<font color=$reqcolor>力：$ireq</font>";
-		} elsif (50 <= $imode && $imode < 60) {
-			$idmg = "<font color=$efcolor[1]>回避：$idmg</font>";
-			$ireq = "<font color=$reqcolor>力：$ireq</font>";
-		} elsif (60 <= $imode && $imode < 70) {
-			$idmg = "<font color=$efcolor[2]>補助：$idmg</font>";
-			$ireq = "<font color=$reqcolor>$item_uelm[$iuelm]：$ireq</font>";
-		} elsif (70 <= $imode && $imode < 80) {
-			$idmg = "<font color=$efcolor[0]>攻撃：$idmg</font>";
-			$ireq = "<font color=$reqcolor>$item_uelm[$iuelm]：$ireq</font>";
-		} else {
-			$idmg = "&nbsp;";
-			$ireq = "&nbsp;";
-		}
-
-		my $mes = "<tr><td><input type=radio name=item_no value=\"$iid\"></td><td align=center>$item_eqp[$ieqp]</td><td align=center>$item_mode[$imode]</td><td class=iname>$iname</td><td align=center>$idmg</td><td align=center>$igold G</td><td align=center>$item_hand[$ihand]</td><td align=center>$ireq</td><td align=center><font color=$elmcolor[$ieelm]>$item_eelm[$ieelm]</font></td><td align=center>$item_def[$idef]</td><td align=center>$item_qlt[$iqlt]</td><td align=center>$imake</td><td align=center>$irest 個</td></tr>\n";
-		push(@items, $mes);
-	}
-
-	my $characters = $system->characters;
-	my @send_id;
-
-	for my $to (@$characters)
-	{
-		if($kid eq $to->{id})
-		{
-			next;
-		}
-		push(@send_id, sprintf("<option value='%s'>%s</option>\n", $to->{id}, $to->{名前}));
-	}
-
-	my $i = 1;
-	my @item_count;
-
-	foreach(1 .. $max_itemcnt)
-	{
-		push(@item_count, sprintf("<option value='%s'>%s</option>\n", $i, $i));
-		$i++;
-	}
-
+	my @items = @{&item_check_tr(2)};
+	my @send_id = @{&item_check_option_mes_id};
+	my @item_count = @{&item_check_option_count};
 	my $html = $controller->render_to_string(
 		template    => "item_check",
 		script      => $script,
