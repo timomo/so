@@ -70,7 +70,7 @@ function setup_neighbors()
 				p.attr("id", "mode_pvp-select_1");
 				p.html("近くにいるキャラに攻撃をしかける");
 				jQuery("#select-menu-window").append(p);
-				setup_select_menu();
+				// setup_select_menu();
 			}
 		}
 	});
@@ -78,15 +78,9 @@ function setup_neighbors()
 
 function setup_take_control_form()
 {
-	let timer;
-
 	jQuery("body").on("submit", "form", (event) => {
 		const param = jQuery(event.target).serializeArray();
 		const tmp = {};
-
-		if (timer) {
-			clearInterval(timer);
-		}
 
 		param.forEach((ary) => {
 			tmp[ary.name] = ary.value;
@@ -113,6 +107,7 @@ function setup_message()
 
 function setup_select_menu()
 {
+	/*
 	jQuery("#camp-select").hide();
 	jQuery("#camp-select-submit").hide();
 	jQuery("#monster-select").hide();
@@ -128,6 +123,8 @@ function setup_select_menu()
 	jQuery("form[name='town']").hide();
 	jQuery("form[name='move']").hide();
 
+
+	 */
 	jQuery(".select-menu")
 		.unbind("mouseenter")
 		.unbind("click");
@@ -172,11 +169,7 @@ function setup_select_menu()
 			return false;
 		}
 
-		if (select_id === "default-select" && select_value === "logout") {
-			location.href = "./logout";
-			return false;
-		}
-		else if (select_id !== "pvp-select") {
+		if (select_id !== "pvp-select") {
 			jQuery("#" + select_id).val(select_value);
 			jQuery("#" + select_id + "-submit").trigger("click");
 		}
@@ -458,7 +451,7 @@ jQuery(document).ready(() => {
 		else {
 			music.request = "dungeon1";
 		}
-		
+
 		 */
 	}
 	else
