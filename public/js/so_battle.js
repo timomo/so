@@ -133,6 +133,7 @@ jQuery(document).ready(() => {
 				if (window_item.length === 0) {
 					window_item = jQuery("<div></div>");
 					window_item.attr("id", "window_item");
+					window_item.css("position", "absolute");
 					window_item.draggable();
 					jQuery("body").append(window_item);
 				}
