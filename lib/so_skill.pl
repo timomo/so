@@ -222,7 +222,9 @@ sub skill_manage
 
 	&skill_regist;
 
-	&status_check;
+	print &status_check;
+
+	exit;
 }
 
 #--------------#

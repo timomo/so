@@ -1,0 +1,180 @@
+<div class="blackboard question">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+
+<form action="<%== $script %>" method="post">
+
+<table border=0 width='100%'>
+<tr>
+<td valign=top width='40%'>
+<table border=0 width='100%'>
+<tr>
+<td colspan="10" class="b2" align="center">現在地</td>
+</tr>
+<tr>
+<td class="b1" width='25%'>地名</td>
+<td colspan="9" width='75%'><%== $town_name->[$karea] %></td>
+</tr>
+<tr>
+<td class="b1" width='25%'>場所</td>
+<td colspan="9" width='75%'><%= $spot %></td>
+</tr>
+<tr>
+<td colspan="10" class="b2" align="center">状態</td>
+</tr>
+<tr>
+<td class="b1" width='20%'>名前</td>
+<td colspan="4" width='30%'><%= $kname %></td>
+<td class="b1" width='20%'>性別</td>
+<td colspan="4" width='30%'><%= $esex %></td>
+</tr>
+<tr>
+<td class="b1">レベル</td>
+<td colspan="4"><%= $klv %></td>
+<td class="b1">経験値</td>
+<td colspan="4"><%= $kex %>%</td>
+</tr>
+<tr>
+<td class="b1">HP</td>
+<td colspan="4"><%= $khp %>/<%= $kmaxhp %></td>
+<td class="b1">LP</td>
+<td colspan="4"><%= $klp %>/<%= $max_lp %></td>
+</tr>
+<tr>
+<td class="b1">リスク</td>
+<td colspan="4"><%= $rrsk %>%</td>
+<td class="b1">所持金</td>
+<td colspan="4"><%= $kgold %></td>
+</tr>
+<tr>
+<td colspan="10" class="b2" align="center">能力値</td>
+</tr>
+<tr>
+<td class="b1">力</td>
+<td colspan="4"><%= $kn_0 %></td>
+<td class="b1">賢さ</td>
+<td colspan="4"><%= $kn_1 %></td>
+</tr>
+<tr>
+<td class="b1">信仰心</td>
+<td colspan="4"><%= $kn_2 %></td>
+<td class="b1">体力</td>
+<td colspan="4"><%= $kn_3 %></td>
+</tr>
+<tr>
+<td class="b1">器用さ</td>
+<td colspan="4"><%= $kn_4 %></td>
+<td class="b1">素早さ</td>
+<td colspan="4"><%= $kn_5 %></td>
+</tr>
+<tr>
+<td class="b1">魅力</td>
+<td colspan="4"><%= $kn_6 %></td>
+<td class="b1">残りAP</td>
+<td colspan="4"><%= $kap %></td>
+</tr>
+<tr>
+<td colspan="5" align="center">能力値上昇(要求AP)</td>
+<td align="center">
+<select name=up>
+	<option value=0>力(<%= $req_ap->[0] %>)</option>
+	<option value=1>賢さ(<%= $req_ap->[1] %>)</option>
+	<option value=2>信仰心(<%= $req_ap->[2] %>)</option>
+	<option value=3>体力(<%= $req_ap->[3] %>)</option>
+	<option value=4>器用さ(<%= $req_ap->[4] %>)</option>
+	<option value=5>素早さ(<%= $req_ap->[5] %>)</option>
+	<option value=6>魅力(<%= $req_ap->[6] %>)</option>
+</select></td>
+<td colspan="4" align="center">
+<input type=hidden name=id value="<%= $kid %>">
+<input type=hidden name=mode value="status_up">
+<input type=button value="上昇する" class="param-submit">
+</td>
+</table>
+</form>
+</td>
+</tr><tr>
+<td valign="top" width='30%'>
+<table border=0 width='100%'>
+<tr>
+<td colspan="6" class="b2" align="center">装備</td>
+</tr>
+
+%== join("\n", @$equip);
+
+<tr>
+<td colspan="6" class="b2" align="center">効果</td>
+</tr>
+<tr>
+<td class="b1" width='25%'>攻撃力</td>
+<td colspan="2" width='25%'><%= $dmg1 %> × <%= $swg1 %> &nbsp;<span COLOR="<%= $atccol %>"><%= $atcbuf %></span></td>
+<td class="b1" width='25%'>防御力</td>
+<td colspan="2" width='25%'><%= $def1 %> &nbsp;<span COLOR="<%= $defcol %>"><%= $defbuf %></span></td>
+</tr>
+<tr>
+<td class="b1">先制補正</td>
+<td colspan="2"><%= $spd1 %> % &nbsp;<span COLOR="<%= $spdcol %>"><%= $spdbuf %></span></td>
+<td class="b1">技発動</td>
+<td colspan="2"><%= $clt1 %> %</td>
+</tr>
+<tr>
+<td class="b1">受け流し</td>
+<td colspan="2"><%= $k_par %> %</td>
+<td class="b1">ブロック</td>
+<td colspan="2"><%= $k_blc %> %</td>
+</tr>
+<tr>
+<td class="b1">回避</td>
+<td colspan="2"><%= $k_esc %> %</td>
+<td class="b1">&nbsp;</td>
+<td colspan="2">&nbsp;</td>
+</tr>
+<tr>
+<td colspan="6">※修正後の数値を表示しています</td>
+</tr>
+</table>
+</td>
+
+</tr><tr>
+
+<td valign="top" width='30%'>
+<form action="<%== $script %>" method="post">
+<table border=0 width='100%'>
+<tr>
+<td colspan="5" class="b2" align="center">スキル</td>
+</tr>
+
+%== join("\n", @$skills);
+
+<tr>
+<td class="b1">合計</td>
+<td colspan="3"><span <%= $sklcol %>><%= $cttl %> / <%= $kmax %></span></td>
+<td colspan="1" align="center">
+<input type=hidden name=id value="<%= $kid %>">
+<input type=hidden name=mode value="skill_manage">
+<input type=button value="登録する" class="skill-submit">
+</td>
+</tr>
+</td>
+</table>
+</tr>
+</table>
+
+</form>
+
+</div>
+
+<script>
+jQuery(".param-submit, .skill-submit").bind("click", (event) => {
+    const form = jQuery(event.target).closest("form");
+    const param = form.serializeArray();
+    const tmp = {};
+
+    param.forEach((ary) => {
+        tmp[ary.name] = ary.value;
+    });
+
+    jQuery.post("/window/status", tmp, (data) => {
+        jQuery("#td_status").trigger("click");
+    });
+});
+</script>

@@ -45,6 +45,8 @@ function setup_neighbors()
 	}
 
 	jQuery.get( "/neighbors", {}, (data) => {
+		neighbors.html("");
+
 		if (data.hasOwnProperty("neighbors")) {
 			const menu = jQuery("<p class='answer-menu'>【近くにいるキャラ】</p>");
 			jQuery("#neighbors").append(menu);
@@ -211,6 +213,24 @@ function setup_select_menu()
 			window_item.html(data);
 		});
 	});
+
+	jQuery("body").on("click", "#td_status", (event) =>
+	{
+		jQuery.get("/window/status", {}, (data) => {
+			let window_item = jQuery("div#window_status");
+
+			if (window_item.length === 0) {
+				window_item = jQuery("<div></div>");
+				window_item.attr("id", "window_status");
+				window_item.css("position", "absolute");
+				window_item.css({ position: "fixed", width: "85%",  bottom: 150, zIndex: 999 });
+				window_item.draggable();
+				jQuery("body").append(window_item);
+			}
+
+			window_item.html(data);
+		});
+	});
 }
 
 let ws;
@@ -369,6 +389,7 @@ function setup_websocket(timer) {
 		jQuery.get("/location", {}, (data) => {
 			jQuery("#location").html(data);
 		});
+		setup_neighbors();
 	};
 
 	ws.onmessage = function (e) {

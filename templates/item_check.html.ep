@@ -58,7 +58,7 @@
 </select>
 </p>
 <p>
-<input type=submit value="OK">
+<input type=button value="OK" class="item-submit">
 </p>
 <p>
 個数&nbsp;
@@ -94,4 +94,19 @@ jQuery("input[name='item_no']").bind("change", (event) => {
     menu.offset(offset);
 });
 jQuery(".select-item-menu").draggable();
+
+jQuery(".item-submit").bind("click", (event) => {
+    const form = jQuery(event.target).closest("form");
+    const param = form.serializeArray();
+    const tmp = {};
+
+    param.forEach((ary) => {
+        tmp[ary.name] = ary.value;
+    });
+
+    jQuery.post("/window/item", tmp, (data) => {
+        jQuery(".select-item-menu").hide();
+        jQuery("#td_item").trigger("click");
+    });
+});
 </script>

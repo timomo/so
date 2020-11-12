@@ -74,13 +74,56 @@ any "/window/item" => sub
 
     if ($self->req->method eq "POST")
     {
+        my $env = $self->tx->req->env || {};
+        my $url = Mojo::URL->new;
+        $url->query({ %$json, id => $k->{id}, pass => $k->{パスワード} });
+        $env->{QUERY_STRING} = $url->to_string;
+        $env->{QUERY_STRING} =~ s/^\?//;
+        my $utf8 = $self->emulate_cgi($env);
 
+        my $mes = { method => "status", data => 1 };
+        $self->unicast_send($mes, $k->{id});
+
+        return $self->render(text => $utf8, format => "html");
     }
     else
     {
         my $env = $self->tx->req->env || {};
         my $url = Mojo::URL->new;
         $url->query({ mode => "item_check_window", id => $k->{id}, pass => $k->{パスワード} });
+        $env->{QUERY_STRING} = $url->to_string;
+        $env->{QUERY_STRING} =~ s/^\?//;
+        my $utf8 = $self->emulate_cgi($env);
+        return $self->render(text => $utf8, format => "html");
+    }
+};
+
+any "/window/status" => sub
+{
+    my $self = shift;
+    my $json = $self->req->json;
+    my $id = $json->{id};
+    my $k = $system->load_chara($id);
+
+    if ($self->req->method eq "POST")
+    {
+        my $env = $self->tx->req->env || {};
+        my $url = Mojo::URL->new;
+        $url->query({ %$json, id => $k->{id}, pass => $k->{パスワード} });
+        $env->{QUERY_STRING} = $url->to_string;
+        $env->{QUERY_STRING} =~ s/^\?//;
+        my $utf8 = $self->emulate_cgi($env);
+
+        my $mes = { method => "status", data => 1 };
+        $self->unicast_send($mes, $k->{id});
+
+        return $self->render(text => $utf8, format => "html");
+    }
+    else
+    {
+        my $env = $self->tx->req->env || {};
+        my $url = Mojo::URL->new;
+        $url->query({ mode => "status_check_window", id => $k->{id}, pass => $k->{パスワード} });
         $env->{QUERY_STRING} = $url->to_string;
         $env->{QUERY_STRING} =~ s/^\?//;
         my $utf8 = $self->emulate_cgi($env);
