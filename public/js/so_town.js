@@ -67,12 +67,16 @@ function setup_neighbors()
 			});
 
 			if (data.neighbors.length !== 0) {
-				const p = jQuery("<p></p>");
-				p.addClass("select-menu");
-				p.attr("id", "mode_pvp-select_1");
-				p.html("近くにいるキャラに攻撃をしかける");
-				jQuery("#select-menu-window").append(p);
-				// setup_select_menu();
+				const target = jQuery("#mode_pvp-select_1");
+
+				if (target.length === 0)
+				{
+					const p = jQuery("<p></p>");
+					p.addClass("select-menu");
+					p.attr("id", "mode_pvp-select_1");
+					p.html("近くにいるキャラに攻撃をしかける");
+					jQuery("#select-menu-window").append(p);
+				}
 			}
 		}
 	});

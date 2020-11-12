@@ -28,7 +28,7 @@ sub read_buff
 	}
 	else
 	{
-		($rrsk, @rbuf) = @$buff{@{$controller->config->{キャラバフ}}};
+		our ($rrsk, @rbuf) = @$buff{@{$controller->config->{キャラバフ}}};
 	}
 }
 

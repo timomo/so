@@ -82,17 +82,14 @@ sub yado_in
 		&yado;
 	}
 
-	&get_host;
+	if($kspot != 0 || $kpst != 0) {
+		$mode = "yado";
+		&error("不正なパラメータです。");
+	}
 
-	$date = time();
-
-	# ファイルロック
-	if ($lockkey == 1) { &lock1; }
-	elsif ($lockkey == 2) { &lock2; }
-	elsif ($lockkey == 3) { &file'lock; }
-
-	@YADO = &load_ini($chara_file);
-	@inn_array = &load_ini($town_inn[$in{'area'}]);
+	my @inn_array = &load_ini($town_inn[$in{'area'}]);
+	my $yado_gold;
+	my ($y_no,$y_name,$y_food,$y_atc,$y_def,$y_spd,$y_rsk,$y_gold);
 
 	foreach(@inn_array){
 		($y_no,$y_name,$y_food,$y_atc,$y_def,$y_spd,$y_rsk,$y_gold) = split(/<>/);
@@ -102,64 +99,47 @@ sub yado_in
 		}
 	}
 
-	$hit=0;@yado_new=();
-	foreach(@YADO){
-		($yid,$ypass,$yname,$ysex,$ychara,$yn_0,$yn_1,$yn_2,$yn_3,$yn_4,$yn_5,$yn_6,$yhp,$ymaxhp,$yex,$ylv,$yap,$ygold,$ylp,$ytotal,$ykati,$yhost,$ydate,$yarea,$yspot,$ypst,$yitem) = split(/<>/);
-		if($in{'id'} eq "$yid" and $in{'pass'} eq "$ypass") {
-			#割引率の設定
-			$cut = 1 - $yn_6 / 200;
-			$yado_gold = int($yado_gold * $cut);
-			if($ygold < $yado_gold) {
-				$mode = "yado";
-				$error = "所持金が足りません。";
-				&yado;
-			}
-			else { $ygold = $ygold - $yado_gold; }
-			$ymaxhp = int($ylv * 7.5 + $yn_3 * 7.5);
+	my $yn_6 = $kn_6;
+	my $ygold = $kgold;
+	my $ymaxhp = $kmaxhp;
+	my $ylv = $klv;
+	my $yn_3 = $kn_3;
 
-			my $mes = "$yid<>$ypass<>$yname<>$ysex<>$ychara<>$yn_0<>$yn_1<>$yn_2<>$yn_3<>$yn_4<>$yn_5<>$yn_6<>$ymaxhp<>$ymaxhp<>$yex<>$ylv<>$yap<>$ygold<>$max_lp<>$ytotal<>$ykati<>$host<>$ydate<>$yarea<>$yspot<>$ypst<>$yitem<>\n";
-			my $utf8 = Encode::encode_utf8($mes);
+	#割引率の設定
+	my $cut = 1 - $yn_6 / 200;
+	$yado_gold = int($yado_gold * $cut);
 
-			unshift(@yado_new,$utf8);
-			$kid = $yid;
-			$kpass = $ypass;
-			$karea = $yarea;
-			$kspot = $yspot;
-			$kpst = $ypst;
-			@kbuf = (100,100,100);
-			$krsk    = 0   - $y_rsk;
-			$kbuf[0] = 100 + $y_atc;
-			$kbuf[1] = 100 + $y_def;
-			$kbuf[2] = 100 + $y_spd;
-			$buff_flg = 1;
-			&regist_buff;
-			$hit=1;
-		}else{
-			push(@yado_new,"$_\n");
-		}
-	}
-
-	if(!$hit) { &error("入力されたIDは登録されていません。又はパスワードが違います。"); }
-	if($kspot != 0 || $kpst != 0) {
+	if($ygold < $yado_gold) {
 		$mode = "yado";
-		&error("不正なパラメータです。");
+		$error = "所持金が足りません。";
+		&yado;
 	}
+	else { $ygold = $ygold - $yado_gold; }
+	$ymaxhp = int($ylv * 7.5 + $yn_3 * 7.5);
 
-	open(OUT,">$chara_file");
-	print OUT @yado_new;
-	close(OUT);
+	our @kbuf = (100,100,100);
+	our $krsk    = 0 - $y_rsk;
+	$kbuf[0] = 100 + $y_atc;
+	$kbuf[1] = 100 + $y_def;
+	$kbuf[2] = 100 + $y_spd;
+	our $buff_flg = 1;
+	&regist_buff;
 
-	# ロック解除
-	if ($lockkey == 3) { &file'unlock; }
-	else { if(-e $lockfile) { unlink($lockfile); } }
+	$kgold = $ygold;
+	$khp = $ymaxhp;
+	$kmaxhp = $ymaxhp;
 
-	$get_area=$karea;$get_id="03";$get_cnt="1";
+	&regist;
+
+	our $get_area = $karea;
+	our $get_id = "03";
+	our $get_cnt = "1";
 	&get_msg;
 
 	&town_load;
 
 	my $html = $controller->render_to_string(
-		template      => "yado_in",
+		template => "yado_in",
 		t_inn => $t_inn,
 		get_msg => $get_msg,
 		spot => $spot,

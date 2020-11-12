@@ -1,8 +1,10 @@
+% if (scalar(@$select_menu) != 0) {
 <div class="clearfix">
 	<div class="blackboard answer float-l">
-	    %== join("\n", @$select_menu);
+%== join("\n", @$select_menu);
 	</div>
 </div>
+% }
 <form action="<%= $script %>" method="post" style="display: none" class="non">
 <select id="default-select" name="mode" onchange="javascript:selectTown(this);">
 <option value="item_check">アイテム一覧</option>
