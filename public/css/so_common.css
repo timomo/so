@@ -68,7 +68,9 @@ table
 }
 
 .item_table td,
-.item_table th
+.item_table th,
+.status_table td,
+.status_table th
 {
     font-size: 6pt;
 }
@@ -82,4 +84,11 @@ table
 .non
 {
     display: none;
+}
+
+#td_logout,
+#td_item,
+#td_status
+{
+    cursor: pointer;
 }

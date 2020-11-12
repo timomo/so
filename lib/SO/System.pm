@@ -580,14 +580,21 @@ sub save_chara_db
 
     my $result = $self->dbi("main")->model("キャラ")->select(["*"], where => { id => $new->{id} });
     my $row = $result->fetch_hash_one;
+    my $dat = {};
+    my $keys = $self->context->config->{keys};
+
+    for my $key (@$keys)
+    {
+        $dat->{$key} = $new->{$key};
+    }
 
     if (defined $row)
     {
-        $self->dbi("main")->model("キャラ")->update($new, where => {id => $new->{id}}, mtime => "mtime");
+        $self->dbi("main")->model("キャラ")->update($dat, where => {id => $dat->{id}}, mtime => "mtime");
     }
     else
     {
-        $self->dbi("main")->model("キャラ")->insert($new, ctime => "ctime");
+        $self->dbi("main")->model("キャラ")->insert($dat, ctime => "ctime");
     }
 }
 

@@ -3,7 +3,7 @@
 
 <form action="<%== $script %>" method="post">
 
-<table border=0 width='100%'>
+<table border=0 width='100%' class="status_table">
 <tr>
 <td valign=top width='40%'>
 <table border=0 width='100%'>
