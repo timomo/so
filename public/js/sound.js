@@ -32,6 +32,11 @@ function change_music(id)
     const soundObj = get_sound_object({sound: music.past, type: 2});
     if (soundObj)
     {
+        stop_sound({sound: music.past, type: 2});
+    }
+    /*
+    if (soundObj)
+    {
         soundObj.fade(0.6, 0, 1000);
         soundObj.on("fade", function ()
         {
@@ -40,6 +45,7 @@ function change_music(id)
         });
         return true;
     }
+     */
     if (id)
     {
         play_sound({sound: id, type: 2});
