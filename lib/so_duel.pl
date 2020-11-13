@@ -863,7 +863,7 @@ EOM
 	if($win == 2) {
 		$krgold = $kpoint * 2;
 		$kpgold = 0;$kpitem = 0;
-		$kmsg = "「ShadowDuelにおける$k1nameの撃退」 <b>$krgold</b> G";
+		$kmsg = "「ShadowDuelにおける$k1name の撃退」 <b>$krgold</b> G";
 		$bflag = 1;
 		&regist_bank;
 	}
@@ -886,7 +886,7 @@ EOM
 	if($win == 1) {
 		$krgold = $kpoint * 2;
 		$kpgold = 0;$kpitem = 0;
-		$kmsg = "「ShadowDuelにおける$k2nameへの勝利」 <b>$krgold</b> G";
+		$kmsg = "「ShadowDuelにおける$k2name への勝利」 <b>$krgold</b> G";
 		$bflag = 1;
 		&regist_bank;
 	}

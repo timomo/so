@@ -279,11 +279,9 @@ sub user_shop
 #------------#
 sub bank
 {
-	my @bank_item = &load_ini($bank_path. $in{'id'});
-	my @item_chara = &load_ini($chara_file);
-	my $hit=0;
-
-	$rid = $kid;
+	my $rows = $system->load_bank_storage($kid);
+	my @bank_item = @$rows;
+	our $rid = $kid;
 	&read_bank;
 	my $space_price = int($kpitem / 5) + 1;
 
@@ -297,7 +295,7 @@ sub bank
 
 	foreach(@bank_item)
 	{
-		my ($iid,$ino,$iname,$idmg,$igold,$imode,$iuelm,$ieelm,$ihand,$idef,$ireq,$iqlt,$imake,$irest) = split(/<>/);
+		my ($iid,$ino,$iname,$idmg,$igold,$imode,$iuelm,$ieelm,$ihand,$idef,$ireq,$iqlt,$imake,$irest) = @$_{@{$controller->config->{銀行貸し金庫}}};
 		$igold = int($igold * $plus / 2);
 		&check_limit;
 		# アイテム種別により処理変更
@@ -387,41 +385,37 @@ sub bank
 #----------------#
 sub item_buy
 {
-	my $item_cnt = $in{item};
-
+	if($kspot != 0 || $kpst != 0) { &error("不正なパラメータです"); }
 	if ($in{item_no} eq "")
 	{
 		$error = "アイテムを選んでください。";
 		&item_shop;
 	}
-	if($kspot != 0 || $kpst != 0) { &error("不正なパラメータです"); }
-
-	my @item_array = &load_ini($item_file);
-	my $hit = 0;
+	my $item_cnt = int($in{item});
 	my $item_no_id = Encode::encode_utf8($in{'item_no'});
-	our ($i_no, $i_name, $i_dmg, $i_gold, $i_mode, $i_uelm, $i_eelm, $i_hand, $i_def, $i_req, $i_qlt, $i_make, $i_rest);
-
+	my @item_array;
+	{
+		my $rows = $system->load_master_item_db;
+		@item_array = @$rows;
+	}
+	my $new;
 	foreach(@item_array)
 	{
-		($i_no, $i_name, $i_dmg, $i_gold, $i_mode, $i_uelm, $i_eelm, $i_hand, $i_def, $i_req, $i_qlt, $i_make, $i_rest) = split(/<>/);
-		my $tmp = Encode::encode_utf8(sprintf("%s%s%s", $i_no, $i_qlt, $i_make));
-		if($item_no_id eq $tmp) { $hit=1;last; }
+		my $tmp = Encode::encode_utf8(sprintf("%s%s%s", @$_{qw|アイテムid 品質 作成者|}));
+		if($item_no_id eq $tmp) {
+			$new = Storable::dclone($_);
+			last;
+		}
 	}
 
-	if ($hit == 0) { &error("アイテムが存在しません。"); }
-
-	&get_host;
-	$khost = $host;
-	my $date = time();
-	$kdate = $date;
-
-	if ($kitem eq $max_item) {
+	if ($kitem eq $max_item)
+	{
 		$error = "所持アイテムが多すぎます。";
 		&item_shop;
 	}
 	#割引率の設定
 	my $cut = 1 - $kn_6 / 200;
-	my $buy_gold = int($i_gold * $cut) * $item_cnt;
+	my $buy_gold = int($new->{価値} * $cut) * $item_cnt;
 	if ($kgold < $buy_gold)
 	{
 		$error = "所持金が足りません。";
@@ -431,10 +425,32 @@ sub item_buy
 	{
 		$kgold -= $buy_gold;
 	}
-	my $buy_name = $i_name;
-	$kcnt = $item_cnt;
-	&item_regist;
-	$kitem = $u_cnt;
+	my $buy_name = $new->{名前};
+
+	$new->{キャラid} = $kid;
+	$new->{装備} = 0;
+	$new->{所持数} = $item_cnt;
+
+	my $rows = $system->load_item_db($kid);
+	my $hit = 0;
+
+	for my $item (@$rows)
+	{
+		my $item_id = Encode::encode_utf8(sprintf("%s%s%s", @$new{qw|アイテムid 品質 作成者|}));
+		my $tmp = Encode::encode_utf8(sprintf("%s%s%s", @$item{qw|アイテムid 品質 作成者|}));
+
+		if ($item_id eq $tmp)
+		{
+			$item->{所持数} += $item_cnt;
+			$hit = 1;
+		}
+	}
+
+	if ($hit == 0)
+	{
+		push(@$rows, $new);
+	}
+	$system->save_item_db($kid, $rows);
 
 	&regist;
 
@@ -471,18 +487,14 @@ sub user_buy
 	{
 		if($exhibit->{id} eq $item_no_id)
 		{
-			$sell = $exhibit;
+			$sell = Storable::dclone($exhibit);
+			$exhibit->{所持数} -= $item_cnt;
 			$hit = 1;
 			last;
 		}
 	}
 
 	if($hit == 0) { &error("アイテムが存在しません。"); }
-
-	&get_host;
-	$khost = $host;
-	my $date = time();
-	$kdate = $date;
 
 	my $buy_gold = 0;
 	my $buy_name = "";
@@ -563,9 +575,6 @@ sub user_buy
 	$bflag = 1;
 	&regist_bank;
 
-	# $iarea = $item_area;
-	# &shop_sort;
-
 	$buy_msg = "$buy_gold Gで買いました。";
 	if($rtn_flag == 1){
 		$buy_msg = "引き戻しました。";
@@ -581,186 +590,39 @@ sub user_buy
 #----------------#
 sub bank_out
 {
-	$item_id = $in{'id'};
-	$item_pass = $in{'pass'};
-	$item_cnt = $in{'item'};
-	if($in{'item_no'} eq ""){
-		$error = "アイテムを選んでください。";
-		&bank;
-	}
-
-	@item_array = &load_ini($bank_path. $item_id);
-
-	my $item_no_id = Encode::decode_utf8($in{'item_no'});
-
-	$hit=0;
-	foreach(@item_array){
-		($i_id,$i_no,$i_name,$i_dmg,$i_gold,$i_mode,$i_uelm,$i_eelm,$i_hand,$i_def,$i_req,$i_qlt,$i_make,$i_rest) = split(/<>/);
-		if($item_no_id eq "$i_id") { $hit=1;last; }
-	}
-	if(!$hit) { &error("アイテムが存在しません。"); }
-
-	&get_host;
-
-	$date = time();
-
-	# ファイルロック
-	if ($lockkey == 1) { &lock1; }
-	elsif ($lockkey == 2) { &lock2; }
-	elsif ($lockkey == 3) { &file'lock; }
-
-	@item_chara = &load_ini($chara_file);
-
-	$buy_gold = 0;
-	$buy_name = "";
-	$rtn_flag = 0;
-	$hit=0;@item_new=();
-	foreach(@item_chara){
-		($iid,$ipass,$iname,$isex,$ichara,$in_0,$in_1,$in_2,$in_3,$in_4,$in_5,$in_6,$ihp,$imaxhp,$iex,$ilv,$iap,$igold,$ilp,$itotal,$ikati,$ihost,$idate,$iarea,$ispot,$ipst,$iitem) = split(/<>/);
-		if($iid eq "$item_id" && $ipass eq "$item_pass" ) {
-			if($iitem eq $max_item) {
-				$error = "所持アイテムが多すぎます。";
-				&bank;
-			}
-			@bank_item=();
-			foreach(@item_array){
-				($i_id,$i_no,$i_name,$i_dmg,$i_gold,$i_mode,$i_uelm,$i_eelm,$i_hand,$i_def,$i_req,$i_qlt,$i_make,$i_rest) = split(/<>/);
-				if($item_no_id eq "$i_id") {
-					if($i_rest < $item_cnt) {
-						$error = "在庫が足りません。";
-						&bank;
-					}
-					$buy_name = $i_name;
-					$kid = $iid;
-					$kpass = $ipass;
-					$kcnt = $item_cnt;
-					&item_regist;
-
-					$kspot = $ispot;
-					$kpst = $ipst;
-
-					$iitem = $u_cnt;
-
-					if($i_rest > $item_cnt) {
-						$i_rest -= $item_cnt;
-
-						my $mes = "$i_id<>$i_no<>$i_name<>$i_dmg<>$i_gold<>$i_mode<>$i_uelm<>$i_eelm<>$i_hand<>$i_def<>$i_req<>$i_qlt<>$i_make<>$i_rest<>\n";
-						my $utf8 = Encode::encode_utf8($mes);
-
-						unshift(@bank_item,$utf8);
-					}
-				}else{
-					my $mes = "$i_id<>$i_no<>$i_name<>$i_dmg<>$i_gold<>$i_mode<>$i_uelm<>$i_eelm<>$i_hand<>$i_def<>$i_req<>$i_qlt<>$i_make<>$i_rest<>\n";
-					my $utf8 = Encode::encode_utf8($mes);
-
-					unshift(@bank_item,$utf8);
-				}
-			}
-
-			my $mes = "$iid<>$ipass<>$iname<>$isex<>$ichara<>$in_0<>$in_1<>$in_2<>$in_3<>$in_4<>$in_5<>$in_6<>$ihp<>$imaxhp<>$iex<>$ilv<>$iap<>$igold<>$ilp<>$itotal<>$ikati<>$host<>$idate<>$iarea<>$ispot<>$ipst<>$iitem<>\n";
-			my $utf8 = Encode::encode_utf8($mes);
-
-			unshift(@item_new,$utf8);
-			$hit=1;
-		}else{
-			push(@item_new,"$_\n");
-		}
-	}
-
-	if(!$hit) { &error("キャラクターが見つかりません。"); }
 	if($kspot != 0 || $kpst != 0) { &error("不正なパラメータです"); }
 
-	open(OUT,">$bank_path$item_id");
-	print OUT @bank_item;
-	close(OUT);
+	my $rows = $system->load_bank_storage($kid);
+	my $item_id = int($in{item_no});
+	my $item_cnt = int($in{item});
+	my $new;
+	my $rows2 = $system->load_item_db($kid);
 
-	$iid = $kid;
-	&bank_sort;
-	&read_bank;
-	$kpitem = $bcnt;
-	&in_bank;
+	for my $item (@$rows)
+	{
+		if ($item->{id} != $item_id)
+		{
+			next;
+		}
+		$item->{所持数} -= $item_cnt;
+		$new = Storable::dclone($item);
+		$new->{所持数} = $item_cnt;
+	}
 
-	open(OUT,">$chara_file");
-	print OUT @item_new;
-	close(OUT);
+	delete $new->{id};
+	$new->{キャラid} = $kid;
+	$new->{装備} = 0;
 
-	# ロック解除
-	if ($lockkey == 3) { &file'unlock; }
-	else { if(-e $lockfile) { unlink($lockfile); } }
+	push(@$rows2, $new);
 
-	$buy_msg = "$buy_nameを$item_cnt 個取り出しました。";
+	$system->save_item_db($kid, $rows2);
+	$system->save_bank_storage_db($kid, $rows);
+
+	my $buy_name = $new->{名前};
+
+	our $buy_msg = "$buy_name を$item_cnt 個取り出しました。";
 
 	&bank;
-}
-
-#------------------#
-#  ショップソート  #
-#------------------#
-sub shop_sort
-{
-	#ソートし直す
-	@sort_shop = &load_ini($user_shop[$iarea]);
-
-	@tmp1 = @tmp2 = @tmp3 = ();
-	foreach(@sort_shop){
-		($i_no,$i_name,$i_dmg,$i_gold,$i_mode,$i_uelm,$i_eelm,$i_hand,$i_def,$i_req,$i_qlt,$i_make,$i_rest,$i_id) = split(/<>/);
-		if($i_no != null){
-			push(@tmp1, $u_no);
-			push(@tmp2, $u_make);
-		}
-	}
-	@sort_shop = @sort_shop[sort {$tmp1[$b] <=> $tmp1[$a] or
-			$tmp2[$b] <=> $tmp2[$a]} 0 .. $#tmp1];
-
-	@new_sort_shop=();
-	foreach(@sort_shop){
-		($i_no,$i_name,$i_dmg,$i_gold,$i_mode,$i_uelm,$i_eelm,$i_hand,$i_def,$i_req,$i_qlt,$i_make,$i_rest,$i_id) = split(/<>/);
-
-		my $mes = "$i_no<>$i_name<>$i_dmg<>$i_gold<>$i_mode<>$i_uelm<>$i_eelm<>$i_hand<>$i_def<>$i_req<>$i_qlt<>$i_make<>$i_rest<>$i_id<>\n";
-		my $utf8 = Encode::encode_utf8($mes);
-
-		unshift(@new_sort_shop,$utf8);
-	}
-	open(OUT,">$user_shop[$iarea]");
-	print OUT @new_sort_shop;
-	close(OUT);
-}
-
-#--------------#
-#  銀行ソート  #
-#--------------#
-sub bank_sort
-{
-	#ソートし直す
-	@sort_bank = &load_ini($bank_path. $iid);
-
-	@tmp1 = @tmp2 = @tmp3 = ();
-	foreach(@sort_bank){
-		($i_id,$i_no,$i_name,$i_dmg,$i_gold,$i_mode,$i_uelm,$i_eelm,$i_hand,$i_def,$i_req,$i_qlt,$i_make,$i_rest) = split(/<>/);
-		if($i_no != null){
-			push(@tmp1, $i_no);
-			push(@tmp2, $i_make);
-		}
-	}
-	@sort_bank = @sort_bank[sort {$tmp1[$b] <=> $tmp1[$a] or
-			$tmp2[$b] <=> $tmp2[$a]} 0 .. $#tmp1];
-
-	@new_sort_bank=();$cnt = @sort_bank;
-	foreach(@sort_bank){
-		($i_id,$i_no,$i_name,$i_dmg,$i_gold,$i_mode,$i_uelm,$i_eelm,$i_hand,$i_def,$i_req,$i_qlt,$i_make,$i_rest) = split(/<>/);
-
-		my $mes = "$cnt<>$i_no<>$i_name<>$i_dmg<>$i_gold<>$i_mode<>$i_uelm<>$i_eelm<>$i_hand<>$i_def<>$i_req<>$i_qlt<>$i_make<>$i_rest<>\n";
-		my $utf8 = Encode::encode_utf8($mes);
-
-		unshift(@new_sort_bank,$utf8);
-		$cnt -= 1;
-	}
-
-	$bcnt = @new_sort_bank;
-
-	open(OUT,">$bank_path$iid");
-	print OUT @new_sort_bank;
-	close(OUT);
 }
 
 1;

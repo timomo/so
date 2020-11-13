@@ -2,168 +2,72 @@ use utf8;
 #------------------#
 #    金額計算      #
 #------------------#
-sub money_get {
+sub money_get
+{
+	my $tgold = $kgold + $ggold;
 
-	&get_host;
-	$date = time();
-
-	# ファイルロック
-	if ($lockkey == 1) { &lock1; }
-	elsif ($lockkey == 2) { &lock2; }
-	elsif ($lockkey == 3) { &file'lock; }
-
-	@money = &load_ini($chara_file);
-
-	@money_new=();@sn=();
-	foreach(@money){
-		($sid,$spass,$sname,$ssex,$schara,$sn[0],$sn[1],$sn[2],$sn[3],$sn[4],$sn[5],$sn[6],$shp,$smaxhp,$sex,$slv,$sap,$sgold,$slp,$stotal,$skati,$shost,$sdate,$sarea,$sspot,$spst,$sitem) = split(/<>/);
-		if($in{'id'} eq "$sid") {
-			$tgold = $sgold + $ggold;
-			if($tgold < 0) {
-				$error = "所持金が足りません。";
-				$mode = "log_in";
-				&log_in;
-			}
-			if($bflag == 1){$sdate = $date}
-
-			my $mes = "$sid<>$spass<>$sname<>$ssex<>$schara<>$sn[0]<>$sn[1]<>$sn[2]<>$sn[3]<>$sn[4]<>$sn[5]<>$sn[6]<>$shp<>$smaxhp<>$sex<>$slv<>$sap<>$tgold<>$slp<>$stotal<>$skati<>$host<>$sdate<>$sarea<>$sspot<>$spst<>$sitem<>\n";
-			my $utf8 = Encode::encode_utf8($mes);
-
-			unshift(@money_new,$utf8);
-		}else{
-			push(@money_new,"$_\n");
-		}
+	if($tgold < 0)
+	{
+		$error = "所持金が足りません。";
+		$mode = "log_in";
+		&log_in;
 	}
 
-	open(OUT,">$chara_file");
-	print OUT @money_new;
-	close(OUT);
+	$kgold = $tgold;
 
-	# ロック解除
-	if ($lockkey == 3) { &file'unlock; }
-	else { if(-e $lockfile) { unlink($lockfile); } }
+	&regist;
 }
 
 #------------------#
 #  銀行データ読込  #
 #------------------#
-sub read_bank {
+sub read_bank
+{
+	my $rows = $system->load_bank($rid);
 
-	@bank = &load_ini($bank_file);
+	$krgold = 0;
 
-	$hit=0;@bank_new=();
-	foreach(@bank){
-		($bid,$bpgold,$brgold,$bpitem,$bmsg) = split(/<>/);
-		if($rid eq "$bid") {
-			$kpgold = $brgold;
-			$krgold  = $brgold;
-			$kpitem = $bpitem;
-			$kmsg = $bmsg;
-			$hit=1;
-		}
+	my @mes;
+
+	for my $row (@$rows)
+	{
+		$kpgold += 0;
+		$krgold  += $row->{送金額};
+		$kpitem += $row->{預かりアイテム数};
+		push(@mes, $row->{預かりメッセージ});
 	}
 
-	if(!$hit){$krgold = 0;}
+	$kmsg = join("<br />", @mes);
 }
 
 #----------------------#
 #  銀行金額データ書込  #
 #----------------------#
-sub regist_bank {
+sub regist_bank
+{
+	my $new = {
+		キャラid    => $kid,
+		送金額      => $krgold,
+		預かりアイテム数 => $kpitem,
+		預かりメッセージ => $kmsg,
+	};
 
-	# ファイルロック
-	if ($lockkey == 1) { &lock1; }
-	elsif ($lockkey == 2) { &lock2; }
-	elsif ($lockkey == 3) { &file'lock; }
-
-	@bank = &load_ini($bank_file);
-
-	$hit=0;@bank_new=();
-	foreach(@bank)
-	{
-		($bid,$bpgold,$brgold,$bpitem,$bmsg) = split(/<>/);
-		if($kid eq "$bid") {
-			# 支払い完了
-			if($bflag == 0){
-				$brgold = 0;
-				$bmsg = "";
-			} else {
-				$brgold  += $krgold;
-				$bpgold  += $kpgold;
-				$bpitem  += $kpitem;
-				if($bmsg ne ""){
-					$bmsg = "$bmsg<br>$kmsg";
-				} else {
-					$bmsg = $kmsg;
-				}
-			}
-
-			my $mes = "$bid<>$bpgold<>$brgold<>$bpitem<>$bmsg<>\n";
-			my $utf8 = Encode::encode_utf8($mes);
-
-			unshift(@bank_new,$utf8);
-		$hit=1;
-		}else{
-			push(@bank_new,"$_\n");
-		}
-	}
-
-	if(!$hit){
-		my $mes = "$kid<>$kpgold<>$krgold<>$kpitem<>$kmsg<>\n";
-		my $utf8 = Encode::encode_utf8($mes);
-
-		unshift(@bank_new,$utf8);
-	}
-
-	open(OUT,">$bank_file");
-	print OUT @bank_new;
-	close(OUT);
-
-	# ロック解除
-	if ($lockkey == 3) { &file'unlock; }
-	else { if(-e $lockfile) { unlink($lockfile); } }
+	$system->save_bank_db($kid, $new);
 }
 
 #----------------------#
 #  銀行持物データ書込  #
 #----------------------#
-sub in_bank {
+sub in_bank
+{
+	my $new = {
+		キャラid    => $kid,
+		送金額      => 0,
+		預かりアイテム数 => $kpitem,
+		預かりメッセージ => "",
+	};
 
-	# ファイルロック
-	if ($lockkey == 1) { &lock1; }
-	elsif ($lockkey == 2) { &lock2; }
-	elsif ($lockkey == 3) { &file'lock; }
-
-	@bank = &load_ini($bank_file);
-
-	$hit=0;@bank_new=();
-	foreach(@bank){
-		($bid,$bpgold,$brgold,$bpitem,$bmsg) = split(/<>/);
-		if($kid eq "$bid") {
-			my $mes = "$bid<>$bpgold<>$brgold<>$kpitem<>$bmsg<>\n";
-			my $utf8 = Encode::encode_utf8($mes);
-
-			unshift(@bank_new,$utf8);
-		$hit=1;
-		}else{
-			push(@bank_new,"$_\n");
-		}
-	}
-
-	if(!$hit){
-		my $mes = "$kid<>0<>0<>$kpitem<><>\n";
-		my $utf8 = Encode::encode_utf8($mes);
-
-		unshift(@bank_new,$utf8);
-	}
-
-	open(OUT,">$bank_file");
-	print OUT @bank_new;
-	close(OUT);
-
-	# ロック解除
-	if ($lockkey == 3) { &file'unlock; }
-	else { if(-e $lockfile) { unlink($lockfile); } }
+	$system->save_bank_db($kid, $new);
 }
 
 1;

@@ -240,3 +240,37 @@ CREATE TABLE マスタデータ_アイテム (
         ctime DATETIME,
 	    mtime DATETIME
  );
+
+DROP TABLE IF EXISTS 銀行貸し金庫;
+
+CREATE TABLE 銀行貸し金庫 (
+        id INTEGER PRIMARY KEY,
+        アイテムid TEXT NOT NULL,
+        名前 TEXT NOT NULL,
+        効果 INTEGER NOT NULL,
+        価値 INTEGER NOT NULL,
+        アイテム種別 TEXT NOT NULL,
+        攻撃属性 INTEGER NOT NULL,
+        属性 INTEGER NOT NULL,
+        使用 INTEGER NOT NULL,
+        耐久 INTEGER NOT NULL,
+        装備条件 INTEGER NOT NULL,
+        品質 INTEGER NOT NULL,
+        作成者 TEXT NOT NULL,
+        所持数 INTEGER NOT NULL,
+        キャラid TEXT NOT NULL,
+        ctime DATETIME,
+	    mtime DATETIME
+ );
+
+DROP TABLE IF EXISTS 銀行データ;
+
+CREATE TABLE 銀行データ (
+        id INTEGER PRIMARY KEY,
+        キャラid TEXT NOT NULL,
+        送金額 INTEGER NOT NULL,
+        預かりアイテム数 INTEGER NOT NULL,
+        預かりメッセージ TEXT NOT NULL,
+        ctime DATETIME,
+	    mtime DATETIME
+ );

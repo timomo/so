@@ -10,21 +10,7 @@ sub status_check
 
 	our $rid = $kid;
 	&read_buff;
-
 	&town_load;
-
-	if($kspot == 0 && $kpst == 1){
-		$spot = "$town_name[$karea]郊外";
-	} elsif($kspot == 1){
-		$spot = "$area_name[$karea]最深部まで残り $kpst";
-	} elsif($kspot == 2  && $kpst > 0){
-		$spot = "$town_name[$farea]まで残り $kpst";
-	} elsif($kspot == 3  && $kpst > 0){
-		$spot = "$town_name[$rarea]まで残り $kpst";
-	} else {
-		$spot = "町の中";
-	}
-
 	&req_ap;
 
 	our $k_eqp = 5;
@@ -35,6 +21,7 @@ sub status_check
 	my @equip;
 	my $hit = 0;
 	my $cnt = 1;
+
 	foreach (1 .. 6) {
 		$k_eqp = $cnt;
 		&get_equip;

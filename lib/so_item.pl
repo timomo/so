@@ -806,142 +806,60 @@ sub user_sell
 #------------#
 sub bank_in
 {
-	#入国ＩＤ
-	$kid = $in{'id'};
-	$kpass = $in{'pass'};
-	$kitem = $in{'item'};
+	my $items = $system->load_item_db($kid);
+	$kitem = int($in{item});
+	my $item_id = int($in{item_no});
+	my $storage;
 
-	# ファイルロック
-	if ($lockkey == 1) { &lock1; }
-	elsif ($lockkey == 2) { &lock2; }
-	elsif ($lockkey == 3) { &file'lock; }
-
-	@delete_item = &load_ini($item_path. $kid);
-
-	$item_count = 0;
-	$sell_flag = 0;
-	$select_id   = "";
-	$select_item = "";
-
-	@new_delete_item=();
-	foreach(@delete_item){
-		($u_id,$u_no,$u_name,$u_dmg,$u_gold,$u_mode,$u_uelm,$u_eelm,$u_hand,$u_def,$u_req,$u_qlt,$u_make,$u_rest,$u_eqp) = split(/<>/);
-		if($u_id eq $k_id){
-			$sell_flag = 1;
-			$sell_name = $u_name;
-			$sell_gold = $u_gold;
-			$select_id   = "$u_no$u_qlt$u_make";
-			$select_item = "$kid<>$u_no<>$u_name<>$u_dmg<>$u_gold<>$u_mode<>$u_uelm<>$u_eelm<>$u_hand<>$u_def<>$u_req<>$u_qlt<>$u_make<>$kitem<>\n";
-			if($u_rest < $kitem) {
-				$error = "所持アイテムが足りません。";
-				&item_check;
-			}
-			if($u_rest > $kitem){
-				$u_rest -= $kitem;
-
-				my $mes = "$item_count<>$u_no<>$u_name<>$u_dmg<>$u_gold<>$u_mode<>$u_uelm<>$u_eelm<>$u_hand<>$u_def<>$u_req<>$u_qlt<>$u_make<>$u_rest<>$u_eqp<>\n";
-				my $utf8 = Encode::encode_utf8($mes);
-
-				unshift(@new_delete_item,$utf8);
-				$item_count++;
-			}
-		} else {
-			my $mes = "$item_count<>$u_no<>$u_name<>$u_dmg<>$u_gold<>$u_mode<>$u_uelm<>$u_eelm<>$u_hand<>$u_def<>$u_req<>$u_qlt<>$u_make<>$u_rest<>$u_eqp<>\n";
-			my $utf8 = Encode::encode_utf8($mes);
-
-			unshift(@new_delete_item,$utf8);
-			$item_count++;
+	for my $item (@$items)
+	{
+		if ($item_id != $item->{id})
+		{
+			next;
 		}
+		if($item->{所持数} < $kitem)
+		{
+			$error = "所持アイテムが足りません。";
+			&item_check;
+		}
+		$storage = Storable::dclone($item);
+		if($item->{所持数} >= $kitem)
+		{
+			$item->{所持数} -= $kitem;
+		}
+		$storage->{所持数} = $kitem;
 	}
 
-	@item_chara = &load_ini($chara_file);
+	delete $storage->{id};
+	delete $storage->{装備};
 
-	$hit=0;@item_new=();
-	foreach(@item_chara){
-		($iid,$ipass,$iname,$isex,$ichara,$in_0,$in_1,$in_2,$in_3,$in_4,$in_5,$in_6,$ihp,$imaxhp,$iex,$ilv,$iap,$igold,$ilp,$itotal,$ikati,$ihost,$idate,$iarea,$ispot,$ipst,$iitem) = split(/<>/);
-		if($kid eq "$iid"){
-			#割増率の設定
-			$plus = 1 + $in_6 / 200;
+	$system->save_bank_storage_db($kid, [$storage]);
+	$system->save_item_db($kid, $items);
 
-			$rid = $iid;
-			&read_bank;
-			$space_price = int($kpitem / 5) + 1;
-			$bank_gold =int($sell_gold * $plus * $space_price / 200) * $kitem;
-			if($bank_gold < 1){ $bank_gold = 1; }
-			if($igold < $bank_gold) {
-				$error = "所持金が足りません。";
-				&item_check;
-			}
+	my $plus = 1 + $kn_6 / 200;
+	our $rid = $kid;
+	&read_bank;
 
-			$igold -= $bank_gold;
+	my $space_price = int($kpitem / 5) + 1;
+	my $bank_gold =int($sell_gold * $plus * $space_price / 200) * $kitem;
 
-			$kid   = $iid;
-			$kspot = $ispot;
-			$kpst  = $ipst;
-
-			open(IN,"$bank_path$kid");
-			@item_array = <IN>;
-			close(IN);
-
-			@sell_item=();
-			$new_item = 0;
-			foreach(@item_array){
-				($i_id,$i_no,$i_name,$i_dmg,$i_gold,$i_mode,$i_uelm,$i_eelm,$i_hand,$i_def,$i_req,$i_qlt,$i_make,$i_rest) = split(/<>/);
-				if($select_id eq "$i_no$i_qlt$i_make") {
-					$i_rest += $kitem;
-					$new_item=1;
-				}
-
-				my $mes = "$i_id<>$i_no<>$i_name<>$i_dmg<>$i_gold<>$i_mode<>$i_uelm<>$i_eelm<>$i_hand<>$i_def<>$i_req<>$i_qlt<>$i_make<>$i_rest<>\n";
-				my $utf8 = Encode::encode_utf8($mes);
-
-				unshift(@sell_item,$utf8);
-			}
-			if($new_item == 0) {
-				unshift(@sell_item,$select_item);
-			}
-
-			open(OUT,">$bank_path$kid");
-			print OUT @sell_item;
-			close(OUT);
-
-			$iid = $kid;
-			&bank_sort;
-			&read_bank;
-			$kpitem = $bcnt;
-			&in_bank;
-
-			$iitem = $item_count;
-
-			my $mes = "$iid<>$ipass<>$iname<>$isex<>$ichara<>$in_0<>$in_1<>$in_2<>$in_3<>$in_4<>$in_5<>$in_6<>$ihp<>$imaxhp<>$iex<>$ilv<>$iap<>$igold<>$ilp<>$itotal<>$ikati<>$ihost<>$idate<>$iarea<>$ispot<>$ipst<>$iitem<>\n";
-			my $utf8 = Encode::encode_utf8($mes);
-
-			unshift(@item_new,$utf8);
-			$hit=1;
-		}else{
-			push(@item_new,"$_\n");
-		}
+	if ($bank_gold < 1) { $bank_gold = 1; }
+	if($kgold < $bank_gold) {
+		$error = "所持金が足りません。";
+		&item_check;
 	}
 
-	if(!$hit) { &error("キャラクターが見つかりません。"); }
+	$kgold -= $bank_gold;
+	$kpitem = scalar(@$items);
 
-	open(OUT,">$chara_file");
-	print OUT @item_new;
-	close(OUT);
+	&regist;
 
-	open(OUT,">$item_path$kid");
-	print OUT @new_delete_item;
-	close(OUT);
-
-	&item_sort;
-
-	# ロック解除
-	if ($lockkey == 3) { &file'unlock; }
-	else { if(-e $lockfile) { unlink($lockfile); } }
+	&in_bank;
 
 	$msg = "";
+
 	if($sell_flag == 1){
-		$msg = "$sell_nameを$kitem 個 手数料 $bank_gold Gで貸し金庫に預けました。";
+		$msg = "$sell_name を$kitem 個 手数料 $bank_gold Gで貸し金庫に預けました。";
 	}
 
 	&item_check;

@@ -64,6 +64,8 @@ sub dbi
         $dbi->create_model("キャラ所持品");
         $dbi->create_model("出品データ");
         $dbi->create_model("マスタデータ_アイテム");
+        $dbi->create_model("銀行データ");
+        $dbi->create_model("銀行貸し金庫");
 
         $self->dbis->{$type} = $dbi;
 
@@ -206,6 +208,28 @@ sub load_chara
     my $row = $result->fetch_hash_one;
 
     return $row;
+}
+
+sub load_bank_storage
+{
+    my $self = shift;
+    my $id = shift;
+
+    my $result = $self->dbi("main")->model("銀行貸し金庫")->select(["*"], where => { キャラid => $id });
+    my $rows = $result->fetch_hash_all;
+
+    return $rows;
+}
+
+sub load_bank
+{
+    my $self = shift;
+    my $id = shift;
+
+    my $result = $self->dbi("main")->model("銀行データ")->select(["*"], where => { キャラid => $id });
+    my $rows = $result->fetch_hash_all;
+
+    return $rows;
 }
 
 sub load_buff_db
@@ -568,6 +592,70 @@ sub save_buff_db
     {
         $new->{id} = $id;
         $self->dbi("main")->model("キャラバフ")->insert($new, ctime => "ctime");
+    }
+}
+
+sub save_bank_storage_db
+{
+    my $self = shift;
+    my $id = shift;
+    my $rows = shift;
+
+    for my $no (0 .. $#$rows)
+    {
+        my $item = $rows->[$no];
+
+        # $self->modify_item_data($item);
+
+        if ($item->{所持数} != 0)
+        {
+            my $result = $self->dbi("main")->model("銀行貸し金庫")->select(["*"], where => { id => $item->{id} });
+            my $row = $result->fetch_hash_one;
+
+            if (defined $row)
+            {
+                $self->dbi("main")->model("銀行貸し金庫")->update($item, where => {id => $item->{id}}, mtime => "mtime");
+            }
+            else
+            {
+                delete $item->{id};
+                $self->dbi("main")->model("銀行貸し金庫")->insert($item, ctime => "ctime");
+            }
+        }
+        else
+        {
+            splice(@$rows, $no, 1);
+            $no--;
+            $self->dbi("main")->model("銀行貸し金庫")->delete(where => { id => $item->{id} });
+        }
+    }
+}
+
+sub save_bank_db
+{
+    my $self = shift;
+    my $id = shift;
+    my $new = shift;
+
+    # $self->modify_chara_data($new);
+
+    my $result = $self->dbi("main")->model("銀行データ")->select(["*"], where => { id => $new->{id} });
+    my $row = $result->fetch_hash_one;
+    my $dat = {};
+    my $keys = $self->context->config->{銀行データ};
+
+    for my $key (@$keys)
+    {
+        $dat->{$key} = $new->{$key};
+    }
+
+    if (defined $row)
+    {
+        $self->dbi("main")->model("銀行データ")->update($dat, where => {id => $dat->{id}}, mtime => "mtime");
+    }
+    else
+    {
+        $self->dbi("main")->model("銀行データ")->insert($dat, ctime => "ctime");
     }
 }
 

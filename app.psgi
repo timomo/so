@@ -112,7 +112,7 @@ plugin 'authentication',
     },
 };
 
-any "/window/message" => sub
+any "/window/:name" => [ name => qr/(?:message|item|status)/ ] => sub
 {
     my $self = shift;
     my $k = $self->current_user;
@@ -121,53 +121,13 @@ any "/window/message" => sub
 
     if ($self->req->method eq "GET")
     {
-        my $utf8 = $self->backend_request("get", "/window/message", { id => $k->{id} });
+        my $utf8 = $self->backend_request("get", $self->req->url->path->to_string, { id => $k->{id} });
         return $self->render(text => $utf8, format => "html");
     }
     else
     {
         my $json = $self->req->body_params->to_hash;
-        my $utf8 = $self->backend_request("post", "/window/message", { id => $k->{id}, %$json });
-        return $self->render(text => $utf8, format => "html");
-    }
-};
-
-any "/window/item" => sub
-{
-    my $self = shift;
-    my $k = $self->current_user;
-
-    return $self->reply->not_found unless ($k);
-
-    if ($self->req->method eq "GET")
-    {
-        my $utf8 = $self->backend_request("get", "/window/item", { id => $k->{id} });
-        return $self->render(text => $utf8, format => "html");
-    }
-    else
-    {
-        my $json = $self->req->body_params->to_hash;
-        my $utf8 = $self->backend_request("post", "/window/item", { id => $k->{id}, %$json });
-        return $self->render(text => $utf8, format => "html");
-    }
-};
-
-any "/window/status" => sub
-{
-    my $self = shift;
-    my $k = $self->current_user;
-
-    return $self->reply->not_found unless ($k);
-
-    if ($self->req->method eq "GET")
-    {
-        my $utf8 = $self->backend_request("get", "/window/status", { id => $k->{id} });
-        return $self->render(text => $utf8, format => "html");
-    }
-    else
-    {
-        my $json = $self->req->body_params->to_hash;
-        my $utf8 = $self->backend_request("post", "/window/status", { id => $k->{id}, %$json });
+        my $utf8 = $self->backend_request("post", $self->req->url->path->to_string, { id => $k->{id}, %$json });
         return $self->render(text => $utf8, format => "html");
     }
 };
@@ -346,7 +306,7 @@ get "/main" => sub
         ],
         select_menu => [],
         script      => "./",
-        kpass       => "test",
+        kpass       => "*****",
         k           => $k,
     );
 };
