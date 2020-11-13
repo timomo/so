@@ -408,12 +408,14 @@ sub save_master_item_db
 
     for my $item (@$rows)
     {
-        my $result = $self->dbi("main")->model("マスタデータ_アイテム")->select(["*"], where => { アイテムid => $item->{アイテムid} });
+        my $query = { アイテムid => $item->{アイテムid}, 品質 => $item->{品質}, 作成者 => $item->{作成者} };
+        my $result = $self->dbi("main")->model("マスタデータ_アイテム")->select(["*"], where => $query);
         my $row = $result->fetch_hash_one;
 
         if (defined $row)
         {
-            $self->dbi("main")->model("マスタデータ_アイテム")->update($item, where => {アイテムid => $item->{アイテムid}}, mtime => "mtime");
+
+            $self->dbi("main")->model("マスタデータ_アイテム")->update($item, where => $query, mtime => "mtime");
         }
         else
         {

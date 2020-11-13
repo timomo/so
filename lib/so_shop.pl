@@ -19,30 +19,35 @@ sub item_shop
 	}
 
 	my $i = 0;
-
-	my @item_array = &load_ini($item_file);
+	my @item_array;
+	{
+		my $rows = $system->load_master_item_db;
+		@item_array = @$rows;
+	}
 	my @item_list;
 	my @item_count;
 
-	foreach(@shop_array)
+	for my $key (@shop_array)
 	{
 		my $hit = 0;
+		my $item;
 
-		my ($ino, $iname, $idmg, $igold, $imode, $iuelm, $ieelm, $ihand, $idef, $ireq, $iqlt, $imake, $irest);
-
-		foreach(@item_array)
+		for my $tmp (@item_array)
 		{
-			($ino, $iname, $idmg, $igold, $imode, $iuelm, $ieelm, $ihand, $idef, $ireq, $iqlt, $imake, $irest) = split(/<>/);
-			my $shopitem = "$ino$iqlt$imake";
+			my $key2 = sprintf("%s%s%s", @$tmp{qw|アイテムid 品質 作成者|});
 
-			if($shop_array[$i] == $shopitem)
+			if($key eq $key2)
 			{
-				$hit=1;
+				$item = $tmp;
+				$hit = 1;
 				last;
 			}
 		}
-		if($hit == 0) { &error("アイテムが存在しません。"); }
+
+		if($hit == 0) { next; }
 		$i++;
+
+		my ($iid,$ino,$iname,$idmg,$igold,$imode,$iuelm,$ieelm,$ihand,$idef,$ireq,$iqlt,$imake,$irest) = @$item{@{$controller->config->{マスタデータ_アイテム}}};
 
 		$igold = int($igold * $cut);
 		&check_limit;
@@ -117,7 +122,7 @@ sub item_shop
 			$ireq = "&nbsp;";
 		}
 
-		my $mes = "<tr><td><input type=radio name=item_no value=\"$ino$iqlt$imake\"></td><td align=center>$item_mode[$imode]</td><td>$iname</td><td align=center>$idmg</td><td align=center>$igold G</td><td align=center>$item_hand[$ihand]</td><td align=center>$ireq</td><td align=center><font color=$elmcolor[$ieelm]>$item_eelm[$ieelm]</font></td><td align=center>$item_def[$idef]</td><td align=center>$item_qlt[$iqlt]</td><td align=center>$imake</td></tr>";
+		my $mes = "<tr><td><input type=radio name=item_no value=\"$iid\"></td><td align=center>$item_mode[$imode]</td><td>$iname</td><td align=center>$idmg</td><td align=center>$igold G</td><td align=center>$item_hand[$ihand]</td><td align=center>$ireq</td><td align=center><font color=$elmcolor[$ieelm]>$item_eelm[$ieelm]</font></td><td align=center>$item_def[$idef]</td><td align=center>$item_qlt[$iqlt]</td><td align=center>$imake</td></tr>";
 
 		push(@item_list, $mes);
 	}
@@ -401,8 +406,7 @@ sub item_buy
 	my $new;
 	foreach(@item_array)
 	{
-		my $tmp = Encode::encode_utf8(sprintf("%s%s%s", @$_{qw|アイテムid 品質 作成者|}));
-		if($item_no_id eq $tmp) {
+		if($item_no_id eq $_->{id}) {
 			$new = Storable::dclone($_);
 			last;
 		}
