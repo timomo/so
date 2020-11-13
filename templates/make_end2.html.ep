@@ -1,0 +1,64 @@
+%= include "layouts/header"
+%= include "layouts/meta"
+%= include "layouts/javascript"
+%= include "layouts/javascript_default"
+%= include "layouts/sound"
+%= include "layouts/stylesheet"
+</head>
+<body>
+
+登録完了画面
+以下の内容で登録が完了しました。
+<hr size="0">
+<p>
+
+<div class="blackboard question">
+
+<table border=0>
+<tr>
+<td class="b1">名前</td>
+<td><%= $kname %></td>
+<td class="b1">性別</td>
+<td><%= $esex %></td>
+</tr>
+<td class="b1">HP</td>
+<td><%= $khp %></td>
+<td class="b1">LP</td>
+<td><%= $klp %></td>
+</tr>
+<tr>
+<td class="b1">力</td>
+<td><%= $kn_0 %></td>
+<td class="b1">賢さ</td>
+<td><%= $kn_1 %></td>
+</tr>
+<tr>
+<td class="b1">信仰心</td>
+<td><%= $kn_2 %></td>
+<td class="b1">体力</td>
+<td><%= $kn_3 %></td>
+</tr>
+<tr>
+<td class="b1">器用さ</td>
+<td><%= $kn_4 %></td>
+<td class="b1">素早さ</td>
+<td><%= $kn_5 %></td>
+</tr>
+<tr>
+<td class="b1">魅力</td>
+<td><%= $kn_6 %></td>
+<td class="b1">所持金</td>
+<td><%= $kgold %></td>
+</tr>
+<tr>
+<td class="b1">メインスキル</td>
+<td><%= $chara_skill->[$in->{'skill1'}] %></td>
+<td class="b1">サブスキル</td>
+<td><%= $chara_skill->[$in->{'skill2'}] %></td>
+</tr>
+</table>
+</div>
+
+<a href="/">TOPページへ</a>
+
+%= include "footer"

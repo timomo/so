@@ -1,0 +1,46 @@
+%= include "layouts/header"
+%= include "layouts/meta"
+%= include "layouts/javascript"
+%= include "layouts/javascript_default"
+%= include "layouts/sound"
+%= include "layouts/stylesheet"
+</head>
+<body>
+
+<b>入国手続き</b><hr size=0
+<i>受付嬢「ご職業はなんでしょうか？」</i><p>
+メインスキルとサブスキルを選択してください。<BR />
+両方同じものを選択するとより得意なものになります。<BR />
+ここで選択しなかったスキルも後で自由に上昇できます。</p>
+
+<form action="<%= $script %>" method="post">
+<input type=hidden name=mode value=regist>
+メインスキル
+<select name="skill1">
+
+%== join("\n", @$option);
+
+</select>
+
+　サブスキル
+<select name=skill2>
+
+%== join("\n", @$option2);
+
+</select>
+<input type=hidden name=new value=new>
+<input type=hidden name=id value="<%= $in->{'id'} %>">
+<input type=hidden name=pass value="<%= $in->{'pass'} %>">
+<input type=hidden name=c_name value="<%= $in->{'c_name'} %>">
+<input type=hidden name=sex value="<%= $in->{'sex'} %>">
+<input type=hidden name=chara value="<%= $in->{'chara'} %>">
+<input type=hidden name=n_0 value="<%= $in->{'n_0'} %>">
+<input type=hidden name=n_1 value="<%= $in->{'n_1'} %>">
+<input type=hidden name=n_2 value="<%= $in->{'n_2'} %>">
+<input type=hidden name=n_3 value="<%= $in->{'n_3'} %>">
+<input type=hidden name=n_4 value="<%= $in->{'n_4'} %>">
+<input type=hidden name=n_5 value="<%= $in->{'n_5'} %>">
+<input type=hidden name=n_6 value="<%= $in->{'n_6'} %>">
+<input type=submit value="このスキルでOK"></form><p>
+
+%= include "footer"

@@ -35,57 +35,8 @@ sub html_top
 	# ヘッダー表示
 	&header;
 
-	# HTMLの表示
-	print <<"EOM";
-<form action="$script" method="POST">
-<input type="hidden" name="mode" value="log_in" />
-<table border=0 width='100%'>
-<tr>
-	<td align="center" valign="top"><img src="$titlegif" width="227" height="81"></td>
-</tr>
-<tr>
-<td align="center" valign="top">
-
-<div class="blackboard question">
-
-	<table border=0>
-	<tr>
-	<td align=center colspan=5 class=b2>冒険中の方はこちら</td>
-	</tr>
-	<tr>
-	<td class=b1>入国ＩＤ</td>
-	<td><input type="text" size="11" name="id" value="$c_id" /></td>
-	</tr><tr>
-	<td class=b1>パスワード</td>
-	<td><input type="password" size="11" name="pass" value="$c_pass" /></td>
-	</tr><tr>
-	<td colspan="2"><input type="submit" value="旅の続き" /></td>
-	</tr>
-	</table>
-
-	</div>
-
-</td>
-</tr>
-</table>
-<p>
-<hr size=0>
-</form>
-<BR>
-[<B><FONT COLOR="#FF9933">お知らせ</FONT></B>]<BR>
-$kanri_message
-<BR>
-<BR>
-[<B><FONT COLOR="#FF9933">ランキング</FONT></B>]<BR>
-現在の Shadow Duel 参加者中ポイントTOP<b>$rank_top</b>を表\示しています。
-<p>
-<table border=1>
-<tr>
-<th></th><th>名前</th><th>SDP</th><th>Rate</th><th>Rank</th>
-</tr>
-EOM
-
 	my $i = 1;
+	my @tr;
 
 	foreach(@battle)
 	{
@@ -105,29 +56,29 @@ EOM
 			$brate = 0;
 		}
 
-		print "<tr>\n";
-		print "<td align=center>$i</td><td>$bname</td><td align=center>$bpoint</td><td align=center>$brate%</td><td align=center>$sdrank[$brank]</td>\n";
-		print "</tr>\n";
+		my $mes = "";
+		$mes .= "<tr>\n";
+		$mes .= "<td align=center>$i</td><td>$bname</td><td align=center>$bpoint</td><td align=center>$brate%</td><td align=center>$sdrank[$brank]</td>\n";
+		$mes .= "</tr>\n";
+
+		push(@tr, $mes);
 
 		$i++;
 	}
 
-	print <<"EOM";
-</table>
-<form action="$script" method="post">
-[<B><span COLOR="#FF9933">入国管理室</span></B>]<BR>
-右手の入り口より入国手続きを行います。（新キャラ登録）&nbsp
-<input type="hidden" name="mode" value="chara_make" />
-<input type="submit" value="入国手続き" />
-</form>
-</td>
-</tr>
-</table>
-<p>
-EOM
+	my $html = $controller->render_to_string(
+		template      => "chara_make",
+		script        => $script,
+		titlegif      => $titlegif,
+		c_id          => $c_id,
+		c_pass        => $c_pass,
+		kanri_message => $kanri_message,
+		rank_top      => $rank_top,
+		tr            => \@tr,
 
-	# フッター表示
-	&footer;
+	);
+
+	print Encode::encode_utf8($html);
 
 	exit;
 }

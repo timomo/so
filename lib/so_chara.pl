@@ -2,95 +2,48 @@ use utf8;
 #----------------------#
 #  キャラクタ作成画面  #
 #----------------------#
-sub chara_make {
-	# ヘッダー表示
-	&header;
-
-	print <<"EOM";
-<b>入国手続き</b>
-<hr size=0>
-<i>受付嬢「シマダ共和国にご入国でしょうか？こちらにご記入願います。」</i>
-<form action="$script" method="post">
-<input type="hidden" name="mode" value="make_end">
-
-<div class="blackboard question">
-
-<table border=0>
-<tr>
-<td class="b1" align=center>入国ＩＤ</td>
-<td><input type="text" name="id" size="11"><br><small>半角英数字4～8文字以内</small></td>
-</tr>
-<tr>
-<td class="b1" align=center>パスワード</td>
-<td><input type="password" name="pass" size="11"><br><small>半角英数字4～8文字以内</small></td>
-</tr>
-<tr>
-<td class="b1" align=center>氏名</td>
-<td><input type="text" name="c_name" size="30"></td>
-</tr>
-<tr>
-<td class="b1" align=center>性別</td>
-<td><input type="radio" name="sex" value="0">女　<input type="radio" name="sex" value="1">男</td>
-</tr>
-<tr>
-<td class="b1" align=center>写真</td>
-<td><select name="chara">
-EOM
+sub chara_make
+{
+	my @option;
 
 	$i=0;
 	foreach(@chara_name){
-		print "<option value=\"$i\">$chara_name[$i]\n";
+		push(@option, "<option value=\"$i\">$chara_name[$i]\n");
 		$i++;
 	}
 
-	print <<"EOM";
-</select></td>
-</tr>
-<tr>
-<td class="b1" align=center>能\力</td>
-<td>
-	<table border=1>
-	<tr>
-	<td class="b2" width="70">力</td><td class="b2" width="70">賢さ</td><td class="b2" width="70">信仰心</td><td class="b2" width="70">体力</td><td class="b2" width="70">器用さ</td><td class="b2" width="70">素早さ</td><td class="b2" width="70">魅力</td>
-	</tr>
-	<tr>
-EOM
 	my $point = $system->range_rand(7, 14);
-
 	my $i=0;
 	my $j=0;
+	my @param;
 
 	foreach(0..6){
-		print "<td>$kiso_nouryoku[$i] + <select name=n_$i>\n";
+		my $mes = "";
+		$mes .= "<td>$kiso_nouryoku[$i] + <select name=n_$i>\n";
 		foreach(0..$point){
-			print "<option value=\"$j\">$j\n";
+			$mes .= "<option value=\"$j\">$j\n";
 			$j++;
 		}
-		print "</select>\n";
-		print "</td>\n";
+		$mes .= "</select>\n";
+		$mes .= "</td>\n";
 		$i++;$j=0;
+
+		push(@param, $mes);
 	}
 
-	print <<"EOM";
-	</tr>
-	</table>
-<small>ボーナスポイント「<b>$point</b>」をそれぞれに振り分けてください。</small>
-</td>
-</tr>
-<tr>
-<td colspan="2" align="center"><input type="submit" value="これで登録"></td>
-</tr>
-</table>
-<input type="hidden" name=point value="$point">
+	my $html = $controller->render_to_string(
+		template    => "chara_make",
+		script      => $script,
+		chara_name  => \@option,
+		param       => \@param,
+		kid         => $kid,
+		mode        => "chara_make",
+		select_menu => [],
+		kpass       => "*****",
+		point       => $point,
+	);
 
-</div>
-
-</form>
-<p>
-EOM
-
-	# フッター表示
-	&footer;
+	print Encode::encode_utf8($html);
 
 	exit;
 }
@@ -105,7 +58,7 @@ sub make_end {
 	if ($in{'pass'} =~ m/[^0-9a-zA-Z]/)
 	{&error("パスワードに半角英数字以外の文字が含まれています。"); }
 	# スキル未取得の場合
-		if($in{'skill1'} eq "") {
+	if($in{'skill1'} eq "") {
 		if($in{'id'} eq "" or length($in{'id'}) < 4 or length($in{'id'}) > 8) { &error("IDは、4文字以上、8文字以下で入力して下さい。"); }
 		elsif($in{'pass'} eq "" or length($in{'pass'}) < 4 or length($in{'pass'}) > 8) { &error("パスワードは、4文字以上、8文字以下で入力して下さい。"); }
 		elsif($in{'c_name'} eq "") { &error("キャラクターの名前が未記入です。"); }
@@ -115,110 +68,66 @@ sub make_end {
 
 		if($g > $in{'point'}) { &error("ポイントの振り分けが多すぎます。振り分けの合計を、$in{'point'}以下にしてください。"); }
 
-		&header;
+		my @option;
+		my $cnt=0;
 
-		print "<b>入国手続き</b><hr size=0>\n";
-		print "<i>受付嬢「ご職業はなんでしょうか？」</i><p>\n";
-		print "メインスキルとサブスキルを選択してください。<BR>両方同じものを選択するとより得意なものになります。<BR>ここで選択しなかったスキルも後で自由に上昇できます。<p>\n";
-		print "<form action=\"$script\" method=\"post\">\n";
-		print "<input type=hidden name=mode value=regist>\n";
-		print "メインスキル";
-		print "<select name=skill1>\n";
+		foreach (0 .. @chara_skill) {
+			push(@option, "<option value=$cnt>$chara_skill[$cnt]\n");
+			$cnt++;
+		}
+
+		my @option2;
 		$cnt=0;
 		foreach (0 .. @chara_skill) {
-			print "<option value=$cnt>$chara_skill[$cnt]\n";
+			push(@option2, "<option value=$cnt>$chara_skill[$cnt]\n");
 			$cnt++
 		}
-		print "</select>\n";
-		print "　サブスキル";
-		print "<select name=skill2>\n";
-		$cnt=0;
-		foreach (0 .. @chara_skill) {
-			print "<option value=$cnt>$chara_skill[$cnt]\n";
-			$cnt++
-		}
-		print "</select>\n";
-		print "<input type=hidden name=new value=new>\n";
-		print "<input type=hidden name=id value=\"$in{'id'}\">\n";
-		print "<input type=hidden name=pass value=\"$in{'pass'}\">\n";
-		print "<input type=hidden name=c_name value=\"$in{'c_name'}\">\n";
-		print "<input type=hidden name=sex value=\"$in{'sex'}\">\n";
-		print "<input type=hidden name=chara value=\"$in{'chara'}\">\n";
-		print "<input type=hidden name=n_0 value=\"$in{'n_0'}\">\n";
-		print "<input type=hidden name=n_1 value=\"$in{'n_1'}\">\n";
-		print "<input type=hidden name=n_2 value=\"$in{'n_2'}\">\n";
-		print "<input type=hidden name=n_3 value=\"$in{'n_3'}\">\n";
-		print "<input type=hidden name=n_4 value=\"$in{'n_4'}\">\n";
-		print "<input type=hidden name=n_5 value=\"$in{'n_5'}\">\n";
-		print "<input type=hidden name=n_6 value=\"$in{'n_6'}\">\n";
-		print "<input type=submit value=\"このスキルでOK\"></form><p>\n";
 
-		&footer;
+		my $html = $controller->render_to_string(
+			template    => "make_end1",
+			script      => $script,
+			option      => \@option,
+			option2     => \@option2,
+			in          => \%in,
+			kid         => $kid,
+			mode        => "make_end",
+			select_menu => [],
+			kpass       => "*****",
+		);
+
+		print Encode::encode_utf8($html);
 
 		exit;
 	}else{
+		my $esex;
 		if($in{'sex'}) { $esex = "男"; } else { $esex = "女"; }
-		$next_ex = $lv_up;
 
-		&header;
+		my $html = $controller->render_to_string(
+			template    => "make_end2",
+			script      => $script,
+			option      => \@option,
+			option2     => \@option2,
+			in          => \%in,
+			kid         => $kid,
+			esex        => $esex,
+			kname       => $kname,
+			khp         => $khp,
+			klp         => $klp,
+			kn_0        => $kn_0,
+			kn_1        => $kn_1,
+			kn_2        => $kn_2,
+			kn_3        => $kn_3,
+			kn_4        => $kn_4,
+			kn_5        => $kn_5,
+			kn_6        => $kn_6,
+			kgold       => $kgold,
+			chara_skill => \@chara_skill,
+			mode        => "make_end",
+			select_menu => [],
+			kpass       => "*****",
+		);
 
-		print <<"EOM";
-登録完了画面
-以下の内容で登録が完了しました。
-<hr size=0>
-<p>
-
-<div class="blackboard question">
-
-<table border=0>
-<tr>
-<td class="b1">名前</td>
-<td>$kname</td>
-<td class="b1">性別</td>
-<td>$esex</td>
-</tr>
-<td class="b1">HP</td>
-<td>$khp</td>
-<td class="b1">LP</td>
-<td>$klp</td>
-</tr>
-<tr>
-<td class="b1">力</td>
-<td>$kn_0</td>
-<td class="b1">賢さ</td>
-<td>$kn_1</td>
-</tr>
-<tr>
-<td class="b1">信仰心</td>
-<td>$kn_2</td>
-<td class="b1">体力</td>
-<td>$kn_3</td>
-</tr>
-<tr>
-<td class="b1">器用さ</td>
-<td>$kn_4</td>
-<td class="b1">素早さ</td>
-<td>$kn_5</td>
-</tr>
-<tr>
-<td class="b1">魅力</td>
-<td>$kn_6</td>
-<td class="b1">所持金</td>
-<td>$kgold</td>
-</tr>
-<tr>
-<td class="b1">メインスキル</td>
-<td>$chara_skill[$in{'skill1'}]</td>
-<td class="b1">サブスキル</td>
-<td>$chara_skill[$in{'skill2'}]</td>
-</tr>
-</table>
-</div>
-
-<a href="/">TOPページへ</a>
-EOM
-
-		&footer;
+		print Encode::encode_utf8($html);
 
 		exit;
 	}

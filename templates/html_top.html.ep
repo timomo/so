@@ -1,0 +1,71 @@
+%= include "layouts/header"
+%= include "layouts/meta"
+%= include "layouts/javascript"
+%= include "layouts/javascript_default"
+%= include "layouts/sound"
+%= include "layouts/stylesheet"
+</head>
+<body>
+
+<form action="<%= $script %>" method="POST">
+<input type="hidden" name="mode" value="log_in" />
+<table border=0 width='100%'>
+<tr>
+	<td align="center" valign="top"><img src="<%= $titlegif %>" width="227" height="81"></td>
+</tr>
+<tr>
+<td align="center" valign="top">
+
+<div class="blackboard question">
+
+	<table border=0>
+	<tr>
+	<td align=center colspan=5 class=b2>冒険中の方はこちら</td>
+	</tr>
+	<tr>
+	<td class=b1>入国ＩＤ</td>
+	<td><input type="text" size="11" name="id" value="<%= $c_id %>" /></td>
+	</tr><tr>
+	<td class=b1>パスワード</td>
+	<td><input type="password" size="11" name="pass" value="<%= $c_pass %>" /></td>
+	</tr><tr>
+	<td colspan="2"><input type="submit" value="旅の続き" /></td>
+	</tr>
+	</table>
+
+	</div>
+
+</td>
+</tr>
+</table>
+<p>
+<hr size=0>
+</form>
+<BR>
+[<B><FONT COLOR="#FF9933">お知らせ</FONT></B>]<BR>
+<%== $kanri_message %>
+<BR>
+<BR>
+[<B><FONT COLOR="#FF9933">ランキング</FONT></B>]<BR>
+現在の Shadow Duel 参加者中ポイントTOP<b><%= $rank_top %></b>を表\示しています。
+<p>
+<table border=1>
+<tr>
+<th></th><th>名前</th><th>SDP</th><th>Rate</th><th>Rank</th>
+</tr>
+
+%== join("\n", @$tr);
+
+</table>
+<form action="<%= $script %>" method="post">
+[<B><span COLOR="#FF9933">入国管理室</span></B>]<BR>
+右手の入り口より入国手続きを行います。（新キャラ登録）&nbsp
+<input type="hidden" name="mode" value="chara_make" />
+<input type="submit" value="入国手続き" />
+</form>
+</td>
+</tr>
+</table>
+<p>
+
+%= include "footer"

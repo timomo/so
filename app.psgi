@@ -13,6 +13,7 @@ use Data::Dumper;
 use YAML::XS;
 use Mojo::JSON;
 use JSON;
+use DBIx::Custom;
 
 push @{app->static->paths}, File::Spec->catdir($FindBin::Bin, qw|public js|);
 push @{app->static->paths}, File::Spec->catdir($FindBin::Bin, qw|public css|);
