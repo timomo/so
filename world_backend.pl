@@ -63,6 +63,17 @@ my $loops = {};
 my $system = SO::System->new(context => app);
 $system->open;
 
+{
+    if (! -f "so.sqlite")
+    {
+        my $sql = File::Spec->catfile($FindBin::Bin, "master", "main.sql");
+        my $file = Mojo::File->new($sql);
+        my $content = $file->slurp;
+        my @sqls = split(";", Encode::decode_utf8($content));
+	$system->dbi("main")->dbh->do($_) for @sqls;
+    }
+}
+
 app->log->level(app->config->{log_level});
 
 any "/window/item" => sub
