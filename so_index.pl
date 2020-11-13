@@ -164,6 +164,12 @@ elsif($mode eq 'status_check_window')
 	print &status_check;
 	exit;
 }
+elsif($mode eq 'message_check_window')
+{
+	# print &item_check_window;
+	print &message_check;
+	exit;
+}
 elsif($mode eq 'item_check') { &item_check; }
 elsif($mode eq 'item_use') { &item_use; }
 elsif($mode eq 'item_battle') { &item_use; }

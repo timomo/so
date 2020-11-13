@@ -49,4 +49,33 @@ sub message {
 	exit;
 }
 
+sub message_check
+{
+	my @log_in = &load_ini($chara_file);
+	my @mesid;
+
+	for ( @log_in ) {
+		my ( $did, $dpass, $dname, $dmy ) = split /<>/, $_, 4;
+		if($kid eq $did)
+		{
+			next;
+		}
+		push(@mesid, "<option value=\"$did\">$dname</option>");
+	}
+
+	push(@mesid, "<option value=\"Ａ\">全員に送信（迷惑注意）</option>");
+
+	my $html = $controller->render_to_string(
+		template => "message_check",
+		script   => "/window/message",
+		kid      => $kid,
+		kname    => $kname,
+		kpass    => "******",
+		mesid    => \@mesid,
+		max_gyo  => $max_gyo,
+	);
+
+	return Encode::encode_utf8($html);
+}
+
 1;

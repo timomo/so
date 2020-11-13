@@ -112,6 +112,26 @@ plugin 'authentication',
     },
 };
 
+any "/window/message" => sub
+{
+    my $self = shift;
+    my $k = $self->current_user;
+
+    return $self->reply->not_found unless ($k);
+
+    if ($self->req->method eq "GET")
+    {
+        my $utf8 = $self->backend_request("get", "/window/message", { id => $k->{id} });
+        return $self->render(text => $utf8, format => "html");
+    }
+    else
+    {
+        my $json = $self->req->body_params->to_hash;
+        my $utf8 = $self->backend_request("post", "/window/message", { id => $k->{id}, %$json });
+        return $self->render(text => $utf8, format => "html");
+    }
+};
+
 any "/window/item" => sub
 {
     my $self = shift;

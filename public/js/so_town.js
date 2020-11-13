@@ -100,7 +100,7 @@ function setup_take_control_form()
 
 function setup_message()
 {
-	jQuery("#send_message").bind("click", (event) => {
+	jQuery("body").on("click", "#send_message", (event) => {
 		const form = jQuery(event.target).closest("form");
 		const to = form.find("select[name='mesid']").val();
 		const message = form.find("input[name='mes']").val();
@@ -188,13 +188,8 @@ function setup_select_menu()
 
 	});
 
-	jQuery("#td_logout").bind("click", (event) =>
+	jQuery("body").on("click", "#td_logout", (event) =>
 	{
-		/*
-		const customEO = jQuery.Event("click");
-		customEO.target = jQuery("#mode_default-select_logout");
-		jQuery(".select-menu").trigger("click", customEO);
-		 */
 		jQuery.get("/logout", {}, (data) => {
 			location.href = "/";
 		});
@@ -233,6 +228,26 @@ function setup_select_menu()
 			}
 
 			window_item.html(data);
+		});
+	});
+
+	jQuery("body").on("click", "#td_message", (event) =>
+	{
+		jQuery.get("/window/message", {}, (data) => {
+			let window_item = jQuery("div#window_message");
+
+			if (window_item.length === 0) {
+				window_item = jQuery("<div></div>");
+				window_item.attr("id", "window_message");
+				window_item.css("position", "absolute");
+				window_item.css({ position: "fixed", width: "85%",  bottom: 500, zIndex: 999 });
+				window_item.draggable();
+				jQuery("body").append(window_item);
+			}
+
+			window_item.html(data);
+
+			get_message();
 		});
 	});
 }
@@ -464,29 +479,6 @@ jQuery(document).ready(() => {
 	}
 
 	get_message();
-
-	if (typeof spot !== "undefined") {
-		/*
-		if (spot === "町の中") {
-			music.request = "town1";
-		}
-		else if (spot === "モンスター" || spot === "デュエル") {
-			music.request = "battle1";
-		}
-		else if (spot === "PVP") {
-			music.request = "battle2";
-		}
-		else {
-			music.request = "dungeon1";
-		}
-
-		 */
-	}
-	else
-	{
-		return;
-	}
-
 	setup_neighbors();
 	setup_take_control_form();
 	setup_select_menu();

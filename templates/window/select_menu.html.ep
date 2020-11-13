@@ -1,4 +1,4 @@
-<div id="move_text" class="text_detail">&nbsp;</div>
+<div id="move_text" class="text_detail non">&nbsp;</div>
 <div class="clearfix">
 	<div class="blackboard answer float-l" id="select-menu-window">
 

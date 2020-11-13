@@ -1,0 +1,4 @@
+<div class="blackboard question">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+%= include "window/message"
+</div>

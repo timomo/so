@@ -41,7 +41,6 @@ sub log_in
 	$esex = "男" if($ksex);
 
 	my @select_menu = ();
-	my @log_in = &load_ini($chara_file);
 	$next_ex = $lv_up;
 
 	&town_load;
@@ -190,59 +189,6 @@ sub log_in
 		}
 	}
 
-	my @mesid;
-
-	for ( @log_in ) {
-		my ( $did, $dpass, $dname, $dmy ) = split /<>/, $_, 4;
-		if($kid eq $did)
-		{
-			next;
-		}
-		push(@mesid, "<option value=\"$did\">$dname</option>");
-	}
-
-	push(@mesid, "<option value=\"Ａ\">全員に送信（迷惑注意）</option>");
-
-	my @MESSAGE_LOG = &load_ini($message_file);
-
-	my $hit = 0;
-	my $i = 1;
-	my @message_log;
-
-	foreach(@MESSAGE_LOG)
-	{
-		my ($pid, $hid, $hname, $hmessage, $hhname, $htime) = split(/<>/);
-		if($kid eq $pid)
-		{
-			if($max_gyo < $i)
-			{
-				last;
-			}
-			push(@message_log, "<hr size=0><small><b>$hname</b>　＞ 「<b>$hmessage</b>」($htime)</small><br>");
-			$hit=1;
-			$i++;
-		}
-		elsif($kid eq $hid)
-		{
-			push(@message_log, "<hr size=0><small>$kname から $hhname へ　＞ 「$hmessage」($htime)</small><br>");
-		}
-		elsif("Ａ" eq "$pid")
-		{
-			if($max_gyo < $i)
-			{
-				last;
-			}
-			push(@message_log, "<hr size=0><small><b>$hname (全員へ)</b>　＞ 「<b>$hmessage</b>」($htime)</small><br>");
-			$hit=1;
-			$i++;
-		}
-	}
-
-	if(!$hit)
-	{
-		push(@message_log, "<hr size=0><p>$kname 宛てのメッセージはありません。</p>");
-	}
-
 	my $html = $controller->render_to_string(
 		template      => "log_in",
 		script        => $script,
@@ -250,9 +196,6 @@ sub log_in
 		kname         => $kname,
 		kpass         => $kpass,
 		karea         => $karea,
-		mesid         => \@mesid,
-		message_log   => \@message_log,
-		max_gyo       => $max_gyo,
 		spot          => $spot,
 		optionHTML    => $optionHTML,
 		select_menu   => \@select_menu,

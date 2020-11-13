@@ -1,4 +1,6 @@
-<form action="<%= $script %>" method="post" class="non">
+<div class="blackboard question">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+<form action="<%= $script %>" method="post" class="">
 【メッセージ送信】<br>
 <input type="hidden" name="id" value="<%= $kid %>" />
 <input type="hidden" name="name" value="<%= $kname %>" />
@@ -12,8 +14,10 @@
 <input type="text" name="mes" size="35" autocomplete="off" />
 <div class="text_detail">他のキャラクターへメッセージを送ることができます。</div>
 </form>
+</div>
 
 <div class="blackboard question">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
 【届いているメッセージ】表示数<b><%= $max_gyo %></b>件まで<br />
 <span id="display_messages">
 </span>

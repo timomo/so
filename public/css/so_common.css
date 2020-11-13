@@ -88,7 +88,8 @@ table
 
 #td_logout,
 #td_item,
-#td_status
+#td_status,
+#td_message
 {
     cursor: pointer;
 }
