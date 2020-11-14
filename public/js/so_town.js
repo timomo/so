@@ -467,7 +467,7 @@ function fixed_bottom_player_status_area() {
 
 jQuery(document).ready(() => {
 	jQuery("body").on("click", "div.menu-close", (event) => {
-		jQuery(event.target).closest("div.blackboard").hide();
+		jQuery(event.target).closest("div.blackboard").closest("div.ui-draggable").remove();
 	});
 
 	jQuery("body").on("click", ".button-cancel", (event) => {
