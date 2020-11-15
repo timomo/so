@@ -2,7 +2,6 @@
 <hr size="0">
 <%== $get_msg %><br>
 <%== $buy_msg %><B><span COLOR="#FF9933"><%== $error %></span></B>
-<form action="<%= $script %>" method="post">
 
 % if($kitem >= $max_item) {
     アイテムはこれ以上所持できません。<BR><BR>
@@ -21,25 +20,27 @@
 %== join("\n", @$item_list);
 
 </table>
-
 </div>
 
-<p>
+<div class="blackboard question select-shop-menu" style="display: none; position: absolute; z-index: 99">
+<form action="<%= $script %>" method="post">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
 <input type=hidden name=id   value=<%= $kid %> />
 <input type=hidden name=area value=<%= $karea %> />
 <input type=hidden name=mode value="item_buy" />
-
-% if ($kitem < $max_item) {
-
+<input type=hidden name=item_no value="" />
 <select name="item">
 %== join("\n", @$item_count);
 </select>
- 個 <input type="submit" value="アイテムを買う" />
-
-% }
+ 個 <input type="button" class="item-submit" value="アイテムを買う" />
 <input type="button" value="街へ戻る" class="button-cancel">
 </form>
-<p>
+</div>
+<script src="/js/so_shop.js"></script>
 <script>
 player.spot = "<%= $spot %>";
+jQuery("td.iname").bind("click", (event) => {
+    const td = jQuery(event.target);
+    td.siblings("td").first().find("input").prop("checked", true).trigger("change");
+});
 </script>

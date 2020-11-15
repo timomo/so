@@ -451,7 +451,7 @@ function fixed_bottom_location_area() {
 		return true;
 	}
 
-	player_status.css({ position: "sticky", top: 0, zIndex: 999, "word-break": "keep-all" });
+	player_status.css({ position: "sticky", top: 0, zIndex: player_status.zIndex + 1, "word-break": "keep-all" });
 }
 
 function fixed_bottom_player_status_area() {
@@ -462,7 +462,7 @@ function fixed_bottom_player_status_area() {
 		return true;
 	}
 
-	player_status.css({ position: "fixed", width: "85%",  bottom: 0, zIndex: 999, "word-break": "keep-all" });
+	player_status.css({ position: "fixed", width: "85%",  bottom: 0, zIndex: player_status.zIndex + 1, "word-break": "keep-all" });
 }
 
 jQuery(document).ready(() => {
@@ -472,6 +472,15 @@ jQuery(document).ready(() => {
 
 	jQuery("body").on("click", ".button-cancel", (event) => {
 		command({ mode: "log_in" });
+	});
+
+	jQuery("body").on("change", "input[name='item_no']", (event) => {
+		if ("window_item" === jQuery(event.target).closest("div.ui-draggable").attr("id")) {
+			confirm_window(".select-item-menu", event);
+		}
+		else {
+			confirm_window(".select-shop-menu", event);
+		}
 	});
 
 	if (typeof const_id !== "undefined") {

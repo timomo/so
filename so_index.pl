@@ -149,7 +149,10 @@ elsif($mode eq 'yado') { $spot = "宿屋"; &yado; }
 elsif($mode eq 'yado_in') { $spot = "宿屋"; &yado_in; }
 elsif($mode eq 'message') { &message; }
 elsif($mode eq 'item_shop') { &item_shop; }
-elsif($mode eq 'item_buy') { &item_buy; }
+elsif($mode eq 'item_buy') {
+	&item_buy;
+	exit;
+}
 elsif($mode eq 'user_shop') { &user_shop; }
 elsif($mode eq 'user_buy') { &user_buy; }
 elsif($mode eq 'item_check_window')

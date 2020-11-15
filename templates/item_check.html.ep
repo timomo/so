@@ -1,5 +1,3 @@
-<form action="<%== $script %>" method="post">
-
 <div class="blackboard question">
 <div class="menu-close" style="float: right; cursor: pointer">×</div>
 <table border="0" class="item_table">
@@ -26,8 +24,8 @@
 </div>
 
 <div class="blackboard question select-item-menu" style="display: none; position: absolute; z-index: 99">
+<form action="<%== $script %>" method="post">
 <div class="menu-close" style="float: right; cursor: pointer">×</div>
-<p>
 <input type="hidden" name="id" value="<%= $kid %>">
 <select name="mode">
 <option value="item_use">使うor装備or装備解除</option>
@@ -59,6 +57,7 @@
 </p>
 <p>
 <input type=button value="OK" class="item-submit">
+<input type=hidden name=item_no value="" />
 </p>
 <p>
 個数&nbsp;
@@ -77,36 +76,11 @@
 </small>
 </p>
 </div>
-
 </form>
-
+<script src="/js/so_shop.js"></script>
 <script>
 jQuery("td.iname").bind("click", (event) => {
     const td = jQuery(event.target);
     td.siblings("td").first().find("input").prop("checked", true).trigger("change");
-});
-jQuery("input[name='item_no']").bind("change", (event) => {
-    const menu = jQuery(".select-item-menu");
-    const input = jQuery(event.target);
-    const offset = input.offset();
-    offset.top += 16;
-    menu.show();
-    menu.offset(offset);
-});
-jQuery(".select-item-menu").draggable();
-
-jQuery(".item-submit").bind("click", (event) => {
-    const form = jQuery(event.target).closest("form");
-    const param = form.serializeArray();
-    const tmp = {};
-
-    param.forEach((ary) => {
-        tmp[ary.name] = ary.value;
-    });
-
-    jQuery.post("/window/item", tmp, (data) => {
-        jQuery(".select-item-menu").hide();
-        jQuery("#td_item").trigger("click");
-    });
 });
 </script>

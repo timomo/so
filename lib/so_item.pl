@@ -371,31 +371,23 @@ sub item_load
 #----------------#
 sub item_use
 {
-	my @user_item = &item_load($in{'id'});
-
 	if($in{'item_no'} eq "")
 	{
 		$error = "アイテムを選んでください。";
 		&item_check;
 	}
 
-	my $hit = 0;
+	my $use = $system->pickup_item($kid, $in{'item_no'});
+	my $i_mode = $use->{アイテム種別};
+	my $i_dmg = $use->{効果};
 
-	foreach(@user_item)
-	{
-		($i_id,$i_no,$i_name,$i_dmg,$i_gold,$i_mode,$i_uelm,$i_eelm,$i_hand,$i_def,$i_req,$i_qlt,$i_make,$i_rest,$i_eqp) = @$_;
-		if($in{item_no} eq $i_id) {
-			$hit = 1;
-			last;
-		}
-	}
-	if($hit == 0)
+	if(! defined $use)
 	{
 		$error = "アイテムが存在しません。";
 		&item_check;
 	}
 
-	$k_id = $i_id;
+	our $k_id = $use->{id};
 
 	if($in{'mode'} eq "item_use"){
 		$k_eqp = 0;

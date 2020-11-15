@@ -823,6 +823,30 @@ sub load_ini
     return \@ret;
 }
 
+sub pickup_item
+{
+    my $self = shift;
+    my $kid = shift;
+    my $iid = shift;
+    my $rows = $self->load_item_db($kid);
+
+    for my $row (@$rows)
+    {
+        if ($iid == $row->{id})
+        {
+            return $row;
+        }
+    }
+}
+
+sub item_uniq_key
+{
+    my $self = shift;
+    my $item = shift;
+    my $uniq_key = sprintf("%s%s%s", @$item{qw|アイテムid 品質 作成者|});
+    return Encode::encode_utf8($uniq_key);
+}
+
 sub watch
 {
     my ($self, $key, $func) = @_;

@@ -127,8 +127,9 @@ any "/window/:name" => [ name => qr/(?:message|item|status)/ ] => sub
     }
     else
     {
-        my $json = $self->req->body_params->to_hash;
-        my $utf8 = $self->backend_request("post", $self->req->url->path->to_string, { id => $k->{id}, %$json });
+        my $param = $self->req->body_params->to_hash || {};
+        my $json = $self->req->json || {};
+        my $utf8 = $self->backend_request("post", $self->req->url->path->to_string, { id => $k->{id}, %$param, %$json });
         return $self->render(text => $utf8, format => "html");
     }
 };

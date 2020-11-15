@@ -79,15 +79,17 @@ app->log->level(app->config->{log_level});
 any "/window/:name" => [ name => qr/(?:message|item|status)/ ] => sub
 {
     my $self = shift;
-    my $json = $self->req->json;
+    my $param = $self->req->body_params->to_hash || {};
+    my $json = $self->req->json || {};
     my $id = $json->{id};
     my $k = $system->load_chara($id);
     my $mode = "";
     my $method = "";
+    my $query = { %$param, %$json };
 
     if ($self->req->url->path->to_string eq "/window/item")
     {
-        $mode = "item_check_window";
+        $mode = $query->{mode} || "item_check_window";
         $method = "item";
     }
     elsif ($self->req->url->path->to_string eq "/window/message")
@@ -105,7 +107,7 @@ any "/window/:name" => [ name => qr/(?:message|item|status)/ ] => sub
     {
         my $env = $self->tx->req->env || {};
         my $url = Mojo::URL->new;
-        $url->query({ %$json, id => $k->{id}, pass => $k->{パスワード} });
+        $url->query({ %$param, %$json, id => $k->{id}, pass => $k->{パスワード} });
         $env->{QUERY_STRING} = $url->to_string;
         $env->{QUERY_STRING} =~ s/^\?//;
         my $utf8 = $self->emulate_cgi($env);
@@ -117,7 +119,7 @@ any "/window/:name" => [ name => qr/(?:message|item|status)/ ] => sub
     {
         my $env = $self->tx->req->env || {};
         my $url = Mojo::URL->new;
-        $url->query({ mode => $mode, id => $k->{id}, pass => $k->{パスワード} });
+        $url->query({ %$param, %$json, mode => $mode, id => $k->{id}, pass => $k->{パスワード} });
         $env->{QUERY_STRING} = $url->to_string;
         $env->{QUERY_STRING} =~ s/^\?//;
         my $utf8 = $self->emulate_cgi($env);

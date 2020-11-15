@@ -1,0 +1,41 @@
+function confirm_window(name, event)
+{
+    const menus = jQuery(name);
+    const menu = menus.first().clone().show(); // 全てをcloseしてから、1つだけshowする
+    const input = jQuery(event.target);
+    const div = input.closest("div.blackboard.question");
+    const offset = input.offset();
+    offset.top += 16;
+    menu.show();
+    // div.show();
+    menu.offset(offset);
+    menu.draggable();
+    menu.zIndex = input.zIndex + 1;
+
+    // console.error(input);
+
+    if(menus.length === 1)
+    {
+        input.closest("td").prepend(menu);
+    }
+
+    menu.find("input[name='item_no']").val(input.val());
+    menu.find("div.menu-close").bind("click", (event) => {
+        event.stopPropagation();
+        menu.remove();
+    });
+    menu.find(".item-submit").bind("click", (event) => {
+        const form = jQuery(event.target).closest("form");
+        const param = form.serializeArray();
+        const tmp = {};
+
+        param.forEach((ary) => {
+            tmp[ary.name] = ary.value;
+        });
+
+        console.error(tmp);
+
+        jQuery.post("/window/item", tmp, (data) => {
+        });
+    });
+}
