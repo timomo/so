@@ -7,23 +7,26 @@ function confirm_window(name, event)
     const offset = input.offset();
     offset.top += 16;
     menu.show();
-    // div.show();
-    menu.offset(offset);
     menu.draggable();
     menu.zIndex = input.zIndex + 1;
+    menu.offset(offset);
 
-    // console.error(input);
+    if(div.css("display") === "none")
+    {
+        div.show();
+    }
 
     if(menus.length === 1)
     {
-        input.closest("td").prepend(menu);
+        div.append(menu);
     }
 
-    menu.find("input[name='item_no']").val(input.val());
+    div.find("input:hidden[name='item_no']").val(input.val());
     menu.find("div.menu-close").bind("click", (event) => {
         event.stopPropagation();
         menu.remove();
     });
+
     menu.find(".item-submit").bind("click", (event) => {
         const form = jQuery(event.target).closest("form");
         const param = form.serializeArray();
@@ -33,9 +36,9 @@ function confirm_window(name, event)
             tmp[ary.name] = ary.value;
         });
 
-        console.error(tmp);
-
         jQuery.post("/window/item", tmp, (data) => {
+            jQuery("#td_item").trigger("click");
+            return true;
         });
     });
 }
