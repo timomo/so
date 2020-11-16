@@ -8,8 +8,6 @@ function confirm_window(name, event)
     offset.top += 16;
     menu.show();
     menu.draggable();
-    menu.zIndex = input.zIndex + 1;
-    menu.offset(offset);
 
     if(div.css("display") === "none")
     {
@@ -20,6 +18,8 @@ function confirm_window(name, event)
     {
         div.append(menu);
     }
+    menu.zIndex = input.zIndex + 1;
+    menu.offset(offset);
 
     div.find("input:hidden[name='item_no']").val(input.val());
     menu.find("div.menu-close").bind("click", (event) => {
