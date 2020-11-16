@@ -17,6 +17,7 @@ use SO::Monster;
 use SO::PVP;
 use SO::Dummy;
 use SO::System;
+use SO::Town;
 use Mojolicious;
 
 # 初期設定ファイルの読み込み
@@ -65,6 +66,8 @@ $controller->log($logger);
 $controller->open;
 our $system = SO::System->new(context => $controller);
 $system->open;
+our $town = SO::Town->new(context => $controller, system => $system);
+$town->open;
 
 unshift @{$mojo->renderer->paths}, File::Spec->catdir($FindBin::Bin, "templates");
 

@@ -223,6 +223,8 @@ sub chara_load
 			$kitem
 		) = @$k{@{$config->{keys}}};
 	}
+
+	return $k;
 }
 
 1;

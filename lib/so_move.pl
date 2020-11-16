@@ -21,7 +21,7 @@ sub move
 	}
 	elsif ($direction eq "town") # 街へ戻る
 	{
-		$kspot = 0;
+		$kspot = 4;
 		$kpst = 0;
 	}
 	elsif ($direction eq "field") # フィールド探索
@@ -41,81 +41,47 @@ sub move
 	}
 	elsif ($direction eq "forward") # 先へ進む
 	{
-		$town->{current}->{距離}++;
-		$town->{next}->{距離}++;
-		$town->{previous}->{距離}++;
 		$kpst++;
-		my $key;
-
-		if ($kspot == 1)
+		if ($town->{current}->{距離} == 0)
 		{
-			# noop
+			$karea = $town->{current}->{id};
+			$kspot = 4;
+			$kpst = 0;
 		}
-		elsif ($kspot == 2)
+		elsif ($town->{next}->{距離} == 0)
 		{
-			$key = "current";
-			$town->{$key}->{距離} -= 2;
-			if ($town->{$key}->{距離} == 0)
-			{
-				$kspot = $town->{$key}->{id};
-			}
+			$karea = $town->{next}->{id};
+			$kspot = 4;
+			$kpst = 0;
 		}
-		elsif ($kspot == 3)
+		elsif ($town->{previous}->{距離} == 0)
 		{
-			$key = "next";
-			$town->{$key}->{距離} -= 2;
-			if ($town->{$key}->{距離} == 0)
-			{
-				$kspot = $town->{$key}->{id};
-			}
+			$karea = $town->{previous}->{id};
+			$kspot = 4;
+			$kpst = 0;
 		}
-		elsif ($kspot == 4)
-		{
-			$key = "previous";
-			$town->{$key}->{距離} -= 2;
-			if ($town->{$key}->{距離} == 0)
-			{
-				$kspot = $town->{$key}->{id};
-			}
-		}
+		warn Dump($town);
 	}
 	elsif ($direction eq "backward") # 引き返す
 	{
-		$town->{current}->{距離}--;
-		$town->{next}->{距離}--;
-		$town->{previous}->{距離}--;
 		$kpst--;
-
-		if ($kspot == 1)
+		if ($town->{current}->{距離} == 0)
 		{
-			# noop
+			$karea = $town->{current}->{id};
+			$kspot = 4;
+			$kpst = 0;
 		}
-		elsif ($kspot == 2)
+		elsif ($town->{next}->{距離} == 0)
 		{
-			$key = "current";
-			$town->{$key}->{距離} += 2;
-			if ($town->{$key}->{距離} == 0)
-			{
-				$kspot = $town->{$key}->{id};
-			}
+			$karea = $town->{next}->{id};
+			$kspot = 4;
+			$kpst = 0;
 		}
-		elsif ($kspot == 3)
+		elsif ($town->{previous}->{距離} == 0)
 		{
-			$key = "next";
-			$town->{$key}->{距離} += 2;
-			if ($town->{$key}->{距離} == 0)
-			{
-				$kspot = $town->{$key}->{id};
-			}
-		}
-		elsif ($kspot == 4)
-		{
-			$key = "previous";
-			$town->{$key}->{距離} += 2;
-			if ($town->{$key}->{距離} == 0)
-			{
-				$kspot = $town->{$key}->{id};
-			}
+			$karea = $town->{previous}->{id};
+			$kspot = 4;
+			$kpst = 0;
 		}
 	}
 

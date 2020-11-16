@@ -14,15 +14,24 @@ use YAML::XS;
 use Mojo::JSON;
 use JSON;
 use DBIx::Custom;
+use lib File::Spec->catdir($FindBin::RealBin, 'lib');
+use SO::System;
+use SO::Town;
 
 push @{app->static->paths}, File::Spec->catdir($FindBin::Bin, qw|public js|);
 push @{app->static->paths}, File::Spec->catdir($FindBin::Bin, qw|public css|);
 push @{app->static->paths}, File::Spec->catdir($FindBin::Bin, qw|public sound|);
+push @{app->static->paths}, File::Spec->catdir($FindBin::Bin, qw|public img|);
 
 plugin Config => { file => "so.conf.pl" };
 
 my $ua;
 my $app;
+
+my $system = SO::System->new(context => app);
+my $town = SO::Town->new(context => app, system => $system);
+$system->open;
+$town->open;
 
 app->helper(
     backend_request => sub
@@ -381,34 +390,29 @@ app->helper(
         my $spot = "";
         my @names = keys @{$self->config->{街}};
 
+        my $data = $town->load($k);
+
+        warn Dump($data);
+
         if($k->{スポット} == 0)
         {
             $spot = sprintf("郊外");
         }
         elsif($k->{スポット} == 1)
         {
-            my $farea = $names[$k->{エリア}] - 0;
-            my $rest = $self->config->{タウン間距離}->[$farea]->[$k->{スポット}];
-            $rest -= $k->{距離};
-            $spot = sprintf("%s まで残り %s", $self->config->{街}->[$farea], $rest);
+            $spot = sprintf("%s まで残り %s", $data->{current}->{場所}, $data->{current}->{距離});
         }
         elsif($k->{スポット} == 2)
         {
-            my $farea = $names[$k->{エリア}] - 1;
-            my $rest = $self->config->{タウン間距離}->[$farea]->[$k->{スポット}];
-            $rest -= $k->{距離};
-            $spot = sprintf("%s まで残り %s", $self->config->{街}->[$farea], $rest);
+            $spot = sprintf("%s まで残り %s", $data->{next}->{地名}, $data->{next}->{距離});
         }
         elsif($k->{スポット} == 3)
         {
-            my $rarea = $names[$k->{エリア}] - 1;
-            my $rest = $self->config->{タウン間距離}->[$rarea]->[$k->{スポット}];
-            $rest -= $k->{距離};
-            $spot = sprintf("%s まで残り %s", $self->config->{街}->[$rarea], $rest);
+            $spot = sprintf("%s まで残り %s", $data->{previous}->{地名}, $data->{previous}->{距離});
         }
-        else
+        elsif($k->{スポット} == 4)
         {
-            $spot = "町の中";
+            $spot = sprintf("街の中");
         }
 
         return $spot;

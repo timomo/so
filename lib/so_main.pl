@@ -43,35 +43,13 @@ sub log_in
 	my @select_menu = ();
 	$next_ex = $lv_up;
 
-	my $town = &town_load;
+	# my $town = &town_load;
+	my $k = &chara_load($kid);
+	my $data = $town->load($k);
 
 	my @message = ();
 
-	if($kspot == 0 && $kpst == 1)
-	{
-		push(@message, "<p>$movemsg</p><p>$kname は$town_name[$karea]郊外にいます。</p>");
-		$spot = "$town_name[$karea]郊外";
-	}
-	elsif($kspot == 1)
-	{
-		push(@message, "<p>$movemsg</p><p>$kname は$area_name[$karea]を探索中です。</p>");
-		$spot = "$area_name[$karea]最深部まで残り $kpst";
-	}
-	elsif($kspot == 2  && $kpst > 0)
-	{
-		push(@message, "<p>$movemsg</p><p>$kname は$town_name[$karea]から$town_name[$farea]に移動しています。</p>");
-		$spot = "$town_name[$farea]まで残り $kpst";
-	}
-	elsif($kspot == 3  && $kpst > 0)
-	{
-		push(@message, "<p>$movemsg</p><p>$kname は$town_name[$karea]から$town_name[$rarea]に移動しています。</p>");
-		$spot = "$town_name[$rarea]まで残り $kpst";
-	}
-	else
-	{
-		push(@message, "<p>$movemsg</p><p>$kname は$town_name[$karea]にいます。</p>");
-		$spot = "町の中";
-	}
+	push(@message, $movemsg);
 
 	$rid = $kid;
 	&read_battle;
@@ -131,59 +109,19 @@ sub log_in
 
 	my ( $label, $optionHTML ) = ( "", "" );
 	my @options;
-	my $spot1 = $town_move[$karea][2];
-	if ($kspot == 2)
-	{
-		$spot1 += $kpst;
-	}
-	elsif ($kspot == 3)
-	{
-		$spot1 -= $kpst;
-	}
-	else
-	{
-		$spot1 -= $kpst;
-	}
-	my $spot2 = $town_move[$karea][3];
-	if ($kspot == 3)
-	{
-		$spot2 += $kpst;
-	}
-	elsif ($kspot == 2)
-	{
-		$spot2 -= $kpst;
-	}
-	else
-	{
-		$spot2 -= $kpst;
-	}
-	my $spot3 = $town_move[$karea][1];
-	if ($kspot == 3)
-	{
-		$spot3 -= $kpst;
-	}
-	elsif ($kspot == 2)
-	{
-		$spot3 += $kpst;
-	}
-	else
-	{
-		$spot3 += $kpst;
-	}
 
-
-	$label = "【$town_name[$karea]周辺】";
-	push( @options, [ "explore", sprintf( "%s郊外を探索する", $town_name[$karea] ) ] );
-	push( @options, [ "field", sprintf( "%sへ向かう(距離 %s)", $town->{current}->{場所}, $spot3 ) ] );
-	push( @options, [ "next", sprintf( "%s方面へ(距離 %s)", $town->{next}->{地名}, $spot1 ) ] );
-	push( @options, [ "previous", sprintf( "%s方面へ(距離 %s)", $town->{previous}->{地名}, $spot2 ) ] );
+	$label = sprintf("【%s周辺】", $data->{current}->{地名});
+	push( @options, [ "explore", sprintf( "%s郊外を探索する", $data->{current}->{地名} ) ] );
+	push( @options, [ "field", sprintf( "%sへ向かう(距離 %s)", $data->{current}->{場所}, $data->{current}->{距離} ) ] );
+	push( @options, [ "next", sprintf( "%s方面へ(距離 %s)", $data->{next}->{地名}, $data->{next}->{距離} ) ] );
+	push( @options, [ "previous", sprintf( "%s方面へ(距離 %s)", $data->{previous}->{地名}, $data->{previous}->{距離} ) ] );
 
 	$label = "【行動】";
 	push( @options, [ "explore", "探索する" ] );
 
 	$label = "【行動】";
 	push( @options, [ "forward", "先へ進む" ] );
-	push( @options, [ "town", sprintf( "%sへ帰還する", $town_name[$karea] ) ] );
+	push( @options, [ "town", sprintf( "%sへ帰還する", $data->{current}->{地名} ) ] );
 
 	push(@select_menu, qq|<p class="answer-menu">|. $label. qq|</p>|);
 	push( @options, [ "backward", "引き返す" ] );
