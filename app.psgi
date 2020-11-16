@@ -381,7 +381,7 @@ app->helper(
         my $spot = "";
 
         # TODO: farea、rarea
-        if($k->{スポット} == 0 && $k->{距離} == 1)
+        if($k->{スポット} == 0)
         {
             $spot = sprintf("%s郊外", $self->config->{街}->[$k->{エリア}]);
         }
@@ -389,14 +389,14 @@ app->helper(
         {
             $spot = sprintf("%s最深部まで残り %s", $self->config->{フィールド}->[$k->{スポット}], $k->{距離});
         }
-        elsif($k->{スポット} == 2  && $k->{距離} > 0)
+        elsif($k->{スポット} == 2)
         {
             my $farea = $k->{エリア} - 1;
             my $rest = $self->config->{タウン間距離}->[$farea]->[3];
             $rest -= $k->{距離};
             $spot = sprintf("%s まで残り %s", $self->config->{街}->[$farea], $rest);
         }
-        elsif($k->{スポット} == 3  && $k->{距離} > 0)
+        elsif($k->{スポット} == 3)
         {
             my $rarea = $k->{エリア} + 1;
             my $rest = $self->config->{タウン間距離}->[$rarea]->[2];
