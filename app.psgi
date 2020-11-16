@@ -379,28 +379,29 @@ app->helper(
         my $self = shift;
         my $k = shift;
         my $spot = "";
+        my @names = keys @{$self->config->{街}};
 
-        # TODO: farea、rarea
         if($k->{スポット} == 0)
         {
-            $spot = sprintf("%s郊外", $self->config->{街}->[$k->{エリア}]);
+            $spot = sprintf("郊外");
         }
         elsif($k->{スポット} == 1)
         {
-            my $rest = $self->config->{タウン間距離}->[$k->{エリア}]->[$k->{スポット}];
+            my $farea = $names[$k->{エリア}] - 0;
+            my $rest = $self->config->{タウン間距離}->[$farea]->[$k->{スポット}];
             $rest -= $k->{距離};
-            $spot = sprintf("%s最深部まで残り %s", $self->config->{フィールド}->[$k->{スポット}], $k->{距離});
+            $spot = sprintf("%s まで残り %s", $self->config->{街}->[$farea], $rest);
         }
         elsif($k->{スポット} == 2)
         {
-            my $farea = $k->{エリア} - 1;
+            my $farea = $names[$k->{エリア}] - 1;
             my $rest = $self->config->{タウン間距離}->[$farea]->[$k->{スポット}];
             $rest -= $k->{距離};
             $spot = sprintf("%s まで残り %s", $self->config->{街}->[$farea], $rest);
         }
         elsif($k->{スポット} == 3)
         {
-            my $rarea = $k->{エリア} + 1;
+            my $rarea = $names[$k->{エリア}] - 1;
             my $rest = $self->config->{タウン間距離}->[$rarea]->[$k->{スポット}];
             $rest -= $k->{距離};
             $spot = sprintf("%s まで残り %s", $self->config->{街}->[$rarea], $rest);
