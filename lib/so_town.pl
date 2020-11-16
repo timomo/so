@@ -22,7 +22,17 @@ sub town_load
 			$tmp->{cost} = $t_cost * 1;
 			$tmp->{price} = $t_prize * 1;
 			$tmp->{drop} = $t_drop;
-			$tmp->{距離} = $ret->{move}->[0]->[0];
+			$tmp->{距離} = $ret->{move}->[$karea]->[3];
+
+			if ($kspot == 1)
+			{
+				$tmp->{距離} -= $kpst;
+			}
+			else
+			{
+				$tmp->{距離} += $kpst;
+			}
+
 			$tmp->{地名} = $town_name[$tmp->{id}];
 			$tmp->{場所} = $area_name[$tmp->{id}];
 			$ret->{current} = $tmp;
@@ -51,16 +61,16 @@ sub town_load
 			$tmp->{info} = $f_info;
 			$tmp->{shop} = $f_shop;
 			$tmp->{inn} = $f_inn;
+			$tmp->{距離} = $ret->{move}->[$karea]->[2];
 
 			if ($kspot == 2)
 			{
-				$tmp->{距離} = $ret->{move}->[$tmp->{id}]->[2] + $kpst;
+				$tmp->{距離} -= $kpst;
 			}
 			else
 			{
-				$tmp->{距離} = $ret->{move}->[$tmp->{id}]->[2] - $kpst;
+				$tmp->{距離} += $kpst;
 			}
-
 			$tmp->{地名} = $town_name[$tmp->{id}];
 			$tmp->{場所} = $area_name[$tmp->{id}];
 			$ret->{next} = $tmp;
@@ -89,13 +99,15 @@ sub town_load
 			$tmp->{info} = $r_info;
 			$tmp->{shop} = $r_shop;
 			$tmp->{inn} = $r_inn;
+			$tmp->{距離} = $ret->{move}->[$karea]->[1];
+
 			if ($kspot == 3)
 			{
-				$tmp->{距離} = $ret->{move}->[$tmp->{id}]->[3] + $kpst;
+				$tmp->{距離} -= $kpst;
 			}
 			else
 			{
-				$tmp->{距離} = $ret->{move}->[$tmp->{id}]->[3] - $kpst;
+				$tmp->{距離} += $kpst;
 			}
 			$tmp->{地名} = $town_name[$tmp->{id}];
 			$tmp->{場所} = $area_name[$tmp->{id}];
@@ -103,6 +115,8 @@ sub town_load
 			last;
 		}
 	}
+
+	# warn sprintf("%s = %s, %s", $_, $ret->{$_}->{地名}, $ret->{$_}->{距離}) for (qw|previous next current|);
 
 	delete $ret->{move};
 

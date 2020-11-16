@@ -387,19 +387,21 @@ app->helper(
         }
         elsif($k->{スポット} == 1)
         {
+            my $rest = $self->config->{タウン間距離}->[$k->{エリア}]->[$k->{スポット}];
+            $rest -= $k->{距離};
             $spot = sprintf("%s最深部まで残り %s", $self->config->{フィールド}->[$k->{スポット}], $k->{距離});
         }
         elsif($k->{スポット} == 2)
         {
             my $farea = $k->{エリア} - 1;
-            my $rest = $self->config->{タウン間距離}->[$farea]->[3];
+            my $rest = $self->config->{タウン間距離}->[$farea]->[$k->{スポット}];
             $rest -= $k->{距離};
             $spot = sprintf("%s まで残り %s", $self->config->{街}->[$farea], $rest);
         }
         elsif($k->{スポット} == 3)
         {
             my $rarea = $k->{エリア} + 1;
-            my $rest = $self->config->{タウン間距離}->[$rarea]->[2];
+            my $rest = $self->config->{タウン間距離}->[$rarea]->[$k->{スポット}];
             $rest -= $k->{距離};
             $spot = sprintf("%s まで残り %s", $self->config->{街}->[$rarea], $rest);
         }
