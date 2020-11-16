@@ -70,7 +70,9 @@ table
 .item_table td,
 .item_table th,
 .status_table td,
-.status_table th
+.status_table th,
+.shop_table td,
+.shop_table th
 {
     font-size: 6pt;
 }

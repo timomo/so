@@ -10,7 +10,7 @@
 </DIV>
 
 % for my $log (@$battle_date) {
-    <%== $log %>
+    <%== $log || "" %>
 % }
 
 % if ( $is_finished == 1 ) {

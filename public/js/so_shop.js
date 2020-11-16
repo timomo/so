@@ -18,6 +18,7 @@ function confirm_window(name, event)
     {
         div.append(menu);
     }
+
     menu.zIndex = input.zIndex + 1;
     menu.offset(offset);
 
@@ -36,7 +37,7 @@ function confirm_window(name, event)
             tmp[ary.name] = ary.value;
         });
 
-        jQuery.post("/window/item", tmp, (data) => {
+        jQuery.post("/instant", tmp, (data) => {
             jQuery("#td_item").trigger("click");
             return true;
         });

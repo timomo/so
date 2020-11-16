@@ -12,7 +12,7 @@
 
 <div class="blackboard question">
 
-<table border=0>
+<table border=0 class="shop_table">
 <tr>
 <th></th><th>種別</th><th>名前</th><th>効果</th><th>価値</th><th>使用</th><th>装備条件</th><th>属性</th><th>耐久</th><th>品質</th><th>作成者</th>
 </tr>

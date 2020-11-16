@@ -76,6 +76,24 @@ $system->open;
 
 app->log->level(app->config->{log_level});
 
+post "/instant" => sub
+{
+    my $self = shift;
+    my $param = $self->req->body_params->to_hash || {};
+    my $json = $self->req->json || {};
+    my $id = $json->{id};
+    my $k = $system->load_chara($id);
+    my $env = $self->tx->req->env || {};
+    my $url = Mojo::URL->new;
+    $url->query({ %$param, %$json, id => $k->{id}, pass => $k->{パスワード} });
+    $env->{QUERY_STRING} = $url->to_string;
+    $env->{QUERY_STRING} =~ s/^\?//;
+    my $utf8 = $self->emulate_cgi($env);
+    my $mes = { method => "instant", data => 1 };
+    $self->unicast_send($mes, $k->{id});
+    return $self->render(text => $utf8, format => "html");
+};
+
 any "/window/:name" => [ name => qr/(?:message|item|status)/ ] => sub
 {
     my $self = shift;

@@ -120,18 +120,11 @@ any "/window/:name" => [ name => qr/(?:message|item|status)/ ] => sub
 
     return $self->reply->not_found unless ($k);
 
-    if ($self->req->method eq "GET")
-    {
-        my $utf8 = $self->backend_request("get", $self->req->url->path->to_string, { id => $k->{id} });
-        return $self->render(text => $utf8, format => "html");
-    }
-    else
-    {
-        my $param = $self->req->body_params->to_hash || {};
-        my $json = $self->req->json || {};
-        my $utf8 = $self->backend_request("post", $self->req->url->path->to_string, { id => $k->{id}, %$param, %$json });
-        return $self->render(text => $utf8, format => "html");
-    }
+    my $param = $self->req->body_params->to_hash || {};
+    my $json = $self->req->json || {};
+    my $utf8 = $self->backend_request($self->req->method, $self->req->url->path->to_string, { id => $k->{id}, %$param, %$json });
+
+    return $self->render(text => $utf8, format => "html");
 };
 
 any "/message" => sub
@@ -141,17 +134,11 @@ any "/message" => sub
 
     return $self->reply->not_found unless ($k);
 
-    if ($self->req->method eq "GET")
-    {
-        my $utf8 = $self->backend_request("get", "/message", { id => $k->{id} });
-        return $self->render(json => $utf8);
-    }
-    else
-    {
-        my $json = $self->req->body_params->to_hash;
-        my $utf8 = $self->backend_request("post", "/message", { id => $k->{id}, %$json });
-        return $self->render(json => $utf8);
-    }
+    my $param = $self->req->body_params->to_hash || {};
+    my $json = $self->req->json || {};
+    my $utf8 = $self->backend_request($self->req->method, $self->req->url->path->to_string, { id => $k->{id}, %$param, %$json });
+
+    return $self->render(json => $utf8);
 };
 
 get "/neighbors" => sub
@@ -161,7 +148,9 @@ get "/neighbors" => sub
 
     return $self->reply->not_found unless ($k);
 
-    my $utf8 = $self->backend_request("get", "/neighbors", { id => $k->{id} });
+    my $param = $self->req->body_params->to_hash || {};
+    my $json = $self->req->json || {};
+    my $utf8 = $self->backend_request($self->req->method, $self->req->url->path->to_string, { id => $k->{id}, %$param, %$json });
 
     return $self->render(json => $utf8);
 };
@@ -203,6 +192,23 @@ get "/status" => sub
     );
 };
 
+post "/instant" => sub
+{
+    my $self = shift;
+    my $param = $self->req->body_params->to_hash || {};
+    my $json = $self->req->json || {};
+
+    delete $json->{pass};
+
+    my $k = $self->current_user;
+
+    return $self->reply->not_found unless ($k);
+
+    my $utf8 = $self->backend_request($self->req->method, $self->req->url->path->to_string, { %$param, %$json, id => $k->{id} });
+
+    return $self->render(text => $utf8 || "", format => 'html');
+};
+
 get "/current" => sub
 {
     my $self = shift;
@@ -213,7 +219,7 @@ get "/current" => sub
     $self->cookie(id => $k->{id});
 
     my $accept = $self->param("accept");
-    my $utf8 = $self->backend_request("get", "/current", { "accept" => $accept, id => $k->{id} });
+    my $utf8 = $self->backend_request($self->req->method, $self->req->url->path->to_string, { "accept" => $accept, id => $k->{id} });
 
     return $self->render(text => $utf8 || "", format => 'html');
 };
@@ -221,7 +227,8 @@ get "/current" => sub
 post "/command" => sub
 {
     my $self = shift;
-    my $json = $self->req->body_params->to_hash;
+    my $param = $self->req->body_params->to_hash || {};
+    my $json = $self->req->json || {};
 
     delete $json->{pass};
 
@@ -229,7 +236,7 @@ post "/command" => sub
 
     return $self->reply->not_found unless ($k);
 
-    my $utf8 = $self->backend_request("POST", "/command", { %$json, id => $k->{id}, const_id => $k->{id} });
+    my $utf8 = $self->backend_request($self->req->method, $self->req->url->path->to_string, { %$param, %$json, id => $k->{id}, const_id => $k->{id} });
 
     return $self->render(json => $utf8);
 };
