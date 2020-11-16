@@ -2,42 +2,111 @@ use utf8;
 #----------------------#
 #  街データをロード    #
 #----------------------#
-sub town_load {
+sub town_load
+{
+	my @log_town = &load_ini($town_info);
+	my $ret = {};
 
-	@log_town = &load_ini($town_info);
+	$ret->{move} = \@town_move;
 
-	foreach(@log_town){
-		($t_no,$t_info,$t_shop,$t_inn,$t_cost,$t_prize,$t_drop) = split(/<>/);
-		if($karea eq "$t_no"){ last; }
+	foreach(@log_town)
+	{
+		my ($t_no,$t_info,$t_shop,$t_inn,$t_cost,$t_prize,$t_drop) = split(/<>/);
+		if($karea eq "$t_no")
+		{
+			my $tmp = {};
+			$tmp->{id} = $t_no * 1;
+			$tmp->{info} = $t_info;
+			$tmp->{shop} = $t_shop;
+			$tmp->{inn} = $t_inn;
+			$tmp->{cost} = $t_cost * 1;
+			$tmp->{price} = $t_prize * 1;
+			$tmp->{drop} = $t_drop;
+			$tmp->{距離} = $ret->{move}->[0]->[0];
+			$tmp->{地名} = $town_name[$tmp->{id}];
+			$tmp->{場所} = $area_name[$tmp->{id}];
+			$ret->{current} = $tmp;
+			last;
+		}
 	}
 
-	$farea = 0;
-	if($karea > 0) {
+	my $farea = 0;
+
+	if($karea > 0)
+	{
 		$farea = $karea - 1;
-	} else {
+	}
+	else
+	{
 		$farea = @town_name - 1;
 	}
 
-	@log_town = &load_ini($town_info);
+	foreach(@log_town)
+	{
+		my ($f_no,$f_info,$f_shop,$f_inn) = split(/<>/);
+		if($farea eq "$f_no")
+		{
+			my $tmp = {};
+			$tmp->{id} = $f_no * 1;
+			$tmp->{info} = $f_info;
+			$tmp->{shop} = $f_shop;
+			$tmp->{inn} = $f_inn;
 
-	foreach(@log_town){
-		($f_no,$f_info,$f_shop,$f_inn) = split(/<>/);
-		if($farea eq "$f_no"){ last; }
+			if ($kspot == 2)
+			{
+				$tmp->{距離} = $ret->{move}->[$tmp->{id}]->[2] + $kpst;
+			}
+			else
+			{
+				$tmp->{距離} = $ret->{move}->[$tmp->{id}]->[2] - $kpst;
+			}
+
+			$tmp->{地名} = $town_name[$tmp->{id}];
+			$tmp->{場所} = $area_name[$tmp->{id}];
+			$ret->{next} = $tmp;
+			last;
+		}
 	}
 
-	$rarea = @town_name - 1;
-	if($karea < (@town_name - 1)) {
+	my $rarea = @town_name - 1;
+
+	if($karea < (@town_name - 1))
+	{
 		$rarea = $karea + 1;
-	} else {
+	}
+	else
+	{
 		$rarea = 0;
 	}
 
-	@log_town = &load_ini($town_info);
-
-	foreach(@log_town){
-		($r_no,$r_info,$r_shop,$r_inn) = split(/<>/);
-		if($rarea eq "$r_no"){ last; }
+	foreach(@log_town)
+	{
+		my ($r_no,$r_info,$r_shop,$r_inn) = split(/<>/);
+		if($rarea eq "$r_no")
+		{
+			my $tmp = {};
+			$tmp->{id} = $r_no * 1;
+			$tmp->{info} = $r_info;
+			$tmp->{shop} = $r_shop;
+			$tmp->{inn} = $r_inn;
+			if ($kspot == 3)
+			{
+				$tmp->{距離} = $ret->{move}->[$tmp->{id}]->[3] + $kpst;
+			}
+			else
+			{
+				$tmp->{距離} = $ret->{move}->[$tmp->{id}]->[3] - $kpst;
+			}
+			$tmp->{地名} = $town_name[$tmp->{id}];
+			$tmp->{場所} = $area_name[$tmp->{id}];
+			$ret->{previous} = $tmp;
+			last;
+		}
 	}
+
+	delete $ret->{move};
+
+	return $ret;
 }
 
 #------------------#

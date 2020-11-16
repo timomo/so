@@ -43,7 +43,7 @@ sub log_in
 	my @select_menu = ();
 	$next_ex = $lv_up;
 
-	&town_load;
+	my $town = &town_load;
 
 	my @message = ();
 
@@ -131,36 +131,65 @@ sub log_in
 
 	my ( $label, $optionHTML ) = ( "", "" );
 	my @options;
-
-	if( $kspot == 0 && $kpst == 0 )
+	my $spot1 = $town_move[$karea][2];
+	if ($kspot == 2)
 	{
-		$label = "【$town_name[$karea]周辺】";
-		push( @options, [ 0, sprintf( "%s郊外を探索する", $town_name[$karea] ) ] );
+		$spot1 += $kpst;
 	}
-	elsif( $kspot == 0 && $kpst == 1 )
+	elsif ($kspot == 3)
 	{
-		$label = "【行動】";
-		push( @options, [ 0, "探索する" ] );
+		$spot1 -= $kpst;
 	}
 	else
 	{
-		$label = "【行動】";
-		push( @options, [ 0, "先へ進む" ] );
+		$spot1 -= $kpst;
 	}
+	my $spot2 = $town_move[$karea][3];
+	if ($kspot == 3)
+	{
+		$spot2 += $kpst;
+	}
+	elsif ($kspot == 2)
+	{
+		$spot2 -= $kpst;
+	}
+	else
+	{
+		$spot2 -= $kpst;
+	}
+	my $spot3 = $town_move[$karea][1];
+	if ($kspot == 3)
+	{
+		$spot3 -= $kpst;
+	}
+	elsif ($kspot == 2)
+	{
+		$spot3 += $kpst;
+	}
+	else
+	{
+		$spot3 += $kpst;
+	}
+
+
+	$label = "【$town_name[$karea]周辺】";
+	push( @options, [ "explore", sprintf( "%s郊外を探索する", $town_name[$karea] ) ] );
+	push( @options, [ "field", sprintf( "%sへ向かう(距離 %s)", $town->{current}->{場所}, $spot3 ) ] );
+	push( @options, [ "next", sprintf( "%s方面へ(距離 %s)", $town->{next}->{地名}, $spot1 ) ] );
+	push( @options, [ "previous", sprintf( "%s方面へ(距離 %s)", $town->{previous}->{地名}, $spot2 ) ] );
+
+	$label = "【行動】";
+	push( @options, [ "explore", "探索する" ] );
+
+	$label = "【行動】";
+	push( @options, [ "forward", "先へ進む" ] );
+	push( @options, [ "town", sprintf( "%sへ帰還する", $town_name[$karea] ) ] );
 
 	push(@select_menu, qq|<p class="answer-menu">|. $label. qq|</p>|);
+	push( @options, [ "backward", "引き返す" ] );
 
-	if( $kspot == 0 && $kpst == 0 ){
-		push( @options, [ 1, sprintf( "%sへ向かう", $area_name[$karea] ) ] );
-		push( @options, [ 3, sprintf( "%s方面へ(距離 %s)", $town_name[$rarea], $town_move[$karea][3] ) ] );
-		push( @options, [ 2, sprintf( "%s方面へ(距離 %s)", $town_name[$farea], $town_move[$karea][2] ) ] );
-	} elsif( $kspot == 0 && $kpst == 1 ){
-		push( @options, [ 1, sprintf( "%sへ帰還する", $town_name[$karea] ) ] );
-	} else {
-		push( @options, [ 1, "引き返す" ] );
-	}
-
-	for (@options) {
+	for (@options)
+	{
 		push(@select_menu, sprintf('<p id="mode_monster-select_%s" class="select-menu">%s</p>', @$_));
 		$optionHTML .= sprintf( "<option value=\"%s\">%s</option>\n", @$_);
 	}

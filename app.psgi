@@ -391,11 +391,17 @@ app->helper(
         }
         elsif($k->{スポット} == 2  && $k->{距離} > 0)
         {
-            # $spot = "$town_name[$farea]まで残り $kpst";
+            my $farea = $k->{エリア} - 1;
+            my $rest = $self->config->{タウン間距離}->[$farea]->[3];
+            $rest -= $k->{距離};
+            $spot = sprintf("%s まで残り %s", $self->config->{街}->[$farea], $rest);
         }
         elsif($k->{スポット} == 3  && $k->{距離} > 0)
         {
-            # $spot = "$town_name[$rarea]まで残り $kpst";
+            my $rarea = $k->{エリア} + 1;
+            my $rest = $self->config->{タウン間距離}->[$rarea]->[2];
+            $rest -= $k->{距離};
+            $spot = sprintf("%s まで残り %s", $self->config->{街}->[$rarea], $rest);
         }
         else
         {
