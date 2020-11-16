@@ -17,7 +17,7 @@ sub move
 	if ($direction eq "explore") # 郊外探索
 	{
 		$kspot = 0;
-		$kpst = 1;
+		$kpst = 0;
 	}
 	elsif ($direction eq "town") # 街へ戻る
 	{
@@ -45,22 +45,21 @@ sub move
 		if ($town->{current}->{距離} == 0)
 		{
 			$karea = $town->{current}->{id};
-			$kspot = 4;
+			$kspot = 0;
 			$kpst = 0;
 		}
 		elsif ($town->{next}->{距離} == 0)
 		{
 			$karea = $town->{next}->{id};
-			$kspot = 4;
+			$kspot = 0;
 			$kpst = 0;
 		}
 		elsif ($town->{previous}->{距離} == 0)
 		{
 			$karea = $town->{previous}->{id};
-			$kspot = 4;
+			$kspot = 0;
 			$kpst = 0;
 		}
-		warn Dump($town);
 	}
 	elsif ($direction eq "backward") # 引き返す
 	{
@@ -68,19 +67,19 @@ sub move
 		if ($town->{current}->{距離} == 0)
 		{
 			$karea = $town->{current}->{id};
-			$kspot = 4;
+			$kspot = 0;
 			$kpst = 0;
 		}
 		elsif ($town->{next}->{距離} == 0)
 		{
 			$karea = $town->{next}->{id};
-			$kspot = 4;
+			$kspot = 0;
 			$kpst = 0;
 		}
 		elsif ($town->{previous}->{距離} == 0)
 		{
 			$karea = $town->{previous}->{id};
-			$kspot = 4;
+			$kspot = 0;
 			$kpst = 0;
 		}
 	}
