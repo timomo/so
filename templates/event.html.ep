@@ -12,6 +12,10 @@
 	</div>
 </div>
 <script>
+jQuery(".select-command").bind("mouseenter", (event) => {
+    jQuery(".select-command").removeClass("blink-before");
+    jQuery(event.target).addClass("blink-before");
+});
 jQuery(".select-command").bind("click", (event) => {
     const query = {};
     query["選択"] = jQuery(event.target).text();

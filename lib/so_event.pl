@@ -100,10 +100,7 @@ sub _event_encounter
 		{
 			$row->{選択肢} = [ $row->{選択肢} ];
 		}
-	}
 
-	if (defined $row)
-	{
 		my $html = $controller->render_to_string(
 			template      => "event",
 			event        => $row,
