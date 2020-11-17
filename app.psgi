@@ -233,6 +233,20 @@ get "/current" => sub
     return $self->render(text => $utf8 || "", format => 'html');
 };
 
+post "/event/:id" => sub
+{
+    my $self = shift;
+    my $k = $self->current_user;
+
+    return $self->reply->not_found unless ($k);
+
+    my $param = $self->req->body_params->to_hash || {};
+    my $json = $self->req->json || {};
+    my $utf8 = $self->backend_request($self->req->method, $self->req->url->path->to_string, { %$param, %$json, id => $k->{id} });
+
+    return $self->render(json => $utf8);
+};
+
 post "/command" => sub
 {
     my $self = shift;

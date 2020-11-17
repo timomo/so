@@ -66,6 +66,8 @@ sub dbi
         $dbi->create_model("マスタデータ_アイテム");
         $dbi->create_model("銀行データ");
         $dbi->create_model("銀行貸し金庫");
+        $dbi->create_model("アイテムスポーンデータ");
+        $dbi->create_model("イベント");
 
         $self->dbis->{$type} = $dbi;
 
@@ -310,7 +312,7 @@ sub modify_append_data
     my $self = shift;
     my $new = shift;
     my $keys = $self->context->config->{keys2};
-    my $regex = qr/(?:エリア|スポット|距離|最終実行時間)/;
+    my $regex = qr/(?:エリア|スポット|距離|最終実行時間|階数)/;
 
     for my $key (@$keys)
     {

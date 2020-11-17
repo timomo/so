@@ -52,6 +52,7 @@ CREATE TABLE キャラ追加情報1 (
         エリア INTEGER NOT NULL,
         スポット INTEGER NOT NULL,
         距離 INTEGER NOT NULL,
+        階数 INTEGER NOT NULL DEFAULT 1,
         最終実行時間 INTEGER,
         ctime DATETIME,
 	    mtime DATETIME
@@ -271,6 +272,37 @@ CREATE TABLE 銀行データ (
         送金額 INTEGER NOT NULL,
         預かりアイテム数 INTEGER NOT NULL,
         預かりメッセージ TEXT NOT NULL,
+        ctime DATETIME,
+	    mtime DATETIME
+ );
+
+
+DROP TABLE IF EXISTS アイテムスポーンデータ;
+
+CREATE TABLE アイテムスポーンデータ (
+        id INTEGER PRIMARY KEY,
+        アイテム種別 INTEGER NOT NULL,
+        エリア INTEGER NOT NULL,
+        スポット INTEGER NOT NULL,
+        距離 INTEGER NOT NULL,
+        階数 INTEGER NOT NULL DEFAULT 1,
+        取得者 TEXT,
+        ctime DATETIME,
+	    mtime DATETIME
+ );
+
+DROP TABLE IF EXISTS イベント;
+
+CREATE TABLE イベント (
+        id INTEGER PRIMARY KEY,
+        イベント種別 INTEGER NOT NULL,
+        キャラid TEXT NOT NULL,
+        メッセージ TEXT,
+        選択肢 TEXT,
+        選択 TEXT,
+        正解 TEXT,
+        イベント開始時刻 INTEGER,
+        イベント処理済時刻 INTEGER,
         ctime DATETIME,
 	    mtime DATETIME
  );

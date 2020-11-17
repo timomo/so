@@ -1,0 +1,22 @@
+<div class="blackboard question">
+<p>
+%== $event->{メッセージ}
+</p>
+</div>
+<div class="clearfix">
+	<div class="blackboard answer float-l">
+
+	% for my $command (@{ $event->{選択肢} }) {
+        <p class="select-command"><%== $command %></p>
+    % }
+	</div>
+</div>
+<script>
+jQuery(".select-command").bind("click", (event) => {
+    const query = {};
+    query["選択"] = jQuery(event.target).text();
+    jQuery.post("/event/<%= $event->{id} %>", query, (data) => {
+        jQuery("#stage").html(data);
+    });
+});
+</script>

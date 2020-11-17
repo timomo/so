@@ -141,6 +141,7 @@ elsif($mode eq 'log_in')
 	&log_in;
 	# &log_in_frame;
 }
+elsif($mode eq 'event') { &event_choice; &event_encounter; &log_in; }
 elsif($mode eq 'chara_make') { &chara_make; }
 elsif($mode eq 'make_end') { &make_end; }
 elsif($mode eq 'regist') { &regist; }

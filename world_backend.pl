@@ -76,6 +76,22 @@ $system->open;
 
 app->log->level(app->config->{log_level});
 
+post "/event/:id" => sub
+{
+    my $self = shift;
+    my $param = $self->req->body_params->to_hash || {};
+    my $json = $self->req->json || {};
+    my $event_id = int($self->param("id"));
+    my $k = $system->load_chara($json->{id});
+    my $env = $self->tx->req->env || {};
+    my $url = Mojo::URL->new;
+    $url->query({ %$param, %$json, id => $k->{id}, pass => $k->{パスワード}, イベントid => $event_id, mode => "event" });
+    $env->{QUERY_STRING} = $url->to_string;
+    $env->{QUERY_STRING} =~ s/^\?//;
+    my $utf8 = $self->emulate_cgi($env);
+    return $self->render(text => $utf8, format => "html");
+};
+
 post "/instant" => sub
 {
     my $self = shift;
@@ -510,7 +526,8 @@ app->helper(
                     $k->{エリア},
                     $k->{スポット},
                     $k->{距離},
-                    time
+                    time,
+                    $k->{階数},
                 );
                 $system->save_append($append);
             }
@@ -603,6 +620,21 @@ app->helper(
         my $skill2 = $self->config->{スキル}->[$self->range_rand(0, 21)];
 
 
+    },
+);
+
+app->helper(
+    spawn_item => sub
+    {
+        my $self = shift;
+        my $dat = {
+            アイテム種別 => 1,
+            エリア    => 0,
+            スポット   => 0,
+            距離     => 0,
+            階数     => 1,
+        };
+        $self->dbi("main")->model("アイテムスポーンデータ")->insert($dat, ctime => "ctime");
     },
 );
 
@@ -814,6 +846,7 @@ app->helper(
         }
 
         $self->spawn;
+        $self->spawn_item;
 
         my $min = 9999;
 

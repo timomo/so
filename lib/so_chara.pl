@@ -224,6 +224,15 @@ sub chara_load
 		) = @$k{@{$config->{keys}}};
 	}
 
+	my $append = $system->load_append($id);
+
+	warn Dump($append);
+
+	$karea = $append->{エリア};
+	$kspot = $append->{スポット};
+	$kpst = $append->{距離};
+	$kstage = $append->{階数};
+
 	return $k;
 }
 

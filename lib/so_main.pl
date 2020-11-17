@@ -118,6 +118,7 @@ sub log_in
 	}
 	if ($k->{スポット} == 4 && $k->{距離} == 0)
 	{
+		# push( @options, [ "dungeon", sprintf( "地下に降りる", $data->{current}->{場所} ) ] );
 		push( @options, [ "explore", sprintf( "%s郊外を探索する", $data->{current}->{地名} ) ] );
 		push( @options, [ "field", sprintf( "%sへ向かう(距離 %s)", $data->{current}->{場所}, $data->{current}->{距離} ) ] );
 		push( @options, [ "next", sprintf( "%s方面へ(距離 %s)", $data->{next}->{地名}, $data->{next}->{距離} ) ] );
@@ -146,28 +147,6 @@ sub log_in
 	}
 
 	my @rid;
-
-	if($kspot == 0 && $kpst == 0)
-	{
-		$rid = $kid;
-		&read_battle;
-		$rank = $krank;
-		$todd=0;
-
-		foreach(@log_in)
-		{
-			my ($tid, $tpass, $tname, $tsex, $tchara, $tn_0, $tn_1, $tn_2, $tn_3, $tn_4, $tn_5, $tn_6, $thp, $tmaxhp, $tex, $tlv, $tap, $tgold, $tlp, $ttotal, $tkati, $thost, $tdate, $tarea, $tspot, $tpst, $titem) = split(/<>/);
-			if($kid eq $tid)
-			{
-				next;
-			}
-			$rid = $tid;
-			&read_battle;
-			if($rank >= $krank){
-				push(@rid, "<option value=$tid>$tname Lv$tlv（$sdrank[$krank]）</option>");
-			}
-		}
-	}
 
 	my $html = $controller->render_to_string(
 		template      => "log_in",

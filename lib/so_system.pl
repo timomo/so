@@ -3,7 +3,7 @@ use utf8;
 sub save_dat_append_1p
 {
 	my $param = {};
-	@$param{@{$config->{keys2}}} = ($k1id, $mode, $k1area, $k1spot, $k1pst, time);
+	@$param{@{$config->{keys2}}} = ($k1id, $mode, $k1area, $k1spot, $k1pst, time, 1);
 	$system->modify_append_data($param);
 	$system->save_append($param);
 }
@@ -11,7 +11,7 @@ sub save_dat_append_1p
 sub save_dat_append_2p
 {
 	my $param = {};
-	@$param{@{$config->{keys2}}} = ($k2id, $mode, $k2area, $k2spot, $k2pst, time);
+	@$param{@{$config->{keys2}}} = ($k2id, $mode, $k2area, $k2spot, $k2pst, time, 1);
 	$system->modify_append_data($param);
 	$system->save_append($param);
 }
@@ -19,7 +19,7 @@ sub save_dat_append_2p
 sub save_dat_append
 {
 	my $param = {};
-	@$param{@{$config->{keys2}}} = ($kid, $mode, $karea, $kspot, $kpst, time);
+	@$param{@{$config->{keys2}}} = ($kid, $mode, $karea, $kspot, $kpst, time, $kstage);
 	$system->modify_append_data($param);
 	$system->save_append($param);
 }
@@ -242,7 +242,7 @@ sub initialize
 	our $kn_0 = undef; our $kn_1 = undef; our $kn_2 = undef; our $kn_3 = undef; our $kn_4 = undef; our $kn_5 = undef; our $kn_6 = undef;
 	our $khp = undef; our $kmaxhp = undef; our $kex = undef; our $klv = undef; our $kap = undef;our $kgold = undef; our $klp = undef;
 	our $ktotal = undef; our $kkati = undef; our $host = undef; our $date = undef;
-	our $karea = undef; our $kspot = undef; our $kpst = undef;
+	our $karea = undef; our $kspot = undef; our $kpst = undef; our $kstage = undef;
 	our $kitem = undef;
 	our @kbuff = undef;
 

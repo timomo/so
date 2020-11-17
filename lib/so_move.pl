@@ -14,26 +14,39 @@ sub move
 	{
 		$kspot = 0;
 		$kpst = 0;
+
+		# イベント
+		&event_check_down_stair;
+		# &event_check_treasure;
+		&event_encounter;
+
 	}
 	elsif ($direction eq "town") # 街へ戻る
 	{
 		$kspot = 4;
 		$kpst = 0;
+		$kstage = 1;
 	}
 	elsif ($direction eq "field") # フィールド探索
 	{
 		$kspot = 1;
 		$kpst = 0;
+
+		# イベント
+		&event_check_treasure;
+		&event_encounter;
 	}
 	elsif ($direction eq "next") # 次の街へ
 	{
 		$kspot = 2;
 		$kpst = 0;
+		$kstage = 1;
 	}
 	elsif ($direction eq "previous") # 前の街へ
 	{
 		$kspot = 3;
 		$kpst = 0;
+		$kstage = 1;
 	}
 	elsif ($direction eq "forward") # 先へ進む
 	{
@@ -56,6 +69,10 @@ sub move
 			$kspot = 0;
 			$kpst = 0;
 		}
+
+		# イベント
+		&event_check_treasure;
+		&event_encounter;
 	}
 	elsif ($direction eq "backward") # 引き返す
 	{
@@ -78,14 +95,20 @@ sub move
 			$kspot = 0;
 			$kpst = 0;
 		}
-		warn Dump($town);
+		# イベント
+		&event_check_treasure;
+		&event_encounter;
 	}
 
 	&regist;
 	&save_dat_append;
-	&log_in;
 
-	exit;
+	my $rand = $system->range_rand(0, 100);
+
+	if ($rand < 90)
+	{
+		&log_in;
+	}
 }
 
 sub _move {
