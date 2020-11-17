@@ -10,10 +10,6 @@ sub move
 	my $direction = $in{direction};
 	my $town = &town_load;
 
-	# warn Dump($town);
-
-	# 場所: 0...街の中、1...郊外、2...フィールド、3...次の街へ、4...前の街へ
-
 	if ($direction eq "explore") # 郊外探索
 	{
 		$kspot = 0;

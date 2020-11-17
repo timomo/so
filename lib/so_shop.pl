@@ -6,7 +6,7 @@ sub item_shop
 {
 	my @shop_array = &load_ini($town_shop[$in{'area'}]);
 
-	if($kspot != 0 || $kpst != 0) { &error("不正なパラメータです"); }
+	unless($kspot == 4 && $kpst == 0) { &error("不正なパラメータです。"); }
 
 	#割引率の設定
 	my $cut = 1 - $kn_6 / 200;
@@ -171,7 +171,7 @@ sub user_shop
 	my @item_array = &load_ini($user_shop[$in{'area'}]);
 	my @item_chara = &load_ini($chara_file);
 
-	if($kspot != 0 || $kpst != 0) { &error("不正なパラメータです"); }
+	unless($kspot == 4 && $kpst == 0) { &error("不正なパラメータです。"); }
 
 	&town_load;
 
@@ -284,6 +284,8 @@ sub user_shop
 #------------#
 sub bank
 {
+	unless($kspot == 4 && $kpst == 0) { &error("不正なパラメータです。"); }
+
 	my $rows = $system->load_bank_storage($kid);
 	my @bank_item = @$rows;
 	our $rid = $kid;
@@ -390,7 +392,7 @@ sub bank
 #----------------#
 sub item_buy
 {
-	if($kspot != 0 || $kpst != 0) { &error("不正なパラメータです"); }
+	unless($kspot == 4 && $kpst == 0) { &error("不正なパラメータです。"); }
 	if ($in{item_no} eq "")
 	{
 		$error = "アイテムを選んでください。";
@@ -480,7 +482,7 @@ sub user_buy
 		$error = "アイテムを選んでください。";
 		&user_shop;
 	}
-	if($kspot != 0 || $kpst != 0) { &error("不正なパラメータです"); }
+	unless($kspot == 4 && $kpst == 0) { &error("不正なパラメータです。"); }
 
 	my $exhibits = $system->load_exhibit_db($karea);
 	my $item_no_id = $in{'item_no'};
@@ -594,7 +596,7 @@ sub user_buy
 #----------------#
 sub bank_out
 {
-	if($kspot != 0 || $kpst != 0) { &error("不正なパラメータです"); }
+	unless($kspot == 4 && $kpst == 0) { &error("不正なパラメータです。"); }
 
 	my $rows = $system->load_bank_storage($kid);
 	my $item_id = int($in{item_no});

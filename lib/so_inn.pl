@@ -6,7 +6,7 @@ sub yado
 {
 	my @inn_array = &load_ini($town_inn[$in{'area'}]);
 
-	if($kspot != 0 || $kpst != 0) { &error("不正なパラメータです。"); }
+	unless($kspot == 4 && $kpst == 0) { &error("不正なパラメータです。"); }
 
 	#割引率の設定
 	my $cut = 1 - $kn_6 / 200;
@@ -82,10 +82,7 @@ sub yado_in
 		&yado;
 	}
 
-	if($kspot != 0 || $kpst != 0) {
-		$mode = "yado";
-		&error("不正なパラメータです。");
-	}
+	unless($kspot == 4 && $kpst == 0) { $mode = "yado"; &error("不正なパラメータです。"); }
 
 	my @inn_array = &load_ini($town_inn[$in{'area'}]);
 	my $yado_gold;

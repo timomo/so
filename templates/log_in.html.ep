@@ -1,7 +1,7 @@
 %== include "window/description"
 <b><span color="#FF9933"><%= $error_string %></span></b>
 
-% if($kspot == 0 && $kpst == 0) {
+% if($kspot == 4 && $kpst == 0) {
     %= include "window/facilities"
 % } else {
     %= include "window/camp"

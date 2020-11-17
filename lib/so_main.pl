@@ -94,7 +94,6 @@ sub log_in
 
 	if($kspot == 4 && $kpst == 0)
 	{
-		warn Dump($data);
 		push(@select_menu, sprintf('<p class="answer-menu">【%sの施設】</p>', $data->{current}->{地名}));
 		push(@select_menu, sprintf('<p id="mode_town-select_%s" class="select-menu">%s</p>', "yado", "宿屋：".$data->{current}->{inn}));
 		push(@select_menu, sprintf('<p id="mode_town-select_%s" class="select-menu">%s</p>', "item_shop", "ショップ：".$data->{current}->{shop}));
