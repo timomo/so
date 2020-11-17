@@ -65,10 +65,9 @@ sub event_random_text
 
 sub event_empty_check
 {
-	my $where = $system->dbi("main")->where;
-	$where->clause(["and", "イベント処理済時刻 IS NULL", "キャラid = :キャラid"]);
-	$where->param({ キャラid => $kid });
-	my $result = $system->dbi("main")->model("イベント")->select(["*"], where => $where);
+	# TODO: なぜかIS NULLとキャラidの組み合わせがうまくいかず。。。
+	my $where = "イベント処理済時刻 IS NULL AND キャラid = :キャラid";
+	my $result = $system->dbi("main")->model("イベント")->select(["*"], where => [$where, { キャラid => $kid }]);
 	my $row = $result->fetch_hash_one;
 
 	if (! defined $row)
