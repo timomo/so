@@ -92,13 +92,14 @@ sub log_in
 
 	$error = "";
 
-	if($kspot == 0 && $kpst == 0)
+	if($kspot == 4 && $kpst == 0)
 	{
-		push(@select_menu, sprintf('<p class="answer-menu">【%sの施設】</p>', $town_name[$karea]));
-		push(@select_menu, sprintf('<p id="mode_town-select_%s" class="select-menu">%s</p>', "yado", "宿屋：".$t_inn));
-		push(@select_menu, sprintf('<p id="mode_town-select_%s" class="select-menu">%s</p>', "item_shop", "ショップ：".$t_inn));
-		push(@select_menu, sprintf('<p id="mode_town-select_%s" class="select-menu">%s</p>', "user_shop", "市場：チュパフリマ：". $town_name[$karea]));
-		push(@select_menu, sprintf('<p id="mode_town-select_%s" class="select-menu">%s</p>', "bank", "銀行：シマダ国営銀行（". $town_name[$karea]. "店）"));
+		warn Dump($data);
+		push(@select_menu, sprintf('<p class="answer-menu">【%sの施設】</p>', $data->{current}->{地名}));
+		push(@select_menu, sprintf('<p id="mode_town-select_%s" class="select-menu">%s</p>', "yado", "宿屋：".$data->{current}->{inn}));
+		push(@select_menu, sprintf('<p id="mode_town-select_%s" class="select-menu">%s</p>', "item_shop", "ショップ：".$data->{current}->{shop}));
+		push(@select_menu, sprintf('<p id="mode_town-select_%s" class="select-menu">%s</p>', "user_shop", "市場：チュパフリマ：". $data->{current}->{地名}));
+		push(@select_menu, sprintf('<p id="mode_town-select_%s" class="select-menu">%s</p>', "bank", "銀行：シマダ国営銀行（". $data->{current}->{地名}. "店）"));
 	}
 	else
 	{
@@ -111,20 +112,33 @@ sub log_in
 	my @options;
 
 	$label = sprintf("【%s周辺】", $data->{current}->{地名});
-	push( @options, [ "explore", sprintf( "%s郊外を探索する", $data->{current}->{地名} ) ] );
-	push( @options, [ "field", sprintf( "%sへ向かう(距離 %s)", $data->{current}->{場所}, $data->{current}->{距離} ) ] );
-	push( @options, [ "next", sprintf( "%s方面へ(距離 %s)", $data->{next}->{地名}, $data->{next}->{距離} ) ] );
-	push( @options, [ "previous", sprintf( "%s方面へ(距離 %s)", $data->{previous}->{地名}, $data->{previous}->{距離} ) ] );
 
-	$label = "【行動】";
-	push( @options, [ "explore", "探索する" ] );
+	if ($k->{スポット} == 0 && $k->{距離} == 0)
+	{
+		push( @options, [ "explore", sprintf( "%s郊外を探索する", $data->{current}->{地名} ) ] );
+	}
+	if ($k->{スポット} == 4 && $k->{距離} == 0)
+	{
+		push( @options, [ "explore", sprintf( "%s郊外を探索する", $data->{current}->{地名} ) ] );
+		push( @options, [ "field", sprintf( "%sへ向かう(距離 %s)", $data->{current}->{場所}, $data->{current}->{距離} ) ] );
+		push( @options, [ "next", sprintf( "%s方面へ(距離 %s)", $data->{next}->{地名}, $data->{next}->{距離} ) ] );
+		push( @options, [ "previous", sprintf( "%s方面へ(距離 %s)", $data->{previous}->{地名}, $data->{previous}->{距離} ) ] );
+	}
 
 	$label = "【行動】";
 	push( @options, [ "forward", "先へ進む" ] );
-	push( @options, [ "town", sprintf( "%sへ帰還する", $data->{current}->{地名} ) ] );
+
+	if ($k->{距離} == 0)
+	{
+		push( @options, [ "town", sprintf( "%sへ帰還する", $data->{current}->{地名} ) ] );
+	}
 
 	push(@select_menu, qq|<p class="answer-menu">|. $label. qq|</p>|);
-	push( @options, [ "backward", "引き返す" ] );
+
+	if ($k->{距離} != 0)
+	{
+		push( @options, [ "backward", "引き返す" ] );
+	}
 
 	for (@options)
 	{

@@ -82,6 +82,7 @@ sub move
 			$kspot = 0;
 			$kpst = 0;
 		}
+		warn Dump($town);
 	}
 
 	&regist;

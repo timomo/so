@@ -62,6 +62,7 @@ sub load
             $tmp->{cost} = $t_cost * 1;
             $tmp->{price} = $t_prize * 1;
             $tmp->{drop} = $t_drop;
+            $tmp->{総距離} = $ret->{move}->[$k->{エリア}]->[3];
             $tmp->{距離} = $ret->{move}->[$k->{エリア}]->[3];
 
             if ($k->{スポット} == 1)
@@ -101,6 +102,7 @@ sub load
             $tmp->{info} = $f_info;
             $tmp->{shop} = $f_shop;
             $tmp->{inn} = $f_inn;
+            $tmp->{総距離} = $ret->{move}->[$k->{エリア}]->[2];
             $tmp->{距離} = $ret->{move}->[$k->{エリア}]->[2];
 
             if ($k->{スポット} == 2)
@@ -139,6 +141,7 @@ sub load
             $tmp->{info} = $r_info;
             $tmp->{shop} = $r_shop;
             $tmp->{inn} = $r_inn;
+            $tmp->{総距離} = $ret->{move}->[$k->{エリア}]->[1];
             $tmp->{距離} = $ret->{move}->[$k->{エリア}]->[1];
 
             if ($k->{スポット} == 3)
