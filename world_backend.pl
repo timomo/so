@@ -627,6 +627,20 @@ app->helper(
     spawn_item => sub
     {
         my $self = shift;
+        {
+            my $result = $system->dbi("main")->model("アイテムスポーンデータ")->select(["*"]);
+            my $rows = $result->fetch_hash_all;
+            my $cnt = 0;
+
+            for my $row (@$rows)
+            {
+                $cnt++;
+                if ($cnt >= 10)
+                {
+                    $system->dbi("main")->model("アイテムスポーンデータ")->delete(where => { id => $row->{id} });
+                }
+            }
+        }
         my $dat = {
             アイテム種別 => 1,
             エリア    => 0,

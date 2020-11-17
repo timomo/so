@@ -5,13 +5,6 @@ use utf8;
 
 sub event_check_down_stair
 {
-	my $rand = $system->range_rand(0, 100);
-
-	if ($rand > 50)
-	{
-		return;
-	}
-
 	my $mes = "下り階段を発見した！<br />降りますか？";
 	my $dat = {};
 	$dat->{キャラid} = $kid;
@@ -53,7 +46,44 @@ sub event_check_treasure
 	}
 }
 
+sub event_random_text
+{
+	my $path = File::Spec->catfile($FindBin::Bin, "master", "town", "msg_ikeshima.mst");
+	my $rows = $system->load_raw_ini($path);
+	my $rand2 = $system->range_rand(0, $#$rows);
+	my $mes = $rows->[$rand2]->[2];
+	my $dat = {};
+	$dat->{キャラid} = $kid;
+	$dat->{メッセージ} = $mes;
+	my $choice = ["はい"];
+	$dat->{選択肢} = $choice;
+	$dat->{イベント開始時刻} = time;
+	$dat->{イベント種別} = 0; # メッセージのみ
+	$dat->{正解} = "";
+	&event_db_insert($dat);
+}
+
 sub event_encounter
+{
+	my $rand1 = $system->range_rand(0, 100);
+
+	if ($rand1 >= 0 && $rand1 < 10)
+	{
+		&event_check_down_stair;
+	}
+	elsif ($rand1 > 10 && $rand1 < 60)
+	{
+		&event_check_treasure;
+	}
+	elsif ($rand1 > 60 && $rand1 < 90)
+	{
+		&event_random_text;
+	}
+
+	&_event_encounter;
+}
+
+sub _event_encounter
 {
 	my $where = $system->dbi("main")->where;
 	$where->clause("イベント処理済時刻 IS NULL AND キャラid = :キャラid");

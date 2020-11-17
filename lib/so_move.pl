@@ -16,10 +16,7 @@ sub move
 		$kpst = 0;
 
 		# イベント
-		&event_check_down_stair;
-		# &event_check_treasure;
 		&event_encounter;
-
 	}
 	elsif ($direction eq "town") # 街へ戻る
 	{
@@ -33,7 +30,6 @@ sub move
 		$kpst = 0;
 
 		# イベント
-		&event_check_treasure;
 		&event_encounter;
 	}
 	elsif ($direction eq "next") # 次の街へ
@@ -71,7 +67,6 @@ sub move
 		}
 
 		# イベント
-		&event_check_treasure;
 		&event_encounter;
 	}
 	elsif ($direction eq "backward") # 引き返す
@@ -96,7 +91,6 @@ sub move
 			$kpst = 0;
 		}
 		# イベント
-		&event_check_treasure;
 		&event_encounter;
 	}
 
