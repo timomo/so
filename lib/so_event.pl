@@ -63,8 +63,28 @@ sub event_random_text
 	&event_db_insert($dat);
 }
 
+sub event_empty_check
+{
+	my $where = $system->dbi("main")->where;
+	$where->clause(["and", "イベント処理済時刻 IS NULL", "キャラid = :キャラid"]);
+	$where->param({ キャラid => $kid });
+	my $result = $system->dbi("main")->model("イベント")->select(["*"], where => $where);
+	my $row = $result->fetch_hash_one;
+
+	if (! defined $row)
+	{
+		return 0;
+	}
+	return 1;
+}
+
 sub event_encounter
 {
+	if (&event_empty_check == 1)
+	{
+		return;
+	}
+
 	my $rand1 = $system->range_rand(0, 100);
 
 	if ($rand1 >= 0 && $rand1 < 10)

@@ -11,5 +11,6 @@ master_sound = [
     {"id":2,"ファイル名":"NES-RPG-B10-2(Dungeon2-Loop170).mp3","名称":"dungeon1","ユニークid":"2","サウンド種別":"1"},
     {"id":3,"ファイル名":"GB-RPG-A12-2(Battle1-Loop157).mp3","名称":"battle1","ユニークid":"3","サウンド種別":"1"},
     {"id":4,"ファイル名":"GB-RPG-A13-2(Battle2-Loop157).mp3","名称":"battle2","ユニークid":"4","サウンド種別":"1"},
+    {"id":5,"ファイル名":"se_maoudamashii_retro13.mp3","名称":"FF5","ユニークid":"5","サウンド種別":"1"},
 ];
 </script>
