@@ -1,5 +1,6 @@
 package SO::Event::Base;
 
+# push @ISA, 'Mojo::Base';
 use Mojo::Base -base;
 use Data::Dumper;
 use Mojo::Collection;
@@ -11,19 +12,37 @@ use YAML::XS;
 use Encode;
 use DateTime::HiRes;
 use SO::System;
+# use UNIVERSAL::require;
 
 has data => sub {{}};
 has watch_hook => sub {{}};
 has context => undef;
 has k1id => undef;
 has k2id => undef;
-has id => undef;
 has log_level => undef;
-has system => undef;
-has event_id => undef;
+has system => sub{ SO::System->new };
 has event => sub { {} };
 has hooks => sub { {} };
 has answer => undef;
+has is_continue => 1;
+
+has id => undef; # id
+has event_type => undef; # イベント種別
+has chara_id => undef; # キャラid
+has message => undef; # メッセージ
+has choices => sub { [] }; # 選択肢
+has choice => undef; # 選択
+has correct_answer => undef; # 正解
+has event_start_time => undef; # イベント開始時刻
+has event_end_time => undef; # イベント処理済時刻
+has continue_id => 0; # イベント継続id
+
+sub import
+{
+    my $self = shift;
+    my $class = shift;
+    return $class;
+}
 
 sub close
 {
@@ -45,11 +64,11 @@ sub open
     $self->event({});
     $self->answer(undef);
 
-    if (defined $self->event_id)
+    if (defined $self->id)
     {
         my $where = $self->system->dbi("main")->where;
         $where->clause("キャラid = :キャラid and id = :イベントid");
-        $where->param({ キャラid => $self->id, イベントid => $self->event_id });
+        $where->param({ キャラid => $self->id, イベントid => $self->id });
         my $result = $self->system->dbi("main")->model("イベント")->select(["*"], where => $where);
         my $row = $result->fetch_hash_one;
         $self->event($row);
@@ -69,7 +88,8 @@ sub hook
 sub render_to_string
 {
     my $self = shift;
-    my $row = $self->answer;
+    my $row = $self->generate;
+    $row->{id} = $self->id;
 
     if (defined $row)
     {
@@ -101,19 +121,14 @@ sub encount
     $self->hook("encount", $args);
 }
 
-sub choice
+sub select
 {
     my $self = shift;
     my $choice = shift;
-    my $ref = {};
-    $ref->{選択} = $choice;
-    $ref->{イベント処理済時刻} = time;
-    $self->system->dbi("main")->model("イベント")->update($ref, where => {id => $self->event_id}, mtime => "mtime");
-    $self->event->{選択} = $choice;
-
+    $self->choice($choice);
+    # $self->event_end_time(time);
+    $self->save;
     $self->hook("choice", {});
-
-    # warn Dump($self->event);
 }
 
 sub result
@@ -134,14 +149,70 @@ sub insert
         $dat->{$key} = $row->{$key};
     }
 
-    $dat->{選択肢} = YAML::XS::Dump($dat->{選択肢});
-    $dat->{選択肢} = Encode::decode_utf8($dat->{選択肢});
+    if (ref $dat->{選択肢} eq "ARRAY")
+    {
+        $dat->{選択肢} = YAML::XS::Dump($dat->{選択肢});
+        $dat->{選択肢} = Encode::decode_utf8($dat->{選択肢});
+    }
 
     $self->system->dbi("main")->model("イベント")->insert($dat, ctime => "ctime");
+    $self->id($self->system->dbi("main")->dbh->sqlite_last_insert_rowid);
 
-    $self->event_id($self->system->dbi("main")->dbh->sqlite_last_insert_rowid);
+    $row->{id} = $self->id;
+}
 
-    $row->{id} = $self->event_id;
+sub update
+{
+    my $self = shift;
+    my $row = shift;
+    my $dat = {};
+
+    for my $key (keys %$row)
+    {
+        $dat->{$key} = $row->{$key};
+    }
+
+    if (ref $dat->{選択肢} eq "ARRAY")
+    {
+        $dat->{選択肢} = YAML::XS::Dump($dat->{選択肢});
+        $dat->{選択肢} = Encode::decode_utf8($dat->{選択肢});
+    }
+
+    $self->system->dbi("main")->model("イベント")->update($dat, where => {id => $self->id}, mtime => "mtime");
+}
+
+sub generate
+{
+    my $self = shift;
+
+    my $dat = {};
+    $dat->{イベント種別} = $self->event_type;
+    $dat->{キャラid} = $self->chara_id;
+    $dat->{メッセージ} = $self->message;
+    $dat->{選択肢} = $self->choices;
+    $dat->{選択} = $self->choice;
+    $dat->{正解} = $self->correct_answer;
+    $dat->{イベント開始時刻} = $self->event_start_time;
+    $dat->{イベント処理済時刻} = $self->event_end_time;
+    $dat->{イベント継続id} = $self->continue_id;
+
+    return $dat;
+}
+
+sub save
+{
+    my $self = shift;
+
+    my $dat = $self->generate;
+
+    if (defined $self->id)
+    {
+        $self->update($dat);
+    }
+    else
+    {
+        $self->insert($dat);
+    }
 }
 
 sub watch

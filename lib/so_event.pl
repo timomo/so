@@ -1,4 +1,5 @@
 use utf8;
+
 #----------------------#
 #  イベントメッセージ  #
 #----------------------#
@@ -80,30 +81,55 @@ sub event_encounter
 		my $utf8 = $event->render_to_string;
 		$event->close;
 
-		print $utf8;
-
-		exit;
-	}
-}
-
-sub event_choice
-{
-	my $encounter = SO::Event->new(context => $controller, "system" => $system, id => $kid, event_id => $in{イベントid});
-	my $event = $encounter->load;
-
-	if (defined $event)
-	{
-		$event->choice($in{選択});
-		$event->result;
-
-		my $utf8 = $event->render_to_string;
-		$event->close;
-
 		if (defined $utf8)
 		{
 			print $utf8;
 			exit;
 		}
+	}
+}
+
+sub event_choice
+{
+	my $event_id = $in{イベントid};
+	my $select = $in{選択};
+
+	for my $num (0 .. 10)
+	{
+		my $encounter = SO::Event->new(context => $controller, "system" => $system, id => $kid, event_id => $event_id);
+		my $event = $encounter->load;
+		if (! defined $event)
+		{
+			last;
+		}
+		if (defined $select)
+		{
+			$event->select($select);
+			$select = undef;
+			$event->result;
+		}
+		if ($event->continue_id != 0)
+		{
+			$event->event_end_time(time);
+			$event->save;
+			$event_id = $event->continue_id;
+			next;
+		}
+		if (! defined $event->event_end_time)
+		{
+			my $utf8 = $event->render_to_string;
+
+			if (defined $utf8)
+			{
+				print $utf8;
+				$event->event_end_time(time);
+				$event->save;
+				exit;
+			}
+			$event->event_end_time(time);
+			$event->save;
+		}
+		$event_id = $event->continue_id;
 	}
 }
 

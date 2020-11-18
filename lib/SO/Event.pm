@@ -88,17 +88,28 @@ sub encounter
         }
     }
 
+    # $class = "SO::Event::UnknownTreasure";
+
     if (defined $class)
     {
         $class->require or die $@;
-        $event = $class->new(context => $self->context, "system" => $self->system, id => $self->id, event_id => $self->event_id);
+        $event = $class->new(context => $self->context, "system" => $self->system, chara_id => $self->id, id => $self->event_id);
         $event->open;
         $event->bind;
 
         if (defined $self->event)
         {
-            $event->event_id($self->event_id);
-            $event->event($self->event);
+            $event->id($self->event->{id});
+            $event->event_type($self->event->{イベント種別});
+            $event->chara_id($self->event->{キャラid});
+            $event->message($self->event->{メッセージ});
+            $event->choices($self->event->{選択肢});
+            $event->choice($self->event->{選択});
+            $event->correct_answer($self->event->{正解});
+            $event->event_start_time($self->event->{イベント開始時刻});
+            $event->event_end_time($self->event->{イベント処理済時刻});
+            $event->continue_id($self->event->{イベント継続id});
+            # $event->event($self->event);
         }
     }
 
@@ -116,7 +127,8 @@ sub load
     my $event;
 
     my $where = $self->system->dbi("main")->where;
-    $where->clause("イベント処理済時刻 IS NULL AND キャラid = :キャラid AND id = :イベントid");
+    # $where->clause("イベント処理済時刻 IS NULL AND キャラid = :キャラid AND id = :イベントid");
+    $where->clause("キャラid = :キャラid AND id = :イベントid");
     $where->param({ キャラid => $self->id, イベントid => $self->event_id });
     my $result = $self->system->dbi("main")->model("イベント")->select(["*"], where => $where);
     my $row = $result->fetch_hash_one;
@@ -145,14 +157,23 @@ sub load
     if (defined $class)
     {
         $class->require or die $@;
-        $event = $class->new(context => $self->context, "system" => $self->system, id => $self->id, event_id => $self->event_id);
+        $event = $class->new(context => $self->context, "system" => $self->system, chara_id => $self->id, id => $self->event_id);
         $event->open;
         $event->bind;
 
         if (defined $self->event)
         {
-            $event->event_id($self->event_id);
-            $event->event($self->event);
+            $event->id($self->event->{id});
+            $event->event_type($self->event->{イベント種別});
+            $event->chara_id($self->event->{キャラid});
+            $event->message($self->event->{メッセージ});
+            $event->choices($self->event->{選択肢});
+            $event->choice($self->event->{選択});
+            $event->correct_answer($self->event->{正解});
+            $event->event_start_time($self->event->{イベント開始時刻});
+            $event->event_end_time($self->event->{イベント処理済時刻});
+            $event->continue_id($self->event->{イベント継続id});
+            # $event->event($self->event);
         }
     }
 

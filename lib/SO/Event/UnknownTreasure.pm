@@ -1,7 +1,19 @@
 package SO::Event::UnknownTreasure;
 
-use SO::Event::Base -base;
+# push @ISA, 'SO::Event::Base';
+use Mojo::Base 'SO::Event::Base';
 use YAML::XS;
+use SO::Event::SimpleMessage;
+use SO::Event::TrappedTreasure;
+
+has event_type => 1; # イベント種別
+has chara_id => undef; # キャラid
+has message => "宝箱を発見した！<br />開けますか？"; # メッセージ
+has choices => sub { ["開ける", "開けない"] }; # 選択肢
+has choice => undef; # 選択
+has correct_answer => undef; # 正解
+has event_start_time => sub { return time; }; # イベント開始時刻
+has event_end_time => undef; # イベント処理済時刻
 
 sub bind
 {
@@ -15,25 +27,14 @@ sub bind
 sub _encount
 {
     my $self = shift;
-
-    my $dat = {};
-    $dat->{キャラid} = $self->id;
-    $dat->{メッセージ} = "宝箱を発見した！<br />開けますか？";
-    my $choice = ["開ける", "開けない"];
-    $dat->{イベント開始時刻} = time;
-    $dat->{イベント種別} = 1; # 宝箱
-    $dat->{選択肢} = $choice;
-
-    $self->answer($dat);
-
-    $self->insert($dat);
+    $self->save;
 }
 
 sub _choice
 {
     my $self = shift;
 
-    if ($self->event->{選択} eq "開ける")
+    if ($self->choice eq "開ける")
     {
         $self->hooks->{result} = "_result1";
     }
@@ -47,35 +48,27 @@ sub _result1
 {
     my $self = shift;
     my $args = shift;
-    my $mes = "トラップ付き宝箱だ！<br />罠はどれか？";
-    my $dat = {};
-    $dat->{キャラid} = $self->id;
-    $dat->{メッセージ} = $mes;
-    my $choice = ["石つぶて", "毒針", "爆弾", "睡眠ガス", "毒ガス"];
-    my $rand = $self->system->range_rand(0, $#$choice);
-    $dat->{選択肢} = $choice;
-    $dat->{イベント開始時刻} = time;
-    $dat->{イベント種別} = 2; # トラップ付き宝箱
-    $dat->{正解} = $choice->[$rand] || "";
-    $self->insert($dat);
-    $self->answer($dat);
+    my $class = $self->import("SO::Event::TrappedTreasure");
+    my $mes = $class->new(chara_id => $self->chara_id);
+    $mes->save;
+    $mes->close;
+    $self->continue_id($mes->id);
+    $self->save;
+    $self->is_continue(0);
 }
 
 sub _result2
 {
     my $self = shift;
     my $args = shift;
-    my $mes = "あなたは宝箱を開けるのをやめました。";
-    my $dat = {};
-    $dat->{キャラid} = $self->id;
-    $dat->{メッセージ} = $mes;
-    my $choice = ["はい"];
-    $dat->{選択肢} = $choice;
-    $dat->{イベント開始時刻} = time;
-    $dat->{イベント種別} = 0; # メッセージのみ
-    $dat->{正解} = "";
-    $self->insert($dat);
-    $self->answer($dat);
+    my $class = $self->import("SO::Event::SimpleMessage");
+    my $mes = $class->new(chara_id => $self->chara_id);
+    $mes->message("あなたは宝箱を開けるのをやめました。");
+    $mes->save;
+    $mes->close;
+    $self->continue_id($mes->id);
+    $self->save;
+    $self->is_continue(0);
 }
 
 1;

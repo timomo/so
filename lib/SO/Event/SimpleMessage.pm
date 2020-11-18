@@ -1,7 +1,17 @@
 package SO::Event::SimpleMessage;
 
-use SO::Event::Base -base;
+# push @ISA, 'SO::Event::Base';
+use Mojo::Base 'SO::Event::Base';
 use YAML::XS;
+
+has event_type => 0; # イベント種別
+has chara_id => undef; # キャラid
+has message => undef; # メッセージ
+has choices => sub { ["はい"] }; # 選択肢
+has choice => undef; # 選択
+has correct_answer => undef; # 正解
+has event_start_time => sub { return time; }; # イベント開始時刻
+has event_end_time => undef; # イベント処理済時刻
 
 sub bind
 {
@@ -15,11 +25,7 @@ sub bind
 sub _encount
 {
     my $self = shift;
-
-    if (! defined $self->event_id)
-    {
-        $self->insert($self->event);
-    }
+    $self->save;
 }
 
 sub _choice
