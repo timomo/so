@@ -2,21 +2,6 @@ use utf8;
 #----------------------#
 #  イベントメッセージ  #
 #----------------------#
-
-sub event_check_down_stair
-{
-	my $mes = "下り階段を発見した！<br />降りますか？";
-	my $dat = {};
-	$dat->{キャラid} = $kid;
-	$dat->{メッセージ} = $mes;
-	my $choice = ["はい", "いいえ"];
-	$dat->{選択肢} = $choice;
-	$dat->{イベント開始時刻} = time;
-	$dat->{イベント種別} = 3; # 下り階段
-	$dat->{正解} = "";
-	&event_db_insert($dat);
-}
-
 sub event_check_treasure
 {
 	my $result = $system->dbi("main")->model("キャラ追加情報1")->select(["*"], where => {id => $kid});
@@ -66,7 +51,7 @@ sub event_random_text
 sub event_empty_check
 {
 	# TODO: なぜかIS NULLとキャラidの組み合わせがうまくいかず。。。
-	my $where = "イベント処理済時刻 IS NULL AND キャラid = :キャラid";
+	my $where = "イベント処理済時刻 IS NULL and キャラid = :キャラid";
 	my $result = $system->dbi("main")->model("イベント")->select(["*"], where => [$where, { キャラid => $kid }]);
 	my $row = $result->fetch_hash_one;
 
@@ -74,168 +59,52 @@ sub event_empty_check
 	{
 		return 0;
 	}
+
 	return 1;
 }
 
 sub event_encounter
 {
-	if (&event_empty_check == 1)
+	my $encounter = SO::Event->new(context => $controller, "system" => $system, id => $kid);
+	my $event = $encounter->encounter;
+
+	if (! defined $event)
 	{
-		return;
+		$encounter = SO::Event->new(context => $controller, "system" => $system, id => $kid, random => 1);
+		$event = $encounter->encounter;
 	}
 
-	my $rand1 = $system->range_rand(0, 100);
-
-	if ($rand1 >= 0 && $rand1 < 10)
+	if (defined $event)
 	{
-		&event_check_down_stair;
-	}
-	elsif ($rand1 > 10 && $rand1 < 60)
-	{
-		&event_check_treasure;
-	}
-	elsif ($rand1 > 60 && $rand1 < 90)
-	{
-		&event_random_text;
-	}
+		$event->encount;
+		my $utf8 = $event->render_to_string;
+		$event->close;
 
-	&_event_encounter;
-}
+		print $utf8;
 
-sub _event_encounter
-{
-	my $where = $system->dbi("main")->where;
-	$where->clause("イベント処理済時刻 IS NULL AND キャラid = :キャラid");
-	$where->param({ キャラid => $kid });
-	my $result = $system->dbi("main")->model("イベント")->select(["*"], where => $where, append => "order by id desc");
-	my $row = $result->fetch_hash_one;
-
-	if (defined $row)
-	{
-		$row->{選択肢} = Encode::encode_utf8($row->{選択肢});
-		$row->{選択肢} = YAML::XS::Load($row->{選択肢});
-
-		if (ref $row->{選択肢} ne "ARRAY")
-		{
-			$row->{選択肢} = [ $row->{選択肢} ];
-		}
-
-		my $html = $controller->render_to_string(
-			template      => "event",
-			event        => $row,
-		);
-
-		print Encode::encode_utf8($html);
 		exit;
 	}
 }
 
 sub event_choice
 {
-	my $where = $system->dbi("main")->where;
-	$where->clause("イベント処理済時刻 IS NULL AND キャラid = :キャラid and id = :イベントid");
-	$where->param({ キャラid => $kid, イベントid => int($in{イベントid}) });
-	my $result = $system->dbi("main")->model("イベント")->select(["*"], where => $where);
-	my $row = $result->fetch_hash_one;
-	my $ref = {};
-	$ref->{選択} = $in{選択};
-	$row->{選択} = $ref->{選択};
-	$ref->{イベント処理済時刻} = time;
-	$system->dbi("main")->model("イベント")->update($ref, where => {id => $row->{id}}, mtime => "mtime");
+	my $encounter = SO::Event->new(context => $controller, "system" => $system, id => $kid, event_id => $in{イベントid});
+	my $event = $encounter->load;
 
-	my $choice = Encode::encode_utf8($row->{選択肢});
-	$choice = YAML::XS::Load($choice);
+	if (defined $event)
+	{
+		$event->choice($in{選択});
+		$event->result;
 
-	if ($row->{イベント種別} == 0)
-	{
-		$row->{選択肢} = {};
-		$row->{選択肢}->{$choice->[0]} = \&event_finished;
-	}
-	elsif ($row->{イベント種別} == 1) # 宝箱
-	{
-		$row->{選択肢} = {};
-		$row->{選択肢}->{$choice->[0]} = \&event_open;
-		$row->{選択肢}->{$choice->[1]} = \&event_not_open;
-	}
-	elsif ($row->{イベント種別} == 2) # トラップ付き宝箱
-	{
-		$row->{選択肢} = {};
+		my $utf8 = $event->render_to_string;
+		$event->close;
 
-		for my $c (@$choice)
+		if (defined $utf8)
 		{
-			if ($row->{正解} eq $c)
-			{
-				$row->{選択肢}->{$c} = \&event_release;
-			}
-			else
-			{
-				$row->{選択肢}->{$c} = \&event_release_faild;
-			}
+			print $utf8;
+			exit;
 		}
 	}
-	elsif ($row->{イベント種別} == 3) # 下り階段
-	{
-		$row->{選択肢} = {};
-		$row->{選択肢}->{$choice->[0]} = \&event_go_down_stair;
-		$row->{選択肢}->{$choice->[1]} = \&event_back_down_stair;
-	}
-
-	$row->{選択肢}->{$ref->{選択}}->($row);
-}
-
-sub event_go_down_stair
-{
-	my $row = shift;
-	my $mes = "階段を降りました。";
-	my $dat = {};
-	$dat->{キャラid} = $kid;
-	$dat->{メッセージ} = $mes;
-	my $choice = ["はい"];
-	$dat->{選択肢} = $choice;
-	$dat->{イベント開始時刻} = time;
-	$dat->{イベント種別} = 0; # メッセージのみ
-	$dat->{正解} = "";
-	&event_db_insert($dat);
-
-	my $append = $system->load_append($kid);
-	$append->{階数}++;
-
-	$system->save_append_db($append);
-}
-
-sub event_back_down_stair
-{
-	my $row = shift;
-	my $mes = "降りるのをやめました。";
-	my $dat = {};
-	$dat->{キャラid} = $kid;
-	$dat->{メッセージ} = $mes;
-	my $choice = ["はい"];
-	$dat->{選択肢} = $choice;
-	$dat->{イベント開始時刻} = time;
-	$dat->{イベント種別} = 0; # メッセージのみ
-	$dat->{正解} = "";
-	&event_db_insert($dat);
-}
-
-sub event_finished
-{
-	my $row = shift;
-}
-
-sub event_release
-{
-	my $row = shift;
-	my $mes = "解除に成功した！";
-	my $dat = {};
-	$dat->{キャラid} = $kid;
-	$dat->{メッセージ} = $mes;
-	my $choice = ["はい"];
-	$dat->{選択肢} = $choice;
-	$dat->{イベント開始時刻} = time;
-	$dat->{イベント種別} = 0; # メッセージのみ
-	$dat->{正解} = "";
-	&event_db_insert($dat);
 }
 
 sub event_db_insert
@@ -252,47 +121,6 @@ sub event_db_insert
 	$dat->{選択肢} = Encode::decode_utf8($dat->{選択肢});
 
 	$system->dbi("main")->model("イベント")->insert($dat, ctime => "ctime");
-}
-
-sub event_release_faild
-{
-	my $row = shift;
-	my $mes = "解除に失敗した！";
-	my $dat = {};
-	$dat->{キャラid} = $kid;
-	$dat->{メッセージ} = $mes;
-	my $choice = ["はい"];
-	$dat->{選択肢} = $choice;
-	$dat->{イベント開始時刻} = time;
-	$dat->{イベント種別} = 0; # メッセージのみ
-	$dat->{正解} = "";
-	&event_db_insert($dat);
-
-	$khp -= 50;
-
-	&regist;
-}
-
-sub event_open
-{
-	my $row = shift;
-	my $mes = "トラップ付き宝箱だ！<br />罠はどれか？";
-	my $dat = {};
-	$dat->{キャラid} = $kid;
-	$dat->{メッセージ} = $mes;
-	my $choice = ["石つぶて", "毒針", "爆弾", "睡眠ガス", "毒ガス"];
-	my $rand = $system->range_rand(0, $#$choice);
-	$dat->{選択肢} = $choice;
-	$dat->{イベント開始時刻} = time;
-	$dat->{イベント種別} = 2; # トラップ付き宝箱
-	$dat->{正解} = $choice->[$rand] || "";
-	&event_db_insert($dat);
-}
-
-sub event_not_open
-{
-	my $row = shift;
-	warn Dump("not open");
 }
 
 sub event

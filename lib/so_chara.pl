@@ -226,7 +226,7 @@ sub chara_load
 
 	my $append = $system->load_append($id);
 
-	warn Dump($append);
+	# warn Dump($append);
 
 	$karea = $append->{エリア};
 	$kspot = $append->{スポット};

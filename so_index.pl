@@ -12,13 +12,14 @@ use Mojo::Parameters;
 use Mojo::Template;
 use Mojo::UserAgent;
 use Mojolicious::Plugin::Config;
+use Mojolicious;
 use lib File::Spec->catdir($FindBin::RealBin, 'lib');
 use SO::Monster;
 use SO::PVP;
 use SO::Dummy;
 use SO::System;
 use SO::Town;
-use Mojolicious;
+use So::Event;
 
 # 初期設定ファイルの読み込み
 require './so_system.dat';
@@ -141,7 +142,7 @@ elsif($mode eq 'log_in')
 	&log_in;
 	# &log_in_frame;
 }
-elsif($mode eq 'event') { &event_choice; &event_encounter; &log_in; }
+elsif($mode eq 'event') { &event_choice; &log_in; }
 elsif($mode eq 'chara_make') { &chara_make; }
 elsif($mode eq 'make_end') { &make_end; }
 elsif($mode eq 'regist') { &regist; }

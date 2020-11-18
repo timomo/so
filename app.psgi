@@ -406,7 +406,7 @@ app->helper(
 
         my $data = $town->load($k);
 
-        warn Dump($data);
+        # warn Dump($data);
 
         if($k->{スポット} == 0)
         {
