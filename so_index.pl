@@ -19,7 +19,7 @@ use SO::PVP;
 use SO::Dummy;
 use SO::System;
 use SO::Town;
-use So::Event;
+use SO::Event;
 
 # 初期設定ファイルの読み込み
 require './so_system.dat';
