@@ -58,7 +58,7 @@ sub close
 sub open
 {
     my $self = shift;
-    my $k = $self->system->load_chara($self->id);
+    my $k = $self->system->load_chara($self->chara_id);
     $self->data($k);
     $self->log_level($self->context->log->level);
     $self->event({});
@@ -155,7 +155,14 @@ sub insert
         $dat->{選択肢} = Encode::decode_utf8($dat->{選択肢});
     }
 
-    $self->system->dbi("main")->model("イベント")->insert($dat, ctime => "ctime");
+    eval {
+        $self->system->dbi("main")->model("イベント")->insert($dat, ctime => "ctime");
+    };
+    if ($@)
+    {
+        warn YAML::XS::Dump($dat);
+        die $@;
+    }
     $self->id($self->system->dbi("main")->dbh->sqlite_last_insert_rowid);
 
     $row->{id} = $self->id;
@@ -178,7 +185,14 @@ sub update
         $dat->{選択肢} = Encode::decode_utf8($dat->{選択肢});
     }
 
-    $self->system->dbi("main")->model("イベント")->update($dat, where => {id => $self->id}, mtime => "mtime");
+    eval {
+        $self->system->dbi("main")->model("イベント")->update($dat, where => {id => $self->id}, mtime => "mtime");
+    };
+    if ($@)
+    {
+        warn YAML::XS::Dump($dat);
+        die $@;
+    }
 }
 
 sub generate

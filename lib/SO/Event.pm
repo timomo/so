@@ -80,15 +80,20 @@ sub encounter
         }
         elsif ($rand1 >= 30 && $rand1 <= 59)
         {
-            $class = "SO::Event::UnknownTreasure";
+            my $treasure = $self->check_treasure;
+            if (defined $treasure)
+            {
+                $class = "SO::Event::UnknownTreasure";
+                my $ref = {};
+                $ref->{取得者} = $self->data->{id};
+                $self->system->dbi("main")->model("アイテムスポーンデータ")->update($ref, where => {id => $treasure->{id}}, mtime => "mtime");
+            }
         }
         elsif ($rand1 >= 60 && $rand1 <= 100)
         {
-            # noop
+            $class = "SO::Event::AreaRandomMessage";
         }
     }
-
-    # $class = "SO::Event::UnknownTreasure";
 
     if (defined $class)
     {
@@ -181,6 +186,22 @@ sub load
 
     return $event;
 
+}
+
+sub check_treasure
+{
+    my $self = shift;
+    my $result = $self->system->dbi("main")->model("キャラ追加情報1")->select(["*"], where => {id => $self->data->{id}});
+    my $row = $result->fetch_hash_one;
+    my $where = $self->system->dbi("main")->where;
+    $where->clause("取得者 IS NULL AND エリア = :エリア AND スポット = :スポット AND 距離 = :距離 AND 階数 = :階数");
+    my @keys = ("エリア", "スポット", "距離", "階数");
+    my $query = {};
+    @$query{@keys} = @$row{@keys};
+    $where->param($query);
+    my $result2 = $self->system->dbi("main")->model("アイテムスポーンデータ")->select(["*"], where => $where);
+    my $row2 = $result2->fetch_hash_one;
+    return $row2;
 }
 
 sub watch

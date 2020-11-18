@@ -25,6 +25,7 @@ sub bind
 sub _encount
 {
     my $self = shift;
+    $self->event_end_time(time);
     $self->save;
 }
 
