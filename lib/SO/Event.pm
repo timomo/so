@@ -92,6 +92,9 @@ sub get_event_class
     elsif ($event->{イベント種別} == 4) {
         $class = "SO::Event::ContinuousMessage";
     }
+    elsif ($event->{イベント種別} == 5) {
+        $class = "SO::Event::rAthenaScript";
+    }
 
     return $class;
 }
@@ -135,6 +138,8 @@ sub reserved
         $event->event_end_time($self->event->{イベント処理済時刻});
         $event->continue_id($self->event->{イベント継続id});
         $event->parent_id($self->event->{親イベントid});
+        $event->paragraph($self->event->{段落});
+        $event->case($self->event->{ケース});
     }
 
     $self->close;
@@ -177,7 +182,7 @@ sub encounter
         }
     }
 
-    # $class = "SO::Event::ContinuousMessage";
+    $class = "SO::Event::rAthenaScript";
 
     if (defined $class)
     {
@@ -200,6 +205,8 @@ sub encounter
             $event->event_end_time($self->event->{イベント処理済時刻});
             $event->continue_id($self->event->{イベント継続id});
             $event->parent_id($self->event->{親イベントid});
+            $event->paragraph($self->event->{段落});
+            $event->case($self->event->{ケース});
         }
     }
 
@@ -244,6 +251,8 @@ sub load
         $event->event_end_time($self->event->{イベント処理済時刻});
         $event->continue_id($self->event->{イベント継続id});
         $event->parent_id($self->event->{親イベントid});
+        $event->paragraph($self->event->{段落});
+        $event->case($self->event->{ケース});
     }
 
     $self->close;

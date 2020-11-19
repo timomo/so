@@ -37,6 +37,8 @@ has event_start_time => undef; # イベント開始時刻
 has event_end_time => undef; # イベント処理済時刻
 has continue_id => 0; # イベント継続id
 has parent_id => 0; # 親イベントid
+has paragraph => 0; # 段落
+has case => ""; # ケース
 
 sub import
 {
@@ -226,6 +228,8 @@ sub generate
     $dat->{イベント処理済時刻} = $self->event_end_time;
     $dat->{イベント継続id} = $self->continue_id;
     $dat->{親イベントid} = $self->parent_id;
+    $dat->{段落} = $self->paragraph;
+    $dat->{ケース} = $self->case;
 
     return $dat;
 }
@@ -304,6 +308,8 @@ sub next
     $event->event_end_time($row->{イベント処理済時刻});
     $event->continue_id($row->{イベント継続id});
     $event->parent_id($row->{親イベントid});
+    $event->paragraph($row->{段落});
+    $event->case($row->{ケース});
 
     return $event;
 }
@@ -343,6 +349,8 @@ sub parent
     $event->event_end_time($row->{イベント処理済時刻});
     $event->continue_id($row->{イベント継続id});
     $event->parent_id($row->{親イベントid});
+    $event->paragraph($row->{段落});
+    $event->case($row->{ケース});
 
     return $event;
 }
@@ -376,6 +384,9 @@ sub get_event_class
     }
     elsif ($event->{イベント種別} == 4) {
         $class = "SO::Event::ContinuousMessage";
+    }
+    elsif ($event->{イベント種別} == 5) {
+        $class = "SO::Event::rAthenaScript";
     }
 
     return $class;
