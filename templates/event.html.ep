@@ -1,5 +1,8 @@
 <div class="blackboard question">
 <p>
+%== $event->{id}
+</p>
+<p>
 %== $event->{メッセージ}
 </p>
 </div>

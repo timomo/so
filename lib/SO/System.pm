@@ -102,6 +102,8 @@ sub range_rand
 {
     my ($self, $min, $max) = @_;
 
+    srand(time);
+
     if ($max < $min) {
         ($max, $min) = ($min, $max);
     }

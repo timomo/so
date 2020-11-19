@@ -4,6 +4,56 @@ use utf8;
 #  イベントメッセージ  #
 #----------------------#
 
+sub is_continue_event
+{
+	my $encounter = SO::Event->new(context => $controller, "system" => $system, id => $kid);
+	my $event = $encounter->reserved;
+
+	if (defined $event)
+	{
+		return 1;
+	}
+	return 0;
+}
+
+sub event_reserved
+{
+	my $encounter = SO::Event->new(context => $controller, "system" => $system, id => $kid);
+	my $event = $encounter->reserved;
+
+	if (defined $event)
+	{
+		$event->encount;
+		$event->select(\%in);
+		$event->result;
+		my $next = $event->next;
+
+		if (defined $next)
+		{
+			$event = $next;
+			my $utf8 = $event->render_to_string;
+			$event->close;
+
+			if (defined $utf8)
+			{
+				print $utf8;
+				exit;
+			}
+		}
+		if (defined $event->message)
+		{
+			my $utf8 = $event->render_to_string;
+			$event->close;
+
+			if (defined $utf8)
+			{
+				print $utf8;
+				exit;
+			}
+		}
+	}
+}
+
 sub event_encounter
 {
 	my $encounter = SO::Event->new(context => $controller, "system" => $system, id => $kid);
@@ -38,13 +88,14 @@ sub event_choice
 	{
 		my $encounter = SO::Event->new(context => $controller, "system" => $system, id => $kid, event_id => $event_id);
 		my $event = $encounter->load;
+
 		if (! defined $event)
 		{
 			last;
 		}
-		if (defined $select)
+		if ($event_id == $event->id && defined $select)
 		{
-			$event->select($select);
+			$event->select(\%in);
 			$select = undef;
 			$event->result;
 		}

@@ -304,6 +304,7 @@ CREATE TABLE イベント (
         イベント開始時刻 INTEGER,
         イベント処理済時刻 INTEGER,
         イベント継続id INTEGER NOT NULL DEFAULT 0,
+        親イベントid INTEGER NOT NULL DEFAULT 0,
         ctime DATETIME,
 	    mtime DATETIME
  );

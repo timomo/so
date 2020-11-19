@@ -104,6 +104,11 @@ if ($require_login == 1)
 
 		if ($mode !~ /_window$/)
 		{
+			if (&is_continue_event)
+			{
+				&event_reserved;
+			}
+
 			if (&is_continue_monster)
 			{
 				&monster;

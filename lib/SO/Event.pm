@@ -44,6 +44,7 @@ sub open
 
     if (! defined $self->event_id)
     {
+=begin
         my $where = $self->system->dbi("main")->where;
         $where->clause("イベント処理済時刻 IS NULL AND キャラid = :キャラid");
         $where->param({ キャラid => $self->id });
@@ -51,6 +52,7 @@ sub open
         my $row = $result->fetch_hash_one;
         $self->event($row);
         $self->event_id($row->{id});
+=cut
     }
     elsif (defined $self->event_id)
     {
@@ -58,6 +60,86 @@ sub open
     }
 
     # $self->system(So::System->new(context => $self->context));
+}
+
+sub object
+{
+    my $self = shift;
+    my $class = shift;
+    $class->require or die $@;
+    my $event = $class->new(context => $self->context, "system" => $self->system, chara_id => $self->id);
+    return $event;
+}
+
+sub get_event_class
+{
+    my $self = shift;
+    my $event = shift;
+    my $class;
+
+    if ($event->{イベント種別} == 0) {
+        $class = "SO::Event::SimpleMessage";
+    }
+    elsif ($event->{イベント種別} == 1) {
+        $class = "SO::Event::UnknownTreasure";
+    }
+    elsif ($event->{イベント種別} == 2) {
+        $class = "SO::Event::TrappedTreasure";
+    }
+    elsif ($event->{イベント種別} == 3) {
+        $class = "SO::Event::DownStair";
+    }
+    elsif ($event->{イベント種別} == 4) {
+        $class = "SO::Event::ContinuousMessage";
+    }
+
+    return $class;
+}
+
+sub reserved
+{
+    my $self = shift;
+    $self->open;
+    my $class;
+    my $event;
+
+    {
+        my $where = $self->system->dbi("main")->where;
+        $where->clause("イベント処理済時刻 IS NULL AND キャラid = :キャラid");
+        $where->param({ キャラid => $self->id });
+        my $result = $self->system->dbi("main")->model("イベント")->select(["*"], where => $where, append => "order by id asc");
+        my $row = $result->fetch_hash_one;
+
+        if (defined $row)
+        {
+            $self->event($row);
+            $self->event_id($row->{id});
+        }
+    }
+
+    if (defined $self->event)
+    {
+        $class = $self->get_event_class($self->event);
+        $event = $self->object($class);
+        $event->id($self->event->{id});
+        $event->open;
+        $event->bind;
+        $event->id($self->event->{id});
+        $event->event_type($self->event->{イベント種別});
+        $event->chara_id($self->event->{キャラid});
+        $event->message($self->event->{メッセージ});
+        $event->choices($self->event->{選択肢});
+        $event->choice($self->event->{選択});
+        $event->correct_answer($self->event->{正解});
+        $event->event_start_time($self->event->{イベント開始時刻});
+        $event->event_end_time($self->event->{イベント処理済時刻});
+        $event->continue_id($self->event->{イベント継続id});
+        $event->parent_id($self->event->{親イベントid});
+    }
+
+    $self->close;
+
+    return $event;
 }
 
 sub encounter
@@ -95,15 +177,18 @@ sub encounter
         }
     }
 
+    # $class = "SO::Event::ContinuousMessage";
+
     if (defined $class)
     {
-        $class->require or die $@;
-        $event = $class->new(context => $self->context, "system" => $self->system, chara_id => $self->id, id => $self->event_id);
+        $event = $self->object($class);
+        $event->id($self->event_id);
         $event->open;
         $event->bind;
 
         if (defined $self->event)
         {
+            $event = $self->get_event_class($self->event);
             $event->id($self->event->{id});
             $event->event_type($self->event->{イベント種別});
             $event->chara_id($self->event->{キャラid});
@@ -114,7 +199,7 @@ sub encounter
             $event->event_start_time($self->event->{イベント開始時刻});
             $event->event_end_time($self->event->{イベント処理済時刻});
             $event->continue_id($self->event->{イベント継続id});
-            # $event->event($self->event);
+            $event->parent_id($self->event->{親イベントid});
         }
     }
 
@@ -132,60 +217,38 @@ sub load
     my $event;
 
     my $where = $self->system->dbi("main")->where;
-    # $where->clause("イベント処理済時刻 IS NULL AND キャラid = :キャラid AND id = :イベントid");
     $where->clause("キャラid = :キャラid AND id = :イベントid");
     $where->param({ キャラid => $self->id, イベントid => $self->event_id });
     my $result = $self->system->dbi("main")->model("イベント")->select(["*"], where => $where);
     my $row = $result->fetch_hash_one;
-    $self->event($row);
+    if (defined $row)
+    {
+        $self->event($row);
+    }
 
     if (defined $self->event)
     {
-        if ($self->event->{イベント種別} == 0)
-        {
-            $class = "SO::Event::SimpleMessage";
-        }
-        elsif ($self->event->{イベント種別} == 1)
-        {
-            $class = "SO::Event::UnknownTreasure";
-        }
-        elsif ($self->event->{イベント種別} == 2)
-        {
-            $class = "SO::Event::TrappedTreasure";
-        }
-        elsif ($self->event->{イベント種別} == 3)
-        {
-            $class = "SO::Event::DownStair";
-        }
-    }
-
-    if (defined $class)
-    {
-        $class->require or die $@;
-        $event = $class->new(context => $self->context, "system" => $self->system, chara_id => $self->id, id => $self->event_id);
+        $class = $self->get_event_class($self->event);
+        $event = $self->object($class);
+        $event->id($self->event_id);
         $event->open;
         $event->bind;
-
-        if (defined $self->event)
-        {
-            $event->id($self->event->{id});
-            $event->event_type($self->event->{イベント種別});
-            $event->chara_id($self->event->{キャラid});
-            $event->message($self->event->{メッセージ});
-            $event->choices($self->event->{選択肢});
-            $event->choice($self->event->{選択});
-            $event->correct_answer($self->event->{正解});
-            $event->event_start_time($self->event->{イベント開始時刻});
-            $event->event_end_time($self->event->{イベント処理済時刻});
-            $event->continue_id($self->event->{イベント継続id});
-            # $event->event($self->event);
-        }
+        $event->id($self->event->{id});
+        $event->event_type($self->event->{イベント種別});
+        $event->chara_id($self->event->{キャラid});
+        $event->message($self->event->{メッセージ});
+        $event->choices($self->event->{選択肢});
+        $event->choice($self->event->{選択});
+        $event->correct_answer($self->event->{正解});
+        $event->event_start_time($self->event->{イベント開始時刻});
+        $event->event_end_time($self->event->{イベント処理済時刻});
+        $event->continue_id($self->event->{イベント継続id});
+        $event->parent_id($self->event->{親イベントid});
     }
 
     $self->close;
 
     return $event;
-
 }
 
 sub check_treasure

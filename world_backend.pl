@@ -1323,6 +1323,15 @@ websocket '/channel' => sub {
     });
 };
 
+$loop->recurring(3600, sub {
+    warn "here";
+    my $class = "SO::Event::SimpleMessage";
+    $class->require or die $@;
+    my $event = $class->new(context => app, "system" => $system, chara_id => "tyomo88");
+    $event->message("1時間が経過しました。休憩を入れましょう。");
+    $event->save;
+});
+
 $loop->timer(1, sub { app->reset_ini_all });
 $loop->timer(1, sub { app->load_master_data });
 $loop->recurring(60, sub { app->detach_history });

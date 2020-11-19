@@ -50,8 +50,10 @@ sub _result1
     my $args = shift;
     my $class = $self->import("SO::Event::TrappedTreasure");
     my $mes = $class->new(chara_id => $self->chara_id);
+    $mes->parent_id($self->id);
     $mes->save;
     $mes->close;
+    $self->event_end_time(time);
     $self->continue_id($mes->id);
     $self->save;
     $self->is_continue(0);
@@ -63,9 +65,11 @@ sub _result2
     my $args = shift;
     my $class = $self->import("SO::Event::SimpleMessage");
     my $mes = $class->new(chara_id => $self->chara_id);
+    $mes->parent_id($self->id);
     $mes->message("あなたは宝箱を開けるのをやめました。");
     $mes->save;
     $mes->close;
+    $self->event_end_time(time);
     $self->continue_id($mes->id);
     $self->save;
     $self->is_continue(0);
