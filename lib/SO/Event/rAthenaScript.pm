@@ -25,7 +25,7 @@ sub _encount
 
     for my $line (@{$parse->{""}->{$paragraph}})
     {
-        push(@mes, $line);
+        push(@mes, $self->trim($line));
     }
 
     # 初期データがない場合にのみ、メッセージを初期化する
@@ -35,6 +35,28 @@ sub _encount
         $self->event_end_time(time);
         $self->save;
     }
+}
+
+sub trim
+{
+    my $self = shift;
+    my $mes = shift;
+
+    if ($mes =~ /mes/)
+    {
+        $mes =~ s/^mes ['"]//;
+        $mes =~ s/['"];$//;
+    }
+    if ($mes =~ /\^[0-9A-F]{6}/)
+    {
+        $mes =~ s/\^([0-9A-F]{6})/<span style="color: #$1;">/g;
+        $mes =~ s/color: #000000;/color: #FFFFFF;/g;
+    }
+    if ($mes =~ /next;|close;/)
+    {
+        $mes = "";
+    }
+    return $mes;
 }
 
 sub _choice
@@ -56,7 +78,7 @@ sub _choice
             shift(@{$parse->{""}->{$paragraph}});
             for my $line (@{$parse->{""}->{$paragraph}})
             {
-                push(@mes, $line);
+                push(@mes, $self->trim($line));
             }
             $event->choices(\@mes);
         }
@@ -64,7 +86,7 @@ sub _choice
         {
             for my $line (@{$parse->{""}->{$paragraph}})
             {
-                push(@mes, $line);
+                push(@mes, $self->trim($line));
             }
             $event->message(join("<br />", @mes));
         }
@@ -103,7 +125,7 @@ sub _choice
             shift(@{$parse->{$case}->{$paragraph}});
             for my $line (@{$parse->{$case}->{$paragraph}})
             {
-                push(@mes, $line);
+                push(@mes, $self->trim($line));
             }
             $event->choices(\@mes);
         }
@@ -114,7 +136,7 @@ sub _choice
             {
                 for my $line (@{$parse->{$case}->{$paragraph}})
                 {
-                    push(@mes, $line);
+                    push(@mes, $self->trim($line));
                 }
                 $event->message(join("<br />", @mes));
             }
