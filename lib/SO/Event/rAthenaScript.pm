@@ -100,15 +100,16 @@ sub _choice
     }
     else
     {
+        my @mes;
+        my $event = $self->object(ref $self);
         my $paragraph = $self->paragraph;
-        my %tmp;
-        my $choices = YAML::XS::Load(Encode::encode_utf8($self->choices));
-        $tmp{$choices->[$_]} = $_ for 0 .. $#$choices;
-        my $number = $tmp{$self->choice} + 1;
         my $case = $self->case;
+        my $choices = YAML::XS::Load(Encode::encode_utf8($self->choices));
+        my $choice = $choices->[$self->choice];
 
-        if ($self->choice ne "次へ")
+        if ($choice ne "次へ")
         {
+            my $number = $self->choice + 1;
             $case = sprintf("case %s", $number);
             $paragraph = 0;
         }
@@ -116,9 +117,8 @@ sub _choice
         {
             $paragraph++;
         }
-
-        my @mes;
-        my $event = $self->object(ref $self);
+        $event->case($case);
+        $event->paragraph($paragraph);
 
         if ($parse->{$case}->{$paragraph}->[0] eq "---select")
         {
