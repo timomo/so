@@ -26,7 +26,7 @@ sub _encount
 
     for my $line (@{$parse->{""}->{$paragraph}})
     {
-        push(@mes, $self->trim($line));
+        push(@mes, trim($line));
     }
 
     # 初期データがない場合にのみ、メッセージを初期化する
@@ -40,7 +40,6 @@ sub _encount
 
 sub trim
 {
-    my $self = shift;
     my $mes = shift;
 
     if ($mes =~ /mes/)
@@ -80,7 +79,7 @@ sub _choice
             shift(@{$parse->{$case}->{$paragraph}});
             for my $line (@{$parse->{$case}->{$paragraph}})
             {
-                push(@mes, $self->trim($line));
+                push(@mes, trim($line));
             }
             $event->choices(\@mes);
         }
@@ -123,7 +122,7 @@ sub _choice
             shift(@{$parse->{$case}->{$paragraph}});
             for my $line (@{$parse->{$case}->{$paragraph}})
             {
-                push(@mes, $self->trim($line));
+                push(@mes, trim($line));
             }
             $event->choices(\@mes);
         }
@@ -170,6 +169,41 @@ sub paragraph_check
     $lines =~ s/close;//g;
     $lines =~ s/next;//g;
 
+    my @contents = split("\n", $lines);
+    my $words = qr/JobLevel|BaseJob|Job_Priest|Job_Monk|BaseClass|Job_Acolyte|SKILL_PERM/;
+
+    for my $syntax (@contents)
+    {
+        if ($syntax =~ /^\s+$/ || $syntax eq "")
+        {
+            next;
+        }
+        if ($syntax =~ /($words)/)
+        {
+            $syntax =~ s/($words)/\$self->$1()/g;
+        }
+        if ($syntax =~ /(delitem)\s+(.+);/)
+        {
+            $syntax = "\$self->$1($2);";
+        }
+        if ($syntax =~ /^skill (.+);/)
+        {
+            $syntax = "\$self->skill($1);";
+        }
+        if ($syntax =~ /getskilllv/)
+        {
+            $syntax =~ s/(getskilllv)/\$self->$1/g;
+        }
+        if ($syntax =~ /countitem/)
+        {
+            $syntax =~ s/(countitem)/\$self->$1/g;
+        }
+
+        push(@ret, $syntax);
+    }
+
+    $lines = join("\n", @ret);
+
     warn $lines;
 
     my $capture = IO::Capture::Stdout->new;
@@ -186,72 +220,60 @@ sub paragraph_check
     return join("", @stdout);
 }
 
+sub AUTOLOAD
+{
+    our $AUTOLOAD;
+    my ($method) = ($AUTOLOAD =~ /([^:']+$)/);
+    {
+        warn "-------->$method";
+        no strict 'refs';
+        *{$method} = sub {
+            use strict 'refs';
+            my ($self, $val) = @_;
+            # warn YAML::XS::Dump($self);
+        };
+    }
+    goto &$method;
+}
+
+# アイテムを消す
+sub delitem
+{
+    my $self = shift;
+    my ($item_id, $num) = @_;
+    my $item = $self->system->pickup_item($self->chara_id, $item_id);
+
+    if (ref $item eq "HASH")
+    {
+        $item->{所持数} -= $num;
+        $self->system->save_item_db($self->chara_id, [ $item ]);
+    }
+}
+
+# アイテムを数える
+sub countitem
+{
+    my $self = shift;
+    my $item_id = shift;
+    my $item = $self->system->pickup_item($self->chara_id, $item_id);
+
+    if (ref $item eq "HASH")
+    {
+        return $item->{所持数};
+    }
+    return 0;
+}
+
+sub here
+{
+    my $self = shift;
+    warn "here";
+}
+
 sub mes
 {
     my $line = shift;
-    print $line. "<br />\n";
-    return 1;
-}
-
-sub SKILL_PERM
-{
-    warn "SKILL_PERM";
-}
-
-sub skill
-{
-    warn "skill";
-}
-
-sub JobLevel
-{
-    warn "JobLevel";
-}
-
-sub BaseClass
-{
-    warn "BaseClass";
-}
-
-sub BaseJob
-{
-    warn "BaseJob";
-}
-
-sub Job_Priest
-{
-    warn "Job_Priest";
-}
-
-sub Job_Monk
-{
-    warn "Job_Monk";
-}
-
-sub Job_Acolyte
-{
-    warn "Job_Acolyte";
-}
-
-sub getskilllv
-{
-    my $args = shift;
-    warn "getskilllv:$args";
-}
-
-sub success
-{
-    warn "success";
-}
-
-sub delitem
-{
-    warn "delitem";
-}
-
-sub countitem
-{
-    my $item_id = shift;
+    print trim($line). "<br />\n";
     return 1;
 }
 
