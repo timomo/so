@@ -6,6 +6,15 @@ use FindBin;
 use File::Spec;
 use YAML::XS;
 
+eval(
+    "if ((countitem(727) > 0) && (countitem(991) > 0) && (countitem(2608) > 0) && (JobLevel > 29 || (BaseJob == Job_Priest || BaseJob == Job_Monk)) && (BaseClass == Job_Acolyte)) {success('here');}"
+);
+if ($@)
+{
+    warn $@;
+}
+exit;
+
 {
     my $parse = &parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "script.txt"));
     my $case = "";

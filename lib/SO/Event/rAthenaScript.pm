@@ -3,6 +3,7 @@ package SO::Event::rAthenaScript;
 # push @ISA, 'SO::Event::Base';
 use Mojo::Base 'SO::Event::SimpleMessage';
 use YAML::XS;
+use IO::Capture::Stdout;
 
 has choices => sub { ["次へ"] }; # 選択肢
 has event_type => 5; # イベント種別
@@ -72,11 +73,12 @@ sub _choice
         $paragraph++;
         my @mes;
         my $event = $self->object(ref $self);
+        my $case = "";
 
-        if ($parse->{""}->{$paragraph}->[0] eq "---select")
+        if ($parse->{$case}->{$paragraph}->[0] eq "---select")
         {
-            shift(@{$parse->{""}->{$paragraph}});
-            for my $line (@{$parse->{""}->{$paragraph}})
+            shift(@{$parse->{$case}->{$paragraph}});
+            for my $line (@{$parse->{$case}->{$paragraph}})
             {
                 push(@mes, $self->trim($line));
             }
@@ -84,11 +86,7 @@ sub _choice
         }
         else
         {
-            for my $line (@{$parse->{""}->{$paragraph}})
-            {
-                push(@mes, $self->trim($line));
-            }
-            $event->message(join("<br />", @mes));
+            $event->message($self->paragraph_check($parse->{$case}->{$paragraph}));
         }
 
         $event->paragraph($paragraph);
@@ -134,11 +132,7 @@ sub _choice
             my $ary = $parse->{$case}->{$paragraph};
             if (scalar @$ary != 0)
             {
-                for my $line (@{$parse->{$case}->{$paragraph}})
-                {
-                    push(@mes, $self->trim($line));
-                }
-                $event->message(join("<br />", @mes));
+                $event->message($self->paragraph_check($parse->{$case}->{$paragraph}));
             }
         }
 
@@ -157,12 +151,114 @@ sub _choice
     $self->save;
 }
 
+sub paragraph_check
+{
+    my $self = shift;
+    my $rows = shift;
+    my @ret;
+    my $lines = join("\n", @$rows);
+
+    $lines =~ s/^(\s+)*\}//;
+    if ($lines =~ /if /)
+    {
+        if ($lines !~ /\}$/)
+        {
+            $lines .= "\n}";
+        }
+    }
+    $lines =~ s|//|# |g;
+    $lines =~ s/close;//g;
+    $lines =~ s/next;//g;
+
+    warn $lines;
+
+    my $capture = IO::Capture::Stdout->new;
+    $capture->start;
+    eval($lines);
+    $capture->stop;
+    if ($@)
+    {
+        warn $@;
+    }
+
+    my @stdout = $capture->read;
+
+    return join("", @stdout);
+}
+
+sub mes
+{
+    my $line = shift;
+    print $line. "<br />\n";
+    return 1;
+}
+
+sub SKILL_PERM
+{
+    warn "SKILL_PERM";
+}
+
+sub skill
+{
+    warn "skill";
+}
+
+sub JobLevel
+{
+    warn "JobLevel";
+}
+
+sub BaseClass
+{
+    warn "BaseClass";
+}
+
+sub BaseJob
+{
+    warn "BaseJob";
+}
+
+sub Job_Priest
+{
+    warn "Job_Priest";
+}
+
+sub Job_Monk
+{
+    warn "Job_Monk";
+}
+
+sub Job_Acolyte
+{
+    warn "Job_Acolyte";
+}
+
+sub getskilllv
+{
+    my $args = shift;
+    warn "getskilllv:$args";
+}
+
+sub success
+{
+    warn "success";
+}
+
+sub delitem
+{
+    warn "delitem";
+}
+
+sub countitem
+{
+    my $item_id = shift;
+    return 1;
+}
+
 sub _result1
 {
     my $self = shift;
     my $args = shift;
-
-
 }
 
 sub parse_rathena_script
