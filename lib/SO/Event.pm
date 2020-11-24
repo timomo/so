@@ -193,7 +193,6 @@ sub encounter
 
         if (defined $self->event)
         {
-            $event = $self->get_event_class($self->event);
             $event->id($self->event->{id});
             $event->event_type($self->event->{イベント種別});
             $event->chara_id($self->event->{キャラid});

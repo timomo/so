@@ -209,6 +209,10 @@ sub update
     if ($@)
     {
         warn YAML::XS::Dump($dat);
+
+        warn YAML::XS::Dump(caller(1));
+
+        # warn YAML::XS::Dump(ref $self->system);
         die $@;
     }
 }
