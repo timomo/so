@@ -4,11 +4,14 @@ package SO::Event::rAthenaScript;
 use Mojo::Base 'SO::Event::SimpleMessage';
 use YAML::XS;
 use IO::Capture::Stdout;
+use IO::Capture::Stderr;
+# use Expect;
 use 5.010001;
 use Mojo::Util qw(xml_escape);
 
 has choices => sub { ["次へ"] }; # 選択肢
 has event_type => 5; # イベント種別
+has input_data => sub { {} }; # イベントのAUTOLOAD系の情報
 
 sub bind
 {
@@ -33,7 +36,7 @@ sub _encount
         {
             push(@tmp, $elm->[2]);
         }
-        $self->message($self->paragraph_check(\@tmp));
+        $self->message($self->paragraph_check($parse));
         $self->event_end_time(time);
         $self->save;
     }
@@ -67,11 +70,10 @@ sub _choice
     my $choices = YAML::XS::Load(Encode::encode_utf8($self->choices));
     my $choice = $choices->[$self->choice];
     my $event = $self->object(ref $self);
+    my $message = undef;
 
     if (! defined $parent)
     {
-        warn "1------------------>";
-
         my @tmp;
         for my $elm (@$parse)
         {
@@ -84,20 +86,22 @@ sub _choice
         }
         else
         {
-            $event->message($self->paragraph_check(\@tmp));
+            $message = $self->paragraph_check($parse);
         }
 
-        $event->paragraph($self->paragraph);
-        $event->chara_id($self->chara_id);
-        $event->parent_id($self->id);
-        $event->save;
-        $self->continue_id($event->id);
-        $self->save;
+        if ($message ne "")
+        {
+            $event->message($message);
+            $event->paragraph($self->paragraph);
+            $event->chara_id($self->chara_id);
+            $event->parent_id($self->id);
+            $event->save;
+            $self->continue_id($event->id);
+            $self->save;
+        }
     }
     else
     {
-        warn "2------------------>";
-
         my @tmp;
         for my $elm (@$parse)
         {
@@ -110,12 +114,12 @@ sub _choice
         }
         else
         {
-            $event->message($self->paragraph_check(\@tmp));
+            $message = $self->paragraph_check($parse);
         }
 
-        if (defined $event->message)
+        if ($message ne "")
         {
-            $event->case($self->case);
+            $event->message($message);
             $event->paragraph($self->paragraph);
             $event->chara_id($self->chara_id);
             $event->parent_id($self->id);
@@ -128,101 +132,106 @@ sub _choice
     $self->save;
 }
 
+sub get_rows
+{
+    my $self = shift;
+    my $rows = shift;
+    my @ret;
+
+    warn "------------------->";
+    warn $self->paragraph;
+    warn "------------------->";
+
+    for my $row (@$rows)
+    {
+        # TODO: 明日はここから！
+        push(@ret, $row->[2]);
+    }
+
+    # warn Dump \@ret;
+
+    return \@ret;
+}
+
+sub toggle_mes
+{
+    my $self = shift;
+    my $row = shift;
+    my $type = shift;
+    my $mes = $row->[2];
+
+    if ($type == 1 && $mes =~ />mes\(/)
+    {
+        $mes =~ s/>mes\(/>no_mes(/g;
+    }
+    if ($type == 2 && $mes =~ />no_mes\(/)
+    {
+        $mes =~ s/>no_mes\(/>mes(/g;
+    }
+
+    $row->[2] = $mes;
+
+    # warn Dump $row;
+}
+
 sub paragraph_check
 {
     my $self = shift;
     my $rows = shift;
     my @ret;
-    my $lines = join("\n", @$rows);
 
-    $lines =~ s/^(\s+)*\}//;
-    if ($lines =~ /if /)
-    {
-        if ($lines !~ /\}$/)
-        {
-            $lines .= "\n}";
-        }
-    }
-    $lines =~ s|//|# |g;
-    # $lines =~ s/close;/\$self->conversation_close;/g;
-    # $lines =~ s/next;/\$self->conversation_next;/g;
+    my $tmp = $self->get_rows($rows);
+    @ret = @$tmp;
 
-    my @contents = split("\n", $lines);
-    my $words = qr/JobLevel|BaseJob|Job_Priest|Job_Monk|BaseClass|Job_Acolyte|SKILL_PERM|Job_Alchemist|ALCHE_SK|Sex|SEX_FEMALE|SEX_MALE/;
-
-    for my $syntax (@contents)
-    {
-        if ($syntax =~ /^\s+$/ || $syntax eq "")
-        {
-            next;
-        }
-        if ($syntax =~ /(delitem)\s+(.+);/)
-        {
-            $syntax = "\$self->$1($2);";
-        }
-        if ($syntax =~ /^skill (.+);/)
-        {
-            $syntax = "\$self->skill($1);";
-        }
-        if ($syntax =~ /getskilllv/)
-        {
-            $syntax =~ s/(getskilllv)/\$self->$1/g;
-        }
-        if ($syntax =~ /getitem/)
-        {
-            $syntax =~ s/(getitem) (\d+)/\$self->$1($2)/g;
-        }
-        if ($syntax =~ /countitem/)
-        {
-            $syntax =~ s/(countitem)/\$self->$1/g;
-        }
-        if ($syntax =~ /rand/)
-        {
-            $syntax =~ s/(rand)/\$self->$1/g;
-        }
-        if ($syntax =~ /mes/)
-        {
-            $syntax =~ s/mes "(.+)";/\$self->mes("$1");/g;
-        }
-        if ($syntax =~ /^set/)
-        {
-            $syntax =~ s/set (.+);/\$self->set($1);/g;
-        }
-
-        push(@ret, $syntax);
-    }
-
-    my $num = 0;
-
-    for my $line (@ret)
-    {
-        # warn "$num:$line\n";
-        $num++;
-    }
-
-    $lines = join("\n", @ret);
-    # $lines =~ s/\[\d+\]\://g;
-    # $lines =~ s/\*//g;
-    # $lines =~ s/}$//g;
-
-    unshift(@ret, $self->get_mock_class_string);
-
-    my $path = "test2.pl";
-    my $file = Mojo::File->new($path);
-    $file->spurt(join("\n", @ret));
+    my $stdout;
 
     my $capture = IO::Capture::Stdout->new;
-    $capture->start;
-    eval($lines);
-    $capture->stop;
-    if ($@)
+
+    for my $num (0 .. 100)
     {
-        warn $@;
+        warn "num = $num";
+        $capture->start;
+        eval(join("\n", @ret));
+        $capture->stop;
+        if ($@ =~ /Missing right curly or square bracket/)
+        {
+            push(@ret, "}");
+            # warn $@;
+        }
+        elsif ($@ eq "")
+        {
+            my @tmp = @ret;
+            unshift(@tmp, $self->get_mock_class_string);
+            my $path = File::Spec->catfile($FindBin::Bin, "test2.pl");
+            my $file = Mojo::File->new($path);
+            $file->spurt(join("\n", @tmp));
+
+            my @stdout = $capture->read;
+            my $res = join("", @stdout);
+
+            if ($res eq "")
+            {
+                $self->paragraph($self->paragraph + 1);
+                $self->save;
+                my $tmp2 = $self->get_rows($rows);
+                @ret = @$tmp2;
+                warn "here";
+            }
+            else
+            {
+                $stdout = $res;
+                warn "no here";
+                last;
+            }
+        }
+        else
+        {
+            warn $@;
+            die $@;
+        }
     }
 
-    my @stdout = $capture->read;
-
-    return join("", @stdout);
+    return $stdout;
 }
 
 sub AUTOLOAD
@@ -235,11 +244,47 @@ sub AUTOLOAD
         *{$method} = sub {
             use strict 'refs';
             my ($self, $val) = @_;
+
+            $self->input_data->{$method} = $val;
+
             return 0;
             # warn YAML::XS::Dump($self);
         };
     }
     goto &$method;
+}
+
+sub select_choice
+{
+    my $self = shift;
+    my $mes = shift;
+    my @tmp = split(":", $mes);
+    my $choice = $self->choice;
+
+    if ($choice eq "")
+    {
+        # noop
+    }
+    else
+    {
+        $self->choice(undef);
+        $self->save;
+        return $choice;
+    }
+
+    $self->choices(\@tmp);
+}
+
+sub JobLevel
+{
+    my $self = shift;
+    return 41;
+}
+
+sub ALCHE_SK
+{
+    my $self = shift;
+    return 1;
 }
 
 # アイテムを消す
@@ -283,6 +328,15 @@ sub mes
 
     print $self->trim($line), "<br />\n";
     return 1;
+}
+
+sub no_mes
+{
+    my $self = shift;
+    my $line = shift;
+
+    # warn $self->trim($line). "\n";
+    # return 1;
 }
 
 sub _result1
@@ -408,7 +462,7 @@ sub parse_rathena_script
         my $choice;
         if ($self->paragraph == 0 || ! defined $self->paragraph || $self->paragraph eq "")
         {
-            $self->paragraph(1);
+            # $self->paragraph(1);
         }
 
         if (ref $choices ne "ARRAY")
@@ -419,7 +473,7 @@ sub parse_rathena_script
 
         if ($choice eq "次へ")
         {
-            $self->paragraph($self->paragraph + 1);
+            # $self->paragraph($self->paragraph + 1);
         }
 
         my @tmp;
@@ -579,7 +633,7 @@ sub parse_script
         }
         if ($mes =~ /select\(/)
         {
-            $mes =~ s|select\(|\$self->select(|;
+            $mes =~ s|select\(|\$self->select_choice(|;
             $tmp2[2] = $mes;
         }
         if ($mes =~ /next;/)
@@ -592,15 +646,60 @@ sub parse_script
             $mes =~ s|close;|\$self->conversation_close;|;
             $tmp2[2] = $mes;
         }
+        if ($mes =~ /EF_SUI_EXPLOSION/)
+        {
+            $mes =~ s|EF_SUI_EXPLOSION|\$self->EF_SUI_EXPLOSION()|;
+            $tmp2[2] = $mes;
+        }
+        if ($mes =~ /specialeffect/)
+        {
+            $mes =~ s|specialeffect (.+);|\$self->specialeffect($1);|;
+            $tmp2[2] = $mes;
+        }
+        if ($mes =~ /switch\(/)
+        {
+            $mes =~ s|switch\(|\$self->switch(|;
+            $tmp2[2] = $mes;
+        }
         if ($mes =~ /strcharinfo\(/)
         {
             $mes =~ s|strcharinfo\(|\$self->strcharinfo(|;
             $tmp2[2] = $mes;
         }
+        if ($mes =~ /mes/)
+        {
+            $mes =~ s/mes "(.+)";/\$self->mes("$1");/g;
+            $tmp2[2] = $mes;
+        }
+        if ($mes =~ /set/)
+        {
+            $mes =~ s/set (.+);/\$self->set($1);/g;
+            $tmp2[2] = $mes;
+        }
+        if ($mes =~ /delitem/)
+        {
+            $mes =~ s/delitem (.+);/\$self->delitem($1);/g;
+            $tmp2[2] = $mes;
+        }
+        if ($mes =~ /getitem/)
+        {
+            $mes =~ s/getitem (.+);/\$self->getitem($1);/g;
+            $tmp2[2] = $mes;
+        }
+        if ($mes =~ /countitem/)
+        {
+            $mes =~ s/countitem/\$self->countitem/g;
+            $tmp2[2] = $mes;
+        }
+        if ($mes =~ /mes/ && $mes =~ /\+/)
+        {
+            $mes =~ s/\+/./g;
+            $tmp2[2] = $mes;
+        }
         if ($#ret == $no)
         {
-            $mes = "}}}}}";
-            $tmp2[2] = $mes;
+            # $mes = "}}}}}";
+            # $tmp2[2] = $mes;
         }
 
         if ($mes =~ /($words)/)
@@ -614,72 +713,79 @@ sub parse_script
         push(@disp, $tmp2[2]);
     }
 
-
-    my $path = "test.pl";
-    my $file = Mojo::File->new($path);
-
-    unshift(@disp, "sub mes { print shift. \"\\n\" }");
-    unshift(@disp, "sub delitem { print 'delitem', \$_ }");
-    unshift(@disp, "sub getitem { print 'getitem', \$_ }");
-    unshift(@disp, "sub random { print 'random', \@_ }");
-    unshift(@disp, "sub set { print 'set', \@_ }");
-    unshift(@disp, "sub conversation_next { print 'conversation_next', \@_ }");
-    unshift(@disp, "sub conversation_close { print 'conversation_close', \@_ }");
-    unshift(@disp, "sub ALCHE_SK { print 'ALCHE_SK', \@_ }");
-    unshift(@disp, "sub BaseJob { print 'BaseJob', \@_ }");
-    unshift(@disp, "sub Job_Alchemist { print 'Job_Alchemist', \@_ }");
-    unshift(@disp, "sub JobLevel { print 'JobLevel', \@_ }");
-    unshift(@disp, "sub Sex { print 'Sex', \@_ }");
-    unshift(@disp, "sub SEX_FEMALE { print 'SEX_FEMALE', \@_ }");
-    unshift(@disp, "sub SEX_MALE { print 'SEX_MALE', \@_ }");
-    unshift(@disp, $self->get_mock_class_string);
-
-    $file->spurt(join("\n", @disp));
-
     return \@ret;
 }
 
 sub get_mock_class_string
 {
     my $self = shift;
-    my $class = <<'EOF';
-package Test;
+    my $class = <<EOF;
+package Mock;
 
 use Mojo::Base -base;
 
+has paragraph => 0;
+
 sub random
 {
-    my $self = shift;
+    my \$self = shift;
+}
+
+sub JobLevel
+{
+    return 41;
 }
 
 sub AUTOLOAD
 {
-    our $AUTOLOAD;
-    my ($method) = ($AUTOLOAD =~ /([^:']+$)/);
+    our \$AUTOLOAD;
+    my (\$method) = (\$AUTOLOAD =~ /([^:']+\$)/);
     {
-        warn "-------->$method";
+        warn "-------->\$method";
         no strict 'refs';
-        *{$method} = sub {
+        *{\$method} = sub {
             use strict 'refs';
-            my ($self, $val) = @_;
+            my (\$self, \$val) = \@_;
             return 0;
-            # warn YAML::XS::Dump($self);
+            # warn YAML::XS::Dump(\$self);
         };
     }
-    goto &$method;
+    goto &\$method;
+}
+
+sub conversation_close
+{
+    my \$self = shift;
+    exit;
+}
+
+sub conversation_next
+{
+    my \$self = shift;
+    # my \$in = <STDIN>;
+    # chomp(\$in);
+    \$self->paragraph(\$self->paragraph + 1);
 }
 
 sub mes
 {
-    my $self = shift;
-    my $mes = shift;
+    my \$self = shift;
+    my \$mes = shift;
 
-    print $mes, "\n";
+    print \$mes, "\\n";
+}
+
+sub no_mes
+{
+    my \$self = shift;
+    my \$mes = shift;
+
+    # warn \$mes, "\\n";
 }
 
 package main;
 
-my $self = Test->new;
+my \$self = Mock->new;
 EOF
     return $class;
 }
