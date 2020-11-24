@@ -70,6 +70,8 @@ sub _choice
 
     if (! defined $parent)
     {
+        warn "1------------------>";
+
         my @tmp;
         for my $elm (@$parse)
         {
@@ -94,6 +96,8 @@ sub _choice
     }
     else
     {
+        warn "2------------------>";
+
         my @tmp;
         for my $elm (@$parse)
         {
@@ -116,8 +120,6 @@ sub _choice
             $event->chara_id($self->chara_id);
             $event->parent_id($self->id);
             $event->save;
-            # $self->system($event->system);
-            # $self->context($event->context);
             $self->continue_id($event->id);
             $self->save;
         }
@@ -233,6 +235,7 @@ sub AUTOLOAD
         *{$method} = sub {
             use strict 'refs';
             my ($self, $val) = @_;
+            return 0;
             # warn YAML::XS::Dump($self);
         };
     }
@@ -540,7 +543,7 @@ sub parse_script
         my $elm = $ret[$no];
         my @tmp2 = split(/\[(\d+)\]:/, $elm);
         my $mes = $tmp2[2];
-        my $words = qr/JobLevel|BaseJob|Job_Priest|Job_Monk|BaseClass|Job_Acolyte|SKILL_PERM|Job_Alchemist|ALCHE_SK|Sex|SEX_FEMALE|SEX_MALE/;
+        my $words = qr/JobLevel|BaseJob|Job_Priest|Job_Monk|BaseClass|Job_Acolyte|SKILL_PERM|Job_Alchemist|ALCHE_SK|Sex|SEX_FEMALE|SEX_MALE|break/;
 
         if ($mes =~ /case (\d):/)
         {
@@ -587,6 +590,11 @@ sub parse_script
         if ($mes =~ /close;/)
         {
             $mes =~ s|close;|\$self->conversation_close;|;
+            $tmp2[2] = $mes;
+        }
+        if ($mes =~ /strcharinfo\(/)
+        {
+            $mes =~ s|strcharinfo\(|\$self->strcharinfo(|;
             $tmp2[2] = $mes;
         }
         if ($#ret == $no)
@@ -654,10 +662,19 @@ sub AUTOLOAD
         *{$method} = sub {
             use strict 'refs';
             my ($self, $val) = @_;
+            return 0;
             # warn YAML::XS::Dump($self);
         };
     }
     goto &$method;
+}
+
+sub mes
+{
+    my $self = shift;
+    my $mes = shift;
+
+    print $mes, "\n";
 }
 
 package main;
