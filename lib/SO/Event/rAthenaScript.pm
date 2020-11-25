@@ -140,6 +140,13 @@ sub paragraph_check
             push(@ret, "}");
             # warn $@;
         }
+        elsif ($@ =~ /メッセージ破棄/)
+        {
+            $stdout = "&nbsp;";
+            warn "skip: $@";
+            # warn Dump $self->choices;
+            last;
+        }
         elsif ($@ =~ /てへ/ || $@ =~ /__CLOSE__/)
         {
             if ($@ =~ /__CLOSE__/)
@@ -202,6 +209,7 @@ sub paragraph_check
         $self->save;
         my $event = $self->object(ref $self);
         $event->paragraph($self->paragraph);
+        $event->parent_id($self->id);
 
         if ($close == 1)
         {
@@ -212,7 +220,6 @@ sub paragraph_check
         $self->event_end_time(time);
         $self->message($stdout);
         $self->save;
-        # warn $stdout;
     }
 
     return $stdout;
@@ -269,7 +276,7 @@ sub select_choice
     warn "------------------------>select_choice";
     warn Dump(\@tmp);
 
-    # die "メッセージ破棄";
+    die "メッセージ破棄";
 }
 
 sub JobLevel
