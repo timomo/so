@@ -108,6 +108,10 @@ sub render_to_string
             }
         }
 
+        warn "選択肢--------------";
+        warn Dump($row->{選択肢});
+        warn "選択肢--------------";
+
         my $html = $self->context->render_to_string(
             template      => "event",
             event        => $row,
