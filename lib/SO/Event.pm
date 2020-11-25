@@ -140,6 +140,7 @@ sub reserved
         $event->parent_id($self->event->{親イベントid});
         $event->paragraph($self->event->{段落});
         $event->case($self->event->{ケース});
+        $event->fin_flag($self->event->{終了フラグ});
     }
 
     $self->close;
@@ -206,6 +207,7 @@ sub encounter
             $event->parent_id($self->event->{親イベントid});
             $event->paragraph($self->event->{段落});
             $event->case($self->event->{ケース});
+            $event->fin_flag($self->event->{終了フラグ});
         }
     }
 
@@ -252,6 +254,7 @@ sub load
         $event->parent_id($self->event->{親イベントid});
         $event->paragraph($self->event->{段落});
         $event->case($self->event->{ケース});
+        $event->fin_flag($self->event->{終了フラグ});
     }
 
     $self->close;

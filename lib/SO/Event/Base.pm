@@ -39,6 +39,7 @@ has continue_id => 0; # イベント継続id
 has parent_id => 0; # 親イベントid
 has paragraph => 0; # 段落
 has case => ""; # ケース
+has fin_flag => 0; # 終了フラグ
 
 sub import
 {
@@ -93,8 +94,6 @@ sub render_to_string
     my $self = shift;
     my $row = $self->generate;
     $row->{id} = $self->id;
-
-    # warn Dump $row;
 
     if (defined $row)
     {
@@ -262,6 +261,7 @@ sub generate
     $dat->{親イベントid} = $self->parent_id;
     $dat->{段落} = $self->paragraph;
     $dat->{ケース} = $self->case;
+    $dat->{終了フラグ} = $self->fin_flag;
 
     return $dat;
 }
@@ -271,6 +271,8 @@ sub save
     my $self = shift;
 
     my $dat = $self->generate;
+
+    # warn Dump $dat;
 
     if (defined $self->id)
     {
@@ -309,6 +311,11 @@ sub next
 {
     my $self = shift;
 
+    if ($self->fin_flag == 1)
+    {
+        return;
+    }
+
     if ($self->continue_id == 0)
     {
         return;
@@ -342,6 +349,7 @@ sub next
     $event->parent_id($row->{親イベントid});
     $event->paragraph($row->{段落});
     $event->case($row->{ケース});
+    $event->fin_flag($row->{終了フラグ});
 
     return $event;
 }
@@ -383,6 +391,7 @@ sub parent
     $event->parent_id($row->{親イベントid});
     $event->paragraph($row->{段落});
     $event->case($row->{ケース});
+    $event->fin_flag($row->{終了フラグ});
 
     return $event;
 }
@@ -481,6 +490,7 @@ sub DESTROY
     my $dt = DateTime::HiRes->now(time_zone => "Asia/Tokyo");
     my $mes = sprintf("[%s] [%s] [%s] %s [%s] DESTROY", $dt->strftime('%Y-%m-%d %H:%M:%S.%5N'), $$, "debug", $self, $self->id || "-");
     my $utf8 = Encode::encode_utf8($mes);
+
     warn $utf8. "\n" if ($self->log_level eq "debug");
 }
 

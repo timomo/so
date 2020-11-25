@@ -18,6 +18,8 @@ sub is_continue_event
 
 sub event_reserved
 {
+	warn "---------------->event_reserved";
+
 	my $encounter = SO::Event->new(context => $controller, "system" => $system, id => $kid);
 	my $event = $encounter->reserved;
 
@@ -56,6 +58,7 @@ sub event_reserved
 
 sub event_encounter
 {
+	warn "---------------->event_encounter";
 	my $encounter = SO::Event->new(context => $controller, "system" => $system, id => $kid);
 	my $event = $encounter->encounter;
 
@@ -81,6 +84,7 @@ sub event_encounter
 
 sub event_choice
 {
+	warn "---------------->event_choice";
 	my $event_id = $in{イベントid};
 	my $select = $in{選択};
 

@@ -307,6 +307,7 @@ CREATE TABLE イベント (
         親イベントid INTEGER NOT NULL DEFAULT 0,
         段落 INTEGER NOT NULL DEFAULT 0,
         ケース TEXT,
+        終了フラグ INTEGER NOT NULL DEFAULT 0,
         ctime DATETIME,
 	    mtime DATETIME
  );
