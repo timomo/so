@@ -94,6 +94,8 @@ sub render_to_string
     my $row = $self->generate;
     $row->{id} = $self->id;
 
+    # warn Dump $row;
+
     if (defined $row)
     {
         if (ref $row->{選択肢} ne "ARRAY")
@@ -133,17 +135,38 @@ sub select
     my $self = shift;
     my $choice = shift;
 
-    if ($choice->{イベントid} != $self->id)
+    warn Dump([$choice, $self->id]);
+
+    if (int($choice->{イベントid}) != $self->id)
     {
         return;
     }
 
-    if (! defined $choice->{選択})
+    warn Dump($choice->{選択});
+
+    if ($choice->{選択} eq "")
     {
         return;
     }
 
-    $self->choice($choice->{選択});
+    warn Dump($choice);
+
+    my $raw = $self->choice;
+
+    if (ref $raw ne "ARRAY")
+    {
+        $raw = Encode::encode_utf8($raw);
+        $raw = YAML::XS::Load($raw);
+
+        if (ref $raw ne "ARRAY")
+        {
+            $raw = [ $raw ];
+        }
+    }
+
+    push(@$raw, $choice->{選択});
+
+    $self->choice($raw);
     # $self->event_end_time(time);
     $self->save;
     $self->hook("choice", {});
@@ -201,6 +224,11 @@ sub update
     {
         $dat->{選択肢} = YAML::XS::Dump($dat->{選択肢});
         $dat->{選択肢} = Encode::decode_utf8($dat->{選択肢});
+    }
+    if (ref $dat->{選択} eq "ARRAY")
+    {
+        $dat->{選択} = YAML::XS::Dump($dat->{選択});
+        $dat->{選択} = Encode::decode_utf8($dat->{選択});
     }
 
     eval {
@@ -364,7 +392,7 @@ sub object
     my $self = shift;
     my $class = shift;
     $class->require or die $@;
-    my $event = $class->new(context => $self->context, "system" => $self->system, chara_id => $self->id);
+    my $event = $class->new(context => $self->context, "system" => $self->system, chara_id => $self->chara_id);
     return $event;
 }
 
@@ -455,5 +483,13 @@ sub DESTROY
     my $utf8 = Encode::encode_utf8($mes);
     warn $utf8. "\n" if ($self->log_level eq "debug");
 }
+
+sub delete
+{
+    my ($self) = @_;
+    $self->system->dbi("main")->model("イベント")->delete(where => { id => $self->{id} });
+
+}
+
 
 1;

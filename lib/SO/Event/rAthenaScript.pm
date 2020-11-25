@@ -28,18 +28,14 @@ sub _encount
     my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "alchemist_skills.txt"));
     # my $parse = $self->_parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "script.txt"));
 
-    # 初期データがない場合にのみ、メッセージを初期化する
-    if (! defined $self->message)
-    {
-        my @tmp;
-        for my $elm (@$parse)
-        {
-            push(@tmp, $elm->[2]);
-        }
-        $self->message($self->paragraph_check($parse));
-        $self->event_end_time(time);
-        $self->save;
-    }
+    warn "------------------>_encount";
+
+    $self->paragraph_check($parse);
+
+    warn Dump "---------------------------------------------->". $self->continue_id;
+
+    $self->event_end_time(time);
+    $self->save;
 }
 
 sub trim
@@ -69,67 +65,14 @@ sub _choice
     # my $parse = $self->_parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "script.txt"));
     my $choices = YAML::XS::Load(Encode::encode_utf8($self->choices));
     my $choice = $choices->[$self->choice];
-    my $event = $self->object(ref $self);
+    # my $event = $self->object(ref $self);
     my $message = undef;
 
-    if (! defined $parent)
-    {
-        my @tmp;
-        for my $elm (@$parse)
-        {
-            push(@tmp, $elm->[2]);
-        }
+    warn "------------------>_choice";
 
-        if ($tmp[0] eq "---select")
-        {
-            $event->choices(\@tmp);
-        }
-        else
-        {
-            $message = $self->paragraph_check($parse);
-        }
-
-        if ($message ne "")
-        {
-            $event->message($message);
-            $event->paragraph($self->paragraph);
-            $event->chara_id($self->chara_id);
-            $event->parent_id($self->id);
-            $event->save;
-            $self->continue_id($event->id);
-            $self->save;
-        }
-    }
-    else
-    {
-        my @tmp;
-        for my $elm (@$parse)
-        {
-            push(@tmp, $elm->[2]);
-        }
-
-        if ($tmp[0] eq "---select")
-        {
-            $event->choices(\@tmp);
-        }
-        else
-        {
-            $message = $self->paragraph_check($parse);
-        }
-
-        if ($message ne "")
-        {
-            $event->message($message);
-            $event->paragraph($self->paragraph);
-            $event->chara_id($self->chara_id);
-            $event->parent_id($self->id);
-            $event->save;
-            $self->continue_id($event->id);
-            $self->save;
-        }
-    }
-    $self->event_end_time(time);
-    $self->save;
+    $self->paragraph_check($parse);
+    # $self->event_end_time(time);
+    # $self->save;
 }
 
 sub get_rows
@@ -142,36 +85,32 @@ sub get_rows
     warn $self->paragraph;
     warn "------------------->";
 
-    for my $row (@$rows)
+    my $skip = 0;
+
+    for my $no (0 .. $#$rows)
     {
-        # TODO: 明日はここから！
+        my $row = $rows->[$no];
+
+        if ($self->paragraph >= $row->[0])
+        {
+            if ($row->[2] =~ /conversation_next/)
+            {
+                $row->[2] =~ s/>conversation_next\(/>_conversation_next\(/;
+            }
+            warn join(",", (1, $self->paragraph, @$row));
+        }
+        else
+        {
+            # $skip = $no;
+            # warn join(",", (2, $self->paragraph, @$row));
+            # last;
+        }
         push(@ret, $row->[2]);
     }
 
-    # warn Dump \@ret;
+    # warn join (", ", ($self->paragraph, $_, $ret[$_])) for 0 ..  $#ret;
 
     return \@ret;
-}
-
-sub toggle_mes
-{
-    my $self = shift;
-    my $row = shift;
-    my $type = shift;
-    my $mes = $row->[2];
-
-    if ($type == 1 && $mes =~ />mes\(/)
-    {
-        $mes =~ s/>mes\(/>no_mes(/g;
-    }
-    if ($type == 2 && $mes =~ />no_mes\(/)
-    {
-        $mes =~ s/>no_mes\(/>mes(/g;
-    }
-
-    $row->[2] = $mes;
-
-    # warn Dump $row;
 }
 
 sub paragraph_check
@@ -179,13 +118,10 @@ sub paragraph_check
     my $self = shift;
     my $rows = shift;
     my @ret;
-
+    my $stdout;
+    my $capture = IO::Capture::Stdout->new;
     my $tmp = $self->get_rows($rows);
     @ret = @$tmp;
-
-    my $stdout;
-
-    my $capture = IO::Capture::Stdout->new;
 
     for my $num (0 .. 100)
     {
@@ -195,32 +131,45 @@ sub paragraph_check
         $capture->stop;
         if ($@ =~ /Missing right curly or square bracket/)
         {
+            warn $@;
             push(@ret, "}");
             # warn $@;
         }
-        elsif ($@ eq "")
+        elsif ($@ =~ /てへ/)
         {
-            my @tmp = @ret;
-            unshift(@tmp, $self->get_mock_class_string);
-            my $path = File::Spec->catfile($FindBin::Bin, "test2.pl");
-            my $file = Mojo::File->new($path);
-            $file->spurt(join("\n", @tmp));
-
             my @stdout = $capture->read;
             my $res = join("", @stdout);
 
+            warn "skip: $@";
+
             if ($res eq "")
             {
-                $self->paragraph($self->paragraph + 1);
-                $self->save;
-                my $tmp2 = $self->get_rows($rows);
-                @ret = @$tmp2;
                 warn "here";
             }
             else
             {
                 $stdout = $res;
                 warn "no here";
+                warn $stdout;
+                last;
+            }
+        }
+        elsif ($@ =~ /__CLOSE__/)
+        {
+            my @stdout = $capture->read;
+            my $res = join("", @stdout);
+
+            warn "skip: $@";
+
+            if ($res eq "")
+            {
+                warn "here";
+            }
+            else
+            {
+                $stdout = $res;
+                warn "no here";
+                warn $stdout;
                 last;
             }
         }
@@ -284,7 +233,7 @@ sub JobLevel
 sub ALCHE_SK
 {
     my $self = shift;
-    return 1;
+    return 0;
 }
 
 # アイテムを消す
@@ -315,10 +264,60 @@ sub countitem
     return 0;
 }
 
-sub here
+sub _conversation_next
 {
     my $self = shift;
-    warn "here";
+    my $paragraph = shift;
+
+    # $self->paragraph($paragraph + 1);
+    # $self->event_end_time(time);
+    $self->message(undef);
+    $self->save;
+
+    warn "---------------------------->メッセージ破棄開始";
+    warn $self->message;
+    warn "---------------------------->メッセージ破棄終了";
+
+    # die "てへ";
+}
+
+sub conversation_next
+{
+    my $self = shift;
+    my $paragraph = shift;
+    my $event = $self->object(ref $self);
+
+    $self->save;
+
+    $event->message($self->message);
+    $event->paragraph($paragraph);
+    $event->parent_id($self->id);
+    $event->save;
+    $self->continue_id($event->id);
+
+    $self->event_end_time(time);
+    $self->save;
+
+    print $self->message;
+
+    # $self->delete;
+
+    die "てへ";
+}
+
+sub conversation_close
+{
+    my $self = shift;
+    my $paragraph = shift;
+
+    $self->save;
+    $self->paragraph($paragraph);
+    $self->event_end_time(time);
+    $self->save;
+
+    print $self->message;
+
+    die "__CLOSE__";
 }
 
 sub mes
@@ -326,7 +325,11 @@ sub mes
     my $self = shift;
     my $line = shift;
 
-    print $self->trim($line), "<br />\n";
+    my $message = $self->message;
+    $message .= $self->trim($line). "<br />\n";
+
+    $self->message($message);
+
     return 1;
 }
 
@@ -638,12 +641,12 @@ sub parse_script
         }
         if ($mes =~ /next;/)
         {
-            $mes =~ s|next;|\$self->conversation_next;|;
+            $mes =~ s|next;|\$self->conversation_next($no);|;
             $tmp2[2] = $mes;
         }
         if ($mes =~ /close;/)
         {
-            $mes =~ s|close;|\$self->conversation_close;|;
+            $mes =~ s|close;|\$self->conversation_close($no);|;
             $tmp2[2] = $mes;
         }
         if ($mes =~ /EF_SUI_EXPLOSION/)
