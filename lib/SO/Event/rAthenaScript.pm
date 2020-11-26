@@ -320,13 +320,13 @@ sub select_choice
 sub JobLevel
 {
     my $self = shift;
-    return 39;
+    return 41;
 }
 
 sub ALCHE_SK
 {
     my $self = shift;
-    return 4;
+    return 1;
 }
 
 # アイテムを消す

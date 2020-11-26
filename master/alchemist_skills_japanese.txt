@@ -63,7 +63,7 @@ yuno_in04,33,108,4	script	Pisruik#qsk_al	883,{
 			mes "Though, I'm afraid I can't be";
 			mes "of very much help to you.";
 			next;
-			if (select("What are you working on?:I don't need anything, thanks.") == 1) {
+			if (select("選択肢1:選択肢2") == 1) {
 				mes "[Pisruik]";
 				mes "Well, I'm not sure if I can";
 				mes "give you all of the details.";
