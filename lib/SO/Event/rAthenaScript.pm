@@ -518,11 +518,18 @@ sub parse_rathena_script
 
     if ($content =~ m/(.+?)(\{)(.+?)\n(\})/s)
     {
+        # TODO: なぜか括弧を付け加えないと括弧がずれる
         my $titie = $1;
         my $right = $2;
         my $body = $3;
         my $left = $4;
-        my $ref = $self->parse_script($body. $left);
+        my $ref = $self->parse_script($body. "}");
+        my $amari = $5;
+
+        warn $body;
+        warn "amari--------------->";
+        # warn $amari;
+        warn "amari--------------->";
 
         my @mes = @$ref;
         my $num = 0;
