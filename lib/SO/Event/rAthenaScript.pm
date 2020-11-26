@@ -28,8 +28,8 @@ sub bind
 sub _encount
 {
     my $self = shift;
-    # my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "alchemist_skills_japanese.txt"));
-    my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "script.txt"));
+    my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "alchemist_skills_japanese.txt"), 3);
+    # my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "script.txt"), 0);
 
     $self->paragraph_check($parse);
 }
@@ -37,8 +37,8 @@ sub _encount
 sub _choice
 {
     my $self = shift;
-    # my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "alchemist_skills_japanese.txt"));
-    my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "script.txt"));
+    my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "alchemist_skills_japanese.txt"), 3);
+    # my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "script.txt"), 0);
 
     $self->paragraph_check($parse);
 }
@@ -516,15 +516,74 @@ sub parse_rathena_script
 {
     my $self = shift;
     my $path = shift;
+    my $number = shift;
     my $file = Mojo::File->new($path);
     my $content = $file->slurp;
     {
         my $utf8 = Encode::decode_utf8($content);
         $content = $utf8;
     }
-    $content =~ s/\r\n|\r|\n/\n/;
+    $content =~ s/\r\n|\r|\n/\n/g;
+    my @dummy = split(/\n/, $content);
 
-    if ($content =~ m/(.+?)(\{)(.+?)\n(\})/s)
+    # my $root_paragraph = $self->get_paragraph($dummy[0]);
+    my $map = {};
+    my $key = undef;
+    my @ary;
+    my $map2 = {};
+
+    for my $no (0 ..$#dummy)
+    {
+        my $line = $dummy[$no];
+        # my $paragraph = $self->get_paragraph($line);
+
+        push(@ary, $line);
+
+        if ($line =~ qr|^//| || $line =~ qr|^\s*$|)
+        {
+            next;
+        }
+
+        if ($line =~ /script/)
+        {
+            if ($line ne $key)
+            {
+                $map->{$key} = $no;
+                $key = $line;
+            }
+        }
+    }
+
+    my @keys = sort { $map->{$a} <=> $map->{$b} } keys %$map;
+
+    if (scalar(@keys) != 1)
+    {
+        for my $no (1 .. $#keys)
+        {
+            my $now = $keys[$no];
+            my $prev = $keys[$no - 1];
+            my $now_no = $map->{$now};
+            my $prev_no = $map->{$prev};
+            $map2->{$now} ||= [];
+            my @lines = @ary[$prev_no .. $now_no];
+            push(@{$map2->{$now}}, @lines);
+        }
+    }
+    elsif (scalar(@keys) == 1)
+    {
+        my $now = $keys[0];
+        my $prev = $keys[0];
+        my $now_no = $#ary;
+        my $prev_no = 0;
+        $map2->{$now} ||= [];
+        my @lines = @ary[$prev_no .. $now_no];
+        push(@{$map2->{$now}}, @lines);
+    }
+
+    my $current = $keys[$number];
+    my $content2 = join("\n", @{$map2->{$current} || []});
+
+    if ($content2 =~ m/(.+?)(\{)(.+?)\n(\})/s)
     {
         # TODO: なぜか括弧を付け加えないと括弧がずれる
         my $titie = $1;
@@ -588,7 +647,7 @@ sub get_paragraph
     my $body = shift;
     $body =~ s/\r\n|\r|\n//g;
     my @list = split //, $body;
-    my $count;
+    my $count = 0;
 
     for my $str (@list)
     {
