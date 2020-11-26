@@ -9,6 +9,7 @@ use IO::Capture::Stderr;
 use 5.010001;
 use Mojo::Util qw(xml_escape);
 use Text::Diff 'diff';
+use Perl::Tidy;
 
 has choices => sub { ["次へ"] }; # 選択肢
 has event_type => 5; # イベント種別
@@ -864,7 +865,33 @@ sub parse_script
             push(@tmp3, $string. $tmp2[2]);
         }
         my $file = Mojo::File->new("intermediate_data2.pl");
+        my $file2 = Mojo::File->new("intermediate_data_tidy.pl");
         $tmp3[$_] = Encode::encode_utf8($tmp3[$_]) for 0 .. $#tmp3;
+
+        {
+            my @tmp4 = @tmp3;
+            unshift(@tmp4, $self->get_mock_class_string);
+            my $source_string = join("\n", @tmp4);
+            my $dest_string;
+            my $stderr_string;
+            my $errorfile_string;
+            my $argv = "-npro";   # Ignore any .perltidyrc at this site
+            $argv .= " -pbp";     # Format according to perl best practices
+            $argv .= " -nst";     # Must turn off -st in case -pbp is specified
+            $argv .= " -se";      # -se appends the errorfile to stderr
+
+            my $error = Perl::Tidy::perltidy(
+                argv        => $argv,
+                source      => \$source_string,
+                destination => \$dest_string,
+                stderr      => \$stderr_string,
+                errorfile   => \$errorfile_string,    # ignored when -se flag is set
+                ##phasers   => 'stun',                # uncomment to trigger an error
+            );
+
+            $file2->spurt($dest_string);
+        }
+
         $file->spurt(join("\n", @tmp3));
     }
 
