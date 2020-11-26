@@ -522,7 +522,7 @@ sub parse_rathena_script
         my $right = $2;
         my $body = $3;
         my $left = $4;
-        my $ref = $self->parse_script($body);
+        my $ref = $self->parse_script($body. $left);
 
         my @mes = @$ref;
         my $num = 0;
@@ -601,7 +601,11 @@ sub parse_script
         my $paragraph = $self->get_paragraph($line);
 
         $line =~ s/\r\n|\r|\n/\n/g;
-        $line =~ s/$/{/g;
+
+        if ($#tmp != $no)
+        {
+            $line =~ s/$/{/g;
+        }
 
         if ($line =~ /mes/)
         {
@@ -648,7 +652,10 @@ sub parse_script
 
                     if ($paragraph2 == 0)
                     {
-                        next;
+                        # warn "まじで！？";
+                        # warn $line2;
+                        # warn "まじで！？";
+                        # next;
                     }
 
                     # warn "------------->[$paragraph2]:$line2";
@@ -667,12 +674,36 @@ sub parse_script
         }
     }
 
+    # 中間データ1を吐き出し
+    {
+        my @tmp3;
+        for my $elm (@ret)
+        {
+            my @tmp2 = split(/\[(\d+)\]:/, $elm);
+            my $string = "\t" x $tmp2[1];
+            push(@tmp3, $string. $tmp2[2]);
+        }
+        my $file = Mojo::File->new("intermediate_data1.pl");
+        $file->spurt(join("\n", @tmp3));
+    }
+
+    my $para = 0;
+    my $switch = 0;
+
     for my $no (0 .. $#ret)
     {
         my $elm = $ret[$no];
         my @tmp2 = split(/\[(\d+)\]:/, $elm);
         my $mes = $tmp2[2];
         my $words = qr/JobLevel|BaseJob|Job_Priest|Job_Monk|BaseClass|Job_Acolyte|SKILL_PERM|Job_Alchemist|ALCHE_SK|Sex|SEX_FEMALE|SEX_MALE|break/;
+
+        # TODO: ここに関しては、無理やりswitch文のcase用に括弧を足しているので、処理が怪しい。。。
+        if ($switch == 1 && $para == $tmp2[1] && $mes =~ /\}/)
+        {
+            $switch = 0;
+            $para = 0;
+            $tmp2[2] = "}}";
+        }
 
         if ($mes =~ /case (\d):/)
         {
@@ -698,6 +729,8 @@ sub parse_script
         }
         if ($mes =~ /^(switch.+)\{/)
         {
+            $para = $tmp2[1];
+            $switch = 1;
             $mes = "if(". $1. ") {";
             $tmp2[2] = $mes;
         }
@@ -784,6 +817,22 @@ sub parse_script
         }
 
         $ret[$no] = sprintf("[%d]:%s", $tmp2[1], $tmp2[2]);
+    }
+
+    # 中間データ2を吐き出し
+    {
+        my @tmp3;
+        for my $elm (@ret)
+        {
+            my @tmp2 = split(/\[(\d+)\]:/, $elm);
+            # warn $tmp2[1];
+
+            my $string = "\t" x $tmp2[1];
+
+            push(@tmp3, $string. $tmp2[2]);
+        }
+        my $file = Mojo::File->new("intermediate_data2.pl");
+        $file->spurt(join("\n", @tmp3));
     }
 
     return \@ret;
