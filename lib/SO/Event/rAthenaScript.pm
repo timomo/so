@@ -524,13 +524,6 @@ sub parse_rathena_script
         my $body = $3;
         my $left = $4;
         my $ref = $self->parse_script($body. "}");
-        my $amari = $5;
-
-        warn $body;
-        warn "amari--------------->";
-        # warn $amari;
-        warn "amari--------------->";
-
         my @mes = @$ref;
         my $num = 0;
         my @hits2;
