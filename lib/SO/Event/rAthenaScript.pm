@@ -27,8 +27,8 @@ sub bind
 sub _encount
 {
     my $self = shift;
-    my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "alchemist_skills_japanese.txt"));
-    # my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "script_japanese.txt"));
+    # my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "alchemist_skills_japanese.txt"));
+    my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "script.txt"));
 
     $self->paragraph_check($parse);
 }
@@ -36,8 +36,8 @@ sub _encount
 sub _choice
 {
     my $self = shift;
-    my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "alchemist_skills_japanese.txt"));
-    # my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "script_japanese.txt"));
+    # my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "alchemist_skills_japanese.txt"));
+    my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "script.txt"));
 
     $self->paragraph_check($parse);
 }
@@ -310,6 +310,8 @@ sub select_choice
     my $mes = shift;
     my @tmp = split(":", $mes);
 
+    $tmp[$_] = $self->trim($tmp[$_]) for 0 .. $#tmp;
+
     $self->choices(\@tmp);
     $self->paragraph($paragraph);
     $self->save;
@@ -530,12 +532,15 @@ sub parse_rathena_script
 
         # case文~case文~括弧閉じるは別処理
 
-        while($body =~ /case (\d+):(.+?)case (\d+):(.+?)\}/s)
+        if (0)
         {
-            my $diff1 = $body;
-            $body =~ s/case (\d+):(.+?)case (\d+):(.+?)\}/if (\$self->case eq "$1") {$2} if (\$self->case eq "$3") { $4 }}/gs;
-            my $diff2 = $body;
-            my $diff = diff(\$diff1, \$diff2);
+            while($body =~ /case (\d+):(.+?)case (\d+):(.+?)\}/s)
+            {
+                my $diff1 = $body;
+                $body =~ s/case (\d+):(.+?)case (\d+):(.+?)\}/if (\$self->case eq "$1") {$2} if (\$self->case eq "$3") { $4 }}/gs;
+                my $diff2 = $body;
+                my $diff = diff(\$diff1, \$diff2);
+            }
         }
 
         my $left = $4;
@@ -703,6 +708,7 @@ sub parse_script
 
     my $para = 0;
     my $switch = 0;
+    my $case = 0;
 
     for my $no (0 .. $#ret)
     {
@@ -712,20 +718,22 @@ sub parse_script
         my $words = qr/JobLevel|BaseJob|Job_Priest|Job_Monk|BaseClass|Job_Acolyte|SKILL_PERM|Job_Alchemist|ALCHE_SK|Sex|SEX_FEMALE|SEX_MALE|break/;
 
         # TODO: ここに関しては、無理やりswitch文のcase用に括弧を足しているので、処理が怪しい。。。
-        if ($switch == 1 && $para == $tmp2[1])
+        if ($case == 1 && $para == $tmp2[1])
         {
             if ($mes =~ /^\}$/)
             {
-                warn Dump([$para, $mes]);
+                # warn Dump([$para, $mes]);
 
-                $switch = 0;
+                $case = 0;
                 $para = 0;
-                # $tmp2[2] = "}}";
+                $tmp2[2] = "}}";
             }
         }
 
         if ($mes =~ /case (\d):/)
         {
+            $case = 1;
+            $para = $tmp2[1];
             if ($1 == 1)
             {
                 $mes = "if (\$self->case eq \"$1\") {";
@@ -750,7 +758,7 @@ sub parse_script
         {
             $para = $tmp2[1];
             $switch = 1;
-            $mes = "if(". $1. ") {";
+            $mes = "if(\$self->". $1. ") {";
             $tmp2[2] = $mes;
         }
         if ($mes =~ /rand\(/)
@@ -783,11 +791,6 @@ sub parse_script
             $mes =~ s|specialeffect (.+);|\$self->specialeffect($1);|;
             $tmp2[2] = $mes;
         }
-        if ($mes =~ /switch\(/)
-        {
-            $mes =~ s|switch\(|\$self->switch(|;
-            $tmp2[2] = $mes;
-        }
         if ($mes =~ /strcharinfo\(/)
         {
             $mes =~ s|strcharinfo\(|\$self->strcharinfo(|;
@@ -816,6 +819,16 @@ sub parse_script
         if ($mes =~ /countitem/)
         {
             $mes =~ s/countitem/\$self->countitem/g;
+            $tmp2[2] = $mes;
+        }
+        if ($mes =~ /getskilllv/)
+        {
+            $mes =~ s/getskilllv\s*\((.+)\)/\$self->getskilllv($1)/g;
+            $tmp2[2] = $mes;
+        }
+        if ($mes =~ /skill/)
+        {
+            $mes =~ s/skill "(.+)",(\d+),(.+);/\$self->skill("$1", $2, "$3");/g;
             $tmp2[2] = $mes;
         }
         if ($mes =~ /mes/ && $mes =~ /\+/)
