@@ -20,6 +20,14 @@ sub event_reserved
 {
 	warn "---------------->event_reserved";
 
+	if (exists $in{イベントid})
+	{
+		my $encounter = SO::Event->new(context => $controller, "system" => $system, id => $kid, event_id => int($in{イベントid}));
+		my $event = $encounter->load;
+		$event->select(\%in);
+		# $event->result;
+	}
+
 	my $encounter = SO::Event->new(context => $controller, "system" => $system, id => $kid);
 	my $event = $encounter->reserved;
 

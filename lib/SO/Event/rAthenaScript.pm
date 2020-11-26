@@ -29,14 +29,7 @@ sub _encount
     my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "alchemist_skills.txt"));
     # my $parse = $self->_parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "script.txt"));
 
-    warn "------------------>_encount";
-
     $self->paragraph_check($parse);
-
-    warn Dump "---------------------------------------------->". $self->continue_id;
-
-    # $self->event_end_time(time);
-    # $self->save;
 }
 
 sub _choice
@@ -47,11 +40,6 @@ sub _choice
     # my $parse = $self->_parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "script.txt"));
 
     $self->paragraph_check($parse);
-
-    warn "------------------>_choice";
-
-    # $self->event_end_time(time);
-    # $self->save;
 }
 
 sub trim
@@ -102,7 +90,7 @@ sub get_rows
             {
                 $row->[2] =~ s/>select_choice\(/>_select_choice\(/;
             }
-            # warn join(",", (1, $self->paragraph, @$row));
+            # warn join (", ", ($self->paragraph, @$row));
         }
         else
         {
@@ -116,6 +104,31 @@ sub get_rows
     return \@ret;
 }
 
+sub complement_syntax
+{
+    my $self = shift;
+    my $scripts = shift;
+
+    for my $num (0 .. 100)
+    {
+        my $capture = IO::Capture::Stdout->new;
+        $capture->start;
+        eval(join("\n", @$scripts));
+        $capture->stop;
+        if ($@ =~ /Missing right curly or square bracket/)
+        {
+            # warn "rethrow: $@";
+            push(@$scripts, "}");
+        }
+        else
+        {
+            last;
+        }
+    }
+
+    return $scripts;
+}
+
 sub paragraph_check
 {
     my $self = shift;
@@ -123,10 +136,11 @@ sub paragraph_check
     my @ret;
     my $stdout;
     my $tmp = $self->get_rows($rows);
+    $self->complement_syntax($tmp);
     @ret = @$tmp;
     my $close = 0;
 
-    for my $num (0 .. 100)
+    for my $num (0 .. 10)
     {
         my $capture = IO::Capture::Stdout->new;
         warn "num = $num";
@@ -134,13 +148,7 @@ sub paragraph_check
         eval(join("\n", @ret));
         $capture->stop;
 
-        if ($@ =~ /Missing right curly or square bracket/)
-        {
-            warn $@;
-            push(@ret, "}");
-            # warn $@;
-        }
-        elsif ($@ =~ /メッセージ破棄/)
+        if ($@ =~ /メッセージ破棄/)
         {
             $stdout = "&nbsp;";
             warn "skip: $@";
@@ -172,7 +180,6 @@ sub paragraph_check
             {
                 $stdout = $res;
                 warn "no here";
-                warn $stdout;
                 last;
             }
         }
@@ -186,7 +193,13 @@ sub paragraph_check
                 $self->paragraph($self->paragraph + 1);
                 $self->save;
                 $tmp = $self->get_rows($rows);
+                $self->complement_syntax($tmp);
                 @ret = @$tmp;
+
+                my @tmp = @ret;
+                unshift(@tmp, $self->get_mock_class_string);
+                my $file = Mojo::File->new("test2.pl");
+                $file->spurt(join("\n", @tmp));
             }
             else
             {
@@ -217,10 +230,10 @@ sub paragraph_check
         }
 
         $event->save;
-        $self->event_end_time(time);
         $self->message($stdout);
-        $self->save;
     }
+    $self->event_end_time(time);
+    $self->save;
 
     return $stdout;
 }
@@ -245,6 +258,17 @@ sub AUTOLOAD
     goto &$method;
 }
 
+sub switch
+{
+    my $self = shift;
+    my $args = shift;
+
+    # warn "------------------------>switch";
+    # warn Dump($args);
+
+    $self->case($args);
+}
+
 sub _select_choice
 {
     my $self = shift;
@@ -252,14 +276,30 @@ sub _select_choice
     my $mes = shift;
     my @tmp = split(":", $mes);
     my $dummy = $self->object(ref $self);
+    my $event = $self;
+    my $select;
 
-    # $self->choices($dummy->choices);
-    # $self->save;
+    $self->paragraph($paragraph);
+    $self->save;
 
-    warn "------------------------>_select_choice";
-    warn Dump(\@tmp);
+    while(my $parent = $event->parent)
+    {
+        if ($paragraph == $parent->paragraph)
+        {
+            $select = $parent;
+            last;
+        }
+        $event = $parent;
+    }
 
-    return 1;
+    if (defined $select)
+    {
+        warn Dump($select->generate);
+        warn Dump($select->choice);
+        return int($select->choice + 1);
+    }
+
+    return undef;
 }
 
 sub select_choice
@@ -273,9 +313,6 @@ sub select_choice
     $self->paragraph($paragraph);
     $self->save;
 
-    warn "------------------------>select_choice";
-    warn Dump(\@tmp);
-
     die "メッセージ破棄";
 }
 
@@ -288,7 +325,7 @@ sub JobLevel
 sub ALCHE_SK
 {
     my $self = shift;
-    return 1;
+    return 2;
 }
 
 # アイテムを消す
@@ -348,8 +385,6 @@ sub conversation_next
     $self->buffer(undef);
     $self->save;
 
-    # $self->delete;
-
     die "てへ";
 }
 
@@ -367,8 +402,6 @@ sub conversation_close
     $self->buffer(undef);
     $self->save;
 
-    # $self->delete;
-
     die "__CLOSE__";
 }
 
@@ -383,15 +416,6 @@ sub mes
     $self->buffer($message);
 
     return 1;
-}
-
-sub no_mes
-{
-    my $self = shift;
-    my $line = shift;
-
-    # warn $self->trim($line). "\n";
-    # return 1;
 }
 
 sub _result1
@@ -593,7 +617,6 @@ sub parse_script
 
                     $line2 =~ s/\r\n|\r|\n/\n/g;
                     $line2 =~ s/^\s+|\s+$//g;
-                    # $line2 =~ s/^\t+|\t+$//g;
 
                     if ($line2 =~ /^$/)
                     {
@@ -617,7 +640,6 @@ sub parse_script
 
                     $line2 =~ s/\r\n|\r|\n/\n/g;
                     $line2 =~ s/^\s+|\s+$//g;
-                    # $line2 =~ s/^\t+|\t+$//g;
 
                     if ($line2 =~ /^$/)
                     {
@@ -644,8 +666,6 @@ sub parse_script
             push(@ret, "[$paragraph]:$line");
         }
     }
-
-    my @disp;
 
     for my $no (0 .. $#ret)
     {
@@ -764,8 +784,6 @@ sub parse_script
         }
 
         $ret[$no] = sprintf("[%d]:%s", $tmp2[1], $tmp2[2]);
-
-        push(@disp, $tmp2[2]);
     }
 
     return \@ret;
@@ -780,6 +798,7 @@ package Mock;
 use Mojo::Base -base;
 
 has paragraph => 0;
+has case => "";
 
 sub random
 {
@@ -830,12 +849,23 @@ sub mes
     print \$mes, "\\n";
 }
 
-sub no_mes
+sub switch
 {
     my \$self = shift;
-    my \$mes = shift;
+    my \$args = shift;
+    \$self->case(\$args);
+}
 
-    # warn \$mes, "\\n";
+sub _select_choice
+{
+    my \$self = shift;
+    return 1;
+}
+
+sub ALCHE_SK
+{
+    my \$self = shift;
+    return 2;
 }
 
 package main;

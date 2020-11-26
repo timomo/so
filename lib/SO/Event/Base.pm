@@ -152,27 +152,10 @@ sub select
         return;
     }
 
-    warn Dump($choice);
-
-    my $raw = $self->choice;
-
-    if (ref $raw ne "ARRAY")
-    {
-        $raw = Encode::encode_utf8($raw);
-        $raw = YAML::XS::Load($raw);
-
-        if (ref $raw ne "ARRAY")
-        {
-            $raw = [ $raw ];
-        }
-    }
-
-    push(@$raw, $choice->{選択});
-
-    $self->choice($raw);
+    $self->choice($choice->{選択});
     # $self->event_end_time(time);
     $self->save;
-    $self->hook("choice", {});
+    # $self->hook("choice", {});
 }
 
 sub result
@@ -405,7 +388,7 @@ sub object
     my $self = shift;
     my $class = shift;
     $class->require or die $@;
-    my $event = $class->new(context => $self->context, "system" => $self->system, chara_id => $self->chara_id);
+    my $event = $class->new(context => $self->context, "system" => $self->system, chara_id => $self->chara_id, log_level => "debug");
     return $event;
 }
 
