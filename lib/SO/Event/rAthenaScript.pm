@@ -27,8 +27,8 @@ sub bind
 sub _encount
 {
     my $self = shift;
-    my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "alchemist_skills.txt"));
-    # my $parse = $self->_parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "script.txt"));
+    my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "alchemist_skills_japanese.txt"));
+    # my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "script_japanese.txt"));
 
     $self->paragraph_check($parse);
 }
@@ -36,9 +36,8 @@ sub _encount
 sub _choice
 {
     my $self = shift;
-    my $parent = $self->parent;
-    my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "alchemist_skills.txt"));
-    # my $parse = $self->_parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "script.txt"));
+    my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "alchemist_skills_japanese.txt"));
+    # my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "script_japanese.txt"));
 
     $self->paragraph_check($parse);
 }
@@ -166,6 +165,7 @@ sub paragraph_check
             my @tmp = @ret;
             unshift(@tmp, $self->get_mock_class_string);
             my $file = Mojo::File->new("test2.pl");
+            $tmp[$_] = Encode::encode_utf8($tmp[$_]) for 0 .. $#tmp;
             $file->spurt(join("\n", @tmp));
 
             my @stdout = $capture->read;
@@ -209,7 +209,7 @@ sub paragraph_check
 
             # TODO: どうやらここに来る事がある模様
             warn "pppppppppppppppppppppppppppppppppppppp";
-            warn $res;
+            # warn $res;
         }
         else
         {
@@ -231,7 +231,7 @@ sub paragraph_check
         }
 
         $event->save;
-        $self->message($stdout);
+        $self->message(Encode::decode_utf8($stdout));
     }
     $self->event_end_time(time);
     $self->save;
@@ -295,8 +295,8 @@ sub _select_choice
 
     if (defined $select)
     {
-        warn Dump($select->generate);
-        warn Dump($select->choice);
+        # warn Dump($select->generate);
+        # warn Dump($select->choice);
         return int($select->choice + 1);
     }
 
@@ -320,7 +320,7 @@ sub select_choice
 sub JobLevel
 {
     my $self = shift;
-    return 41;
+    return 39;
 }
 
 sub ALCHE_SK
@@ -365,7 +365,7 @@ sub _conversation_next
     $self->paragraph($paragraph);
 
     warn "---------------------------->メッセージ破棄開始1";
-    warn $self->buffer;
+    warn Encode::encode_utf8($self->buffer);
     warn "---------------------------->メッセージ破棄終了1";
     $self->buffer(undef);
     $self->save;
@@ -382,7 +382,7 @@ sub conversation_next
     $self->paragraph($paragraph);
     $self->save;
 
-    print $self->buffer;
+    print Encode::encode_utf8($self->buffer);
     $self->buffer(undef);
     $self->save;
 
@@ -399,7 +399,7 @@ sub conversation_close
     $self->event_end_time(time);
     $self->save;
 
-    print $self->buffer;
+    print Encode::encode_utf8($self->buffer);
     $self->buffer(undef);
     $self->save;
 
@@ -515,6 +515,10 @@ sub parse_rathena_script
     my $path = shift;
     my $file = Mojo::File->new($path);
     my $content = $file->slurp;
+    {
+        my $utf8 = Encode::decode_utf8($content);
+        $content = $utf8;
+    }
     $content =~ s/\r\n|\r|\n/\n/;
 
     if ($content =~ m/(.+?)(\{)(.+?)\n(\})/s)
@@ -560,11 +564,6 @@ sub parse_rathena_script
         {
             $choices = YAML::XS::Load(Encode::encode_utf8($self->choices));
             $choice = $choices->[$self->choice];
-        }
-
-        if ($choice eq "次へ")
-        {
-            # $self->paragraph($self->paragraph + 1);
         }
 
         my @tmp;
@@ -696,6 +695,9 @@ sub parse_script
             push(@tmp3, $string. $tmp2[2]);
         }
         my $file = Mojo::File->new("intermediate_data1.pl");
+
+        $tmp3[$_] = Encode::encode_utf8($tmp3[$_]) for 0 .. $#tmp3;
+
         $file->spurt(join("\n", @tmp3));
     }
 
@@ -849,6 +851,7 @@ sub parse_script
             push(@tmp3, $string. $tmp2[2]);
         }
         my $file = Mojo::File->new("intermediate_data2.pl");
+        $tmp3[$_] = Encode::encode_utf8($tmp3[$_]) for 0 .. $#tmp3;
         $file->spurt(join("\n", @tmp3));
     }
 
