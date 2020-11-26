@@ -8,6 +8,7 @@ use IO::Capture::Stderr;
 # use Expect;
 use 5.010001;
 use Mojo::Util qw(xml_escape);
+use Text::Diff 'diff';
 
 has choices => sub { ["次へ"] }; # 選択肢
 has event_type => 5; # イベント種別
@@ -325,7 +326,7 @@ sub JobLevel
 sub ALCHE_SK
 {
     my $self = shift;
-    return 2;
+    return 4;
 }
 
 # アイテムを消す
@@ -522,8 +523,19 @@ sub parse_rathena_script
         my $titie = $1;
         my $right = $2;
         my $body = $3;
+
+        # case文~case文~括弧閉じるは別処理
+
+        while($body =~ /case (\d+):(.+?)case (\d+):(.+?)\}/s)
+        {
+            my $diff1 = $body;
+            $body =~ s/case (\d+):(.+?)case (\d+):(.+?)\}/if (\$self->case eq "$1") {$2} if (\$self->case eq "$3") { $4 }}/gs;
+            my $diff2 = $body;
+            my $diff = diff(\$diff1, \$diff2);
+        }
+
         my $left = $4;
-        my $ref = $self->parse_script($body. "}");
+        my $ref = $self->parse_script($body);
         my @mes = @$ref;
         my $num = 0;
         my @hits2;
@@ -698,11 +710,16 @@ sub parse_script
         my $words = qr/JobLevel|BaseJob|Job_Priest|Job_Monk|BaseClass|Job_Acolyte|SKILL_PERM|Job_Alchemist|ALCHE_SK|Sex|SEX_FEMALE|SEX_MALE|break/;
 
         # TODO: ここに関しては、無理やりswitch文のcase用に括弧を足しているので、処理が怪しい。。。
-        if ($switch == 1 && $para == $tmp2[1] && $mes =~ /\}/)
+        if ($switch == 1 && $para == $tmp2[1])
         {
-            $switch = 0;
-            $para = 0;
-            $tmp2[2] = "}}";
+            if ($mes =~ /^\}$/)
+            {
+                warn Dump([$para, $mes]);
+
+                $switch = 0;
+                $para = 0;
+                # $tmp2[2] = "}}";
+            }
         }
 
         if ($mes =~ /case (\d):/)
@@ -713,7 +730,7 @@ sub parse_script
             }
             else
             {
-                $mes = "} elsif (\$self->case eq \"$1\") {";
+                $mes = "} if (\$self->case eq \"$1\") {";
             }
             $tmp2[2] = $mes;
         }
