@@ -183,7 +183,7 @@ sub encounter
         }
     }
 
-    $class = "SO::Event::rAthenaScript";
+    # $class = "SO::Event::rAthenaScript";
 
     if (defined $class)
     {
