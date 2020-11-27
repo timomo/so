@@ -28,7 +28,7 @@ sub bind
 sub _encount
 {
     my $self = shift;
-    my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "alchemist_skills.txt"), 1);
+    my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "EndlessTower.utf8.txt"), 1);
     # my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "script.txt"), 0);
 
     $self->paragraph_check($parse);
@@ -37,7 +37,7 @@ sub _encount
 sub _choice
 {
     my $self = shift;
-    my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "alchemist_skills.txt"), 1);
+    my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "EndlessTower.utf8.txt"), 1);
     # my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "script.txt"), 0);
 
     $self->paragraph_check($parse);
@@ -775,7 +775,7 @@ sub parse_script
         my $elm = $ret[$no];
         my @tmp2 = split(/\[(\d+)\]:/, $elm);
         my $mes = $tmp2[2];
-        my $words = qr/JobLevel|BaseJob|Job_Priest|Job_Monk|BaseClass|Job_Acolyte|SKILL_PERM|Job_Alchemist|ALCHE_SK|Sex|SEX_FEMALE|SEX_MALE|break/;
+        my @words = (qw|Zeny in_102tower JobLevel BaseJob BaseLevel Job_Priest Job_Monk BaseClass Job_Acolyte SKILL_PERM Job_Alchemist ALCHE_SK Sex SEX_FEMALE SEX_MALE break|);
 
         # TODO: ここに関しては、無理やりswitch文のcase用に括弧を足しているので、処理が怪しい。。。
         if ($case == 1 && $para == $tmp2[1])
@@ -836,6 +836,16 @@ sub parse_script
             $mes =~ s|next;|\$self->conversation_next($no);|;
             $tmp2[2] = $mes;
         }
+        if ($mes =~ /end;/)
+        {
+            $mes =~ s|end;|\$self->conversation_end($no);|;
+            $tmp2[2] = $mes;
+        }
+        if ($mes =~ /close2;/)
+        {
+            $mes =~ s|close2;|\$self->conversation_close2($no);|;
+            $tmp2[2] = $mes;
+        }
         if ($mes =~ /close;/)
         {
             $mes =~ s|close;|\$self->conversation_close($no);|;
@@ -861,9 +871,34 @@ sub parse_script
             $mes =~ s/mes "(.+)";/\$self->mes("$1");/g;
             $tmp2[2] = $mes;
         }
+        if ($mes =~ /warp/)
+        {
+            # warp "e_tower",70,114;
+            $mes =~ s/warp (.+),(.+),(.+);/\$self->warp($1, $2, $3);/g;
+            $tmp2[2] = $mes;
+        }
+        if ($mes =~ /menu/)
+        {
+            # menu "一人で行くつもりですか？",-;
+            $mes =~ s/menu (.+),\s*(-);/\$self->menu($1, '$2');/g;
+            $tmp2[2] = $mes;
+        }
+        if ($mes =~ /\.\@.+\$/)
+        {
+            if ($mes =~ /set/)
+            {
+                # noop
+            }
+            else
+            {
+                $mes =~ s/\.\@(.+?)(\$)/\$self->get('.\@$1\$')/g;
+            }
+            # $mes =~ s/\.\@(.+?)(\$)/".__At_Mark__$1__Dollar_Mark__"/g;
+            $tmp2[2] = $mes;
+        }
         if ($mes =~ /set/)
         {
-            $mes =~ s/set (.+);/\$self->set($1);/g;
+            $mes =~ s/set (.+),(.+);/\$self->set('$1', $2);/g;
             $tmp2[2] = $mes;
         }
         if ($mes =~ /delitem/)
@@ -902,13 +937,38 @@ sub parse_script
             # $tmp2[2] = $mes;
         }
 
-        if ($mes =~ /($words)/)
+        for my $regex (@words)
         {
-            $mes =~ s/($words)/\$self->$1()/g;
-            $tmp2[2] = $mes;
+            if ($mes =~ /($regex)/)
+            {
+                if ($mes =~ /mes.+($regex)/)
+                {
+
+                }
+                elsif ($mes =~ /switch.+($regex)/)
+                {
+
+                }
+                elsif ($mes =~ /["']($regex)["']/)
+                {
+                    if ($regex eq "Zeny")
+                    {
+                        $mes =~ s/Zeny\-(\d+)/Zeny - $1/g;
+                    }
+                    $mes =~ s/[^"']($regex)[^"']/\$self->$1()/g;
+                }
+                else
+                {
+                    # warn "2:".$mes;
+                    $mes =~ s/($regex)/\$self->$1()/g;
+                }
+                $tmp2[2] = $mes;
+            }
         }
 
         $ret[$no] = sprintf("[%d]:%s", $tmp2[1], $tmp2[2]);
+
+        # warn $ret[$no];
     }
 
     # 中間データ2を吐き出し
