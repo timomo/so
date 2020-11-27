@@ -667,6 +667,7 @@ sub parse_rathena_script
         }
 
         my $left = $4;
+	$body = Encode::encode_utf8($body);
         my $ref = $self->parse_script($body);
         my @mes = @$ref;
         my $num = 0;

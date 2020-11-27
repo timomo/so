@@ -2,6 +2,9 @@
 
 package main;
 
+use File::Spec;
+use FindBin;
+use lib File::Spec->catdir($FindBin::Bin, "lib");
 use Mojolicious::Lite;
 use Data::Dumper;
 use Mojo::File;
