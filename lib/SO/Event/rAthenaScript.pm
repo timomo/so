@@ -28,7 +28,7 @@ sub bind
 sub _encount
 {
     my $self = shift;
-    my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "alchemist_skills_japanese.txt"), 3);
+    my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "alchemist_skills.txt"), 1);
     # my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "script.txt"), 0);
 
     $self->paragraph_check($parse);
@@ -37,7 +37,7 @@ sub _encount
 sub _choice
 {
     my $self = shift;
-    my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "alchemist_skills_japanese.txt"), 3);
+    my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "alchemist_skills.txt"), 1);
     # my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "script.txt"), 0);
 
     $self->paragraph_check($parse);

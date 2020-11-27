@@ -183,7 +183,8 @@ sub encounter
         }
     }
 
-    $class = "SO::Event::rAthenaScript";
+    # $class = "SO::Event::rAthenaScript";
+    # $class = "SO::Event::DownStair";
 
     if (defined $class)
     {
