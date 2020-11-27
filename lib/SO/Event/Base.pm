@@ -110,10 +110,6 @@ sub render_to_string
             }
         }
 
-        warn "選択肢--------------";
-        warn Dump($row->{選択肢});
-        warn "選択肢--------------";
-
         my $html = $self->context->render_to_string(
             template      => "event",
             event        => $row,
@@ -140,14 +136,10 @@ sub select
     my $self = shift;
     my $choice = shift;
 
-    warn Dump([$choice, $self->id]);
-
     if (int($choice->{イベントid}) != $self->id)
     {
         return;
     }
-
-    warn Dump($choice->{選択});
 
     if ($choice->{選択} eq "")
     {
@@ -181,10 +173,6 @@ sub event_variable_load
     }
 
     $row->{変数} = YAML::XS::Load($row->{変数});
-
-    warn "チェック--------------------";
-    warn Dump ($row);
-    warn "チェック--------------------";
 
     if ($row->{一時保存フラグ} == 1)
     {

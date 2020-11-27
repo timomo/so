@@ -32,10 +32,6 @@ sub _encount
 
     $self->event_variable_load(2);
 
-    warn "**** reserve_data ****";
-    warn Dump($self->reserve_data);
-    warn "**** reserve_data ****";
-
     my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "EndlessTower.utf8.txt"), 1);
     # my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "script.txt"), 0);
 
@@ -47,10 +43,6 @@ sub _choice
     my $self = shift;
 
     $self->event_variable_load(2);
-
-    warn "**** reserve_data ****";
-    warn Dump($self->reserve_data);
-    warn "**** reserve_data ****";
 
     my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "EndlessTower.utf8.txt"), 1);
     # my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "script.txt"), 0);
@@ -396,9 +388,9 @@ sub _conversation_next
 
     $self->paragraph($paragraph);
 
-    warn "---------------------------->メッセージ破棄開始1";
-    warn Encode::encode_utf8($self->buffer);
-    warn "---------------------------->メッセージ破棄終了1";
+    # warn "---------------------------->メッセージ破棄開始1";
+    # warn Encode::encode_utf8($self->buffer);
+    # warn "---------------------------->メッセージ破棄終了1";
     $self->buffer(undef);
     $self->save;
 
