@@ -68,6 +68,7 @@ sub dbi
         $dbi->create_model("銀行貸し金庫");
         $dbi->create_model("アイテムスポーンデータ");
         $dbi->create_model("イベント");
+        $dbi->create_model("イベント変数");
 
         $self->dbis->{$type} = $dbi;
 

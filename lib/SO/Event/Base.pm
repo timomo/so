@@ -26,6 +26,8 @@ has hooks => sub { {} };
 has answer => undef;
 has is_continue => 1;
 
+has event_key => ""; # クエストのユニークid(イベントDBには保存されず、イベント変数にだけ保存される)
+
 has id => undef; # id
 has event_type => undef; # イベント種別
 has chara_id => undef; # キャラid
@@ -163,6 +165,103 @@ sub result
     my $self = shift;
     my $args = shift;
     $self->hook("result", {});
+}
+
+sub event_variable_load
+{
+    my $self = shift;
+    my $flag = shift;
+    my $where = { キャラid => $self->chara_id, イベントキー => $self->event_key, 一時保存フラグ => $flag };
+    my $result = $self->system->dbi("main")->model("イベント変数")->select(["*"], where => $where, append => "order by 一時保存フラグ desc limit 1");
+    my $row = $result->fetch_hash_one;
+
+    if (! defined $row)
+    {
+        return $row;
+    }
+
+    $row->{変数} = YAML::XS::Load($row->{変数});
+
+    warn "チェック--------------------";
+    warn Dump ($row);
+    warn "チェック--------------------";
+
+    if ($row->{一時保存フラグ} == 1)
+    {
+        $self->reserve_data($row->{変数});
+    }
+    elsif ($row->{一時保存フラグ} == 2)
+    {
+        $self->input_data($row->{変数});
+    }
+
+    return $row;
+}
+
+sub event_variable_temporarily_save
+{
+    my $self = shift;
+    $self->event_variable_save($self->reserve_data, 1);
+}
+
+sub event_variable_persistent_save
+{
+    my $self = shift;
+    $self->event_variable_save($self->input_data, 2);
+}
+
+sub event_variable_save
+{
+    my $self = shift;
+    my $ref = shift;
+    my $flag = shift;
+    my $dat = {};
+    $dat->{変数} = $ref;
+
+    if (ref $dat->{変数} eq "HASH")
+    {
+        $dat->{変数} = YAML::XS::Dump($dat->{変数});
+        $dat->{変数} = Encode::decode_utf8($dat->{変数});
+    }
+
+    $dat->{キャラid} = $self->chara_id;
+    $dat->{イベントキー} = $self->event_key;
+
+    for my $no (1, 2)
+    {
+        my $row = $self->event_variable_load($no);
+        $row ||= {};
+        $row->{キャラid} = $self->chara_id;
+        $row->{イベントキー} = $self->event_key;
+        $row->{変数} = {%{$row->{変数} || {}}, %{$ref || {}}};
+        $row->{変数} = YAML::XS::Dump($row->{変数});
+        $row->{変数} = Encode::decode_utf8($row->{変数});
+        $row->{一時保存フラグ} = $no;
+
+        if (defined $row->{id})
+        {
+            eval {
+                $self->system->dbi("main")->model("イベント変数")->update($row, where => { id => $row->{id} }, mtime => "mtime");
+            };
+            if ($@)
+            {
+                warn YAML::XS::Dump($row);
+                warn YAML::XS::Dump(caller(1));
+                die $@;
+            }
+        }
+        else
+        {
+            eval {
+                $self->system->dbi("main")->model("イベント変数")->insert($row, ctime => "ctime");
+            };
+            if ($@)
+            {
+                warn YAML::XS::Dump($row);
+                die $@;
+            }
+        }
+    }
 }
 
 sub insert

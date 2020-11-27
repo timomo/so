@@ -15,6 +15,7 @@ has choices => sub { ["次へ"] }; # 選択肢
 has event_type => 5; # イベント種別
 has input_data => sub { {} }; # イベントのAUTOLOAD系の情報
 has buffer => ""; # メッセージの送信前情報
+has reserve_data => sub { {} }; # setterで書き込まれ、commit前のデータ
 
 sub bind
 {
@@ -28,6 +29,13 @@ sub bind
 sub _encount
 {
     my $self = shift;
+
+    $self->event_variable_load(2);
+
+    warn "**** reserve_data ****";
+    warn Dump($self->reserve_data);
+    warn "**** reserve_data ****";
+
     my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "EndlessTower.utf8.txt"), 1);
     # my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "script.txt"), 0);
 
@@ -37,6 +45,13 @@ sub _encount
 sub _choice
 {
     my $self = shift;
+
+    $self->event_variable_load(2);
+
+    warn "**** reserve_data ****";
+    warn Dump($self->reserve_data);
+    warn "**** reserve_data ****";
+
     my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "EndlessTower.utf8.txt"), 1);
     # my $parse = $self->parse_rathena_script(File::Spec->catfile($FindBin::Bin, "master", "script.txt"), 0);
 
@@ -79,6 +94,10 @@ sub get_rows
 
         if ($self->paragraph >= $row->[0])
         {
+            if ($row->[2] =~ /set/)
+            {
+                $row->[2] =~ s/>set\(/>_set\(/;
+            }
             if ($row->[2] =~ /conversation_close/)
             {
                 $row->[2] =~ s/>conversation_close\(/>_conversation_close\(/;
@@ -201,6 +220,8 @@ sub paragraph_check
                 my @tmp = @ret;
                 unshift(@tmp, $self->get_mock_class_string);
                 my $file = Mojo::File->new("test2.pl");
+
+                $tmp[$_] = Encode::encode_utf8($tmp[$_]) for 0 .. $#tmp;
                 $file->spurt(join("\n", @tmp));
             }
             else
@@ -245,16 +266,18 @@ sub AUTOLOAD
     our $AUTOLOAD;
     my ($method) = ($AUTOLOAD =~ /([^:']+$)/);
     {
-        warn "-------->$method";
+        # warn "-------->$method";
         no strict 'refs';
         *{$method} = sub {
             use strict 'refs';
             my ($self, $val) = @_;
 
-            $self->input_data->{$method} = $val;
+            if (defined $val)
+            {
+                $self->reserve_data->{$method} = $val;
+            }
 
-            return 0;
-            # warn YAML::XS::Dump($self);
+            return $self->input_data->{$method};
         };
     }
     goto &$method;
@@ -326,6 +349,12 @@ sub JobLevel
     return 41;
 }
 
+sub Zeny
+{
+    my $self = shift;
+    return 20000;
+}
+
 sub ALCHE_SK
 {
     my $self = shift;
@@ -382,6 +411,8 @@ sub conversation_next
     my $paragraph = shift;
     my $event = $self->object(ref $self);
 
+    $self->event_variable_temporarily_save;
+
     $self->paragraph($paragraph);
     $self->save;
 
@@ -406,7 +437,16 @@ sub conversation_close
     $self->buffer(undef);
     $self->save;
 
+    $self->event_variable_persistent_save;
+
     die "__CLOSE__";
+}
+
+sub BaseLevel
+{
+    my $self = shift;
+
+    return 51;
 }
 
 sub mes
@@ -512,6 +552,35 @@ sub __parse_rathena_script
     return $test;
 }
 
+sub get
+{
+    my $self = shift;
+    my $key = shift;
+
+    if ($self->can($key))
+    {
+        return $self->$key();
+    }
+
+    return $self->input_data->{$key};
+}
+
+sub set
+{
+    my $self = shift;
+    my $key = shift;
+    my $val = shift;
+
+    if ($self->can($key))
+    {
+        return $self->$key($val);
+    }
+
+    $self->reserve_data->{$key} = $val;
+
+    return $self->reserve_data->{$key};
+}
+
 sub parse_rathena_script
 {
     my $self = shift;
@@ -582,6 +651,8 @@ sub parse_rathena_script
 
     my $current = $keys[$number];
     my $content2 = join("\n", @{$map2->{$current} || []});
+
+    $self->event_key($current);
 
     if ($content2 =~ m/(.+?)(\{)(.+?)\n(\})/s)
     {
@@ -769,9 +840,11 @@ sub parse_script
     my $para = 0;
     my $switch = 0;
     my $case = 0;
+    my $number = 0;
 
     for my $no (0 .. $#ret)
     {
+        $number = $no;
         my $elm = $ret[$no];
         my @tmp2 = split(/\[(\d+)\]:/, $elm);
         my $mes = $tmp2[2];
@@ -955,12 +1028,12 @@ sub parse_script
                     {
                         $mes =~ s/Zeny\-(\d+)/Zeny - $1/g;
                     }
-                    $mes =~ s/[^"']($regex)[^"']/\$self->$1()/g;
+                    $mes =~ s/[^"']($regex)[^"']/\$self->get("$1")/g;
                 }
                 else
                 {
                     # warn "2:".$mes;
-                    $mes =~ s/($regex)/\$self->$1()/g;
+                    $mes =~ s/($regex)/\$self->get("$1")/g;
                 }
                 $tmp2[2] = $mes;
             }
@@ -970,6 +1043,8 @@ sub parse_script
 
         # warn $ret[$no];
     }
+
+    # push(@ret, "[$number]:\$self->commit;");
 
     # 中間データ2を吐き出し
     {

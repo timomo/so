@@ -311,3 +311,15 @@ CREATE TABLE イベント (
         ctime DATETIME,
 	    mtime DATETIME
  );
+
+DROP TABLE IF EXISTS イベント変数;
+
+CREATE TABLE イベント変数 (
+        id INTEGER PRIMARY KEY,
+        キャラid TEXT NOT NULL,
+        イベントキー TEXT NOT NULL,
+        一時保存フラグ INTEGER NOT NULL, /* 1...一時保管、2...永続保管 */
+        変数 TEXT NOT NULL,
+        ctime DATETIME,
+	    mtime DATETIME
+);
