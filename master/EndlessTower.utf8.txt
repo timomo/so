@@ -1,0 +1,2559 @@
+//===== rAthena Script ======================================= 
+//= Endless Tower
+//===== By: ================================================== 
+//= L0ne_W0lf
+//===== Current Version: ===================================== 
+//= 2.4
+//===== Compatible With: ===================================== 
+//= rAthena Project
+//===== Description: ========================================= 
+//= [Official Conversion]
+//= Endless Tower Memorial Dungeon.
+//= Consists of 101 floors.
+//===== Additional Comments: ================================= 
+//= 1.0 First version.
+//= 1.1 Removed a disablenpc from #102FShadowDust1. (bugreport:4415)
+//= 1.2 Added ends to several NPCs which would allow you to restart timers.
+//=     Added some missing stopnpctimers to npcs. (bugreport:4418)
+//= 1.3 Fixed a couple copy/paste errors :D I fail. [L0ne_W0lf]
+//      Timer no longer resets when re-entering.
+//= 1.4 Added quest log entries based on iRO. [L0ne_W0lf]
+//=     You may need to update your questid2display.
+//=     Changed White lady spawn to MVP White Lady. (bugreport:4601)
+//= 1.5 Corrected some grammar and typos.
+//= 1.6 Corrected the tower re-entry blocked condition. (bugreport:4677) [L0ne_W0lf]
+//=     Corrected floor 75 warp disabling the wrong NPC. (bugreport:4711)
+//= 1.7 Added missing end's to prevent accidental disabling of
+//=     warps between floors. (bugreport:4623)
+//=     Added missing end's to prevent infinite mobspawn (bugreport:4540)
+//=     Commented out remaining GM-only NPCs. [Gepard]
+//= 1.8 Adjusted Instance Attach Map to Validate ALL Maps, instead of 
+//=     only 1@tower -> 5@tower (bugreport:4983)
+//= 1.9 Added 'instance_check_party' command to the script for proper checking if
+//=     the invoking party meets the requirements to join the Memorial Dungeon.
+//= 2.0 Fixed broken else/if chaining. [Joseph]
+//= 2.1 Updated to match latest official script. [Euphy]
+//= 2.2 Instance system rewrite. [Euphy]
+//= 2.3 Added some missing announcements. [Euphy]
+//= 2.4 Added GM management function. [Euphy]
+//============================================================ 
+
+alberta,214,77,6	script	艦長ヤンセン	709,{
+	if (BaseLevel < 50) {
+		mes "[艦長ヤンセン]";
+		mes "ああ……";
+		mes "わしは再び海に出られるだろうか……";
+		next;
+		mes "[艦長ヤンセン]";
+		mes "うん？";
+		mes "君は……冒険者か？";
+		mes "……しかし、^FF0000レベル50未満^000000と見える。";
+		mes "まだまだ青いな……";
+		mes "ふう……";
+		close;
+	}
+	set .@name$,strcharinfo(0);
+	if (in_102tower == 1) {
+		mes "-船乗りは笑顔で近くの";
+		mes "　航海用品売り場に行き、";
+		mes "　色々な品を注文しているようだ。";
+		mes "　せっかくなので";
+		mes "　事情を聞いてみることにしよう-";
+		next;
+		mes "-買い物を終えた船乗りが";
+		mes "　こちらに気付き、近寄ってきた-";
+		next;
+		mes "[艦長ヤンセン]";
+		mes "ふむ、初対面にも関わらず";
+		mes "わしの話を聞いてくれるとは、";
+		mes "今時珍しい冒険者だ。";
+		mes "申し遅れた、わしはヤンセンという。";
+		next;
+		mes "[艦長ヤンセン]";
+		mes "ところで君は";
+		mes "遠い海に出ることに興味はあるかね？";
+		next;
+		switch(select("航海経験がある:興味ある:興味ない")) {
+		case 1:
+			mes "[艦長ヤンセン]";
+			mes "ほお～、ならば";
+			mes "基本はできているようだな。";
+			break;
+		case 2:
+			mes "[艦長ヤンセン]";
+			mes "そうかそうか、";
+			mes "ならば話を聞いてくれ。";
+			break;
+		case 3:
+			mes "[艦長ヤンセン]";
+			mes "何？　夢のないやつだな。";
+			mes "まあいい、とにかく";
+			mes "話を聞いてくれ。";
+			break;
+		}
+		mes "こう見えてもわしは昔、";
+		mes "大船団を率いる艦長だった。";
+		mes "今は一隻だけになったがね。";
+		next;
+		mes "[艦長ヤンセン]";
+		mes "あの大陸の彼方にある海は";
+		mes "まだまだ未知の世界同然だ。";
+		mes "わしはその世界に破れたのだが。";
+		next;
+		mes "-ヤンセンは自分の";
+		mes "　昔話を話しはじめた。";
+		mes "　暇だったのでその昔話に付き合った-";
+		next;
+		mes "-本当かどうか分からない内容が";
+		mes "　ほとんどだったが……";
+		mes "　中には興味深い話もあった。";
+		mes "　それは雲をも突き抜けているという";
+		mes "　^0000FF巨大な塔^000000の話だった-";
+		set in_102tower,2;
+		close;
+	} else if (in_102tower == 2) {
+		mes "[艦長ヤンセン]";
+		mes "……ん、どこまで話したかな。";
+		mes "ああ、そうそう！";
+		mes "それで難破したわしの船は";
+		mes "止むを得ずその巨大な塔の所で";
+		mes "暫く留まるしかなかった。";
+		next;
+		mes "[艦長ヤンセン]";
+		mes "食料も底をつき、このままでは全員";
+		mes "餓死してしまうという状況の中、";
+		mes "船員の何人かが食料を求め、";
+		mes "塔の中に入ったが……";
+		mes "誰一人戻ってこなかった。";
+		next;
+		mes "[艦長ヤンセン]";
+		mes "生き残るために不要な物を全て捨て、";
+		mes "島で手に入れた少量の水と食用植物で";
+		mes "再び海に出た……";
+		next;
+		mes "[艦長ヤンセン]";
+		mes "それから何日経ったかわからないが、";
+		mes "ある日、陸地に";
+		mes "たどり着くことができた。";
+		mes "だが……";
+		mes "結局生き残りはわし一人だけだった。";
+		next;
+		mes "[艦長ヤンセン]";
+		mes "それから、";
+		mes "わしは決心したのだ。";
+		mes "塔に入って戻ってこれなかった、";
+		mes "仲間たちを探すとな。";
+		mes "わしの命が続く限りの使命だ。";
+		next;
+		mes "[艦長ヤンセン]";
+		mes "そして、君のような心優しい";
+		mes "冒険者のおかげで";
+		mes "塔まで航海するための資金ができた。";
+		mes "これで使命を果たすことができる。";
+		mes "本当にありがとう。";
+		next;
+		menu "一人で行くつもりですか？",-;
+		mes "[艦長ヤンセン]";
+		mes "ああ、その通りだ。";
+		mes "……とても危険な場所だ。";
+		mes "自分も行ってみようなどと";
+		mes "考えているのか？";
+		next;
+		mes "[艦長ヤンセン]";
+		mes "君のような若者がそこで";
+		mes "命を落とすようなことが";
+		mes "あってはいかん。";
+		next;
+		menu "行ってみたいです",-;
+		mes "[艦長ヤンセン]";
+		mes "………………";
+		mes "そうか、そこまで言うなら";
+		mes "わしも止めはしない。しかし";
+		mes "準備とかもあるだろうから";
+		mes "全ての準備ができたらわしに";
+		mes "話しかけてくれ。";
+		next;
+		mes "[艦長ヤンセン]";
+		mes "あ……それと！";
+		mes "君を心より歓迎するよ。";
+		mes "勇敢な航海士さんよ！";
+		set in_102tower,3;
+		close;
+	} else if (in_102tower == 3) {
+		mes "[艦長ヤンセン]";
+		mes "準備ができたか？";
+		mes "では、そろそろ行くとするか？";
+		next;
+		switch(select("^0000FF行きましょう！^000000:まだ準備が……")) {
+		case 1:
+			mes "[艦長ヤンセン]";
+			mes "よし！";
+			mes "では出航だ!!";
+			close2;
+			set in_102tower,4;
+			warp "e_tower",70,114;
+			end;
+		case 2:
+			mes "[艦長ヤンセン]";
+			mes "そうか。";
+			mes "では準備ができたら";
+			mes "声をかけてくれ。";
+			close;
+		}
+	} else if (in_102tower > 3) {
+		mes "[艦長ヤンセン]";
+		mes "君か。";
+		mes "再び出航するには";
+		mes "若干の資材が必要だ。";
+		mes "^0000FF10,000^000000Zenyあれば出航のための";
+		mes "全ての準備ができる。";
+		next;
+		switch(select("またにします:^0000FFすぐ行きましょう！^000000")) {
+		case 1:
+			mes "["+.@name$+"]";
+			mes "今は余裕がありません。";
+			mes "残念ですが、今度にします。";
+			next;
+			mes "[艦長ヤンセン]";
+			mes "そうか……";
+			mes "では行きたくなったら";
+			mes "いつでもわしのところに";
+			mes "来てくれ。";
+			close;
+		case 2:
+			if (Zeny < 10000) {
+				mes "[艦長ヤンセン]";
+				mes "残念だが、そのZenyじゃ";
+				mes "全ての資材は買えないな。";
+				close;
+			}
+			else {
+				mes "[艦長ヤンセン]";
+				mes "…………よし！";
+				mes "これで全ての準備が整った。";
+				mes "では早速出航だ！";
+				set Zeny, Zeny-10000;
+				close2;
+				warp "e_tower",70,114;
+				end;
+			}
+		}
+	} else {
+		mes "[艦長ヤンセン]";
+		mes "ん、君は……";
+		mes "冒険者だね？";
+		mes "しかもなかなかの実力がありそうだ。";
+		next;
+		mes "[艦長ヤンセン]";
+		mes "初対面で失礼だとは思うが、";
+		mes "君を見込んで";
+		mes "どうしても頼みたいことがある……";
+		next;
+		mes "[艦長ヤンセン]";
+		mes "^0000FF10,000^000000 Zenyを";
+		mes "わしに寄付してくれないか？";
+		next;
+		switch(select("当然断る:^0000FF10,000Zeny寄付する^000000")) {
+		case 1:
+			mes "[艦長ヤンセン]";
+			mes "……そうか、当然だろうな。";
+			mes "すまない。";
+			mes "失礼したな、若者よ。";
+			close;
+			break;
+		case 2:
+			mes "[艦長ヤンセン]";
+			mes "!!";
+			mes "ほ、本当か!?";
+			mes "わしに寄付してくれると言うのか!?";
+			mes "なんと親切な方だ……！";
+			next;
+			if (Zeny < 10000) {
+				mes "[艦長ヤンセン]";
+				mes "しかし……気持ちはうれしいが、";
+				mes "君が持っているZenyでは";
+				mes "足りないようだ……";
+				mes "すまない、ありがとう若者よ。";
+				close;
+			} else {
+				mes "-10,000 Zenyを";
+				mes "　船乗りに寄付した-";
+				next;
+				mes "[艦長ヤンセン]";
+				mes "本当にありがとう!!";
+				mes "まだこの世に君のような";
+				mes "若者がいるとは……";
+				mes "この恩は一生忘れない。";
+				mes "これで船の資材が用意できる！";
+				set Zeny, Zeny-10000;
+				set in_102tower,1;
+				next;
+				mes "-船の資材？";
+				mes "　一体何をするんだろう……";
+				mes "　もう少し話を聞いてみよう-";
+				close;
+			}
+			break;
+		}
+	}
+}
+
+//============================================================
+// 説明NPC
+//------------------------------------------------------------
+e_tower.gat,80,108,3	script	書置き	857,{
+	mes "[書置き]";
+	mes "……この場所に挑む";
+	mes "後続の冒険者たちのために";
+	mes "これを記す。";
+	mes "初めてここに挑む冒険者は";
+	mes "特に参考にして欲しい。";
+	next;
+	switch(select("^FF0000時間^000000について","^FF0000制限^000000について","^FF0000はじまりの松明^000000について","^FF0000注意点^000000について")) {
+	case 1:
+		mes "[書置き]";
+		mes "この塔に入るための鍵を作成すると、";
+		mes "何故かわからないが";
+		mes "他のパーティーと干渉しない";
+		mes "塔の空間が生成される。";
+		next;
+		mes "[書置き]";
+		mes "そして塔の中に一度でも";
+		mes "立ち入った瞬間、";
+		mes "^FF0000刻の呪い^000000を受ける。";
+		mes "一度生成された空間が";
+		mes "維持される時間は";
+		mes "^0000FF4時間^000000のようだ。";
+		next;
+		mes "[書置き]";
+		mes "一度外に出たり、4時間経過して";
+		mes "空間が消滅した後、再度";
+		mes "鍵を作成したり、中に入るには";
+		mes "一度立ち入った時から";
+		mes "^0000FF約1週間^000000の時間を要する。";
+		next;
+		mes "[書置き]";
+		mes "何度も気軽に挑戦できるものではない。";
+		mes "準備は入念に行ったほうがいいだろう。";
+		break;
+	case 2:
+		mes "[書置き]";
+		mes "塔の内部は特殊な呪術のような";
+		mes "力が張り巡らされているようだ。";
+		mes "そのため一部スキルやアイテムが";
+		mes "効果を発揮しないようだ。";
+		next;
+		mes "[書置き]";
+		mes "スキルでは、";
+		mes "^0000FFテレポート、アイスウォール、";
+		mes "スパイダーウェブ、インティミデイト、";
+		mes "アブラカタブラ^000000が使えない。";
+		mes "また^0000FF太陽と月と星の感情^000000による";
+		mes "登録も不可能だ。";
+		next;
+		mes "[書置き]";
+		mes "アイテムでは、";
+		mes "^0000FFハイローゾイストカード";
+		mes "アゾート^000000といった";
+		mes "モンスターを変換する効果が";
+		mes "無効化されるようだ。";
+		next;
+		mes "[書置き]";
+		mes "当然、テレポートと同じ効果の";
+		mes "^0000FFハエの羽^000000なども";
+		mes "使うことができない。";
+		mes "以上を踏まえて準備をするといい。";
+		break;
+	case 3:
+		mes "[書置き]";
+		mes "塔に入った直後、";
+		mes "ふたつの松明が見えるはずだ。";
+		mes "そのうちの北側のものは";
+		mes "^0000FFはじまりの松明^000000と呼ばれている。";
+		next;
+		mes "[書置き]";
+		mes "このはじまりの松明は、";
+		mes "塔に入った直後は一切反応がないが、";
+		mes "しばらく時間が経てば";
+		mes "文字が浮かび上がり";
+		mes "調べられるようになっているはずだ。";
+		next;
+		mes "[書置き]";
+		mes "このはじまりの松明に、";
+		mes "^0000FF闇の灰^000000というものを撒くと";
+		mes "闇夜の覇王に近づくことが";
+		mes "出来るらしい。";
+		next;
+		mes "[書置き]";
+		mes "詳しいことはわからないが、";
+		mes "何らかの手段で^0000FF闇の灰^000000を入手し、";
+		mes "撒くことによって";
+		mes "上層の階に移動することが";
+		mes "可能なようだ。";
+		next;
+		mes "[書置き]";
+		mes "しかし安易に考えてはならない。";
+		mes "この塔は、1階から順に";
+		mes "モンスターどもを全滅することで";
+		mes "上の階へと移動することが出来る。";
+		next;
+		mes "[書置き]";
+		mes "上層に行くに従って";
+		mes "より強力なモンスターが出現する。";
+		mes "移動した瞬間にやられてしまっては";
+		mes "元も子もない。";
+		mes "十分注意したほうがいいだろう。";
+		break;
+	case 4:
+		mes "[書置き]";
+		mes "この塔では、";
+		mes "その階に出現するモンスターを";
+		mes "全滅させることで上の階への門が開く。";
+		mes "その際、この塔の管理者は";
+		mes "「戦って全滅させたか」を";
+		mes "監視しているようだ……";
+		next;
+		mes "[書置き]";
+		mes "私は一度、つい出来心で";
+		mes "出てきたモンスターを";
+		mes "^FF0000テイミング^000000してしまった。";
+		mes "しかしテイミング成功で消滅した";
+		mes "モンスターは、倒した数として";
+		mes "認められず……";
+		next;
+		mes "[書置き]";
+		mes "挑戦を諦めざるを得なかった。";
+		mes "^FF0000決してモンスターを";
+		mes "テイミングしてはならない。^000000";
+		mes "もししてしまった場合は、";
+		mes "生成されたダンジョンを";
+		mes "破棄するほかない。注意してくれ。";
+		break;
+	}
+	next;
+	mes "[書置き]";
+	mes "諸君の健闘と無事を祈る。";
+	mes " ";
+	mes "^0000FF文責 : 名も無き冒険者たち一同^000000";
+	close;
+}
+
+//============================================================
+// ダンジョン生成NPC
+//------------------------------------------------------------
+e_tower,81,105,0	script	塔の守護石	406,{
+
+	set .@party_id,getcharid(1);
+	set .@p_name$,getpartyname(.@party_id);
+	set .@md_name$,"Endless Tower";
+
+	set .@etower_timer,checkquest(60200,PLAYTIME); // 1 week
+	set .@etower_timer2,checkquest(60201,PLAYTIME); // 4 hours
+
+	if (!instance_check_party(.@party_id,1)) {
+		mes "【塔の守護石】";
+		mes "1人以上のパーティーを組んでから";
+		mes "再試行せよ。";
+		close;
+	}
+	if (.@etower_timer == -1) {
+		if (getcharid(0) == getpartyleader(.@party_id,2)) {
+			mes "【塔の守護石】";
+			mes "資格ある代表の者よ。";
+			mes "塔に入る鍵を作るか？";
+			next;
+			switch(select(.@md_name$+"の鍵の作成:"+.@md_name$+"に入る:アルベルタに帰還:キャンセル")) {
+			case 1:
+				if (instance_create(.@md_name$) < 0) {
+					mes "■パーティー名";
+					mes "^0000FF" +.@p_name$+ "^000000";
+					mes "■パーティーリーダー";
+					mes "^0000FF" +strcharinfo(0)+ "^000000";
+					mes "^0000ff"+.@md_name$+" ^000000の鍵の作成失敗!";
+					close;
+				}
+				mes "【塔の守護石】";
+				mes "■パーティー名";
+				mes "^0000FF" +.@p_name$+ "^000000";
+				mes "■パーティーリーダー";
+				mes "^0000FF" +strcharinfo(0)+ "^000000";
+				mes " ";
+				mes "^006400"+.@md_name$+"^000000の鍵の作成試行中。";
+				next;
+				mes "【塔の守護石】";
+				mes "作成に成功した場合は";
+				mes "再び守護石に話しかけ、";
+				mes "『"+.@md_name$+"に入る』を";
+				mes "選択することで入場が可能。";
+				close;
+			case 2:
+				callsub L_Enter,0,1;
+			case 3:
+				mes "【塔の守護石】";
+				mes "元の場所への帰還術を";
+				mes "発動……";
+				close2;
+				warp "alberta",223,36;
+				end;
+			case 4:
+				close;
+			}
+		}
+		switch(select(.@md_name$+"に入る:アルベルタに帰還:キャンセル")) {
+		case 1:
+			callsub L_Enter,1,1;
+		case 2:
+			mes "【塔の守護石】";
+			mes "元の場所への帰還術を";
+			mes "発動……";
+			close2;
+			warp "alberta",223,36;
+			end;
+		case 3:
+			end;
+		}
+	} else if ((.@etower_timer >= 0) && (.@etower_timer2 < 2)) {
+		mes "【塔の守護石】";
+		mes "資格ある者よ。";
+		mes "塔に入るか？";
+		next;
+		switch(select(.@md_name$+"に入る:アルベルタに帰還:キャンセル")) {
+		case 1:
+			callsub L_Enter,0,0;
+		case 2:
+			mes "【塔の守護石】";
+			mes "元の場所への帰還術を";
+			mes "発動……";
+			close2;
+			warp "alberta",223,36;
+			end;
+		case 3:
+			break;
+		}
+		close;
+	} else if ((.@etower_timer >= 0) && (.@etower_timer < 2) && (.@etower_timer2 == 2)) {
+
+		set .@dun_lim_time,etower_timer+604800; // 1 week
+		set .@dun_lim_time2,etower_timer+14400; // 4 hours
+		set .@dun_cur_time,gettimetick(2);
+		set .@dun_ent_t,(.@dun_lim_time - .@dun_cur_time);
+		set .@dun_h,(.@dun_ent_t / 3600);
+		set .@dun_m,(.@dun_ent_t - (.@dun_h * 3600)) / 60;
+		set .@dun_s,.@dun_ent_t - ((.@dun_h * 3600) + (.@dun_m * 60));
+
+		mes "【塔の守護石】";
+		mes "塔に足を踏み入れたため、";
+		mes "^FF0000刻の呪い^000000を受けている状態。";
+		mes "呪いが解けるまで";
+		mes "鍵の作成、入場を行う資格はない。";
+		next;
+		switch(select("アルベルタに帰還:キャンセル")){
+		case 1:
+			mes "【塔の守護石】";
+			mes "元の場所への帰還術を";
+			mes "発動……";
+			close2;
+			warp "alberta",223,36;
+			end;
+		case 2:
+			mes "【塔の守護石】";
+			mes "元の場所への帰還術の";
+			mes "発動を中止……";
+			close;
+		}
+	} else {
+		set etower_timer,0;
+		erasequest 60200;
+		erasequest 60201;
+		mes "【塔の守護石】";
+		mes "塔の^FF0000刻の呪い^000000が解けた。";
+		mes "塔の鍵の作成、及び塔への";
+		mes "入場が可能になった。";
+		close;
+	}
+
+L_Enter:
+	switch(instance_enter("Endless Tower")) {
+	case 3:
+		mes "【塔の守護石】";
+		mes "不明なエラーが発生。";
+		close;
+	case 2:
+		mes "【塔の守護石】";
+		mes "Endless Tower の鍵が";
+		mes "存在しない。";
+		mes "パーティーリーダーが鍵を";
+		mes "作成していない状態。";
+		close;
+	case 1:
+		mes "【塔の守護石】";
+		mes "Endless Tower に入る資格がない。";
+		mes "パーティーに加入していない状態。";
+		close;
+	case 0:
+		mapannounce "e_tower", "["+.@p_name$+"]パーティーの[" +strcharinfo(0)+ "]が[Endless Tower]に入場します",bc_map,"0x00ff99",FW_NORMAL,12;
+		if (getarg(1)) {
+			set etower_timer,gettimetick(2);
+			setquest 60200;
+			setquest 60201;
+		}
+		//warp "1@tower",52,354;
+		if (getarg(0) == 0) close;
+		else end;
+	}
+}
+
+e_tower,30,30,2	script	Huge Vortex	844,2,2,{
+	end;
+OnTouch:
+	mapannounce "e_tower","[ " + strcharinfo(0) + " ], seems to be engulfed by a huge vortex",bc_map,"0x00ff99",FW_NORMAL,12;
+	warp "alberta",223,36;
+	end;
+}
+
+// Original name: "#102Administrator Mode104"
+e_tower,1,1,2	script	#102Administrator Mode	844,{
+	callfunc "F_GM_NPC";
+	mes "Please enter the password";
+	set .@i, callfunc("F_GM_NPC","dmc2008",1);
+	next;
+	if (.@i == 1) {
+		switch(select("Generate Purification Stone:Remove Purification Stone:Cancel")) {
+		case 1:
+			mes "Create the Purification Stone that stays for 30 minutes.";
+			donpcevent "Purification Stone#et1::OnEnable";
+			break;
+		case 2:
+			mes "Destroy the Purification Stone immediately";
+			donpcevent "Purification Stone#et1::OnDisable";
+			break;
+		case 3:
+			mes "You have canceled it.";
+			break;
+		}
+		close;
+	} else {
+		mes "Enter the password exactly.";
+		close;
+	}
+}
+
+e_tower,69,117,4	script	Purification Stone#et1	406,{
+	set etower_timer,0;
+	mes "^0000ffThe records and aftereffects related to the Endless Tower have been removed. You can generate and enter the Endless Tower again.^000000";
+	close;
+
+OnInit:
+	disablenpc "Purification Stone#et1";
+	end;
+
+OnEnable:
+	initnpctimer;
+	end;
+
+OnDisable:
+	stopnpctimer;
+	disablenpc "Purification Stone#et1";
+	end;
+
+OnTimer1000:
+	enablenpc "Purification Stone#et1";
+	end;
+
+OnTimer1740000:
+	mapannounce "e_tower", "The Purification Stone will be destroyed in one minute.",bc_map,"0x00ff99";
+	end;
+
+OnTimer1800000:
+	disablenpc "Purification Stone#et1";
+	end;
+}
+
+e_tower,151,185,4	script	Purification Stone#et2	844,{
+	callfunc "F_GM_NPC";
+	set etower_timer,0;
+	mes "^0000ffThe records and aftereffects related to the Endless Tower have been removed. You can generate and enter the Endless Tower again.^000000";
+	close2;
+	warp "e_tower",75,108;
+	end;
+}
+
+// Core Functions
+//============================================================
+function	script	F_Tower_Monster	{
+
+	set .@level, getarg(0);
+	set .@map$, getarg(1);
+	set .@label$, getarg(2);
+
+	switch(.@level) {
+	case 1:
+		areamonster .@map$,7,351,17,387,"メタリン",1613,15,.@label$;
+		areamonster .@map$,7,351,17,387,"マーリン",1242,5,.@label$;
+		areamonster .@map$,7,351,17,387,"ポポリン",1031,5,.@label$;
+		areamonster .@map$,7,351,17,387,"ドロップス",1113,5,.@label$;
+		areamonster .@map$,7,351,17,387,"マスターリング",1090,1,.@label$;
+		areamonster .@map$,7,351,17,387,"ポリン",1002,5,.@label$;
+		break;
+	case 2:
+		areamonster .@map$,93,351,103,387,"デザートウルフ",1106,20,.@label$;
+		areamonster .@map$,93,351,103,387,"さすらい狼",1092,1,.@label$;
+		areamonster .@map$,93,351,103,387,"子デザートウルフ",1107,10,.@label$;
+		break;
+	case 3:
+		areamonster .@map$,181,351,191,387,"アーチャースケルトン",1016,5,.@label$;
+		areamonster .@map$,181,351,191,387,"スケルワーカー",1169,5,.@label$;
+		areamonster .@map$,181,351,191,387,"ソルジャースケルトン",1028,5,.@label$;
+		areamonster .@map$,181,351,191,387,"オークスケルトン",1152,5,.@label$;
+		areamonster .@map$,181,351,191,387,"パイレーツスケル",1071,5,.@label$;
+		areamonster .@map$,181,351,191,387,"スケルトン",1076,5,.@label$;
+		break;
+	case 4:
+		areamonster .@map$,267,351,277,387,"アルギオペ",1099,15,.@label$;
+		areamonster .@map$,267,351,277,387,"マンティス",1139,5,.@label$;
+		areamonster .@map$,267,351,277,387,"アルゴス",1100,5,.@label$;
+		areamonster .@map$,267,351,277,387,"ボーカル",1088,1,.@label$;
+		areamonster .@map$,267,351,277,387,"ロッカー",1052,5,.@label$;
+		areamonster .@map$,267,351,277,387,"ホーネット",1004,5,.@label$;
+		break;
+	case 5:
+		//areamonster .@map$,352,351,362,387,"黄金蟲",1086,1,.@label$;
+		//areamonster .@map$,352,351,362,387,"雄盗蟲",1054,15,.@label$;
+		//areamonster .@map$,352,351,362,387,"雌盗蟲",1053,15,.@label$;
+		//areamonster .@map$,352,351,362,387,"盗蟲",1051,15,.@label$;
+		//areamonster .@map$,352,351,362,387,"盗蟲の卵",1048,5,.@label$;
+		// jRO配置
+		areamonster .@map$,352,351,362,387,"エドガ",1115,1,.@label$;
+		areamonster .@map$,352,351,362,387,"サスカッチ",1243,20,.@label$;
+		areamonster .@map$,352,351,362,387,"レイブオルマイ",1306,5,.@label$;
+		areamonster .@map$,352,351,362,387,"虎人",1517,5,.@label$;
+		break;
+	case 6:
+		areamonster .@map$,9,267,19,303,"ドラゴンの卵",1721,5,.@label$;
+		areamonster .@map$,9,267,19,303,"盗蟲の卵",1048,5,.@label$;
+		areamonster .@map$,9,267,19,303,"蟻の卵",1097,5,.@label$;
+		areamonster .@map$,9,267,19,303,"プパ",1008,5,.@label$;
+		break;
+	case 7:
+		areamonster .@map$,93,267,103,303,"エクスプロージョン",1383,15,.@label$;
+		areamonster .@map$,93,267,103,303,"ドレインリアー",1111,15,.@label$;
+		areamonster .@map$,93,267,103,303,"ウィレス",1627,15,.@label$;
+		areamonster .@map$,93,267,103,303,"ファミリアー",1005,15,.@label$;
+		break;
+	case 8:
+		areamonster .@map$,181,267,191,303,"銃奇兵",1403,15,.@label$;
+		areamonster .@map$,181,267,191,303,"クルーザー",1248,15,.@label$;
+		break;
+	case 9:
+		areamonster .@map$,267,267,277,303,"オブシディアン",1615,15,.@label$;
+		areamonster .@map$,267,267,277,303,"ゴーレム",1040,15,.@label$;
+		areamonster .@map$,267,267,277,303,"スタポ",1784,10,.@label$;
+		break;
+	case 10:
+		areamonster .@map$,352,267,362,303,"ミストレス",1059,1,.@label$;
+		areamonster .@map$,352,267,362,303,"ジャイアントホーネット",1303,25,.@label$;
+		areamonster .@map$,352,267,362,303,"ホーネット",1004,20,.@label$;
+		break;
+	case 11:
+		areamonster .@map$,9,180,19,216,"ドリアード",1493,15,.@label$;
+		areamonster .@map$,9,180,19,216,"フェアリーフ",1500,15,.@label$;
+		areamonster .@map$,9,180,19,216,"老人参",1413,15,.@label$;
+		areamonster .@map$,9,180,19,216,"ラフレシア",1162,5,.@label$;
+		break;
+	case 12:
+		areamonster .@map$,93,180,103,216,"デーモンパンク",1378,25,.@label$;
+		areamonster .@map$,93,180,103,216,"パンク",1199,25,.@label$;
+		break;
+	case 13:
+		areamonster .@map$,181,180,191,216,"ヒェグン",1512,15,.@label$;
+		areamonster .@map$,181,180,191,216,"ボンゴン",1188,15,.@label$;
+		areamonster .@map$,181,180,191,216,"ムナック",1026,10,.@label$;
+		break;
+	case 14:
+		areamonster .@map$,267,180,277,216,"ハイオーク",1213,15,.@label$;
+		areamonster .@map$,267,180,277,216,"オークアーチャー",1189,10,.@label$;
+		areamonster .@map$,267,180,277,216,"オークレディ",1273,10,.@label$;
+		areamonster .@map$,267,180,277,216,"オークウォリアー",1023,5,.@label$;
+		areamonster .@map$,267,180,277,216,"オークベイビー",1686,5,.@label$;
+		break;
+	case 15:
+		//areamonster .@map$,352,180,362,216,"マヤー",1147,1,.@label$;
+		//areamonster .@map$,352,180,362,216,"フリオニ",1159,1,.@label$;
+		//areamonster .@map$,352,180,362,216,"デニーロ",1105,15,.@label$;
+		//areamonster .@map$,352,180,362,216,"ピエール",1160,15,.@label$;
+		//areamonster .@map$,352,180,362,216,"アンドレ",1095,15,.@label$;
+		//areamonster .@map$,352,180,362,216,"蟻の卵",1097,5,.@label$;
+		//jRO配置
+		areamonster .@map$,352,180,362,216,"マヤー",1147,1,.@label$;
+		areamonster .@map$,352,180,362,216,"マヤパープル",1289,1,.@label$;
+		areamonster .@map$,352,180,362,216,"デニーロ",1105,15,.@label$;
+		areamonster .@map$,352,180,362,216,"ピエール",1160,15,.@label$;
+		areamonster .@map$,352,180,362,216,"アンドレ",1095,15,.@label$;
+		areamonster .@map$,352,180,362,216,"蟻の卵",1097,5,.@label$;
+		break;
+	case 16:
+		areamonster .@map$,9,96,19,132,"レイドリックアーチャー",1276,10,.@label$;
+		areamonster .@map$,9,96,19,132,"オークアーチャー",1189,10,.@label$;
+		areamonster .@map$,9,96,19,132,"ガーゴイル",1253,10,.@label$;
+		areamonster .@map$,9,96,19,132,"アーチャースケルトン",1016,10,.@label$;
+		break;
+	case 17:
+		areamonster .@map$,93,96,103,132,"半漁人",1264,10,.@label$;
+		areamonster .@map$,93,96,103,132,"バフォメット.Jr",1101,10,.@label$;
+		areamonster .@map$,93,96,103,132,"ストラウフ",1065,15,.@label$;
+		areamonster .@map$,93,96,103,132,"ヒルウィンド",1629,5,.@label$;
+		break;
+	case 18:
+		areamonster .@map$,181,96,191,132,"クランプ",1209,25,.@label$;
+		areamonster .@map$,181,96,191,132,"タロウ",1175,15,.@label$;
+		break;
+	case 19:
+		areamonster .@map$,267,96,277,132,"デビアス",1108,10,.@label$;
+		areamonster .@map$,267,96,277,132,"メガロドン",1064,10,.@label$;
+		areamonster .@map$,267,96,277,132,"ソードフィッシュ",1069,10,.@label$;
+		areamonster .@map$,267,96,277,132,"フェン",1158,10,.@label$;
+		break;
+	case 20:
+		areamonster .@map$,352,96,362,132,"ドレイク",1112,1,.@label$;
+		areamonster .@map$,352,96,362,132,"パイレーツスケル",1071,50,.@label$;
+		break;
+	case 21:
+		areamonster .@map$,9,9,19,45,"プラズマ",1693,10,.@label$;
+		areamonster .@map$,9,9,19,45,"プラズマ",1696,10,.@label$;
+		areamonster .@map$,9,9,19,45,"プラズマ",1695,5,.@label$;
+		areamonster .@map$,9,9,19,45,"プラズマ",1697,5,.@label$;
+		areamonster .@map$,9,9,19,45,"プラズマ",1694,5,.@label$;
+		break;
+	case 22:
+		areamonster .@map$,93,9,103,45,"マスキプラー",1780,15,.@label$;
+		areamonster .@map$,93,9,103,45,"ドロセラ",1781,15,.@label$;
+		areamonster .@map$,93,9,103,45,"フローラ",1118,15,.@label$;
+		areamonster .@map$,93,9,103,45,"ヒドラ",1068,15,.@label$;
+		areamonster .@map$,93,9,103,45,"マンドラゴラ",1020,10,.@label$;
+		areamonster .@map$,93,9,103,45,"ラフレシア",1162,10,.@label$;
+		break;
+	case 23:
+		areamonster .@map$,181,9,191,45,"ペノメナ",1216,15,.@label$;
+		areamonster .@map$,181,9,191,45,"オボンヌ",1044,10,.@label$;
+		areamonster .@map$,181,9,191,45,"マルス",1144,10,.@label$;
+		areamonster .@map$,181,9,191,45,"ソードフィッシュ",1069,10,.@label$;
+		areamonster .@map$,181,9,191,45,"ヒドラ",1068,5,.@label$;
+		break;
+	case 24:
+		areamonster .@map$,267,9,277,45,"ジョーカー",1131,15,.@label$;
+		areamonster .@map$,267,9,277,45,"ジェスター",1267,15,.@label$;
+		areamonster .@map$,267,9,277,45,"ジャック",1130,10,.@label$;
+		break;
+	case 25:
+		areamonster .@map$,352,9,362,45,"キャットナインテイル",1307,15,.@label$;
+		areamonster .@map$,352,9,362,45,"月夜花",1150,1,.@label$;
+		areamonster .@map$,352,9,362,45,"九尾狐",1180,15,.@label$;
+		break;
+	case 26:
+		areamonster .@map$,9,351,19,387,"ジビット",1503,10,.@label$;
+		areamonster .@map$,9,351,19,387,"人面桃樹",1410,10,.@label$;
+		areamonster .@map$,9,351,19,387,"ウドゥンゴーレム",1497,10,.@label$;
+		areamonster .@map$,9,351,19,387,"フレイムシューター",1495,10,.@label$;
+		areamonster .@map$,9,351,19,387,"エルダーウィロー",1033,5,.@label$;
+		break;
+	case 27:
+		areamonster .@map$,93,351,103,387,"ゴブリンアーチャー",1258,10,.@label$;
+		areamonster .@map$,93,351,103,387,"ゴブリン長男",1122,10,.@label$;
+		areamonster .@map$,93,351,103,387,"ゴブリン次男",1123,5,.@label$;
+		areamonster .@map$,93,351,103,387,"ゴブリン三男",1124,5,.@label$;
+		areamonster .@map$,93,351,103,387,"ゴブリン四男",1125,5,.@label$;
+		areamonster .@map$,93,351,103,387,"ゴブリン五男",1126,5,.@label$;
+		break;
+	case 28:
+		areamonster .@map$,181,351,191,387,"アクラウス",1194,30,.@label$;
+		areamonster .@map$,181,351,191,387,"ネレイド",1255,15,.@label$;
+		areamonster .@map$,181,351,191,387,"ペスト",1256,15,.@label$;
+		areamonster .@map$,181,351,191,387,"ククレ",1070,10,.@label$;
+		break;
+	case 29:
+		areamonster .@map$,267,351,277,387,"ダークフレーム",1260,10,.@label$;
+		areamonster .@map$,267,351,277,387,"一反木綿",1375,10,.@label$;
+		areamonster .@map$,267,351,277,387,"ハイローゾイスト",1510,10,.@label$;
+		areamonster .@map$,267,351,277,387,"キューブ",1508,5,.@label$;
+		areamonster .@map$,267,351,277,387,"ルード",1509,5,.@label$;
+		areamonster .@map$,267,351,277,387,"ウィスパー",1179,10,.@label$;
+		break;
+	case 30:
+		//areamonster .@map$,352,351,362,387,"ペクソジン",1630,1,.@label$;
+		//areamonster .@map$,352,351,362,387,"天仙娘々",1416,30,.@label$;
+		// jRO配置
+		areamonster .@map$,352,351,362,387,"フリオニ",1159,1,.@label$;
+		areamonster .@map$,352,351,362,387,"サベージ",1166,20,.@label$;
+		areamonster .@map$,352,351,362,387,"グリンブルスティ",1311,10,.@label$;
+		break;
+	case 31:
+		areamonster .@map$,9,267,19,303,"ギグ",1387,20,.@label$;
+		areamonster .@map$,9,267,19,303,"アイアンフィスト",1212,15,.@label$;
+		areamonster .@map$,9,267,19,303,"アルギオペ",1099,10,.@label$;
+		areamonster .@map$,9,267,19,303,"スコーピオン",1001,5,.@label$;
+		break;
+	case 32:
+		areamonster .@map$,93,267,103,303,"ゴブリンリーダー",1299,1,.@label$;
+		areamonster .@map$,93,267,103,303,"ゴブリンアーチャー",1258,10,.@label$;
+		areamonster .@map$,93,267,103,303,"ゴブリン長男",1122,10,.@label$;
+		areamonster .@map$,93,267,103,303,"ゴブリン次男",1123,5,.@label$;
+		areamonster .@map$,93,267,103,303,"ゴブリン三男",1124,5,.@label$;
+		areamonster .@map$,93,267,103,303,"ゴブリン四男",1125,5,.@label$;
+		areamonster .@map$,93,267,103,303,"ゴブリン五男",1126,5,.@label$;
+		break;
+	case 33:
+		areamonster .@map$,181,267,191,303,"コボルドリーダー",1296,1,.@label$;
+		areamonster .@map$,181,267,191,303,"コボルド",1133,15,.@label$;
+		areamonster .@map$,181,267,191,303,"コボルドアーチャー",1282,15,.@label$;
+		areamonster .@map$,181,267,191,303,"コボルド",1134,10,.@label$;
+		areamonster .@map$,181,267,191,303,"コボルド",1135,5,.@label$;
+		break;
+	case 34:
+		areamonster .@map$,267,267,277,303,"フレームスカル",1869,20,.@label$;
+		areamonster .@map$,267,267,277,303,"ウィスパー",1179,10,.@label$;
+		areamonster .@map$,267,267,277,303,"巨大ウィスパー",1186,10,.@label$;
+		break;
+	case 35:
+		areamonster .@map$,352,267,362,303,"タートルジェネラル",1312,1,.@label$;
+		areamonster .@map$,352,267,362,303,"フリーズタートル",1319,10,.@label$;
+		areamonster .@map$,352,267,362,303,"ソリッドタートル",1316,10,.@label$;
+		areamonster .@map$,352,267,362,303,"ヒートタートル",1318,10,.@label$;
+		areamonster .@map$,352,267,362,303,"パーメットタートル",1314,10,.@label$;
+		break;
+	case 36:
+		areamonster .@map$,9,180,19,216,"アノリアン",1206,30,.@label$;
+		areamonster .@map$,9,180,19,216,"グリーンイグアナ",1687,10,.@label$;
+		areamonster .@map$,9,180,19,216,"アリゲーター",1271,10,.@label$;
+		break;
+	case 37:
+		areamonster .@map$,93,180,103,216,"時計塔管理者",1270,5,.@label$;
+		areamonster .@map$,93,180,103,216,"クロック",1269,10,.@label$;
+		areamonster .@map$,93,180,103,216,"アラーム",1193,30,.@label$;
+		break;
+	case 38:
+		areamonster .@map$,181,180,191,216,"デスワード",1698,25,.@label$;
+		areamonster .@map$,181,180,191,216,"ライドワード",1195,25,.@label$;
+		break;
+	case 39:
+		areamonster .@map$,267,180,277,216,"天仙娘々",1416,10,.@label$;
+		areamonster .@map$,267,180,277,216,"ミョグェ",1513,10,.@label$;
+		areamonster .@map$,267,180,277,216,"天邪仙人",1412,10,.@label$;
+		areamonster .@map$,267,180,277,216,"小龍舞",1514,10,.@label$;
+		areamonster .@map$,267,180,277,216,"虎人",1517,5,.@label$;
+		break;
+	case 40:
+		//areamonster .@map$,352,180,362,216,"怨霊武士",1492,1,.@label$;
+		//areamonster .@map$,352,180,362,216,"カブキ忍者",1401,10,.@label$;
+		//areamonster .@map$,352,180,362,216,"酒天狗",1405,10,.@label$;
+		//areamonster .@map$,352,180,362,216,"銃奇兵",1403,5,.@label$;
+		//areamonster .@map$,352,180,362,216,"雅人形",1404,10,.@label$;
+		//areamonster .@map$,352,180,362,216,"カラ傘",1400,5,.@label$;
+		// jRO配置
+		areamonster .@map$,352,180,362,216,"ストームナイト",1251,1,.@label$;
+		areamonster .@map$,352,180,362,216,"ハティー",1252,1,.@label$;
+		areamonster .@map$,352,180,362,216,"ハティーベベ",1515,35,.@label$;
+		areamonster .@map$,352,180,362,216,"スノウアー",1775,15,.@label$;
+		areamonster .@map$,352,180,362,216,"アイスタイタン",1777,15,.@label$;
+		break;
+	case 41:
+		areamonster .@map$,9,96,19,132,"クラベン",1587,50,.@label$;
+		break;
+	case 42:
+		areamonster .@map$,93,96,103,132,"スリーパー",1386,20,.@label$;
+		areamonster .@map$,93,96,103,132,"スティング",1207,10,.@label$;
+		areamonster .@map$,93,96,103,132,"土精",1516,10,.@label$;
+		areamonster .@map$,93,96,103,132,"サンドマン",1165,5,.@label$;
+		areamonster .@map$,93,96,103,132,"ホード",1127,5,.@label$;
+		break;
+	case 43:
+		areamonster .@map$,181,96,191,132,"メデューサ",1148,10,.@label$;
+		areamonster .@map$,181,96,191,132,"サイドワインダー",1037,40,.@label$;
+		areamonster .@map$,181,96,191,132,"アナコンダク",1030,5,.@label$;
+		areamonster .@map$,181,96,191,132,"スネイク",1025,5,.@label$;
+		break;
+	case 44:
+		areamonster .@map$,267,96,277,132,"ハティーベベ",1515,20,.@label$;
+		areamonster .@map$,267,96,277,132,"バフォメット.Jr",1101,20,.@label$;
+		areamonster .@map$,267,96,277,132,"オークベイビー",1686,1,.@label$;
+		areamonster .@map$,267,96,277,132,"子デザートウルフ",1107,10,.@label$;
+		areamonster .@map$,267,96,277,132,"サベージベベ",1167,10,.@label$;
+		break;
+	case 45:
+		areamonster .@map$,352,96,362,132,"オシリス",1038,1,.@label$;
+		areamonster .@map$,352,96,362,132,"エンシェントマミー",1297,15,.@label$;
+		areamonster .@map$,352,96,362,132,"ベリット",1032,15,.@label$;
+		areamonster .@map$,352,96,362,132,"マミー",1041,20,.@label$;
+		break;
+	case 46:
+		areamonster .@map$,9,9,19,45,"シーカー",1774,20,.@label$;
+		areamonster .@map$,9,9,19,45,"ビホルダー",1633,20,.@label$;
+		break;
+	case 47:
+		areamonster .@map$,93,9,103,45,"デリーター",1384,20,.@label$;
+		areamonster .@map$,93,9,103,45,"デリーター",1385,10,.@label$;
+		areamonster .@map$,93,9,103,45,"プティット",1156,10,.@label$;
+		areamonster .@map$,93,9,103,45,"プティット",1155,10,.@label$;
+		break;
+	case 48:
+		areamonster .@map$,181,9,191,45,"エンシェントワーム",1305,10,.@label$;
+		areamonster .@map$,181,9,191,45,"エンシェントマミー",1297,10,.@label$;
+		areamonster .@map$,181,9,191,45,"エンシェントミミック",1699,10,.@label$;
+		break;
+	case 49:
+		areamonster .@map$,267,9,277,45,"グリズリー",1381,20,.@label$;
+		areamonster .@map$,267,9,277,45,"レイブオルマイ",1306,7,.@label$;
+		areamonster .@map$,267,9,277,45,"チャッキー",1417,5,.@label$;
+		areamonster .@map$,267,9,277,45,"サスカッチ",1243,5,.@label$;
+		areamonster .@map$,267,9,277,45,"ビッグフット",1060,5,.@label$;
+		break;
+	case 50:
+		areamonster .@map$,352,9,362,45,"ファラオ",1157,1,.@label$;
+		areamonster .@map$,352,9,362,45,"アモンラー",1511,1,.@label$;
+		areamonster .@map$,352,9,362,45,"アヌビス",1098,10,.@label$;
+		areamonster .@map$,352,9,362,45,"マルドゥーク",1140,10,.@label$;
+		areamonster .@map$,352,9,362,45,"マーター",1146,10,.@label$;
+		break;
+	case 51:
+		areamonster .@map$,9,351,19,387,"ミニデモ",1292,20,.@label$;
+		areamonster .@map$,9,351,19,387,"ディアボリック",1382,20,.@label$;
+		areamonster .@map$,9,351,19,387,"デビルチ",1109,10,.@label$;
+		break;
+	case 52:
+		areamonster .@map$,93,351,103,387,"ハーピー",1376,20,.@label$;
+		areamonster .@map$,93,351,103,387,"グランペコ",1369,10,.@label$;
+		areamonster .@map$,93,351,103,387,"パピヨン",1408,10,.@label$;
+		areamonster .@map$,93,351,103,387,"ガーゴイル",1253,10,.@label$;
+		areamonster .@map$,93,351,103,387,"ヒルウィンド",1680,5,.@label$;
+		areamonster .@map$,93,351,103,387,"ヒルウィンド",1629,5,.@label$;
+		break;
+	case 53:
+		areamonster .@map$,181,351,191,387,"アサルトタートル",1315,25,.@label$;
+		areamonster .@map$,181,351,191,387,"カブキ忍者",1401,30,.@label$;
+		break;
+	case 54:
+		areamonster .@map$,267,351,277,387,"チェペット",1250,10,.@label$;
+		areamonster .@map$,267,351,277,387,"マリオネット",1143,10,.@label$;
+		areamonster .@map$,267,351,277,387,"雅人形",1404,10,.@label$;
+		break;
+	case 55:
+		areamonster .@map$,352,351,362,387,"メデューサ",1148,25,.@label$;
+		areamonster .@map$,352,351,362,387,"黒蛇王",1418,1,.@label$;
+		areamonster .@map$,352,351,362,387,"イシス",1029,15,.@label$;
+		areamonster .@map$,352,351,362,387,"サイドワインダー",1037,15,.@label$;
+		break;
+	case 56:
+		areamonster .@map$,9,267,19,303,"フリーズタートル",1319,10,.@label$;
+		areamonster .@map$,9,267,19,303,"ハティーベベ",1515,10,.@label$;
+		areamonster .@map$,9,267,19,303,"アイスタイタン",1777,15,.@label$;
+		areamonster .@map$,9,267,19,303,"スノウアー",1775,10,.@label$;
+		areamonster .@map$,9,267,19,303,"ゲイズティ",1778,10,.@label$;
+		break;
+	case 57:
+		areamonster .@map$,93,267,103,303,"アークエンジェリング",1388,1,.@label$;
+		areamonster .@map$,93,267,103,303,"デビルリング",1582,1,.@label$;
+		areamonster .@map$,93,267,103,303,"エンジェリング",1096,1,.@label$;
+		areamonster .@map$,93,267,103,303,"ゴーストリング",1120,1,.@label$;
+		areamonster .@map$,93,267,103,303,"マスターリング",1090,1,.@label$;
+		areamonster .@map$,93,267,103,303,"メタリン",1613,25,.@label$;
+		areamonster .@map$,93,267,103,303,"マーリン",1242,5,.@label$;
+		areamonster .@map$,93,267,103,303,"ポポリン",1031,5,.@label$;
+		areamonster .@map$,93,267,103,303,"ドロップス",1113,5,.@label$;
+		break;
+	case 58:
+		areamonster .@map$,181,267,191,303,"フェンダーク",1202,20,.@label$;
+		areamonster .@map$,181,267,191,303,"リビオ",1201,10,.@label$;
+		areamonster .@map$,181,267,191,303,"ゾンビプリズナー",1197,10,.@label$;
+		areamonster .@map$,181,267,191,303,"スケルプリズナー",1196,5,.@label$;
+		areamonster .@map$,181,267,191,303,"インジャスティス",1257,5,.@label$;
+		break;
+	case 59:
+		areamonster .@map$,267,267,277,303,"エンシェントミミック",1699,30,.@label$;
+		areamonster .@map$,267,267,277,303,"ミミック",1191,20,.@label$;
+		areamonster .@map$,267,267,277,303,"ミストケース",1249,10,.@label$;
+		break;
+	case 60:
+		areamonster .@map$,352,267,362,303,"イグニゼム=セニア",1658,1,.@label$;
+		areamonster .@map$,352,267,362,303,"ドッペルゲンガー",1046,1,.@label$;
+		areamonster .@map$,352,267,362,303,"アルマイア=デュンゼ",1654,10,.@label$;
+		areamonster .@map$,352,267,362,303,"ヒュッケバイン=トリス",1653,10,.@label$;
+		areamonster .@map$,352,267,362,303,"ラウレル=ヴィンダー",1657,10,.@label$;
+		areamonster .@map$,352,267,362,303,"カヴァク=イカルス",1656,10,.@label$;
+		areamonster .@map$,352,267,362,303,"イレンド=エベシ",1655,10,.@label$;
+		areamonster .@map$,352,267,362,303,"イグニゼム=セニア",1652,10,.@label$;
+		break;
+	case 61:
+		areamonster .@map$,9,180,19,216,"アガヴ",1769,10,.@label$;
+		areamonster .@map$,9,180,19,216,"エキオ",1770,10,.@label$;
+		areamonster .@map$,9,180,19,216,"アイシラ",1772,5,.@label$;
+		areamonster .@map$,9,180,19,216,"チンピラ",1313,10,.@label$;
+		areamonster .@map$,9,180,19,216,"パサナ",1154,10,.@label$;
+		areamonster .@map$,9,180,19,216,"ヴァンベルク",1771,5,.@label$;
+		break;
+	case 62:
+		areamonster .@map$,93,180,103,216,"彷徨う者",1208,35,.@label$;
+		break;
+	case 63:
+		areamonster .@map$,181,180,191,216,"ラギッドゾンビ",1865,20,.@label$;
+		areamonster .@map$,181,180,191,216,"ゾンビマスター",1298,10,.@label$;
+		areamonster .@map$,181,180,191,216,"ゾンビプリズナー",1197,5,.@label$;
+		areamonster .@map$,181,180,191,216,"オークゾンビ",1153,5,.@label$;
+		areamonster .@map$,181,180,191,216,"ゾンビ",1015,5,.@label$;
+		break;
+	case 64:
+		areamonster .@map$,267,180,277,216,"ウンゴリアント",1618,30,.@label$;
+		areamonster .@map$,267,180,277,216,"エンシェントワーム",1305,2,.@label$;
+		areamonster .@map$,267,180,277,216,"キャタピラー",1300,2,.@label$;
+		areamonster .@map$,267,180,277,216,"クリーミーフィアー",1293,2,.@label$;
+		areamonster .@map$,267,180,277,216,"キラーマンティス",1294,2,.@label$;
+		areamonster .@map$,267,180,277,216,"ジャイアントホーネット",1303,2,.@label$;
+		break;
+	case 65:
+		areamonster .@map$,352,180,362,216,"アトロス",1785,1,.@label$;
+		areamonster .@map$,352,180,362,216,"ガリオン",1783,20,.@label$;
+		break;
+	case 66:
+		areamonster .@map$,9,96,19,132,"インキュバス",1374,20,.@label$;
+		areamonster .@map$,9,96,19,132,"エリオット",1736,20,.@label$;
+		areamonster .@map$,9,96,19,132,"インジャスティス",1257,10,.@label$;
+		break;
+	case 67:
+		areamonster .@map$,93,96,103,132,"オシドス",1716,10,.@label$;
+		areamonster .@map$,93,96,103,132,"オシドス",1713,10,.@label$;
+		areamonster .@map$,93,96,103,132,"デリーター",1384,5,.@label$;
+		areamonster .@map$,93,96,103,132,"ミュータントドラゴン",1262,10,.@label$;
+		areamonster .@map$,93,96,103,132,"プティット",1156,5,.@label$;
+		break;
+	case 68:
+		areamonster .@map$,181,96,191,132,"ラーヴァゴーレム",1366,10,.@label$;
+		areamonster .@map$,181,96,191,132,"スタラクタイトゴーレム",1278,10,.@label$;
+		areamonster .@map$,181,96,191,132,"アイスタイタン",1777,10,.@label$;
+		areamonster .@map$,181,96,191,132,"ウドゥンゴーレム",1497,5,.@label$;
+		areamonster .@map$,181,96,191,132,"ゴーレム",1040,5,.@label$;
+		break;
+	case 69:
+		areamonster .@map$,267,96,277,132,"監視する者",1700,20,.@label$;
+		areamonster .@map$,267,96,277,132,"保護する者",1701,10,.@label$;
+		areamonster .@map$,267,96,277,132,"執行する者",1702,10,.@label$;
+		areamonster .@map$,267,96,277,132,"慰める者",1703,10,.@label$;
+		areamonster .@map$,267,96,277,132,"フェイクエンジェル",1371,10,.@label$;
+		break;
+	case 70:
+		areamonster .@map$,352,96,362,132,"オークヒーロー",1087,1,.@label$;
+		areamonster .@map$,352,96,362,132,"オークロード",1190,1,.@label$;
+		areamonster .@map$,352,96,362,132,"オークベイビー",1686,20,.@label$;
+		break;
+	case 71:
+		areamonster .@map$,9,9,19,45,"サキュバス",1370,20,.@label$;
+		areamonster .@map$,9,9,19,45,"ナイトメアテラー",1379,20,.@label$;
+		areamonster .@map$,9,9,19,45,"インキュバス",1374,20,.@label$;
+		areamonster .@map$,9,9,19,45,"ナイトメア",1061,5,.@label$;
+		break;
+	case 72:
+		areamonster .@map$,93,9,103,45,"マーガレッタ=ソリン",1637,10,.@label$;
+		areamonster .@map$,93,9,103,45,"パーメットタートル",1314,10,.@label$;
+		areamonster .@map$,93,9,103,45,"イレンド=エベシ",1655,10,.@label$;
+		areamonster .@map$,93,9,103,45,"人面桃樹",1410,10,.@label$;
+		break;
+	case 73:
+		areamonster .@map$,181,9,191,45,"サキュバス",1370,10,.@label$;
+		areamonster .@map$,181,9,191,45,"ロリルリ",1505,20,.@label$;
+		areamonster .@map$,181,9,191,45,"エリザ",1737,10,.@label$;
+		areamonster .@map$,181,9,191,45,"ジルタス",1200,5,.@label$;
+		areamonster .@map$,181,9,191,45,"アリス",1275,5,.@label$;
+		areamonster .@map$,181,9,191,45,"チュンイー",1631,10,.@label$;
+		break;
+	case 74:
+		areamonster .@map$,267,9,277,45,"ディミック",1671,6,.@label$;
+		areamonster .@map$,267,9,277,45,"ディミック",1673,6,.@label$;
+		areamonster .@map$,267,9,277,45,"ディミック",1672,6,.@label$;
+		areamonster .@map$,267,9,277,45,"ヴェナート",1677,6,.@label$;
+		areamonster .@map$,267,9,277,45,"ディミック",1670,6,.@label$;
+		areamonster .@map$,267,9,277,45,"アークダム",1668,6,.@label$;
+		areamonster .@map$,267,9,277,45,"ヴェナート",1678,6,.@label$;
+		areamonster .@map$,267,9,277,45,"ヴェナート",1679,6,.@label$;
+		areamonster .@map$,267,9,277,45,"ヴェナート",1676,6,.@label$;
+		break;
+	case 75:
+		areamonster .@map$,352,9,362,45,"バフォメット",1039,1,.@label$;
+		areamonster .@map$,352,9,362,45,"ダークロード",1272,1,.@label$;
+		areamonster .@map$,352,9,362,45,"バフォメット.Jr",1101,20,.@label$;
+		areamonster .@map$,352,9,362,45,"ダークイリュージョン",1302,10,.@label$;
+		break;
+	case 76:
+		areamonster .@map$,9,351,19,387,"深淵の騎士",1219,30,.@label$;
+		areamonster .@map$,9,351,19,387,"ナイトメアテラー",1379,20,.@label$;
+		areamonster .@map$,9,351,19,387,"ナイトメア",1061,10,.@label$;
+		break;
+	case 77:
+		areamonster .@map$,93,351,103,387,"バンシー",1867,30,.@label$;
+		areamonster .@map$,93,351,103,387,"デッドリーレイス",1291,10,.@label$;
+		areamonster .@map$,93,351,103,387,"イビルドルイド",1117,10,.@label$;
+		areamonster .@map$,93,351,103,387,"レイス",1192,10,.@label$;
+		areamonster .@map$,93,351,103,387,"ウィンドゴースト",1263,10,.@label$;
+		break;
+	case 78:
+		areamonster .@map$,181,351,191,387,"ソードガーディアン",1829,5,.@label$;
+		areamonster .@map$,181,351,191,387,"ブラッディナイト",1268,10,.@label$;
+		areamonster .@map$,181,351,191,387,"深淵の騎士",1219,5,.@label$;
+		areamonster .@map$,181,351,191,387,"デュラハン",1504,10,.@label$;
+		areamonster .@map$,181,351,191,387,"レイドリック",1163,20,.@label$;
+		break;
+	case 79:
+		areamonster .@map$,267,351,277,387,"ハイドラランサー",1720,10,.@label$;
+		areamonster .@map$,267,351,277,387,"ペロス",1714,10,.@label$;
+		areamonster .@map$,267,351,277,387,"ペロス",1717,10,.@label$;
+		areamonster .@map$,267,351,277,387,"デリーター",1385,10,.@label$;
+		areamonster .@map$,267,351,277,387,"プティット",1155,10,.@label$;
+		break;
+	case 80:
+		areamonster .@map$,352,351,362,387,"堕ちた大神官ヒバム",1871,1,.@label$;
+		areamonster .@map$,352,351,362,387,"ネクロマンサー",1870,15,.@label$;
+		break;
+	case 81:
+		areamonster .@map$,9,267,19,303,"ミステルテイン",1203,20,.@label$;
+		areamonster .@map$,9,267,19,303,"オーガトゥース",1204,20,.@label$;
+		areamonster .@map$,9,267,19,303,"エクスキューショナー",1205,20,.@label$;
+		break;
+	case 82:
+		areamonster .@map$,93,267,103,303,"ブラッディナイト",1268,10,.@label$;
+		areamonster .@map$,93,267,103,303,"アガヴ",1769,10,.@label$;
+		areamonster .@map$,93,267,103,303,"ブラッディマーダー",1507,10,.@label$;
+		areamonster .@map$,93,267,103,303,"スコグル",1752,10,.@label$;
+		areamonster .@map$,93,267,103,303,"インジャスティス",1257,10,.@label$;
+		break;
+	case 83:
+		areamonster .@map$,181,267,191,303,"スケゴルト",1754,10,.@label$;
+		areamonster .@map$,181,267,191,303,"ダークイリュージョン",1302,10,.@label$;
+		areamonster .@map$,181,267,191,303,"グリフォン",1259,10,.@label$;
+		areamonster .@map$,181,267,191,303,"キメラ",1283,10,.@label$;
+		break;
+	case 84:
+		areamonster .@map$,267,267,277,303,"サキュバス",1370,10,.@label$;
+		areamonster .@map$,267,267,277,303,"ダークイリュージョン",1302,20,.@label$;
+		areamonster .@map$,267,267,277,303,"オウルデューク",1320,10,.@label$;
+		areamonster .@map$,267,267,277,303,"オウルバロン",1295,10,.@label$;
+		areamonster .@map$,267,267,277,303,"インキュバス",1374,10,.@label$;
+		break;
+	case 85:
+		areamonster .@map$,352,267,362,303,"イフリート",1832,1,.@label$;
+		break;
+	case 86:
+		areamonster .@map$,9,180,19,216,"ハイドラランサー",1720,10,.@label$;
+		areamonster .@map$,9,180,19,216,"グリフォン",1259,10,.@label$;
+		areamonster .@map$,9,180,19,216,"キメラ",1283,10,.@label$;
+		areamonster .@map$,9,180,19,216,"ごっついミノタウロス",1310,10,.@label$;
+		break;
+	case 87:
+		areamonster .@map$,93,180,103,216,"サラマンダー",1831,15,.@label$;
+		areamonster .@map$,93,180,103,216,"カーサ",1833,20,.@label$;
+		areamonster .@map$,93,180,103,216,"ラーヴァゴーレム",1366,15,.@label$;
+		areamonster .@map$,93,180,103,216,"ガジョマート",1309,10,.@label$;
+		break;
+	case 88:
+		areamonster .@map$,181,180,191,216,"ネクロマンサー",1870,15,.@label$;
+		areamonster .@map$,181,180,191,216,"アヌビス",1098,15,.@label$;
+		areamonster .@map$,181,180,191,216,"デッドリーレイス",1291,10,.@label$;
+		areamonster .@map$,181,180,191,216,"エンシェントマミー",1297,10,.@label$;
+		areamonster .@map$,181,180,191,216,"カーリッツバーグ",1132,10,.@label$;
+		break;
+	case 89:
+		areamonster .@map$,267,180,277,216,"タナトスの憎悪",1704,6,.@label$;
+		areamonster .@map$,267,180,277,216,"タナトスの絶望",1705,6,.@label$;
+		areamonster .@map$,267,180,277,216,"タナトスの悲しみ",1706,6,.@label$;
+		areamonster .@map$,267,180,277,216,"タナトスの苦悩",1707,6,.@label$;
+		break;
+	case 90:
+		areamonster .@map$,352,180,362,216,"ランドグリス",1751,1,.@label$;
+		areamonster .@map$,352,180,362,216,"執行する者",1702,10,.@label$;
+		areamonster .@map$,352,180,362,216,"慰める者",1703,10,.@label$;
+		areamonster .@map$,352,180,362,216,"フェイクエンジェル",1371,10,.@label$;
+		break;
+	case 91:
+		areamonster .@map$,9,96,19,132,"セシル=ディモン",1638,10,.@label$;
+		areamonster .@map$,9,96,19,132,"ボウガーディアン",1830,10,.@label$;
+		areamonster .@map$,9,96,19,132,"カヴァク=イカルス",1656,30,.@label$;
+		break;
+	case 92:
+		areamonster .@map$,93,96,103,132,"カトリーヌ=ケイロン",1639,15,.@label$;
+		areamonster .@map$,93,96,103,132,"エルダー",1377,10,.@label$;
+		areamonster .@map$,93,96,103,132,"ラウレル=ヴィンダー",1657,10,.@label$;
+		areamonster .@map$,93,96,103,132,"ウィンドゴースト",1263,10,.@label$;
+		areamonster .@map$,93,96,103,132,"マルドゥーク",1140,10,.@label$;
+		break;
+	case 93:
+		areamonster .@map$,181,96,191,132,"セイレン=ウィンザー",1634,15,.@label$;
+		areamonster .@map$,181,96,191,132,"ブラッディナイト",1268,10,.@label$;
+		areamonster .@map$,181,96,191,132,"深淵の騎士",1219,10,.@label$;
+		areamonster .@map$,181,96,191,132,"彷徨う者",1208,10,.@label$;
+		break;
+	case 94:
+		areamonster .@map$,267,96,277,132,"ソードガーディアン",1829,15,.@label$;
+		areamonster .@map$,267,96,277,132,"ボウガーディアン",1830,15,.@label$;
+		break;
+	case 95:
+		areamonster .@map$,352,96,362,132,"ヴェルゼブブ",1873,1,.@label$;
+		areamonster .@map$,352,96,362,132,"ハンターフライ",1035,30,.@label$;
+		areamonster .@map$,352,96,362,132,"スチールチョンチョン",1042,5,.@label$;
+		areamonster .@map$,352,96,362,132,"ドラゴンフライ",1091,5,.@label$;
+		areamonster .@map$,352,96,362,132,"チョンチョン",1011,5,.@label$;
+		break;
+	case 96:
+		areamonster .@map$,9,9,19,45,"ランドグリスゴースト",1765,5,.@label$;
+		areamonster .@map$,9,9,19,45,"スケゴルト",1755,10,.@label$;
+		areamonster .@map$,9,9,19,45,"スケゴルト",1754,10,.@label$;
+		break;
+	case 97:
+		areamonster .@map$,93,9,103,45,"モロクの現身",1918,5,.@label$;
+		areamonster .@map$,93,9,103,45,"モロクの現身",1919,5,.@label$;
+		areamonster .@map$,93,9,103,45,"モロクの現身",1920,5,.@label$;
+		areamonster .@map$,93,9,103,45,"モロクの現身",1921,5,.@label$;
+		break;
+	case 98:
+		areamonster .@map$,181,9,191,45,"カトリーヌ=ケイロン",1639,2,.@label$;
+		areamonster .@map$,181,9,191,45,"セイレン=ウィンザー",1634,2,.@label$;
+		areamonster .@map$,181,9,191,45,"マーガレッタ=ソリン",1637,2,.@label$;
+		areamonster .@map$,181,9,191,45,"エレメス=ガイル",1635,2,.@label$;
+		areamonster .@map$,181,9,191,45,"ハワード=アルトアイゼン",1636,2,.@label$;
+		areamonster .@map$,181,9,191,45,"セシル=ディモン",1638,2,.@label$;
+		break;
+	case 99:
+		for(set .@i,1; .@i<=7; set .@i,.@i+1) {
+			set .@mob_ran,rand(1,30);
+			if (.@mob_ran == 1) 
+				areamonster .@map$,267,9,277,45,"カトリーヌ=ケイロン",1639,2,.@label$;
+			else if (.@mob_ran == 2) 
+				areamonster .@map$,267,9,277,45,"セイレン=ウィンザー",1634,2,.@label$;
+			else if (.@mob_ran == 3) 
+				areamonster .@map$,267,9,277,45,"マーガレッタ=ソリン",1637,2,.@label$;
+			else if (.@mob_ran == 4) 
+				areamonster .@map$,267,9,277,45,"エレメス=ガイル",1635,2,.@label$;
+			else if (.@mob_ran == 5) 
+				areamonster .@map$,267,9,277,45,"ハワード=アルトアイゼン",1636,2,.@label$;
+			else if (.@mob_ran == 6) 
+				areamonster .@map$,267,9,277,45,"セシル=ディモン",1638,2,.@label$;
+			else if (.@mob_ran == 7) 
+				areamonster .@map$,267,9,277,45,"モロクの現身",1918,5,.@label$;
+			else if (.@mob_ran == 8) 
+				areamonster .@map$,267,9,277,45,"モロクの現身",1919,5,.@label$;
+			else if (.@mob_ran == 9) 
+				areamonster .@map$,267,9,277,45,"モロクの現身",1920,5,.@label$;
+			else if (.@mob_ran == 10) 
+				areamonster .@map$,267,9,277,45,"モロクの現身",1921,5,.@label$;
+			else if (.@mob_ran == 11) 
+				areamonster .@map$,267,9,277,45,"ランドグリスゴースト",1765,5,.@label$;
+			else if (.@mob_ran == 12) 
+				areamonster .@map$,267,9,277,45,"スケゴルト",1755,10,.@label$;
+			else if (.@mob_ran == 13) 
+				areamonster .@map$,267,9,277,45,"スケゴルト",1754,10,.@label$;
+			else if (.@mob_ran == 14) 
+				areamonster .@map$,267,9,277,45,"セイレン=ウィンザー",1634,15,.@label$;
+			else if (.@mob_ran == 15) 
+				areamonster .@map$,267,9,277,45,"ブラッディナイト",1268,10,.@label$;
+			else if (.@mob_ran == 16) 
+				areamonster .@map$,267,9,277,45,"深淵の騎士",1219,10,.@label$;
+			else if (.@mob_ran == 17) 
+				areamonster .@map$,267,9,277,45,"彷徨う者",1208,10,.@label$;
+			else if (.@mob_ran == 18) 
+				areamonster .@map$,267,9,277,45,"ソードガーディアン",1829,15,.@label$;
+			else if (.@mob_ran == 19) 
+				areamonster .@map$,267,9,277,45,"ボウガーディアン",1830,15,.@label$;
+			else if (.@mob_ran == 20) 
+				areamonster .@map$,267,9,277,45,"カトリーヌ=ケイロン",1639,15,.@label$;
+			else if (.@mob_ran == 21) 
+				areamonster .@map$,267,9,277,45,"エルダー",1377,10,.@label$;
+			else if (.@mob_ran == 22) 
+				areamonster .@map$,267,9,277,45,"ラウレル=ヴィンダー",1657,10,.@label$;
+			else if (.@mob_ran == 23) 
+				areamonster .@map$,267,9,277,45,"ウィンドゴースト",1263,10,.@label$;
+			else if (.@mob_ran == 24) 
+				areamonster .@map$,267,9,277,45,"マルドゥーク",1140,10,.@label$;
+			else if (.@mob_ran == 25) 
+				areamonster .@map$,267,9,277,45,"セシル=ディモン",1638,10,.@label$;
+			else if (.@mob_ran == 26) 
+				areamonster .@map$,267,9,277,45,"ボウガーディアン",1830,10,.@label$;
+			else if (.@mob_ran == 27) 
+				areamonster .@map$,267,9,277,45,"カヴァク=イカルス",1656,30,.@label$;
+			else if (.@mob_ran == 28) 
+				areamonster .@map$,267,9,277,45,"執行する者",1702,10,.@label$;
+			else if (.@mob_ran == 29) 
+				areamonster .@map$,267,9,277,45,"慰める者",1703,10,.@label$;
+			else 
+				areamonster .@map$,267,9,277,45,"フェイクエンジェル",1371,10,.@label$;
+		}
+		break;
+	}
+	return;
+}
+
+function	script	F_Tower_Warp	{
+
+	set .@level, getarg(0);
+	set .@map$, getarg(1);
+
+	switch(.@level) {
+		case 2: warp .@map$,136,354; break;
+		case 3: warp .@map$,224,354; break;
+		case 4: warp .@map$,310,354; break;
+		case 5: warp .@map$,395,354; break;
+		case 6: warp .@map$,52,270; break;
+		case 7: warp .@map$,136,270; break;
+		case 8: warp .@map$,224,270; break;
+		case 9: warp .@map$,310,270; break;
+		case 10: warp .@map$,395,270; break;
+		case 11: warp .@map$,52,183; break;
+		case 12: warp .@map$,136,183; break;
+		case 13: warp .@map$,224,183; break;
+		case 14: warp .@map$,310,183; break;
+		case 15: warp .@map$,395,183; break;
+		case 16: warp .@map$,52,99; break;
+		case 17: warp .@map$,136,99; break;
+		case 18: warp .@map$,224,99; break;
+		case 19: warp .@map$,310,99; break;
+		case 20: warp .@map$,395,99; break;
+		case 21: warp .@map$,52,12; break;
+		case 22: warp .@map$,136,12; break;
+		case 23: warp .@map$,224,12; break;
+		case 24: warp .@map$,310,12; break;
+		case 25: warp .@map$,395,12; break;
+
+		case 27: warp .@map$,136,354; break;
+		case 28: warp .@map$,224,354; break;
+		case 29: warp .@map$,310,354; break;
+		case 30: warp .@map$,395,354; break;
+		case 31: warp .@map$,52,270; break;
+		case 32: warp .@map$,136,270; break;
+		case 33: warp .@map$,224,270; break;
+		case 34: warp .@map$,310,270; break;
+		case 35: warp .@map$,395,270; break;
+		case 36: warp .@map$,52,183; break;
+		case 37: warp .@map$,136,183; break;
+		case 38: warp .@map$,224,183; break;
+		case 39: warp .@map$,310,183; break;
+		case 40: warp .@map$,395,183; break;
+		case 41: warp .@map$,52,99; break;
+		case 42: warp .@map$,136,99; break;
+		case 43: warp .@map$,224,99; break;
+		case 44: warp .@map$,310,99; break;
+		case 45: warp .@map$,395,99; break;
+		case 46: warp .@map$,52,12; break;
+		case 47: warp .@map$,136,12; break;
+		case 48: warp .@map$,224,12; break;
+		case 49: warp .@map$,310,12; break;
+		case 50: warp .@map$,395,12; break;
+
+		case 52: warp .@map$,136,354; break;
+		case 53: warp .@map$,224,354; break;
+		case 54: warp .@map$,310,354; break;
+		case 55: warp .@map$,395,354; break;
+		case 56: warp .@map$,52,270; break;
+		case 57: warp .@map$,136,270; break;
+		case 58: warp .@map$,224,270; break;
+		case 59: warp .@map$,310,270; break;
+		case 60: warp .@map$,395,270; break;
+		case 61: warp .@map$,52,183; break;
+		case 62: warp .@map$,136,183; break;
+		case 63: warp .@map$,224,183; break;
+		case 64: warp .@map$,310,183; break;
+		case 65: warp .@map$,395,183; break;
+		case 66: warp .@map$,52,99; break;
+		case 67: warp .@map$,136,99; break;
+		case 68: warp .@map$,224,99; break;
+		case 69: warp .@map$,310,99; break;
+		case 70: warp .@map$,395,99; break;
+		case 71: warp .@map$,52,12; break;
+		case 72: warp .@map$,136,12; break;
+		case 73: warp .@map$,224,12; break;
+		case 74: warp .@map$,310,12; break;
+		case 75: warp .@map$,395,12; break;
+
+		case 77: warp .@map$,136,354; break;
+		case 78: warp .@map$,224,354; break;
+		case 79: warp .@map$,310,354; break;
+		case 80: warp .@map$,395,354; break;
+		case 81: warp .@map$,52,270; break;
+		case 82: warp .@map$,136,270; break;
+		case 83: warp .@map$,224,270; break;
+		case 84: warp .@map$,310,270; break;
+		case 85: warp .@map$,395,270; break;
+		case 86: warp .@map$,52,183; break;
+		case 87: warp .@map$,136,183; break;
+		case 88: warp .@map$,224,183; break;
+		case 89: warp .@map$,310,183; break;
+		case 90: warp .@map$,395,183; break;
+		case 91: warp .@map$,52,99; break;
+		case 92: warp .@map$,136,99; break;
+		case 93: warp .@map$,224,99; break;
+		case 94: warp .@map$,310,99; break;
+		case 95: warp .@map$,395,99; break;
+		case 96: warp .@map$,52,12; break;
+		case 97: warp .@map$,136,12; break;
+		case 98: warp .@map$,224,12; break;
+		case 99: warp .@map$,309,12; break;
+	}
+	return;
+}
+
+// Levels 1-25
+//============================================================
+1@tower,50,360,0	script	はじまりの松明#	844,{
+	mes "-松明に浮かんだ文-";
+	mes " ";
+	mes "^006600ここに^0000FF闇の灰^006600を撒いた者は、";
+	mes "闇夜の覇王に近づくだろう……^000000";
+	next;
+
+	setarray .@level$[1],"26階","51階","76階";
+	setarray .@map$[1],"2@tower","3@tower","4@tower";
+	set .@i, select("^0000FF26階^000000:^00660051階^000000:^FF000076階^000000");
+
+	if (countitem(6000) < .@i) {
+		mes "-^FF0000警告^000000-";
+		mes .@level$[.@i]+"に移動するためには";
+		mes "^0000FF闇の灰^000000が^FF0000" +.@i+ "個^000000必要である。";
+		close;
+	}
+	delitem 6000,.@i; //Dark_Ashes
+	mapannounce instance_mapname("1@tower"), "[" +strcharinfo(0)+ "]が "+.@level$[.@i]+"階 へ移動します",bc_map,"0x00ff99";
+	warp instance_mapname(.@map$[.@i]),52,354;
+	close;
+
+OnInstanceInit:
+	initnpctimer;
+	end;
+
+OnTimer10000:
+	//mapannounce instance_mapname("1@tower"), "Notice : Taming a monster does not count towards defeating them.",bc_map,"0xff0000";
+	stopnpctimer;
+	end;
+}
+
+1@tower,29,365,1	script	#1F Controller	844,{
+	end;
+
+OnInstanceInit:
+	callfunc "F_Tower_Monster",
+		1,
+		instance_mapname("1@tower"),
+		instance_npcname("#1F Controller")+"::OnMyMobDead";
+	end;
+
+OnMyMobDead:
+	set .@map$, instance_mapname("1@tower");
+	set .@mob_dead_num,mobcount(.@map$,instance_npcname("#1F Controller")+"::OnMyMobDead");
+	if (.@mob_dead_num < 1) {
+		initnpctimer;
+		//SetItemPartyInMap in_102floor 1
+	} else
+		mapannounce .@map$, "1階に残ったモンスター ["+.@mob_dead_num+"]体",bc_map,"0x00ff99";
+	end;
+
+OnTimer5000:
+	mapannounce instance_mapname("1@tower"), "1階のすべてのモンスターを倒しました",bc_map,"0xffff00";
+	donpcevent instance_npcname("1FGate102tower")+"::OnEnable";
+	stopnpctimer;
+	end;
+}
+
+1@tower,12,393,0	script	1FGate102tower	45,2,2,{
+	end;
+
+OnInstanceInit:
+	disablenpc instance_npcname(strnpcinfo(0));
+	end;
+
+OnEnable:
+	enablenpc instance_npcname(strnpcinfo(0));
+	callfunc "F_Tower_Monster",
+		atoi(replacestr(strnpcinfo(0),"FGate102tower","")) + 1,
+		strnpcinfo(4),
+		instance_npcname(strnpcinfo(0))+"::OnMyMobDead";
+	end;
+
+OnTouch_:
+	callfunc "F_Tower_Warp",
+		atoi(replacestr(strnpcinfo(0),"FGate102tower","")) + 1,
+		strnpcinfo(4);
+	end;
+
+OnMyMobDead:
+	set .@map$, strnpcinfo(4);
+	set .@level, atoi(replacestr(strnpcinfo(0),"FGate102tower","")) + 1;
+	set .@mob_dead_num,mobcount(.@map$,instance_npcname(strnpcinfo(0))+"::OnMyMobDead");
+	if (.@mob_dead_num < 1) {
+		initnpctimer;
+		//SetItemPartyInMap in_102floor .@level
+	} else
+		mapannounce .@map$, .@level+"階に残ったモンスター ["+.@mob_dead_num+"]体",bc_map,"0x00ff99";
+	end;
+
+OnTimer5000:
+	set .@level, atoi(replacestr(strnpcinfo(0),"FGate102tower","")) + 1;
+	mapannounce strnpcinfo(4), .@level+"階のすべてのモンスターを倒しました",bc_map,"0xffff00";
+	donpcevent instance_npcname(.@level+"FGate102tower")+"::OnEnable";
+	stopnpctimer;
+	end;
+}
+1@tower,96,393,0	duplicate(1FGate102tower)	2FGate102tower	45,2,2
+1@tower,184,393,0	duplicate(1FGate102tower)	3FGate102tower	45,2,2
+1@tower,270,393,0	duplicate(1FGate102tower)	4FGate102tower	45,2,2
+1@tower,355,393,0	duplicate(1FGate102tower)	5FGate102tower	45,2,2
+1@tower,12,309,0	duplicate(1FGate102tower)	6FGate102tower	45,2,2
+1@tower,96,309,0	duplicate(1FGate102tower)	7FGate102tower	45,2,2
+1@tower,184,309,0	duplicate(1FGate102tower)	8FGate102tower	45,2,2
+1@tower,270,309,0	duplicate(1FGate102tower)	9FGate102tower	45,2,2
+1@tower,355,309,0	duplicate(1FGate102tower)	10FGate102tower	45,2,2
+1@tower,12,222,0	duplicate(1FGate102tower)	11FGate102tower	45,2,2
+1@tower,96,222,0	duplicate(1FGate102tower)	12FGate102tower	45,2,2
+1@tower,184,222,0	duplicate(1FGate102tower)	13FGate102tower	45,2,2
+1@tower,270,222,0	duplicate(1FGate102tower)	14FGate102tower	45,2,2
+1@tower,355,222,0	duplicate(1FGate102tower)	15FGate102tower	45,2,2
+1@tower,12,138,0	duplicate(1FGate102tower)	16FGate102tower	45,2,2
+1@tower,96,138,0	duplicate(1FGate102tower)	17FGate102tower	45,2,2
+1@tower,184,138,0	duplicate(1FGate102tower)	18FGate102tower	45,2,2
+1@tower,270,138,0	duplicate(1FGate102tower)	19FGate102tower	45,2,2
+1@tower,355,138,0	duplicate(1FGate102tower)	20FGate102tower	45,2,2
+1@tower,12,51,0	duplicate(1FGate102tower)	21FGate102tower	45,2,2
+1@tower,96,51,0	duplicate(1FGate102tower)	22FGate102tower	45,2,2
+1@tower,184,51,0	duplicate(1FGate102tower)	23FGate102tower	45,2,2
+1@tower,270,51,0	duplicate(1FGate102tower)	24FGate102tower	45,2,2
+
+1@tower,355,51,0	script	25FGate102tower	45,2,2,{
+	end;
+
+OnInstanceInit:
+	disablenpc instance_npcname("25FGate102tower");
+	end;
+
+OnEnable:
+	enablenpc instance_npcname("25FGate102tower");
+	initnpctimer;
+	end;
+
+OnTouch_:
+	getitem 6000,1; //Dark_Ashes
+	warp instance_mapname("2@tower"),52,354;
+	end;
+
+OnTimer120000:
+	disablenpc instance_npcname("25FGate102tower");
+	donpcevent instance_npcname("25FGate102tower-2")+"::OnEnable";
+	stopnpctimer;
+	end;
+}
+
+1@tower,355,51,0	script	25FGate102tower-2	45,2,2,{
+	end;
+
+OnInstanceInit:
+	disablenpc instance_npcname("25FGate102tower-2");
+	end;
+
+OnEnable:
+	enablenpc instance_npcname("25FGate102tower-2");
+	end;
+
+OnTouch_:
+	warp instance_mapname("2@tower"),52,354;
+	end;
+}
+
+1@tower,71,4,0	script	#Broadcast Mode1	844,{
+	end;
+
+OnInstanceInit:
+	initnpctimer;
+	end;
+
+OnTimer15000:
+OnTimer60000:
+	//mapannounce instance_mapname("1@tower"), "Notice : In any abnormal situation where you defeat a monster, you can't advance to the next level!",bc_map,"0xff0000";
+	end;
+OnTimer120000:
+	//mapannounce instance_mapname("1@tower"), "Notice : In any abnormal situation where you defeat a monster, you can't advance to the next level!",bc_map,"0xff0000";
+	stopnpctimer;
+	end;
+}
+
+1@tower,71,1,0	script	#Manager Mode1	844,{
+	callfunc "F_GM_NPC";
+	mes "Please enter the password.";
+	set .@i, callfunc("F_GM_NPC","dmc2008",1);
+	next;
+	if (.@i == 1) {
+		mes "This NPC manages the tower from the 1st to the 25th Level.";
+		mes "Please enter the Level number to open.";
+		mes "(i.g.: 1F->1, 25F->25)";
+		input .@input,1,25;
+		next;
+		if (.@input < 1 || .@input > 25)
+			mes "You can only enter a number from 1 to 25.";
+		else {
+			donpcevent instance_npcname(.@input+"FGate102tower")+"::OnEnable";
+			mes "*** Level "+ .@input + " is now being opened. ***";
+		}
+	}
+	close;
+}
+
+// Levels 26-50
+//============================================================
+2@tower,29,365,2	script	Immortal Furnace#1	844,{
+	end;
+
+OnInstanceInit:
+	callfunc "F_Tower_Monster",
+		26,
+		instance_mapname("2@tower"),
+		instance_npcname("Immortal Furnace#1")+"::OnMyMobDead";
+	end;
+
+OnMyMobDead:
+	set .@map$, instance_mapname("2@tower");
+	set .@mob_dead_num,mobcount(.@map$,instance_npcname("Immortal Furnace#1")+"::OnMyMobDead");
+	if (.@mob_dead_num < 1) {
+		initnpctimer;
+		//SetItemPartyInMap in_102floor 26
+	}
+	else
+		mapannounce .@map$, "26階に残ったモンスター ["+.@mob_dead_num+"]体",bc_map,"0x00ff99";
+	end;
+
+OnTimer5000:
+	mapannounce instance_mapname("2@tower"), "26階のすべてのモンスターを倒しました",bc_map,"0xffff00";
+	donpcevent instance_npcname("26FGate102tower")+"::OnEnable";
+	stopnpctimer;
+	end;
+}
+
+2@tower,12,393,0	duplicate(1FGate102tower)	26FGate102tower	45,2,2
+2@tower,96,393,0	duplicate(1FGate102tower)	27FGate102tower	45,2,2
+2@tower,184,393,0	duplicate(1FGate102tower)	28FGate102tower	45,2,2
+2@tower,270,393,0	duplicate(1FGate102tower)	29FGate102tower	45,2,2
+2@tower,355,393,0	duplicate(1FGate102tower)	30FGate102tower	45,2,2
+2@tower,12,309,0	duplicate(1FGate102tower)	31FGate102tower	45,2,2
+2@tower,96,309,0	duplicate(1FGate102tower)	32FGate102tower	45,2,2
+2@tower,184,309,0	duplicate(1FGate102tower)	33FGate102tower	45,2,2
+2@tower,270,309,0	duplicate(1FGate102tower)	34FGate102tower	45,2,2
+2@tower,355,309,0	duplicate(1FGate102tower)	35FGate102tower	45,2,2
+2@tower,12,222,0	duplicate(1FGate102tower)	36FGate102tower	45,2,2
+2@tower,96,222,0	duplicate(1FGate102tower)	37FGate102tower	45,2,2
+2@tower,184,222,0	duplicate(1FGate102tower)	38FGate102tower	45,2,2
+2@tower,270,222,0	duplicate(1FGate102tower)	39FGate102tower	45,2,2
+2@tower,355,222,0	duplicate(1FGate102tower)	40FGate102tower	45,2,2
+2@tower,12,138,0	duplicate(1FGate102tower)	41FGate102tower	45,2,2
+2@tower,96,138,0	duplicate(1FGate102tower)	42FGate102tower	45,2,2
+2@tower,184,138,0	duplicate(1FGate102tower)	43FGate102tower	45,2,2
+2@tower,270,138,0	duplicate(1FGate102tower)	44FGate102tower	45,2,2
+2@tower,355,138,0	duplicate(1FGate102tower)	45FGate102tower	45,2,2
+2@tower,12,51,0	duplicate(1FGate102tower)	46FGate102tower	45,2,2
+2@tower,96,51,0	duplicate(1FGate102tower)	47FGate102tower	45,2,2
+2@tower,184,51,0	duplicate(1FGate102tower)	48FGate102tower	45,2,2
+2@tower,270,51,0	duplicate(1FGate102tower)	49FGate102tower	45,2,2
+
+2@tower,355,51,0	script	50FGate102tower	45,2,2,{
+	end;
+
+OnInstanceInit:
+	disablenpc instance_npcname("50FGate102tower");
+	end;
+
+OnEnable:
+	enablenpc instance_npcname("50FGate102tower");
+	initnpctimer;
+	end;
+
+OnTouch_:
+	getitem 6000,1; //Dark_Ashes
+	warp instance_mapname("3@tower"),52,354;
+	end;
+
+OnTimer120000:
+	disablenpc instance_npcname("50FGate102tower");
+	donpcevent instance_npcname("50FGate102tower-2")+"::OnEnable";
+	stopnpctimer;
+	end;
+}
+
+2@tower,355,51,0	script	50FGate102tower-2	45,2,2,{
+	end;
+
+OnInstanceInit:
+	disablenpc instance_npcname("50FGate102tower-2");
+	end;
+
+OnEnable:
+	enablenpc instance_npcname("50FGate102tower-2");
+	end;
+
+OnTouch_:
+	warp instance_mapname("3@tower"),52,354;
+	end;
+}
+
+2@tower,71,1,0	script	#Manager Mode2	844,{
+	callfunc "F_GM_NPC";
+	mes "Please enter the password.";
+	set .@i, callfunc("F_GM_NPC","dmc2008",1);
+	next;
+	if (.@i == 1) {
+		mes "This NPC manages the tower from the 26st to the 50th Level.";
+		mes "Please enter the Level number to open.";
+		mes "(i.g.: 26F->26, 50F->50)";
+		input .@input,26,50;
+		next;
+		if (.@onput < 26 || .@input > 50)
+			mes "You can only enter a number from 26 to 50.";
+		else {
+			donpcevent instance_npcname(.@input+"FGate102tower")+"::OnEnable";
+			mes "*** Level "+ .@input + " is now being opened. ***";
+		}
+	}
+	close;
+}
+
+// Levels 51-75
+//============================================================
+3@tower,29,365,2	script	Immortal Furnace#2	844,{
+	end;
+
+OnInstanceInit:
+	callfunc "F_Tower_Monster",
+		51,
+		instance_mapname("3@tower"),
+		instance_npcname("Immortal Furnace#2")+"::OnMyMobDead";
+	end;
+
+OnMyMobDead:
+	set .@map$, instance_mapname("3@tower");
+	set .@mob_dead_num,mobcount(.@map$,instance_npcname("Immortal Furnace#2")+"::OnMyMobDead");
+	if (.@mob_dead_num < 1) {
+		initnpctimer;
+		//SetItemPartyInMap in_102floor 51
+	}
+	else
+		mapannounce .@map$, "51階に残ったモンスター ["+.@mob_dead_num+"]体",bc_map,"0x00ff99";
+	end;
+
+OnTimer5000:
+	mapannounce instance_mapname("3@tower"), "51階のすべてのモンスターを倒しました",bc_map,"0xffff00";
+	donpcevent instance_npcname("51FGate102tower")+"::OnEnable";
+	stopnpctimer;
+	end;
+}
+
+3@tower,12,393,0	duplicate(1FGate102tower)	51FGate102tower	45,2,2
+3@tower,96,393,0	duplicate(1FGate102tower)	52FGate102tower	45,2,2
+3@tower,184,393,0	duplicate(1FGate102tower)	53FGate102tower	45,2,2
+3@tower,270,393,0	duplicate(1FGate102tower)	54FGate102tower	45,2,2
+3@tower,355,393,0	duplicate(1FGate102tower)	55FGate102tower	45,2,2
+3@tower,12,309,0	duplicate(1FGate102tower)	56FGate102tower	45,2,2
+3@tower,96,309,0	duplicate(1FGate102tower)	57FGate102tower	45,2,2
+3@tower,184,309,0	duplicate(1FGate102tower)	58FGate102tower	45,2,2
+3@tower,270,309,0	duplicate(1FGate102tower)	59FGate102tower	45,2,2
+3@tower,355,309,0	duplicate(1FGate102tower)	60FGate102tower	45,2,2
+3@tower,12,222,0	duplicate(1FGate102tower)	61FGate102tower	45,2,2
+3@tower,96,222,0	duplicate(1FGate102tower)	62FGate102tower	45,2,2
+3@tower,184,222,0	duplicate(1FGate102tower)	63FGate102tower	45,2,2
+3@tower,270,222,0	duplicate(1FGate102tower)	64FGate102tower	45,2,2
+3@tower,355,222,0	duplicate(1FGate102tower)	65FGate102tower	45,2,2
+3@tower,12,138,0	duplicate(1FGate102tower)	66FGate102tower	45,2,2
+3@tower,96,138,0	duplicate(1FGate102tower)	67FGate102tower	45,2,2
+3@tower,184,138,0	duplicate(1FGate102tower)	68FGate102tower	45,2,2
+3@tower,270,138,0	duplicate(1FGate102tower)	69FGate102tower	45,2,2
+3@tower,355,138,0	duplicate(1FGate102tower)	70FGate102tower	45,2,2
+3@tower,12,51,0	duplicate(1FGate102tower)	71FGate102tower	45,2,2
+3@tower,96,51,0	duplicate(1FGate102tower)	72FGate102tower	45,2,2
+3@tower,184,51,0	duplicate(1FGate102tower)	73FGate102tower	45,2,2
+3@tower,270,51,0	duplicate(1FGate102tower)	74FGate102tower	45,2,2
+
+3@tower,355,51,0	script	75FGate102tower	45,1,1,{
+	end;
+
+OnInstanceInit:
+	disablenpc instance_npcname("75FGate102tower");
+	end;
+
+OnEnable:
+	enablenpc instance_npcname("75FGate102tower");
+	initnpctimer;
+	end;
+
+OnTouch_:
+	getitem 6000,1; //Dark_Ashes
+	warp instance_mapname("4@tower"),52,354;
+	end;
+
+OnTimer120000:
+	disablenpc instance_npcname("75FGate102tower");
+	donpcevent instance_npcname("75FGate102tower-2")+"::OnEnable";
+	stopnpctimer;
+	end;
+}
+
+3@tower,355,51,0	script	75FGate102tower-2	45,2,2,{
+	end;
+
+OnInstanceInit:
+	disablenpc instance_npcname("75FGate102tower-2");
+	end;
+
+OnEnable:
+	enablenpc instance_npcname("75FGate102tower-2");
+	end;
+
+OnTouch_:
+	warp instance_mapname("4@tower"),52,354;
+	end;
+}
+
+3@tower,71,1,0	script	#Manager Mode3	844,{
+	callfunc "F_GM_NPC";
+	mes "Please enter the password.";
+	set .@i, callfunc("F_GM_NPC","dmc2008",1);
+	next;
+	if (.@i == 1) {
+		mes "This NPC manages the tower from the 51st to the 75th Level.";
+		mes "Please enter the Level number to open.";
+		mes "(i.g.: 51F->51, 75F->75)";
+		input .@input,51,75;
+		next;
+		if (.@input < 51 || .@input > 75)
+			mes "You can only enter a number from 51 to 75.";
+		else {
+			donpcevent instance_npcname(.@input+"FGate102tower")+"::OnEnable";
+			mes "*** Level "+ .@input + " is now being opened. ***";
+		}
+	}
+	close;
+}
+
+// Levels 76-99
+//============================================================
+4@tower,29,365,2	script	Immortal Furnace#3	844,{
+	end;
+
+OnInstanceInit:
+	callfunc "F_Tower_Monster",
+		76,
+		instance_mapname("4@tower"),
+		instance_npcname("Immortal Furnace#3")+"::OnMyMobDead";
+	end;
+
+OnMyMobDead:
+	set .@map$, instance_mapname("4@tower");
+	set .@mob_dead_num,mobcount(.@map$,instance_npcname("Immortal Furnace#3")+"::OnMyMobDead");
+	if (.@mob_dead_num < 1) {
+		initnpctimer;
+		//SetItemPartyInMap in_102floor 76
+	}
+	else
+		mapannounce .@map$,"76階に残ったモンスター ["+.@mob_dead_num+"]体",bc_map,"0x00ff99";
+	end;
+
+OnTimer5000:
+	mapannounce instance_mapname("4@tower"),"76階のすべてのモンスターを倒しました",bc_map,"0xffff00";
+	donpcevent instance_npcname("76FGate102tower")+"::OnEnable";
+	stopnpctimer;
+	end;
+}
+
+4@tower,12,393,0	duplicate(1FGate102tower)	76FGate102tower	45,2,2
+4@tower,96,393,0	duplicate(1FGate102tower)	77FGate102tower	45,2,2
+4@tower,184,393,0	duplicate(1FGate102tower)	78FGate102tower	45,2,2
+4@tower,270,393,0	duplicate(1FGate102tower)	79FGate102tower	45,2,2
+4@tower,355,393,0	duplicate(1FGate102tower)	80FGate102tower	45,2,2
+4@tower,12,309,0	duplicate(1FGate102tower)	81FGate102tower	45,2,2
+4@tower,96,309,0	duplicate(1FGate102tower)	82FGate102tower	45,2,2
+4@tower,184,309,0	duplicate(1FGate102tower)	83FGate102tower	45,2,2
+4@tower,270,309,0	duplicate(1FGate102tower)	84FGate102tower	45,2,2
+4@tower,355,309,0	duplicate(1FGate102tower)	85FGate102tower	45,2,2
+4@tower,12,222,0	duplicate(1FGate102tower)	86FGate102tower	45,2,2
+4@tower,96,222,0	duplicate(1FGate102tower)	87FGate102tower	45,2,2
+4@tower,184,222,0	duplicate(1FGate102tower)	88FGate102tower	45,2,2
+4@tower,270,222,0	duplicate(1FGate102tower)	89FGate102tower	45,2,2
+4@tower,355,222,0	duplicate(1FGate102tower)	90FGate102tower	45,2,2
+4@tower,12,138,0	duplicate(1FGate102tower)	91FGate102tower	45,2,2
+4@tower,96,138,0	duplicate(1FGate102tower)	92FGate102tower	45,2,2
+4@tower,184,138,0	duplicate(1FGate102tower)	93FGate102tower	45,2,2
+4@tower,270,138,0	duplicate(1FGate102tower)	94FGate102tower	45,2,2
+4@tower,355,138,0	duplicate(1FGate102tower)	95FGate102tower	45,2,2
+4@tower,12,51,0	duplicate(1FGate102tower)	96FGate102tower	45,2,2
+4@tower,96,51,0	duplicate(1FGate102tower)	97FGate102tower	45,2,2
+4@tower,184,51,0	duplicate(1FGate102tower)	98FGate102tower	45,2,2
+
+4@tower,271,51,0	script	99FGate102tower	45,2,2,{
+	end;
+
+OnInstanceInit:
+	disablenpc instance_npcname("99FGate102tower");
+	end;
+
+OnEnable:
+	enablenpc instance_npcname("99FGate102tower");
+	initnpctimer;
+	end;
+
+OnTouch_:
+	getitem 6000,1; //Dark_Ashes
+	warp instance_mapname("5@tower"),101,72;
+	end;
+
+OnTimer120000:
+	disablenpc instance_npcname("99FGate102tower");
+	donpcevent instance_npcname("99FGate102tower-2")+"::OnEnable";
+	stopnpctimer;
+	end;
+}
+
+4@tower,271,51,0	script	99FGate102tower-2	45,2,2,{
+	end;
+
+OnInstanceInit:
+	disablenpc instance_npcname("99FGate102tower-2");
+	end;
+
+OnEnable:
+	enablenpc instance_npcname("99FGate102tower-2");
+	end;
+
+OnTouch_:
+	warp instance_mapname("5@tower"),101,72;
+	end;
+}
+
+4@tower,71,1,0	script	#Manager Mode4	844,{
+	callfunc "F_GM_NPC";
+	mes "Please enter the password.";
+	set .@i, callfunc("F_GM_NPC","dmc2008",1);
+	next;
+	if (.@i == 1) {
+		mes "This NPC manages the tower from the 76th to the 99th Level.";
+		mes "Please enter the Level number to open.";
+		mes "(i.g.: 76F->76, 99F->99)";
+		input .@input,76,99;
+		next;
+		if (.@input < 76 || .@input > 99)
+			mes "You can only enter a number from 76 to 99.";
+		else {
+			donpcevent instance_npcname(.@input+"FGate102tower")+"::OnEnable";
+			mes "*** Level "+ .@input + " is now being opened. ***";
+		}
+	}
+	close;
+}
+
+// Level 100
+//============================================================
+5@tower,106,109,2	script	水晶#102	844,{
+//	if (in_102tower < 10) {
+//		mes "^0000ffA mysterious voice echoes through the room as you touch the lucid crystal radiating a strong light.^000000";
+//		next;
+//		mes "[Mysterious Voice]";
+//		mes "Welcome to my place, intruders. I've had fun watching you endure all the difficulties I've set before you.";
+//		next;
+//		mes "[Mysterious Voice]";
+//		mes "Unfortunately, the time has come to end the show.";
+//		next;
+//		mes "[Mysterious Voice]";
+//		mes "It's still too early to celebrate your victory against my right-hand man Knothen because he isn't completely destroyed!";
+//		next;
+//		mes "[Mysterious Voice]";
+//		mes "I shall resurrect him for your next show. Defeat him again, and then I'll gladly accept your challenge.";
+//		next;
+//		mes "[Mysterious Voice]";
+//		mes "Good-bye for now.";
+//		mes "Once again, I had such a great time, humans. I look forward to seeing you again.";
+//		next;
+//		mes "^0000ffAs soon as the voice stopped talking, an irresistible force lifted and moved you somewhere else.";
+//		close2;
+//		set in_102tower,10;
+//		warp "alberta",223,36;
+//	}
+//	else {
+		mes "-強い光を放つ水晶から";
+		mes "　奇妙な感覚を感じる。";
+		mes "　まるでこちらを歓迎しているかの";
+		mes "　ようだ……-";
+		next;
+		mes "[正体不明の声]";
+		mes "^FF0000フフフ……";
+		mes "血と汗の臭い、そして";
+		mes "荒い息を感じるぞ……";
+		mes "人間どもの無謀さには";
+		mes "いつになっても興味が尽きぬ……^000000";
+		next;
+		mes "[正体不明の声]";
+		mes "^FF0000……私の所まで来ることを";
+		mes "許可してやろう。";
+		mes "この闇夜の覇王の所までな……^000000";
+		close2;
+		warp instance_mapname("6@tower"),32,12;
+//	}
+	end;
+
+OnInstanceInit:
+OnDisable:
+	disablenpc instance_npcname("水晶#102");
+	end;
+
+OnEnable:
+	enablenpc instance_npcname("水晶#102");
+	donpcevent instance_npcname("#102Effect1")+"::OnEnable";
+	end;
+}
+
+5@tower,106,109,2	script	#102Effect1	844,{
+	end;
+
+OnInstanceInit:
+	disablenpc instance_npcname("#102Effect1");
+	end;
+
+OnDisable:
+	disablenpc instance_npcname("#102Effect1");
+	end;
+
+OnEnable:
+	enablenpc instance_npcname("#102Effect1");
+	initnpctimer;
+	end;
+
+OnTimer500:
+	specialeffect EF_ENHANCE;
+	stopnpctimer;
+	donpcevent instance_npcname("#102Effect2")+"::OnEnable";
+	end;
+}
+
+5@tower,106,109,2	script	#102Effect2	844,{
+	end;
+
+OnInstanceInit:
+	disablenpc instance_npcname("#102Effect2");
+	end;
+
+OnDisable:
+	disablenpc instance_npcname("#102Effect2");
+	end;
+
+OnEnable:
+	enablenpc instance_npcname("#102Effect2");
+	initnpctimer;
+	end;
+
+OnTimer500:
+	specialeffect EF_ENHANCE;
+	stopnpctimer;
+	donpcevent instance_npcname("#102Effect1")+"::OnEnable";
+	end;
+}
+
+5@tower,82,112,2	script	#102FShadowDust1	844,{
+	end;
+
+OnInstanceInit:
+	donpcevent instance_npcname("#102FShadowDust")+"::OnEnable";
+	monster instance_mapname("5@tower"),83,85,"エントヴァイエン",1957,1,instance_npcname("#102FShadowDust1")+"::OnMyMobDead";
+	end;
+
+OnMyMobDead:
+	set .@map$, instance_mapname("5@tower");
+	set .@mob_dead_num,mobcount(.@map$,instance_npcname("#102FShadowDust1")+"::OnMyMobDead");
+	if (.@mob_dead_num < 1) {
+		mapannounce .@map$, "正体不明の声 : 誰だ？　勝手に私のテリトリーに入った者は……",bc_map,"0xffff00";
+		donpcevent instance_npcname("#102FShadowDust")+"::OnDisable";
+		donpcevent instance_npcname("水晶#102")+"::OnEnable";
+		//SetItemPartyInMap in_102floor 100
+	}
+	end;
+}
+
+5@tower,82,113,2	script	#102FShadowDust	844,{
+	end;
+
+OnInstanceInit:
+	disablenpc instance_npcname("#102FShadowDust");
+	end;
+
+OnDisable:
+	killmonsterall instance_mapname("5@tower");
+	end;
+
+OnEnable:
+	set .@map$, instance_mapname("5@tower");
+	monster .@map$,72,93,"狙撃の茨",1958,1;
+	monster .@map$,70,87,"魔法の茨",1960,1;
+	monster .@map$,68,83,"浄化の茨",1961,1;
+	monster .@map$,70,80,"狙撃の茨",1958,1;
+	monster .@map$,74,81,"魔法の茨",1960,1;
+	monster .@map$,78,72,"魔法の茨",1960,1;
+	monster .@map$,81,70,"狙撃の茨",1958,1;
+	monster .@map$,78,84,"治癒の茨",1959,1;
+	monster .@map$,85,72,"魔法の茨",1960,1;
+	monster .@map$,91,74,"狙撃の茨",1958,1;
+	monster .@map$,79,77,"浄化の茨",1961,1;
+	monster .@map$,82,80,"治癒の茨",1959,1;
+	monster .@map$,87,83,"治癒の茨",1959,1;
+	monster .@map$,80,92,"浄化の茨",1961,1;
+	monster .@map$,81,89,"狙撃の茨",1958,1;
+	monster .@map$,85,93,"魔法の茨",1960,1;
+	monster .@map$,86,90,"治癒の茨",1959,1;
+	monster .@map$,88,88,"狙撃の茨",1958,1;
+	monster .@map$,91,87,"魔法の茨",1960,1;
+	monster .@map$,95,94,"魔法の茨",1960,1;
+	monster .@map$,91,96,"狙撃の茨",1958,1;
+	monster .@map$,90,82,"浄化の茨",1961,1;
+	monster .@map$,96,98,"魔法の茨",1960,1;
+	monster .@map$,83,76,"狙撃の茨",1958,1;
+	monster .@map$,74,85,"狙撃の茨",1958,1;
+	switch(rand(1,3)) {
+		case 1: monster .@map$,82,85,"狙撃の茨",1958,1; break;
+		case 2: monster .@map$,82,85,"魔法の茨",1960,1; break;
+		case 3: monster .@map$,82,85,"浄化の茨",1961,1; break;
+	}
+	switch(rand(1,3)) {
+		case 1: monster .@map$,84,85,"狙撃の茨",1958,1; break;
+		case 2: monster .@map$,84,85,"魔法の茨",1960,1; break;
+		case 3: monster .@map$,84,85,"浄化の茨",1961,1; break;
+	}
+	end;
+}
+
+5@tower,71,1,0	script	#Manager Mode5	844,{
+	callfunc "F_GM_NPC";
+	mes "This NPC manages the crystal on the 100th Level. Please enter the password.";
+	set .@i, callfunc("F_GM_NPC","dmc2008",1);
+	next;
+	if (.@i == 1) {
+		donpcevent instance_npcname("水晶#102")+"::OnEnable";
+		mes "The 100th Level's crystal has been activated.";
+	} else
+		mes "Please enter the correct password.";
+	close;
+}
+
+// Level 101
+//============================================================
+6@tower,45,89,2	script	命の泉#1	844,{
+	mes "^0066FF-幻想的で美しい水を飲むと、";
+	mes "　体中に活力が戻ってくるのが";
+	mes "　わかった-^000000";
+	heal (MaxHp-Hp),(MaxSp-Sp);
+	close;
+
+OnInstanceInit:
+	donpcevent instance_npcname("命の泉#2")+"::OnEnable";
+	end;
+}
+
+6@tower,45,89,2	script	命の泉#2	844,{
+	end;
+
+OnEnable:
+	specialeffect EF_BUBBLE;
+	initnpctimer;
+	end;
+
+OnTimer2000:
+	stopnpctimer;
+	donpcevent instance_npcname("命の泉#3")+"::OnEnable";
+	end;
+}
+
+6@tower,45,89,2	script	命の泉#3	844,{
+	end;
+
+OnEnable:
+	specialeffect EF_BUBBLE;
+	initnpctimer;
+	end;
+
+OnTimer2000:
+	stopnpctimer;
+	donpcevent instance_npcname("命の泉#2")+"::OnEnable";
+	end;
+}
+
+6@tower,32,100,0	warp	102FGate102tower	2,2,6@tower,155,64
+
+6@tower,156,151,2	script	Tyrant's Throne#	844,{
+	end;
+
+OnInstanceInit:
+	areamonster instance_mapname("6@tower"),154,73,156,75,"監視者ウィレス",1627,10,instance_npcname("Tyrant's Throne#")+"::OnMyMobDead";
+	end;
+
+OnMyMobDead:
+	set .@mob_dead_num,mobcount(instance_mapname("6@tower"),instance_npcname("Tyrant's Throne#")+"::OnMyMobDead");
+	if (.@mob_dead_num < 1) {
+		donpcevent instance_npcname("#1st Beeper")+"::OnEnable";
+		disablenpc instance_npcname("Tyrant's Throne#");
+	}
+	end;
+}
+
+6@tower,156,151,2	script	#1st Beeper	844,{
+	end;
+
+OnEnable:
+	initnpctimer;
+	end;
+
+OnTimer500:
+	mapannounce instance_mapname("6@tower"),"正体不明の声 : 来たか……ここがどんな場所かも知らずに……",bc_map,"0x00ffcc";
+	end;
+
+OnTimer5500:
+	mapannounce instance_mapname("6@tower"),"正体不明の声 : お前ら冒険者どもはいつもそうだ。だが、その勇気だけは褒めてやろう。",bc_map,"0x00ffcc";
+	end;
+
+OnTimer10500:
+	mapannounce instance_mapname("6@tower"),"正体不明の声 : ここに足を踏み入れたからには、存分に楽しませて貰うぞ。",bc_map,"0x00ffcc";
+	end;
+
+OnTimer15500:
+	mapannounce instance_mapname("6@tower"),"正体不明の声 : 私は虫けらどもが必死になって右往左往する様を見るのが好きだ。",bc_map,"0x00ffcc";
+	end;
+
+OnTimer20500:
+	set .@map$, instance_mapname("6@tower");
+	mapannounce .@map$,"正体不明の声 : さあ、この私をどこまで楽しませてくれるかな？",bc_map,"0x00ffcc";
+	stopnpctimer;
+	areamonster .@map$,151,66,153,106,"骨の守護兵",1152,50,instance_npcname("#1st Beeper")+"::OnMyMobDead";
+	areamonster .@map$,158,66,160,106,"骨の守護兵",1152,50,instance_npcname("#1st Beeper")+"::OnMyMobDead";
+	end;
+
+OnMyMobDead:
+	set .@map$, instance_mapname("6@tower");
+	set .@mob_dead_num,mobcount(.@map$,instance_npcname("#1st Beeper")+"::OnMyMobDead");
+	if (.@mob_dead_num < 1) {
+		donpcevent instance_npcname("#2nd Beeper")+"::OnEnable";
+		//SetItemPartyInMap in_102floor 101
+	}
+	else
+		mapannounce .@map$,"残り[" + .@mob_dead_num + "]匹",bc_map,"0x00ff99";
+	end;
+}
+
+6@tower,156,151,2	script	#2nd Beeper	844,{
+	end;
+
+OnEnable:
+	initnpctimer;
+	end;
+
+OnTimer500:
+	mapannounce instance_mapname("6@tower"),"正体不明の声 : ……ふむ。まあ、手始めとしては少々物足りなかったか？",bc_map,"0x00ffcc";
+	end;
+
+OnTimer5500:
+	mapannounce instance_mapname("6@tower"),"正体不明の声 : では、少し刺激を増やしてやろう。",bc_map,"0x00ffcc";
+	end;
+
+OnTimer10500:
+	set .@map$, instance_mapname("6@tower");
+	mapannounce .@map$,"正体不明の声 : さあ、次はどうかな？",bc_map,"0x00ffcc";
+	stopnpctimer;
+	areamonster .@map$,151,66,153,106,"風の守護兵",1263,30,instance_npcname("#2nd Beeper")+"::OnMyMobDead";
+	areamonster .@map$,158,66,160,106,"風の守護兵",1263,30,instance_npcname("#2nd Beeper")+"::OnMyMobDead";
+	end;
+
+OnMyMobDead:
+	set .@map$, instance_mapname("6@tower");
+	set .@mob_dead_num,mobcount(.@map$,instance_npcname("#2nd Beeper")+"::OnMyMobDead");
+	if (.@mob_dead_num < 1) {
+		donpcevent instance_npcname("#3rd Beeper")+"::OnEnable";
+		//SetItemPartyInMap in_102floor 102
+	}
+	else
+		mapannounce .@map$,"残り[" + .@mob_dead_num + "]匹",bc_map,"0x00ff99";
+	end;
+}
+
+6@tower,156,151,2	script	#3rd Beeper	844,{
+	end;
+
+OnEnable:
+	initnpctimer;
+	end;
+
+OnTimer500:
+	mapannounce instance_mapname("6@tower"),"正体不明の声 : フフ、少しはやるようだな！",bc_map,"0x00ffcc";
+	end;
+
+OnTimer5500:
+	mapannounce instance_mapname("6@tower"),"正体不明の声 : 流石にここまで来ただけはある。覚えてやろう、お前らの名前を。",bc_map,"0x00ffcc";
+	end;
+
+OnTimer10500:
+	set .@map$, instance_mapname("6@tower");
+	mapannounce .@map$,"正体不明の声 : ……せっかくだ、残りの守護兵でも楽しんでくれ。",bc_map,"0x00ffcc";
+	stopnpctimer;
+	areamonster .@map$,151,66,153,106,"刃の守護兵",1132,20,instance_npcname("#3rd Beeper")+"::OnMyMobDead";
+	areamonster .@map$,158,66,160,106,"刃の守護兵",1132,20,instance_npcname("#3rd Beeper")+"::OnMyMobDead";
+	end;
+
+OnMyMobDead:
+	set .@map$, instance_mapname("6@tower");
+	set .@mob_dead_num,mobcount(.@map$,instance_npcname("#3rd Beeper")+"::OnMyMobDead");
+	if (.@mob_dead_num < 1) {
+		donpcevent instance_npcname("#4th Beeper")+"::OnEnable";
+		//SetItemPartyInMap in_102floor 103
+	}
+	else
+		mapannounce .@map$,"残り[" + .@mob_dead_num + "]匹",bc_map,"0x00ff99";
+	end;
+}
+
+6@tower,156,151,2	script	#4th Beeper	844,{
+	end;
+
+OnEnable:
+	initnpctimer;
+	end;
+
+OnTimer500:
+	mapannounce instance_mapname("6@tower"),"正体不明の声 : ……よかろう！　今度は私が相手だ！",bc_map,"0x00ffcc";
+	end;
+
+OnTimer5500:
+	mapannounce instance_mapname("6@tower"),"正体不明の声 : 私が何者か、気になるのかね？　……私は闇夜の覇王、ナハトズィーガー！",bc_map,"0x00ffcc";
+	end;
+
+OnTimer10500:
+	set .@map$, instance_mapname("6@tower");
+	mapannounce .@map$,"ナハトズィーガー : ……だが、名前を聞いたからには死んでもらう！　行くぞ!!",bc_map,"0x00ffcc";
+	stopnpctimer;
+	monster .@map$,156,147,"ナハトズィーガー",1956,1,instance_npcname("#4th Beeper")+"::OnMyMobDead";
+	end;
+
+OnMyMobDead:
+	donpcevent instance_npcname("彷徨う魂#102")+"::OnEnable";
+	end;
+}
+
+6@tower,169,127,2	script	彷徨う魂#102	796,{
+	if (checkweight(1201,1) == 0) {
+		mes "-所持アイテムの種類数が多い為";
+		mes "　危険です。";
+		mes "　所持アイテムを減らしてから、";
+		mes "　再度話しかけてください-";
+		close;
+	}
+	mes "[彷徨う魂]";
+	mes "^FF0000あなたでしたか……";
+	mes "邪悪なナハトズィーガーから";
+	mes "私たちを解放してくれた人は。^000000";
+	next;
+	mes "[彷徨う魂]";
+	mes "^FF0000これでやっと暗くて湿っぽい";
+	mes "ここから出られます。^000000";
+	next;
+	if ((countitem(13412) > 0) && (countitem(13413) > 0)) {
+		mes "[彷徨う魂]";
+		mes "^FF0000ん？";
+		mes "あなたは";
+		mes "ナハトズィーガーの剣を";
+		mes "両方持っていますね。^000000";
+		next;
+		mes "[彷徨う魂]";
+		mes "^FF0000それらは片手剣ですが、";
+		mes "あなたさえ良ければ";
+		mes "それらを合成して1本の両手剣に";
+		mes "変えてあげますよ？";
+		mes "これが私からできる唯一の";
+		mes "恩返しです……^000000";
+		next;
+		switch(select("両手剣にして:このままでいい")) {
+		case 1:
+			mes "[彷徨う魂]";
+			mes "^FF0000分かりました。";
+			mes "では二つの剣を合わせて";
+			mes "両手剣にしてあげましょう。^000000";
+			next;
+			delitem 13412,1;
+			delitem 13413,1;
+			getitem 1185,1;
+			break;
+		case 2:
+			// 未調査
+			mes "[彷徨う魂]";
+			mes "^FF0000分かりました。";
+			mes "二つの剣はそのままの状態に";
+			mes "しておきましょう。^000000";
+			next;
+			break;
+		}
+		mes "[彷徨う魂]";
+		mes "^FF0000もっと話がしたいですが、";
+		mes "私が現世にいられるのも";
+		mes "あともうごく僅か……^000000";
+		next;
+	}
+	mes "[彷徨う魂]";
+	mes "^FF0000では、お別れの時間です。";
+	mes "お達者で、ありがとう。^000000";
+	close2;
+	warp "alberta",223,36;
+	end;
+
+OnInstanceInit:
+	disablenpc instance_npcname("彷徨う魂#102");
+	end;
+
+OnEnable:
+	initnpctimer;
+	enablenpc instance_npcname("彷徨う魂#102");
+	donpcevent instance_npcname("#Effect30")+"::OnEnable";
+	//SetItemPartyInMap in_102floor 104
+	end;
+
+OnTimer500:
+	mapannounce instance_mapname("6@tower"),"ナハトズィーガー : ば、馬鹿な……!!　この私が……敗れるだと……!?",bc_map,"0xffff00";
+	end;
+
+OnTimer5500:
+	mapannounce instance_mapname("6@tower"),"ナハトズィーガー : ぐぉぉ!!　わ、私の体がっ……!!",bc_map,"0xffff00";
+	end;
+
+OnTimer10500:
+	mapannounce instance_mapname("6@tower"),"ナハトズィーガーは黒い灰になり、空中に飛散していった……",bc_map,"0x00ffcc";
+	stopnpctimer;
+	end;
+}
+
+6@tower,169,127,2	script	#Effect30	844,{
+	end;
+
+OnInstanceInit:
+	disablenpc instance_npcname("#Effect30");
+	end;
+
+OnEnable:
+	specialeffect EF_CONE;
+	initnpctimer;
+	end;
+
+OnTimer1000:
+	stopnpctimer;
+	donpcevent instance_npcname("#Effect31")+"::OnEnable";
+	end;
+}
+
+6@tower,169,127,2	script	#Effect31	844,{
+	end;
+
+OnInstanceInit:
+	disablenpc instance_npcname("#Effect31");
+	end;
+
+OnEnable:
+	specialeffect EF_CONE;
+	initnpctimer;
+	end;
+
+OnTimer1000:
+	stopnpctimer;
+	donpcevent instance_npcname("#Effect30")+"::OnEnable";
+	end;
+}
