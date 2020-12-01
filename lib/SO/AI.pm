@@ -1,6 +1,6 @@
 package SO::AI;
 
-use Mojo::Base -base;
+use Mojo::Base "MojoX::Model";
 use Data::Dumper;
 use Mojo::Collection;
 use Storable;
@@ -13,39 +13,35 @@ use DateTime::HiRes;
 
 has data => sub {{}};
 has watch_hook => sub {{}};
-has context => undef;
 has id => undef;
-has log_level => undef;
 
 sub close
 {
     my $self = shift;
     $self->data({});
     $self->watch_hook({});
-    $self->context(undef);
 }
 
 sub open
 {
     my $self = shift;
-    my $k = $self->context->character($self->id);
+    my $k = $self->app->character($self->id);
     $self->data($k);
-    $self->log_level($self->context->log->level);
 }
 
 sub state
 {
     my $self = shift;
     my $id = $self->id;
-    my $k = $self->context->character($id);
-    my $mode = $self->context->location($id);
+    my $k = $self->app->character($id);
+    my $mode = $self->app->location($id);
 
     if (! defined $k)
     {
         return undef;
     }
 
-    if ($self->context->is_battle($id) || $self->context->is_pvp($id)) { # 戦闘優先
+    if ($self->app->is_battle($id) || $self->app->is_pvp($id)) { # 戦闘優先
         return "battle";
     }
 
@@ -66,11 +62,11 @@ sub log
     my $self = shift;
     my $level = shift;
     my $k = $self->data;
-    my $mode = $self->context->location($k->{id});
+    my $mode = $self->app->location($k->{id});
     my $mes = "id = %s, パスワード = %s, スポット = %s, エリア = %s, 距離 = %s, HP = %s, 前回コマンド = %s. ". shift;
     my @args = (@$k{qw|id パスワード スポット エリア 距離 HP|}, $mode, @_);
 
-    $self->context->log->$level(sprintf($mes, @args));
+    $self->app->log->$level(sprintf($mes, @args));
 }
 
 sub command
@@ -78,8 +74,8 @@ sub command
     my $self = shift;
     my $k = $self->data;
     my $id = $self->id;
-    my $mode = $self->context->location($id);
-    my $state = $self->context->state($id);
+    my $mode = $self->app->location($id);
+    my $state = $self->app->state($id);
 
     if (! defined $mode)
     {
@@ -95,11 +91,11 @@ sub command
 
     if ($state eq "battle")
     {
-        if ($self->context->is_pvp($id))
+        if ($self->app->is_pvp($id))
         {
             $self->log("debug", "PVP");
 
-            my $ids = $self->context->get_pvp_ids($id);
+            my $ids = $self->app->get_pvp_ids($id);
 
             if (defined $ids)
             {
@@ -139,16 +135,16 @@ sub command
         else # 近辺を探索中
         {
             # TODO: PKキャラなら、敵を探し、僧侶系なら、辻ヒールを行う。それ以外なら、応援か素通り
-            my $neighbors = Mojo::Collection->new(@{$self->context->neighbors($id)});
+            my $neighbors = Mojo::Collection->new(@{$self->app->neighbors($id)});
             my $shuffle = $neighbors->shuffle;
             my $target_append = $shuffle->head(1)->last;
-            my $rand = $self->context->range_rand(0 ,100);
+            my $rand = $self->app->range_rand(0 ,100);
 
             if (defined $target_append && $rand >= 99)
             {
-                my $is_battle = $self->context->is_battle($id) || $self->context->is_pvp($id) ? 1 : 0;
-                my $is_battle2 = $self->context->is_battle($target_append->{id}) || $self->context->is_pvp($target_append->{id}) ? 1 : 0;
-                my $rand2 = $self->context->range_rand(0 ,100);
+                my $is_battle = $self->app->is_battle($id) || $self->app->is_pvp($id) ? 1 : 0;
+                my $is_battle2 = $self->app->is_battle($target_append->{id}) || $self->app->is_pvp($target_append->{id}) ? 1 : 0;
+                my $rand2 = $self->app->range_rand(0 ,100);
 
                 if ($rand2 <= 50)
                 {
@@ -305,7 +301,7 @@ sub DESTROY
     my $dt = DateTime::HiRes->now(time_zone => "Asia/Tokyo");
     my $mes = sprintf("[%s] [%s] [%s] %s [%s] DESTROY", $dt->strftime('%Y-%m-%d %H:%M:%S.%5N'), $$, "debug", $self, $self->id || "-");
     my $utf8 = Encode::encode_utf8($mes);
-    warn $utf8. "\n" if ($self->log_level eq "debug");
+    warn $utf8. "\n" if ($self->app->log->level eq "debug");
 }
 
 1;

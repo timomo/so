@@ -6,7 +6,10 @@ use utf8;
 
 sub is_continue_event
 {
-	my $encounter = SO::Event->new(context => $controller, "system" => $system, id => $kid);
+	my $encounter = $mojo->model("event");
+	# $encounter->context($controller);
+	# $encounter->system($system);
+	$encounter->id($kid);
 	my $event = $encounter->reserved;
 
 	if (defined $event)
@@ -22,13 +25,20 @@ sub event_reserved
 
 	if (exists $in{イベントid})
 	{
-		my $encounter = SO::Event->new(context => $controller, "system" => $system, id => $kid, event_id => int($in{イベントid}));
+		my $encounter = $mojo->model("event");
+		# $encounter->context($controller);
+		# $encounter->system($system);
+		$encounter->id($kid);
+		$encounter->event_id(int($in{イベントid}));
 		my $event = $encounter->load;
 		$event->select(\%in);
 		# $event->result;
 	}
 
-	my $encounter = SO::Event->new(context => $controller, "system" => $system, id => $kid);
+	my $encounter = $mojo->model("event");
+	# $encounter->context($controller);
+	# $encounter->system($system);
+	$encounter->id($kid);
 	my $event = $encounter->reserved;
 
 	if (defined $event)
@@ -67,12 +77,19 @@ sub event_reserved
 sub event_encounter
 {
 	warn "---------------->event_encounter";
-	my $encounter = SO::Event->new(context => $controller, "system" => $system, id => $kid);
+	my $encounter = $mojo->model("event");
+	# $encounter->context($controller);
+	# $encounter->system($system);
+	$encounter->id($kid);
 	my $event = $encounter->encounter;
 
 	if (! defined $event)
 	{
-		$encounter = SO::Event->new(context => $controller, "system" => $system, id => $kid, random => 1);
+		$encounter = $mojo->model("event");
+		# $encounter->context($controller);
+		# $encounter->system($system);
+		$encounter->id($kid);
+		$encounter->random(1);
 		$event = $encounter->encounter;
 	}
 
@@ -98,7 +115,11 @@ sub event_choice
 
 	for my $num (0 .. 10)
 	{
-		my $encounter = SO::Event->new(context => $controller, "system" => $system, id => $kid, event_id => $event_id);
+		my $encounter = $mojo->model("event");
+		# $encounter->context($controller);
+		# $encounter->system($system);
+		$encounter->id($kid);
+		$encounter->event_id($event_id);
 		my $event = $encounter->load;
 
 		if (! defined $event)

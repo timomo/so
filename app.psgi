@@ -24,14 +24,16 @@ push @{app->static->paths}, File::Spec->catdir($FindBin::Bin, qw|public sound|);
 push @{app->static->paths}, File::Spec->catdir($FindBin::Bin, qw|public img|);
 
 plugin Config => { file => "so.conf.pl" };
+plugin "Model" => {
+    namespaces => ["SO"],
+};
 
 my $ua;
 my $app;
 
-my $system = SO::System->new(context => app);
-my $town = SO::Town->new(context => app, system => $system);
+my $system = app->model("system");
+my $town = app->model("town");
 $system->open;
-$town->open;
 
 app->helper(
     backend_request => sub

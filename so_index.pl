@@ -51,7 +51,6 @@ require './lib/so_config.pl';
 require './lib/so_pvp.pl';
 require "./lib/so_ajax.pl";
 
-our $mt = Mojo::Template->new(vars => 1);
 our $logger = Mojo::Log->new;
 our $config = Mojolicious::Plugin::Config->load(File::Spec->catfile($FindBin::Bin, "so.conf.pl"), $config);
 $logger->level($config->{log_level_index});
@@ -61,16 +60,25 @@ $ua->request_timeout(1);
 our $mojo = Mojolicious->new;
 $mojo->log($logger);
 $mojo->controller_class("SO::Dummy");
+$mojo->config($config);
 our $controller = $mojo->build_controller;
-$controller->config($config);
-$controller->log($logger);
-$controller->open;
-our $system = SO::System->new(context => $controller);
-$system->open;
-our $town = SO::Town->new(context => $controller, system => $system);
-$town->open;
+our $queue = Mojo::Collection->new;;
 
 unshift @{$mojo->renderer->paths}, File::Spec->catdir($FindBin::Bin, "templates");
+
+$mojo->plugin("Model" => {
+	namespaces => ["SO"],
+});
+
+$mojo->helper(
+	queue => sub
+	{
+		return $queue;
+	},
+);
+
+our $system = $mojo->model("system");
+our $town = $mojo->model("town");
 
 &initialize;
 

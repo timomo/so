@@ -868,11 +868,9 @@ sub monster_stage_load
 
 sub is_continue_monster
 {
-	my $pvp = SO::Monster->new(context => $controller);
+	my $pvp = $mojo->model("monster");
 	my $bool1;
-	$pvp->open;
 	$bool1 = $pvp->is_battle($kid);
-	$pvp->close;
 	return $bool1 == 1;
 }
 

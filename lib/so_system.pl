@@ -3,6 +3,10 @@ use utf8;
 sub save_dat_append_1p
 {
 	my $param = {};
+	if (! defined $k1id)
+	{
+		return;
+	}
 	@$param{@{$config->{keys2}}} = ($k1id, $mode, $k1area, $k1spot, $k1pst, time, 1);
 	$system->modify_append_data($param);
 	$system->save_append($param);
@@ -11,6 +15,10 @@ sub save_dat_append_1p
 sub save_dat_append_2p
 {
 	my $param = {};
+	if (! defined $k2id)
+	{
+		return;
+	}
 	@$param{@{$config->{keys2}}} = ($k2id, $mode, $k2area, $k2spot, $k2pst, time, 1);
 	$system->modify_append_data($param);
 	$system->save_append($param);
@@ -19,6 +27,10 @@ sub save_dat_append_2p
 sub save_dat_append
 {
 	my $param = {};
+	if (! defined $kid)
+	{
+		return;
+	}
 	@$param{@{$config->{keys2}}} = ($kid, $mode, $karea, $kspot, $kpst, time, $kstage);
 	$system->modify_append_data($param);
 	$system->save_append($param);

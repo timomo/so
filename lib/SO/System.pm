@@ -1,6 +1,6 @@
 package SO::System;
 
-use Mojo::Base -base;
+use Mojo::Base "MojoX::Model";
 use Data::Dumper;
 use Mojo::Collection;
 use Storable;
@@ -13,23 +13,17 @@ use DateTime::HiRes;
 
 has id => undef;
 has watch_hook => sub {{}};
-has context => undef;
-has log_level => undef;
 has dbis => sub { {} };
 
 sub close
 {
     my $self = shift;
     $self->watch_hook({});
-    $self->context(undef);
 }
 
 sub open
 {
     my $self = shift;
-    $self->log_level($self->context->log->level);
-    # my $k = $self->context->character($self->id);
-    # $self->data($k);
 }
 
 sub dbi
@@ -167,12 +161,12 @@ sub save_raw_ini
     {
         my @tmp = @$data{@$keys};
         $tmp[$_] ||= "" for 0 .. $#tmp;
-        my $line = join($self->context->config->{sep}, @tmp);
+        my $line = join($self->app->config->{sep}, @tmp);
         my $utf8 = Encode::encode_utf8($line);
         push(@save, $utf8);
     }
 
-    $file->spurt(join($self->context->config->{new_line}, @save));
+    $file->spurt(join($self->app->config->{new_line}, @save));
 }
 
 sub characters
@@ -302,7 +296,7 @@ sub modify_buff_data
 {
     my $self = shift;
     my $new = shift;
-    my $keys = $self->context->config->{キャラバフ};
+    my $keys = $self->app->config->{キャラバフ};
 
     for my $key (@$keys)
     {
@@ -314,7 +308,8 @@ sub modify_append_data
 {
     my $self = shift;
     my $new = shift;
-    my $keys = $self->context->config->{keys2};
+
+    my $keys = $self->app->config->{keys2};
     my $regex = qr/(?:エリア|スポット|距離|最終実行時間|階数)/;
 
     for my $key (@$keys)
@@ -330,7 +325,7 @@ sub modify_chara_data
 {
     my $self = shift;
     my $new = shift;
-    my $keys = $self->context->config->{keys};
+    my $keys = $self->app->config->{keys};
     my $regex = qr/(?:性別|画像|力|賢さ|信仰心|体力|器用さ|素早さ|魅力|HP|最大HP|経験値|レベル|残りAP|所持金|LP|戦闘数|勝利数|最終アクセス|エリア|スポット|距離|アイテム)/;
 
     for my $key (@$keys)
@@ -363,7 +358,7 @@ sub modify_skill_data
     my $key = shift;
     my $new = shift;
 
-    for my $name (@{ $self->context->config->{$key} })
+    for my $name (@{ $self->app->config->{$key} })
     {
         if ($name eq "id")
         {
@@ -649,7 +644,7 @@ sub save_bank_db
     my $result = $self->dbi("main")->model("銀行データ")->select(["*"], where => { id => $new->{id} });
     my $row = $result->fetch_hash_one;
     my $dat = {};
-    my $keys = $self->context->config->{銀行データ};
+    my $keys = $self->app->config->{銀行データ};
 
     for my $key (@$keys)
     {
@@ -676,7 +671,7 @@ sub save_chara_db
     my $result = $self->dbi("main")->model("キャラ")->select(["*"], where => { id => $new->{id} });
     my $row = $result->fetch_hash_one;
     my $dat = {};
-    my $keys = $self->context->config->{keys};
+    my $keys = $self->app->config->{keys};
 
     for my $key (@$keys)
     {
@@ -743,9 +738,9 @@ sub save_message_db
 sub save_chara_file
 {
     my $self = shift;
-    my $path = $self->context->config->{chara_file};
+    my $path = $self->app->config->{chara_file};
     my $new = shift;
-    my $list = $self->load_ini($path, $self->context->config->{keys});
+    my $list = $self->load_ini($path, $self->app->config->{keys});
     my $hit = 0;
 
     $self->modify_chara_data($new);
@@ -760,7 +755,7 @@ sub save_chara_file
         if ($k->{id} eq $new->{id})
         {
             $hit = 1;
-            @$k{@{$self->context->config->{keys}}} = @$new{@{$self->context->config->{keys}}};
+            @$k{@{$self->app->config->{keys}}} = @$new{@{$self->app->config->{keys}}};
         }
     }
 
@@ -769,22 +764,22 @@ sub save_chara_file
         push(@$list, $new);
     }
 
-    $self->save_raw_ini($path, $self->context->config->{keys}, $list);
+    $self->save_raw_ini($path, $self->app->config->{keys}, $list);
 }
 
 sub save_append_file
 {
     my $self = shift;
-    my $path = $self->context->config->{append_file};
+    my $path = $self->app->config->{append_file};
     my $new = shift;
-    my $list = $self->load_ini($path, $self->context->config->{keys2});
+    my $list = $self->load_ini($path, $self->app->config->{keys2});
     my $hit = 0;
 
     $self->modify_append_data($new);
 
     if (! defined $new->{id})
     {
-        $self->context->log->error("save_appendにて不正なデータを検知");
+        $self->app->log->error("save_appendにて不正なデータを検知");
         return;
     }
 
@@ -798,7 +793,7 @@ sub save_append_file
         if ($k->{id} eq $new->{id})
         {
             $hit = 1;
-            @$k{@{$self->context->config->{keys2}}} = @$new{@{$self->context->config->{keys2}}};
+            @$k{@{$self->app->config->{keys2}}} = @$new{@{$self->app->config->{keys2}}};
         }
     }
 
@@ -807,7 +802,7 @@ sub save_append_file
         push(@$list, $new);
     }
 
-    $self->save_raw_ini($path, $self->context->config->{keys2}, $list);
+    $self->save_raw_ini($path, $self->app->config->{keys2}, $list);
 }
 
 sub load_ini
@@ -909,7 +904,7 @@ sub DESTROY
     my $dt = DateTime::HiRes->now(time_zone => "Asia/Tokyo");
     my $mes = sprintf("[%s] [%s] [%s] %s [%s] DESTROY", $dt->strftime('%Y-%m-%d %H:%M:%S.%5N'), $$, "debug", $self, $self->id || "-");
     my $utf8 = Encode::encode_utf8($mes);
-    warn $utf8. "\n" if ($self->log_level eq "debug");
+    warn $utf8. "\n" if ($self->app->log->level eq "debug");
 }
 
 1;

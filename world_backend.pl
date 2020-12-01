@@ -63,7 +63,12 @@ my $app;
 my $clients = {};
 my $dbis = {};
 my $loops = {};
-my $system = SO::System->new(context => app);
+
+plugin "Model" => {
+    namespaces => ["SO"],
+};
+
+my $system = app->model("system");
 $system->open;
 
 {
@@ -374,7 +379,9 @@ app->helper(
     {
         my $self = shift;
         my $id = shift;
-        my $ai = SO::AI->new(context => $self, id => $id);
+        my $ai = $self->model("AI");
+        $ai->context($self);
+        $ai->id($id);
         $ai->open;
         my $state = $ai->state;
         $ai->close;
@@ -388,7 +395,7 @@ app->helper(
     {
         my $self = shift;
         my $id = shift;
-        my $pvp = SO::Monster->new(context => $self);
+        my $pvp = $self->model("monster");
         my $bool;
 
         $pvp->open;
@@ -404,7 +411,7 @@ app->helper(
     {
         my $self = shift;
         my $id = shift;
-        my $pvp = SO::PVP->new(context => $self);
+        my $pvp = $self->model("PVP");
         my $bool;
 
         $pvp->open;
@@ -427,7 +434,7 @@ app->helper(
     {
         my $self = shift;
         my $id = shift;
-        my $pvp = SO::PVP->new(context => $self);
+        my $pvp = $self->model("PVP");
         my $ids;
 
         $pvp->open;
@@ -897,7 +904,9 @@ app->helper(
 
             my $id = $append->{id};
 
-            my $ai = SO::AI->new(context => $self, id => $id);
+            my $ai = $self->model("AI");
+            $ai->context($self);
+            $ai->id($id);
             $ai->open;
             my $npc_command = $ai->command;
             # warn Dump($npc_command);

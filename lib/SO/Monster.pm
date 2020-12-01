@@ -1,6 +1,6 @@
 package SO::Monster;
 
-use Mojo::Base -base;
+use Mojo::Base "MojoX::Model";
 use Data::Dumper;
 use Mojo::Collection;
 use Storable;
@@ -15,46 +15,50 @@ has data => sub {{}};
 has watch_hook => sub {{}};
 has context => undef;
 has id => undef;
-has log_level => undef;
 
 sub close
 {
     my $self = shift;
     $self->data({});
     $self->watch_hook({});
-    $self->context(undef);
 }
 
 sub open
 {
     my $self = shift;
-    # my $k = $self->context->character($self->id);
-    # $self->data($k);
-    $self->log_level($self->context->log->level);
 }
 
 sub is_battle
 {
     my $self = shift;
     my $id = shift;
+    my $hit;
 
-    my $hit = $self->context->queue->first(sub
+    eval {
+        $hit = $self->app->queue->first(sub
+        {
+            my $command = shift;
+            my $param = $command->{param};
+
+            if ($param->{mode} ne "monster")
+            {
+                return 0;
+            }
+
+            if ($param->{id} ne $id)
+            {
+                return 0;
+            }
+
+            return 1;
+        });
+    };
+
+    if ($@)
     {
-        my $command = shift;
-        my $param = $command->{param};
-
-        if ($param->{mode} ne "monster")
-        {
-            return 0;
-        }
-
-        if ($param->{id} ne $id)
-        {
-            return 0;
-        }
-
-        return 1;
-    });
+        warn Dumper caller(1);
+        die $@;
+    }
 
     if (defined $hit)
     {
@@ -122,7 +126,7 @@ sub DESTROY
     my $dt = DateTime::HiRes->now(time_zone => "Asia/Tokyo");
     my $mes = sprintf("[%s] [%s] [%s] %s [%s] DESTROY", $dt->strftime('%Y-%m-%d %H:%M:%S.%5N'), $$, "debug", $self, $self->id || "-");
     my $utf8 = Encode::encode_utf8($mes);
-    warn $utf8. "\n" if ($self->log_level eq "debug");
+    warn $utf8. "\n" if ($self->app->log->level eq "debug");
 }
 
 1;

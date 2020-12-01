@@ -1,7 +1,7 @@
 package SO::Event::rAthenaScript;
 
 # push @ISA, 'SO::Event::Base';
-use Mojo::Base 'SO::Event::SimpleMessage';
+use Mojo::Base 'SO::Event::Base';
 use YAML::XS;
 use IO::Capture::Stdout;
 use IO::Capture::Stderr;
@@ -235,7 +235,9 @@ sub paragraph_check
     if (defined $stdout)
     {
         $self->save;
+
         my $event = $self->object(ref $self);
+
         $event->paragraph($self->paragraph);
         $event->parent_id($self->id);
 
@@ -291,8 +293,6 @@ sub _select_choice
     my $self = shift;
     my $paragraph = shift;
     my $mes = shift;
-    my @tmp = split(":", $mes);
-    my $dummy = $self->object(ref $self);
     my $event = $self;
     my $select;
 
@@ -301,6 +301,9 @@ sub _select_choice
 
     while(my $parent = $event->parent)
     {
+        warn "--------------------->parent";
+        warn sprintf("%s, %s", $parent->id,$paragraph);
+        warn "--------------------->parent";
         if ($paragraph == $parent->paragraph)
         {
             $select = $parent;
@@ -311,8 +314,6 @@ sub _select_choice
 
     if (defined $select)
     {
-        # warn Dump($select->generate);
-        # warn Dump($select->choice);
         return int($select->choice + 1);
     }
 
@@ -358,12 +359,12 @@ sub delitem
 {
     my $self = shift;
     my ($item_id, $num) = @_;
-    my $item = $self->system->pickup_item($self->chara_id, $item_id);
+    my $item = $self->app->model("system")->pickup_item($self->chara_id, $item_id);
 
     if (ref $item eq "HASH")
     {
         $item->{所持数} -= $num;
-        $self->system->save_item_db($self->chara_id, [ $item ]);
+        $self->app->model("system")->save_item_db($self->chara_id, [ $item ]);
     }
 }
 
@@ -372,7 +373,7 @@ sub countitem
 {
     my $self = shift;
     my $item_id = shift;
-    my $item = $self->system->pickup_item($self->chara_id, $item_id);
+    my $item = $self->app->model("system")->pickup_item($self->chara_id, $item_id);
 
     if (ref $item eq "HASH")
     {
@@ -401,7 +402,6 @@ sub conversation_next
 {
     my $self = shift;
     my $paragraph = shift;
-    my $event = $self->object(ref $self);
 
     $self->event_variable_temporarily_save;
 
@@ -419,7 +419,6 @@ sub conversation_close
 {
     my $self = shift;
     my $paragraph = shift;
-    my $event = $self->object(ref $self);
 
     # $self->paragraph(-1);
     $self->event_end_time(time);
@@ -667,7 +666,7 @@ sub parse_rathena_script
         }
 
         my $left = $4;
-	$body = Encode::encode_utf8($body);
+	# $body = Encode::encode_utf8($body);
         my $ref = $self->parse_script($body);
         my @mes = @$ref;
         my $num = 0;

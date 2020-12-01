@@ -1,7 +1,6 @@
 package SO::Event::Base;
 
-# push @ISA, 'Mojo::Base';
-use Mojo::Base -base;
+use Mojo::Base "MojoX::Model";
 use Data::Dumper;
 use Mojo::Collection;
 use Storable;
@@ -11,16 +10,13 @@ use FindBin;
 use YAML::XS;
 use Encode;
 use DateTime::HiRes;
-use SO::System;
 # use UNIVERSAL::require;
 
 has data => sub {{}};
 has watch_hook => sub {{}};
-has context => undef;
 has k1id => undef;
 has k2id => undef;
 has log_level => undef;
-has system => sub{ SO::System->new };
 has event => sub { {} };
 has hooks => sub { {} };
 has answer => undef;
@@ -55,8 +51,6 @@ sub close
     my $self = shift;
     $self->data({});
     $self->watch_hook({});
-    $self->context(undef);
-    $self->system(undef);
     $self->event(undef);
     $self->answer(undef);
 }
@@ -64,18 +58,18 @@ sub close
 sub open
 {
     my $self = shift;
-    my $k = $self->system->load_chara($self->chara_id);
+    my $system = $self->app->model("system");
+    my $k = $system->load_chara($self->chara_id);
     $self->data($k);
-    $self->log_level($self->context->log->level);
     $self->event({});
     $self->answer(undef);
 
     if (defined $self->id)
     {
-        my $where = $self->system->dbi("main")->where;
+        my $where = $system->dbi("main")->where;
         $where->clause("キャラid = :キャラid and id = :イベントid");
         $where->param({ キャラid => $self->id, イベントid => $self->id });
-        my $result = $self->system->dbi("main")->model("イベント")->select(["*"], where => $where);
+        my $result = $system->dbi("main")->model("イベント")->select(["*"], where => $where);
         my $row = $result->fetch_hash_one;
         $self->event($row);
     }
@@ -110,10 +104,9 @@ sub render_to_string
             }
         }
 
-        my $html = $self->context->render_to_string(
-            template      => "event",
-            event        => $row,
-        );
+        my $controller = $self->app->build_controller;
+        $controller->stash(event => $row);
+        my $html = $controller->render_to_string("event");
 
         return Encode::encode_utf8($html);
     }
@@ -163,8 +156,9 @@ sub event_variable_load
 {
     my $self = shift;
     my $flag = shift;
+    my $system = $self->app->model("system");
     my $where = { キャラid => $self->chara_id, イベントキー => $self->event_key, 一時保存フラグ => $flag };
-    my $result = $self->system->dbi("main")->model("イベント変数")->select(["*"], where => $where, append => "order by 一時保存フラグ desc limit 1");
+    my $result = $system->dbi("main")->model("イベント変数")->select(["*"], where => $where, append => "order by 一時保存フラグ desc limit 1");
     my $row = $result->fetch_hash_one;
 
     if (! defined $row)
@@ -172,6 +166,7 @@ sub event_variable_load
         return $row;
     }
 
+    $row->{変数} = Encode::encode_utf8($row->{変数});
     $row->{変数} = YAML::XS::Load($row->{変数});
 
     if ($row->{一時保存フラグ} == 1)
@@ -203,6 +198,7 @@ sub event_variable_save
     my $self = shift;
     my $ref = shift;
     my $flag = shift;
+    my $system = $self->app->model("system");
     my $dat = {};
     $dat->{変数} = $ref;
 
@@ -229,7 +225,7 @@ sub event_variable_save
         if (defined $row->{id})
         {
             eval {
-                $self->system->dbi("main")->model("イベント変数")->update($row, where => { id => $row->{id} }, mtime => "mtime");
+                $system->dbi("main")->model("イベント変数")->update($row, where => { id => $row->{id} }, mtime => "mtime");
             };
             if ($@)
             {
@@ -241,7 +237,7 @@ sub event_variable_save
         else
         {
             eval {
-                $self->system->dbi("main")->model("イベント変数")->insert($row, ctime => "ctime");
+                $system->dbi("main")->model("イベント変数")->insert($row, ctime => "ctime");
             };
             if ($@)
             {
@@ -257,6 +253,7 @@ sub insert
     my $self = shift;
     my $row = shift;
     my $dat = {};
+    my $system = $self->app->model("system");
 
     for my $key (keys %$row)
     {
@@ -270,16 +267,15 @@ sub insert
     }
 
     eval {
-        $self->system->dbi("main")->model("イベント")->insert($dat, ctime => "ctime");
+        $system->dbi("main")->model("イベント")->insert($dat, ctime => "ctime");
+        $self->id($system->dbi("main")->dbh->sqlite_last_insert_rowid);
+        $row->{id} = $self->id;
     };
     if ($@)
     {
         warn YAML::XS::Dump($dat);
         die $@;
     }
-    $self->id($self->system->dbi("main")->dbh->sqlite_last_insert_rowid);
-
-    $row->{id} = $self->id;
 }
 
 sub update
@@ -287,6 +283,7 @@ sub update
     my $self = shift;
     my $row = shift;
     my $dat = {};
+    my $system = $self->app->model("system");
 
     for my $key (keys %$row)
     {
@@ -305,7 +302,7 @@ sub update
     }
 
     eval {
-        $self->system->dbi("main")->model("イベント")->update($dat, where => {id => $self->id}, mtime => "mtime");
+        $system->dbi("main")->model("イベント")->update($dat, where => {id => $self->id}, mtime => "mtime");
     };
     if ($@)
     {
@@ -343,6 +340,15 @@ sub generate
 sub save
 {
     my $self = shift;
+
+    warn "parent_id-------------->";
+    warn $self->parent_id;
+    warn "parent_id-------------->";
+
+    if (! defined $self->parent_id)
+    {
+        $self->parent_id(0);
+    }
 
     my $dat = $self->generate;
 
@@ -394,11 +400,12 @@ sub next
     {
         return;
     }
+    my $system = $self->app->model("system");
 
-    my $where = $self->system->dbi("main")->where;
+    my $where = $system->dbi("main")->where;
     $where->clause("キャラid = :キャラid AND id = :イベントid");
     $where->param({ キャラid => $self->chara_id, イベントid => $self->continue_id });
-    my $result = $self->system->dbi("main")->model("イベント")->select(["*"], where => $where);
+    my $result = $system->dbi("main")->model("イベント")->select(["*"], where => $where);
     my $row = $result->fetch_hash_one;
 
     if (! defined $row)
@@ -436,11 +443,12 @@ sub parent
     {
         return;
     }
+    my $system = $self->app->model("system");
 
-    my $where = $self->system->dbi("main")->where;
+    my $where = $system->dbi("main")->where;
     $where->clause("キャラid = :キャラid AND id = :イベントid");
     $where->param({ キャラid => $self->chara_id, イベントid => $self->parent_id });
-    my $result = $self->system->dbi("main")->model("イベント")->select(["*"], where => $where);
+    my $result = $system->dbi("main")->model("イベント")->select(["*"], where => $where);
     my $row = $result->fetch_hash_one;
 
     if (! defined $row)
@@ -474,8 +482,20 @@ sub object
 {
     my $self = shift;
     my $class = shift;
-    $class->require or die $@;
-    my $event = $class->new(context => $self->context, "system" => $self->system, chara_id => $self->chara_id, log_level => "debug");
+    $class =~ s/^SO:://;
+    my $event = $self->app->entity($class);
+
+    $event->parent_id(0);
+    $event->chara_id($self->chara_id);
+    $event->id(undef);
+    $event->case("");
+    $event->event_end_time(undef);
+    $event->answer(undef);
+    $event->choice(undef);
+    $event->message(undef);
+    $event->correct_answer(undef);
+    $event->continue_id(0);
+    $event->fin_flag(0);
     return $event;
 }
 
@@ -565,13 +585,15 @@ sub DESTROY
     my $mes = sprintf("[%s] [%s] [%s] %s [%s] DESTROY", $dt->strftime('%Y-%m-%d %H:%M:%S.%5N'), $$, "debug", $self, $self->id || "-");
     my $utf8 = Encode::encode_utf8($mes);
 
-    warn $utf8. "\n" if ($self->log_level eq "debug");
+    warn $utf8. "\n" if ($self->app->log->level eq "debug");
 }
 
 sub delete
 {
     my ($self) = @_;
-    $self->system->dbi("main")->model("イベント")->delete(where => { id => $self->{id} });
+    my $system = $self->app->model("system");
+
+    $system->dbi("main")->model("イベント")->delete(where => { id => $self->{id} });
 
 }
 

@@ -1,6 +1,6 @@
 package SO::Town;
 
-use Mojo::Base -base;
+use Mojo::Base "MojoX::Model";
 use Data::Dumper;
 use Mojo::Collection;
 use Storable;
@@ -14,40 +14,31 @@ use SO::System;
 
 has data => sub {{}};
 has watch_hook => sub {{}};
-has context => undef;
 has k1id => undef;
 has k2id => undef;
 has id => undef;
-has log_level => undef;
-has system => undef;
 
 sub close
 {
     my $self = shift;
     $self->data({});
     $self->watch_hook({});
-    $self->context(undef);
-    $self->system(undef);
 }
 
 sub open
 {
     my $self = shift;
-    # my $k = $self->context->character($self->id);
-    # $self->data($k);
-    $self->log_level($self->context->log->level);
-    # $self->system(So::System->new(context => $self->context));
 }
 
 sub load
 {
     my $self = shift;
     my $k = shift;
-    my $log_town = $self->system->load_raw_ini($self->context->config->{town_info});
+    my $log_town = $self->app->model("system")->load_raw_ini($self->app->config->{town_info});
     my $ret = {};
-    $ret->{move} = $self->context->config->{タウン間距離};
-    my $town_name = $self->context->config->{街};
-    my $area_name = $self->context->config->{フィールド};
+    $ret->{move} = $self->app->config->{タウン間距離};
+    my $town_name = $self->app->config->{街};
+    my $area_name = $self->app->config->{フィールド};
 
     foreach(@$log_town)
     {
@@ -224,7 +215,7 @@ sub DESTROY
     my $dt = DateTime::HiRes->now(time_zone => "Asia/Tokyo");
     my $mes = sprintf("[%s] [%s] [%s] %s [%s] DESTROY", $dt->strftime('%Y-%m-%d %H:%M:%S.%5N'), $$, "debug", $self, $self->id || "-");
     my $utf8 = Encode::encode_utf8($mes);
-    warn $utf8. "\n" if ($self->log_level eq "debug");
+    warn $utf8. "\n" if ($self->app->log->level eq "debug");
 }
 
 1;

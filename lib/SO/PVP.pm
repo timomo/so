@@ -1,6 +1,6 @@
 package SO::PVP;
 
-use Mojo::Base -base;
+use Mojo::Base "MojoX::Model";
 use Data::Dumper;
 use Mojo::Collection;
 use Storable;
@@ -13,7 +13,6 @@ use DateTime::HiRes;
 
 has data => sub {{}};
 has watch_hook => sub {{}};
-has context => undef;
 has k1id => undef;
 has k2id => undef;
 has id => undef;
@@ -24,15 +23,11 @@ sub close
     my $self = shift;
     $self->data({});
     $self->watch_hook({});
-    $self->context(undef);
 }
 
 sub open
 {
     my $self = shift;
-    # my $k = $self->context->character($self->id);
-    # $self->data($k);
-    $self->log_level($self->context->log->level);
 }
 
 sub is_pvp
@@ -40,7 +35,7 @@ sub is_pvp
     my $self = shift;
     my $id = shift;
 
-    my $hit = $self->context->queue->first(sub
+    my $hit = $self->app->queue->first(sub
     {
         my $command = shift;
         my $param = $command->{param};
@@ -83,7 +78,7 @@ sub get_pvp_ids
     my $self = shift;
     my $id = shift;
 
-    my $hit = $self->context->queue->first(sub
+    my $hit = $self->app->queue->first(sub
     {
         my $command = shift;
         my $param = $command->{param};
@@ -186,7 +181,7 @@ sub DESTROY
     my $dt = DateTime::HiRes->now(time_zone => "Asia/Tokyo");
     my $mes = sprintf("[%s] [%s] [%s] %s [%s] DESTROY", $dt->strftime('%Y-%m-%d %H:%M:%S.%5N'), $$, "debug", $self, $self->id || "-");
     my $utf8 = Encode::encode_utf8($mes);
-    warn $utf8. "\n" if ($self->log_level eq "debug");
+    warn $utf8. "\n" if ($self->app->log->level eq "debug");
 }
 
 1;
