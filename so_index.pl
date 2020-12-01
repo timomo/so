@@ -77,8 +77,8 @@ $mojo->helper(
 	},
 );
 
-our $system = $mojo->model("system");
-our $town = $mojo->model("town");
+our $system = $mojo->entity("system");
+our $town = $mojo->entity("town");
 
 &initialize;
 

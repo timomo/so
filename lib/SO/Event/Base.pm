@@ -58,7 +58,7 @@ sub close
 sub open
 {
     my $self = shift;
-    my $system = $self->app->model("system");
+    my $system = $self->app->entity("system");
     my $k = $system->load_chara($self->chara_id);
     $self->data($k);
     $self->event({});
@@ -156,7 +156,7 @@ sub event_variable_load
 {
     my $self = shift;
     my $flag = shift;
-    my $system = $self->app->model("system");
+    my $system = $self->app->entity("system");
     my $where = { キャラid => $self->chara_id, イベントキー => $self->event_key, 一時保存フラグ => $flag };
     my $result = $system->dbi("main")->model("イベント変数")->select(["*"], where => $where, append => "order by 一時保存フラグ desc limit 1");
     my $row = $result->fetch_hash_one;
@@ -198,7 +198,7 @@ sub event_variable_save
     my $self = shift;
     my $ref = shift;
     my $flag = shift;
-    my $system = $self->app->model("system");
+    my $system = $self->app->entity("system");
     my $dat = {};
     $dat->{変数} = $ref;
 
@@ -253,7 +253,7 @@ sub insert
     my $self = shift;
     my $row = shift;
     my $dat = {};
-    my $system = $self->app->model("system");
+    my $system = $self->app->entity("system");
 
     for my $key (keys %$row)
     {
@@ -283,7 +283,7 @@ sub update
     my $self = shift;
     my $row = shift;
     my $dat = {};
-    my $system = $self->app->model("system");
+    my $system = $self->app->entity("system");
 
     for my $key (keys %$row)
     {
@@ -396,7 +396,7 @@ sub next
     {
         return;
     }
-    my $system = $self->app->model("system");
+    my $system = $self->app->entity("system");
 
     my $where = $system->dbi("main")->where;
     $where->clause("キャラid = :キャラid AND id = :イベントid");
@@ -439,7 +439,7 @@ sub parent
     {
         return;
     }
-    my $system = $self->app->model("system");
+    my $system = $self->app->entity("system");
 
     my $where = $system->dbi("main")->where;
     $where->clause("キャラid = :キャラid AND id = :イベントid");
@@ -587,7 +587,7 @@ sub DESTROY
 sub delete
 {
     my ($self) = @_;
-    my $system = $self->app->model("system");
+    my $system = $self->app->entity("system");
 
     $system->dbi("main")->model("イベント")->delete(where => { id => $self->{id} });
 

@@ -34,7 +34,7 @@ sub load
 {
     my $self = shift;
     my $k = shift;
-    my $log_town = $self->app->model("system")->load_raw_ini($self->app->config->{town_info});
+    my $log_town = $self->app->entity("system")->load_raw_ini($self->app->config->{town_info});
     my $ret = {};
     $ret->{move} = $self->app->config->{タウン間距離};
     my $town_name = $self->app->config->{街};

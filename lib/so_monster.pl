@@ -868,7 +868,7 @@ sub monster_stage_load
 
 sub is_continue_monster
 {
-	my $pvp = $mojo->model("monster");
+	my $pvp = $mojo->entity("monster");
 	my $bool1;
 	$bool1 = $pvp->is_battle($kid);
 	return $bool1 == 1;

@@ -31,8 +31,8 @@ plugin "Model" => {
 my $ua;
 my $app;
 
-my $system = app->model("system");
-my $town = app->model("town");
+my $system = app->entity("system");
+my $town = app->entity("town");
 $system->open;
 
 app->helper(

@@ -6,7 +6,7 @@ use utf8;
 
 sub is_continue_event
 {
-	my $encounter = $mojo->model("event");
+	my $encounter = $mojo->entity("event");
 	# $encounter->context($controller);
 	# $encounter->system($system);
 	$encounter->id($kid);
@@ -25,7 +25,7 @@ sub event_reserved
 
 	if (exists $in{イベントid})
 	{
-		my $encounter = $mojo->model("event");
+		my $encounter = $mojo->entity("event");
 		# $encounter->context($controller);
 		# $encounter->system($system);
 		$encounter->id($kid);
@@ -35,7 +35,7 @@ sub event_reserved
 		# $event->result;
 	}
 
-	my $encounter = $mojo->model("event");
+	my $encounter = $mojo->entity("event");
 	# $encounter->context($controller);
 	# $encounter->system($system);
 	$encounter->id($kid);
@@ -77,7 +77,7 @@ sub event_reserved
 sub event_encounter
 {
 	warn "---------------->event_encounter";
-	my $encounter = $mojo->model("event");
+	my $encounter = $mojo->entity("event");
 	# $encounter->context($controller);
 	# $encounter->system($system);
 	$encounter->id($kid);
@@ -85,7 +85,7 @@ sub event_encounter
 
 	if (! defined $event)
 	{
-		$encounter = $mojo->model("event");
+		$encounter = $mojo->entity("event");
 		# $encounter->context($controller);
 		# $encounter->system($system);
 		$encounter->id($kid);
@@ -115,7 +115,7 @@ sub event_choice
 
 	for my $num (0 .. 10)
 	{
-		my $encounter = $mojo->model("event");
+		my $encounter = $mojo->entity("event");
 		# $encounter->context($controller);
 		# $encounter->system($system);
 		$encounter->id($kid);

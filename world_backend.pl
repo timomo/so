@@ -68,7 +68,7 @@ plugin "Model" => {
     namespaces => ["SO"],
 };
 
-my $system = app->model("system");
+my $system = app->entity("system");
 $system->open;
 
 {
@@ -379,7 +379,7 @@ app->helper(
     {
         my $self = shift;
         my $id = shift;
-        my $ai = $self->model("AI");
+        my $ai = $self->entity("AI");
         $ai->context($self);
         $ai->id($id);
         $ai->open;
@@ -395,7 +395,7 @@ app->helper(
     {
         my $self = shift;
         my $id = shift;
-        my $pvp = $self->model("monster");
+        my $pvp = $self->entity("monster");
         my $bool;
 
         $pvp->open;
@@ -411,7 +411,7 @@ app->helper(
     {
         my $self = shift;
         my $id = shift;
-        my $pvp = $self->model("PVP");
+        my $pvp = $self->entity("PVP");
         my $bool;
 
         $pvp->open;
@@ -434,7 +434,7 @@ app->helper(
     {
         my $self = shift;
         my $id = shift;
-        my $pvp = $self->model("PVP");
+        my $pvp = $self->entity("PVP");
         my $ids;
 
         $pvp->open;
@@ -904,7 +904,7 @@ app->helper(
 
             my $id = $append->{id};
 
-            my $ai = $self->model("AI");
+            my $ai = $self->entity("AI");
             $ai->context($self);
             $ai->id($id);
             $ai->open;

@@ -34,7 +34,7 @@ sub close
 sub open
 {
     my $self = shift;
-    my $k = $self->app->model("system")->load_chara($self->id);
+    my $k = $self->app->entity("system")->load_chara($self->id);
     $self->data($k);
     $self->event(undef);
 }
@@ -45,9 +45,9 @@ sub object
     my $class = shift;
     $class->require or die $@;
     $class =~ s/^SO:://;
-    my $event = $self->app->model($class);
+    my $event = $self->app->entity($class);
     # $event->context($self->app);
-    # $event->system($self->app->model("system"));
+    # $event->system($self->app->entity("system"));
     $event->chara_id($self->id);
 
 warn $event->system;
@@ -91,7 +91,7 @@ sub reserved
     my $event;
 
     {
-        my $system = $self->app->model("system");
+        my $system = $self->app->entity("system");
         my $where = $system->dbi("main")->where;
         $where->clause("イベント処理済時刻 IS NULL AND キャラid = :キャラid");
         $where->param({ キャラid => $self->id });
@@ -141,7 +141,7 @@ sub encounter
     my $class;
     my $event;
 
-    my $system = $self->app->model("system");
+    my $system = $self->app->entity("system");
     my $rand0 = $system->range_rand(0, 100);
 
     if ($rand0 <= 30)
@@ -211,7 +211,7 @@ sub load
     my $class;
     my $event;
 
-    my $system = $self->app->model("system");
+    my $system = $self->app->entity("system");
     my $where = $system->dbi("main")->where;
     $where->clause("キャラid = :キャラid AND id = :イベントid");
     $where->param({ キャラid => $self->id, イベントid => $self->event_id });
@@ -253,7 +253,7 @@ sub load
 sub check_treasure
 {
     my $self = shift;
-    my $system = $self->app->model("system");
+    my $system = $self->app->entity("system");
     my $result = $system->dbi("main")->model("キャラ追加情報1")->select(["*"], where => {id => $self->data->{id}});
     my $row = $result->fetch_hash_one;
     my $where = $system->dbi("main")->where;

@@ -364,7 +364,7 @@ sub delitem
     if (ref $item eq "HASH")
     {
         $item->{所持数} -= $num;
-        $self->app->model("system")->save_item_db($self->chara_id, [ $item ]);
+        $self->app->entity("system")->save_item_db($self->chara_id, [ $item ]);
     }
 }
 
