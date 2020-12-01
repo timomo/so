@@ -380,7 +380,6 @@ app->helper(
         my $self = shift;
         my $id = shift;
         my $ai = $self->entity("AI");
-        $ai->context($self);
         $ai->id($id);
         $ai->open;
         my $state = $ai->state;
@@ -905,7 +904,6 @@ app->helper(
             my $id = $append->{id};
 
             my $ai = $self->entity("AI");
-            $ai->context($self);
             $ai->id($id);
             $ai->open;
             my $npc_command = $ai->command;

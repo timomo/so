@@ -13,7 +13,8 @@ has choice => undef; # 選択
 has correct_answer => sub {
     my $self = shift;
     my $choices = $self->choices;
-    my $rand = $self->system->range_rand(0, $#$choices);
+    my $system = $self->app->entity("system");
+    my $rand = $system->range_rand(0, $#$choices);
     return $choices->[$rand];
 }; # 正解
 has event_start_time => sub { return time; }; # イベント開始時刻

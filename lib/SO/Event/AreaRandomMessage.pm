@@ -27,8 +27,9 @@ sub _encount
 {
     my $self = shift;
     my $path = File::Spec->catfile($FindBin::Bin, $self->messages->[$self->data->{エリア}]);
-    my $rows = $self->system->load_raw_ini($path);
-    my $rand2 = $self->system->range_rand(0, $#$rows);
+    my $system = $self->app->entity("system");
+    my $rows = $system->load_raw_ini($path);
+    my $rand2 = $system->range_rand(0, $#$rows);
     my $mes = $rows->[$rand2]->[2];
     $self->message($mes);
     $self->event_end_time(time);

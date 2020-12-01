@@ -46,12 +46,7 @@ sub object
     $class->require or die $@;
     $class =~ s/^SO:://;
     my $event = $self->app->entity($class);
-    # $event->context($self->app);
-    # $event->system($self->app->entity("system"));
     $event->chara_id($self->id);
-
-warn $event->system;
-
     return $event;
 }
 
@@ -169,7 +164,7 @@ sub encounter
         }
     }
 
-    $class = "SO::Event::rAthenaScript";
+    # $class = "SO::Event::rAthenaScript";
     # $class = "SO::Event::DownStair";
 
     if (defined $class)

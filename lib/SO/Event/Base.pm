@@ -73,7 +73,6 @@ sub open
         my $row = $result->fetch_hash_one;
         $self->event($row);
     }
-    # $self->system(So::System->new(context => $self->context));
 }
 
 sub hook
@@ -202,6 +201,13 @@ sub event_variable_save
     my $dat = {};
     $dat->{変数} = $ref;
 
+    my $cnt = scalar keys %$ref;
+
+    if ($cnt == 0)
+    {
+        return;
+    }
+
     if (ref $dat->{変数} eq "HASH")
     {
         $dat->{変数} = YAML::XS::Dump($dat->{変数});
@@ -307,10 +313,6 @@ sub update
     if ($@)
     {
         warn YAML::XS::Dump($dat);
-
-        warn YAML::XS::Dump(caller(1));
-
-        # warn YAML::XS::Dump(ref $self->system);
         die $@;
     }
 }
