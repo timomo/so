@@ -341,10 +341,6 @@ sub save
 {
     my $self = shift;
 
-    warn "parent_id-------------->";
-    warn $self->parent_id;
-    warn "parent_id-------------->";
-
     if (! defined $self->parent_id)
     {
         $self->parent_id(0);
