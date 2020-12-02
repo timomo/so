@@ -28,7 +28,7 @@
 
 % } else {
 
-<div class="clearfix">
+<div class="clearfix command-window">
 	<div class="blackboard answer float-l">
 	    <p class="blink-before select-command">戦う</p>
 	    <p class="select-command">アイテム</p>

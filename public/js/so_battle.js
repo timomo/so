@@ -63,6 +63,20 @@ function set_position(pointer) {
 		height: battle_stage.height() - height,
 	});
 
+	/* コマンドウインドウ設定開始 */
+
+	const command = jQuery("div.command-window");
+
+	if (command.length !== 0)
+	{
+		command.css({ position: "absolute" });
+		const offset3 = offset2;
+		offset3.top = pointer.find("div.player").offset().top + pointer.find("div.player").height() - command.height();
+		command.offset(offset3);
+	}
+
+	/* コマンドウインドウ設定終了 */
+
 	keys.forEach((key) => {
 		const p = pointer.find("div." + key);
 		left -= p.find("img").width();

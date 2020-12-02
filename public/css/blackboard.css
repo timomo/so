@@ -87,3 +87,8 @@ see https://fantastech.net/dragon-quest-text
 {
     cursor: pointer;
 }
+
+.command-window p
+{
+    font-size: 0.8rem;
+}
