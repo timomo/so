@@ -42,6 +42,79 @@ function page(type){
 	}
 }
 
+function set_position(pointer) {
+	const keys = ["player1","player2","player3","player4","player5"];
+	const offset2 = pointer.find("div.player").offset();
+
+	if (offset2 === undefined)
+	{
+		return true;
+	}
+	let top = offset2.top;
+	let left = pointer.find("div.player").width();
+
+	const battle_stage = pointer.find("div.battle_stage");
+	const height = 48;
+
+	pointer.find("div.player").css({
+		height: height,
+	});
+	pointer.find("div.enemy").css({
+		height: battle_stage.height() - height,
+	});
+
+	keys.forEach((key) => {
+		const p = pointer.find("div." + key);
+		left -= p.find("img").width();
+		p.show();
+		p.css({
+			position: "absolute",
+			zIndex: 1,
+			top: top,
+			left: left,
+			textAlign: "left",
+			float: "none",
+		});
+
+		p.unbind("click");
+		p.click((event) => {
+			const offset = jQuery(event.target).offset();
+			const status = pointer.find("div.status-" + key).clone();
+			jQuery("body").append(status);
+			status.show();
+			status.css({
+				zIndex: 99,
+				width: 180,
+			});
+
+			offset.left = offset2.left + status.width() - status.offset().left;
+
+			status.offset(offset);
+			status.draggable();
+		});
+	});
+
+	const keys2 = ["enemy1","enemy2","enemy3","enemy4","enemy5"];
+	const offset3 = pointer.find("div.enemy").offset();
+	top = offset3.top;
+	left = offset3.left;
+
+	keys2.forEach((key) => {
+		const p = pointer.find("div." + key);
+		p.show();
+		p.css({
+			position: "absolute",
+			zIndex: 1,
+			top: top,
+			left: left,
+			textAlign: "left",
+			float: "none",
+		});
+		left += p.find("img").width() / 2;
+	});
+}
+
+
 jQuery(document).ready(() => {
 	jQuery("div[id^='sel']").hide();
 
@@ -67,6 +140,13 @@ jQuery(document).ready(() => {
 		if (no >= max) max = no;
 		if (no <= min) min = no;
 	});
+
+	const lazy_load = (pointer, timer) => {
+		const sel = jQuery("div#sel" + pointer);
+		setTimeout(() => {
+			set_position(sel);
+		}, timer);
+	};
 
 	const check = (pointer) => {
 		let backP = pointer - 1;
@@ -107,6 +187,8 @@ jQuery(document).ready(() => {
 		jQuery("div[id^='sel']").hide();
 		sel.show();
 
+		lazy_load(pointer, 1);
+
 		document.command.sel.value = pointer;
 	};
 
@@ -117,6 +199,7 @@ jQuery(document).ready(() => {
 
 	check(pointer);
 	func("current");
+	lazy_load(pointer, 500);
 
 	jQuery(".select-command").bind("mouseenter", (event) => {
 		jQuery(".select-command").removeClass("blink-before");

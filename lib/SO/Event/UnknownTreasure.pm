@@ -48,8 +48,8 @@ sub _result1
 {
     my $self = shift;
     my $args = shift;
-    my $class = $self->import("SO::Event::TrappedTreasure");
-    my $mes = $class->new(chara_id => $self->chara_id);
+    my $mes = $self->object("SO::Event::TrappedTreasure");
+    $mes->chara_id($self->chara_id);
     $mes->parent_id($self->id);
     $mes->save;
     $mes->close;
@@ -63,8 +63,8 @@ sub _result2
 {
     my $self = shift;
     my $args = shift;
-    my $class = $self->import("SO::Event::SimpleMessage");
-    my $mes = $class->new(chara_id => $self->chara_id);
+    my $mes = $self->object("SO::Event::TrappedTreasure");
+    $mes->chara_id($self->chara_id);
     $mes->parent_id($self->id);
     $mes->message("あなたは宝箱を開けるのをやめました。");
     $mes->save;

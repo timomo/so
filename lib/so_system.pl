@@ -257,6 +257,8 @@ sub initialize
 	our $karea = undef; our $kspot = undef; our $kpst = undef; our $kstage = undef;
 	our $kitem = undef;
 	our @kbuff = undef;
+	our $khost = undef;
+	our $kdate = undef;
 
 	# PVP戦
 	our $k1id = undef; our $k1pass = undef; our $k1name = undef; our $k1sex = undef; our $k1chara = undef;

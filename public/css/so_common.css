@@ -95,3 +95,42 @@ table
 {
     cursor: pointer;
 }
+
+.mini
+{
+    width: 48px;
+}
+
+.player
+{
+    height: 48px;
+    text-align: right;
+}
+
+.enemy
+{
+    height: 192px;
+}
+
+.battle_stage
+{
+    width: 320px;
+    height: 240px;
+    /*
+    margin: 0px;
+    padding: 0px;
+
+     */
+    background-image: url(/img/158e35945dfb441ed15105ed7c0e7849.png);
+    background-size: contain;
+}
+
+.position-relative
+{
+    position: relative;
+}
+
+.float-left
+{
+    float: left;
+}

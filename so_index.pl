@@ -41,6 +41,7 @@ require './lib/so_login.pl';
 require './lib/so_main.pl';
 require './lib/so_message.pl';
 require './lib/so_monster.pl';
+require './lib/so_monster2.pl';
 require './lib/so_move.pl';
 require './lib/so_shop.pl';
 require './lib/so_skill.pl';
@@ -119,7 +120,7 @@ if ($require_login == 1)
 
 			if (&is_continue_monster)
 			{
-				&monster;
+				&monster2;
 				exit;
 			}
 
@@ -161,7 +162,7 @@ elsif($mode eq 'make_end') { &make_end; }
 elsif($mode eq 'regist') { &regist; }
 elsif($mode eq 'battle') { &battle; }
 elsif($mode eq 'pvp') { &pvp; }
-elsif($mode eq 'monster') { &monster; }
+elsif($mode eq 'monster') { &monster2; }
 elsif($mode eq 'rest') { &rest; }
 elsif($mode eq 'yado') { $spot = "宿屋"; &yado; }
 elsif($mode eq 'yado_in') { $spot = "宿屋"; &yado_in; }

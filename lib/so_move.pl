@@ -5,6 +5,8 @@ use utf8;
 
 sub move
 {
+	return;
+
 	our $marea = -1;
 	our $mspot = -1;
 	my $direction = $in{direction};
@@ -16,7 +18,7 @@ sub move
 		$kpst = 0;
 
 		# イベント
-		&event_encounter;
+		# &event_encounter;
 	}
 	elsif ($direction eq "town") # 街へ戻る
 	{
@@ -30,7 +32,7 @@ sub move
 		$kpst = 0;
 
 		# イベント
-		&event_encounter;
+		# &event_encounter;
 	}
 	elsif ($direction eq "next") # 次の街へ
 	{
