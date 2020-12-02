@@ -87,7 +87,8 @@ function set_position(pointer) {
 				width: 180,
 			});
 
-			offset.left = offset2.left + status.width() - status.offset().left;
+			// offset.left = offset2.left + status.width() - status.offset().left;
+			offset.left = offset2.left - status.offset().left + (status.width() / 2);
 
 			status.offset(offset);
 			status.draggable();
@@ -123,6 +124,24 @@ function set_position(pointer) {
 			float: "none",
 		});
 		left += (p.find("img").width() / 3) * 1.5;
+
+		p.unbind("click");
+		p.click((event) => {
+			const offset = jQuery(event.target).offset();
+			const status = pointer.find("div.status-" + key).clone();
+			jQuery("body").append(status);
+			status.show();
+			status.css({
+				zIndex: 99,
+				width: 180,
+			});
+
+			// offset.left = offset2.left + status.width() - status.offset().left;
+			offset.left = offset2.left - status.offset().left + (status.width() / 2);
+
+			status.offset(offset);
+			status.draggable();
+		});
 	});
 }
 

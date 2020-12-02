@@ -556,7 +556,7 @@ EOM
 
 	$battle_date[$j] = <<"EOM";
 <DIV id="sel$i">
-<TABLE BORDER=0>
+<TABLE BORDER=0 class="layer_table">
 $battle_date[$j]
 	</TD>
 </TR>

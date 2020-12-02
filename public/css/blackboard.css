@@ -13,7 +13,7 @@ see https://fantastech.net/dragon-quest-text
 
      */
     padding: 0.4rem 1rem 1rem 1.6rem;
-    font-size: 0.8rem;
+    font-size: 1.0rem;
     color: #fff;
     border: 2px solid #000;
     border-radius: 5px;
@@ -27,7 +27,6 @@ see https://fantastech.net/dragon-quest-text
 .blackboard .blink-before {
     /*
     font-size: 1.2rem;
-
      */
 }
 .blackboard a {
