@@ -99,13 +99,25 @@ function set_position(pointer) {
 	top = offset3.top;
 	left = offset3.left;
 
+	let max_height = 0;
+
+	// サイズの一番大きなキャラに合わせる為、max値を取得
+	keys2.forEach((key) => {
+		const p = pointer.find("div." + key);
+		if (max_height < p.height())
+		{
+			max_height = p.height();
+		}
+	});
+
 	keys2.forEach((key) => {
 		const p = pointer.find("div." + key);
 		p.show();
+		const top2 = top + max_height - p.height();
 		p.css({
 			position: "absolute",
 			zIndex: 1,
-			top: top,
+			top: top2,
 			left: left,
 			textAlign: "left",
 			float: "none",
