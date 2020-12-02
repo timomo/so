@@ -122,7 +122,7 @@ function set_position(pointer) {
 			textAlign: "left",
 			float: "none",
 		});
-		left += p.find("img").width() / 2;
+		left += (p.find("img").width() / 3) * 1.5;
 	});
 }
 
