@@ -63,6 +63,33 @@ function set_position(pointer) {
 		height: battle_stage.height() - height,
 	});
 
+	pointer.find("div.player .hp").each((index, elm) => {
+		const hp = jQuery(elm);
+		const name = hp.siblings("span.name");
+		const img = hp.siblings("img");
+		hp.css({
+			width: img.width(),
+			top: img.height() - hp.height(),
+		});
+		name.css({
+			width: img.width(),
+			top: img.height() - hp.height() - name.height(),
+		});
+	});
+	pointer.find("div.enemy .hp").each((index, elm) => {
+		const hp = jQuery(elm);
+		const name = hp.siblings("span.name");
+		const img = hp.siblings("img");
+		name.css({
+			width: img.width() / 2,
+			top: img.height(),
+		});
+		hp.css({
+			width: img.width() / 2,
+			top: img.height() + name.height(),
+		});
+	});
+
 	/* コマンドウインドウ設定開始 */
 
 	const command = jQuery("div.command-window");
@@ -87,7 +114,10 @@ function set_position(pointer) {
 			top: top,
 			left: left,
 			textAlign: "left",
+			/*
 			float: "none",
+			 */
+			display: "table-cell",
 		});
 
 		p.unbind("click");
@@ -232,7 +262,9 @@ jQuery(document).ready(() => {
 		jQuery("div[id^='sel']").hide();
 		sel.show();
 
-		lazy_load(pointer, 1);
+		lazy_load(pointer, 10);
+
+		jQuery("span.page").text(pointer);
 
 		document.command.sel.value = pointer;
 	};

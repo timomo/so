@@ -136,36 +136,56 @@ sub monster_step_run2
 <TD colspan="3">
 <div class="battle_stage">
 <div class="enemy">
-  	<div class="enemy1 non float-left">
+  	<div class="enemy1 non">
+    	<span class="name">$data->{"エネミー:1"}->{名前}</span>
+    	<span class="hp">HP: $data->{"エネミー:1"}->{HP}</span>
     	<img src="/img/enemy/mon_129r.gif" class="">
     </div>
-  	<div class="enemy2 non float-left">
+  	<div class="enemy2 non">
+    	<span class="name">$data->{"エネミー:2"}->{名前}</span>
+    	<span class="hp">HP: $data->{"エネミー:2"}->{HP}</span>
     	<img src="/img/enemy/mon_281.gif" class="">
     </div>
-  	<div class="enemy3 non float-left">
+  	<div class="enemy3 non">
+    	<span class="name">$data->{"エネミー:3"}->{名前}</span>
+    	<span class="hp">HP: $data->{"エネミー:3"}->{HP}</span>
     	<img src="/img/enemy/mon_282.gif" class="">
     </div>
-  	<div class="enemy4 non float-left">
+  	<div class="enemy4 non">
+    	<span class="name">$data->{"エネミー:4"}->{名前}</span>
+    	<span class="hp">HP: $data->{"エネミー:4"}->{HP}</span>
     	<img src="/img/enemy/mon_283.gif" class="">
     </div>
   	<div class="enemy5 non">
+    	<span class="name">$data->{"エネミー:5"}->{名前}</span>
+    	<span class="hp">HP: $data->{"エネミー:5"}->{HP}</span>
     	<img src="/img/enemy/mon_284.gif" class="">
     </div>
 </div>
 <div class="player">
-	<div class="player1 non float-left">
+	<div class="player1 non">
+		<span class="name">$data->{"プレイヤー:1"}->{名前}</span>
+  		<span class="hp">HP: $data->{"プレイヤー:1"}->{HP}</span>
   		<img src="/img/face/1008010101.png" class="mini" width="48">
   	</div>
-	<div class="player2 non float-left">
+	<div class="player2 non">
+		<span class="name">$data->{"プレイヤー:2"}->{名前}</span>
+  		<span class="hp">HP: $data->{"プレイヤー:2"}->{HP}</span>
   		<img src="/img/face/1009010101.png" class="mini" width="48">
   	</div>
-	<div class="player3 non float-left">
+	<div class="player3 non">
+		<span class="name">$data->{"プレイヤー:3"}->{名前}</span>
+  		<span class="hp">HP: $data->{"プレイヤー:3"}->{HP}</span>
   		<img src="/img/face/1010010101.png" class="mini" width="48">
   	</div>
-	<div class="player4 non float-left">
+	<div class="player4 non">
+		<span class="name">$data->{"プレイヤー:4"}->{名前}</span>
+  		<span class="hp">HP: $data->{"プレイヤー:4"}->{HP}</span>
   		<img src="/img/face/1011010101.png" class="mini" width="48">
   	</div>
 	<div class="player5 non">
+		<span class="name">$data->{"プレイヤー:5"}->{名前}</span>
+  		<span class="hp">HP: $data->{"プレイヤー:5"}->{HP}</span>
   		<img src="/img/face/1011010102.png" class="mini" width="48">
   	</div>
 </div>

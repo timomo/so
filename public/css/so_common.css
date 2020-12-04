@@ -173,3 +173,17 @@ table
 {
     z-index: 999;
 }
+
+.hp,
+.name
+{
+    position: absolute;
+    font-size: 0.6rem;
+    text-align: right;
+    text-shadow: 1px 2px 3px #000;
+}
+
+.name
+{
+    overflow-x: hidden;
+}
