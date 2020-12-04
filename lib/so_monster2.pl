@@ -1620,7 +1620,7 @@ sub display_monster_battle2
 	my $data = shift;
 
 	my $out = $controller->render_to_string(
-		template      => "battle",
+		template        => "battle",
 		'battle_header' => \@battle_header,
 		'battle_date'   => \@battle_date,
 		'battle_footer' => \@battle_footer,
@@ -1631,8 +1631,9 @@ sub display_monster_battle2
 		spot            => "モンスター",
 		mode            => "monster",
 		rid             => "",
-		k1id             => "",
-		k2id             => "",
+		k1id            => "",
+		k2id            => "",
+		last_sel        => &monster_get_sel_number(\@battle_date),
 	);
 
 	print Encode::encode_utf8($out);

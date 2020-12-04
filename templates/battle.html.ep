@@ -16,7 +16,7 @@
 
 % if ( scalar(@$battle_footer) != 0 ) {
 
-<DIV id="sel<%= scalar @$battle_date %>" style="display: none;">
+<DIV id="sel<%= $last_sel %>" style="display: none;">
 <div class="blackboard question">
 
 % for my $log (@$battle_footer) {
