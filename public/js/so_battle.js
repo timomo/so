@@ -218,6 +218,7 @@ jQuery(document).ready(() => {
 
 	const lazy_load = (pointer, timer) => {
 		const sel = jQuery("div#sel" + pointer);
+
 		setTimeout(() => {
 			set_position(sel);
 		}, timer);
@@ -262,7 +263,9 @@ jQuery(document).ready(() => {
 		jQuery("div[id^='sel']").hide();
 		sel.show();
 
-		lazy_load(pointer, 10);
+		// TODO: なぜか2回実行しないとうまく制御出来ない。。。
+		lazy_load(pointer, 5);
+		lazy_load(pointer, 100);
 
 		jQuery("span.page").text(pointer);
 
@@ -276,7 +279,6 @@ jQuery(document).ready(() => {
 
 	check(pointer);
 	func("current");
-	lazy_load(pointer, 500);
 
 	jQuery(".select-command").bind("mouseenter", (event) => {
 		jQuery(".select-command").removeClass("blink-before");

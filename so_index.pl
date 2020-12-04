@@ -118,7 +118,7 @@ if ($require_login == 1)
 				&event_reserved;
 			}
 
-			if (&is_continue_monster)
+			if (&is_continue_monster2)
 			{
 				&monster2;
 				exit;

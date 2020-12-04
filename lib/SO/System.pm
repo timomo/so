@@ -678,14 +678,23 @@ sub save_chara_db
         $dat->{$key} = $new->{$key};
     }
 
-    if (defined $row)
+    eval
     {
-        $self->dbi("main")->model("キャラ")->update($dat, where => {id => $dat->{id}}, mtime => "mtime");
-    }
-    else
+        if (defined $row)
+        {
+            $self->dbi("main")->model("キャラ")->update($dat, where => {id => $dat->{id}}, mtime => "mtime");
+        }
+        else
+        {
+            $self->dbi("main")->model("キャラ")->insert($dat, ctime => "ctime");
+        }
+    };
+    if ($@)
     {
-        $self->dbi("main")->model("キャラ")->insert($dat, ctime => "ctime");
+        warn Dump($dat);
+        die $@;
     }
+
 }
 
 sub save_append_db

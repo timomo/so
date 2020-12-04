@@ -574,8 +574,10 @@ EOM
 
 	$battle_date[$j] .= "</p>\n</div>\n";
 
+	my $sel_no = &monster_get_sel_number(\@battle_date);
+
 	$battle_date[$j] = <<"EOM";
-<DIV id="sel$i">
+<DIV id="sel$sel_no">
 <TABLE BORDER=0 class="layer_table">
 $battle_date[$j]
 	</TD>
@@ -586,12 +588,30 @@ EOM
 
 	# $battle_date[$j] = Encode::decode_utf8($battle_date[$j]);
 
+	$j++;
+
 	if($win > 0)
 	{
 		return 1;
 	}
 
 	return 0;
+}
+
+sub monster_get_sel_number
+{
+	my $battle_date = shift;
+	my $sel = 0;
+
+	for my $line (@$battle_date)
+	{
+		if ($line =~ /\sid="sel(\d+)"/s)
+		{
+			$sel = int($1);
+		}
+	}
+
+	return $sel + 1;
 }
 
 sub monster_initialize2
@@ -1070,10 +1090,127 @@ sub monster_stage_load2
 
 sub is_continue_monster2
 {
-	my $pvp = $mojo->entity("monster");
-	my $bool1;
-	$bool1 = $pvp->is_battle($kid);
-	return $bool1 == 1;
+	my $data = shift;
+	my $battle = File::Spec->catfile($FindBin::Bin, "save", "battle", $kid. ".monster.yaml");
+
+	if (! -f $battle)
+	{
+		return 0;
+	}
+	else
+	{
+		$data = &monster_stage_load2;
+		my $bool1 = &monster_judge_battle($data);
+		return $bool1 == 0 ? 1 : 0;
+	}
+}
+
+sub monster_select_target_random_player
+{
+	my $data = shift;
+	my @ret;
+
+	for my $key (keys %$data)
+	{
+		if ($key !~ /^プレイヤー:(\d+)$/)
+		{
+			next;
+		}
+		if ($data->{$key}->{HP} <= 0)
+		{
+			$data->{$key}->{HP} = 0;
+			next;
+		}
+		push(@ret, $1);
+	}
+
+	my $system = $mojo->entity("system");
+
+	if (scalar(@ret) == 0)
+	{
+		return undef;
+	}
+
+	return $ret[$system->range_rand(0, $#ret)];
+}
+
+sub monster_select_target_random_enemy
+{
+	my $data = shift;
+	my @ret;
+
+	for my $key (keys %$data)
+	{
+		if ($key !~ /^エネミー:(\d+)$/)
+		{
+			next;
+		}
+		if ($data->{$key}->{HP} <= 0)
+		{
+			$data->{$key}->{HP} = 0;
+			next;
+		}
+		push(@ret, $1);
+	}
+
+	my $system = $mojo->entity("system");
+
+	if (scalar(@ret) == 0)
+	{
+		return undef;
+	}
+
+	return $ret[$system->range_rand(0, $#ret)];
+}
+
+sub monster_attack_order
+{
+	my $data = shift;
+	my @ret;
+
+	for my $key (keys %$data)
+	{
+		if ($key !~ /^エネミー:(\d+)$/ && $key !~ /^プレイヤー:(\d+)$/)
+		{
+			next;
+		}
+		if ($data->{$key}->{HP} <= 0)
+		{
+			$data->{$key}->{HP} = 0;
+			next;
+		}
+		push(@ret, $key);
+	}
+
+	return Mojo::Collection->new(@ret)->shuffle;
+}
+
+sub monster_judge_battle # 0 .. 戦闘続行、1...プレイヤー勝利、2...モンスター勝利、3...相討ち
+{
+	my $data = shift;
+	my $pid = &monster_select_target_random_player($data);
+	my $eid = &monster_select_target_random_enemy($data);
+
+	if (defined $pid && defined $eid)
+	{
+		return 0;
+	}
+	elsif (defined $pid && ! defined $eid)
+	{
+		return 1;
+	}
+	elsif (! defined $pid && defined $eid)
+	{
+		return 2;
+	}
+	elsif (! defined $pid && ! defined $eid)
+	{
+		return 3;
+	}
+	else
+	{
+		die "pe";
+	}
 }
 
 sub monster2
@@ -1087,7 +1224,7 @@ sub monster2
 
 	# 途中データ確認
 	my $data;
-	if (&is_continue_monster2)
+	if (&is_continue_monster2($data))
 	{
 		$data = &monster_stage_load2;
 		&monster_stage_apply2($data);
@@ -1103,21 +1240,47 @@ sub monster2
 	}
 
 	# ここでユーザーを変えて疑似的に多人数バトルを試してみる
-	&monster_stage_apply_select_player($data, 1);
-	&monster_data_apply_select_monster($data, 1);
-	my $res = &monster_step_run2($data); # 1...終了,0...継続
-	$khp = $khp_flg;
-	$mhp = $mhp_flg;
-	&monster_data_apply_select_player($data, 1);
-	&monster_data_apply_select_monster($data, 1);
+	my @order = @{&monster_attack_order($data)->to_array};
 
-	if($j > 10)
+	for my $num (0 .. $#order)
 	{
-		&add_risk2;
-		$wrsk = $krsk;
+		if (&monster_judge_battle($data) == 0)
+		{
+			if ($data->{$order[$num]}->{HP} <= 0)
+			{
+				next;
+			}
+			my $pid = &monster_select_target_random_player($data);
+			my $eid = &monster_select_target_random_enemy($data);
+
+			&monster_stage_apply_select_player($data, $pid);
+			&monster_data_apply_select_monster($data, $eid);
+
+			my $res = &monster_step_run2($data); # 1...終了,0...継続
+			$khp = $khp_flg;
+			# $mhp = $mhp_flg;
+
+			&monster_data_apply_select_player($data, $pid);
+			&monster_data_apply_select_monster($data, $eid);
+
+			if($j > 10)
+			{
+				&add_risk2;
+				$wrsk = $krsk;
+			}
+		}
+		else
+		{
+			last;
+		}
 	}
 
-	if ($res == 0)
+	&monster_stage_apply_select_player($data, 1);
+	&monster_data_apply_select_player($data, 1);
+
+	$win = &monster_judge_battle($data);
+
+	if ($win == 0)
 	{
 		$turn++;
 		$i++;
@@ -1431,8 +1594,6 @@ sub display_monster_battle2
 		'battle_date'   => \@battle_date,
 		'battle_footer' => \@battle_footer,
 		j               => $j,
-		is_continue     => &is_continue_monster2 ? 1 : 0,
-		is_finished     => $win == 0 ? 0 : 1,
 		kid             => $kid,
 		kpass           => $kpass,
 		sel             => $in{sel} || -1,

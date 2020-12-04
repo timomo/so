@@ -185,5 +185,6 @@ table
 
 .name
 {
-    overflow-x: hidden;
+    white-space: nowrap;
+    overflow:hidden
 }
