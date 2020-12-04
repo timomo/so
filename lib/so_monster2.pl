@@ -1250,23 +1250,38 @@ sub monster2
 			{
 				next;
 			}
-			my $pid = &monster_select_target_random_player($data);
-			my $eid = &monster_select_target_random_enemy($data);
+			my $key = $order[$num];
+			my $pid;
+			my $eid;
 
-			&monster_stage_apply_select_player($data, $pid);
-			&monster_data_apply_select_monster($data, $eid);
-
-			my $res = &monster_step_run2($data); # 1...終了,0...継続
-			$khp = $khp_flg;
-			# $mhp = $mhp_flg;
-
-			&monster_data_apply_select_player($data, $pid);
-			&monster_data_apply_select_monster($data, $eid);
-
-			if($j > 10)
+			if ($key =~ /^プレイヤー:(\d+)$/)
 			{
-				&add_risk2;
-				$wrsk = $krsk;
+				$pid = int($1);
+				$eid = &monster_select_target_random_enemy($data);
+			}
+			elsif ($key =~ /^エネミー:(\d+)$/)
+			{
+				$eid = int($1);
+				$pid = &monster_select_target_random_player($data);
+			}
+
+			if (defined $eid && defined $pid)
+			{
+				&monster_stage_apply_select_player($data, $pid);
+				&monster_data_apply_select_monster($data, $eid);
+
+				my $res = &monster_step_run2($data); # 1...終了,0...継続
+				$khp = $khp_flg;
+				# $mhp = $mhp_flg;
+
+				&monster_data_apply_select_player($data, $pid);
+				&monster_data_apply_select_monster($data, $eid);
+
+				if($j > 10)
+				{
+					&add_risk2;
+					$wrsk = $krsk;
+				}
 			}
 		}
 		else
