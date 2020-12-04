@@ -614,6 +614,10 @@ sub monster_get_sel_number
 	return $sel + 1;
 }
 
+sub monster_rename_dup_chara_name
+{
+}
+
 sub monster_initialize2
 {
 	# キャラ読み出し
@@ -622,7 +626,14 @@ sub monster_initialize2
 	{
 		my $k = &chara_load($kid);
 		$k_party->[$no - 1] = $k;
+
+		if ($no != 1)
+		{
+			$k_party->[$no - 1]->{名前} .= $no;
+		}
 	}
+
+	&monster_rename_dup_chara_name();
 
 	$turn = 1;
 	$win = 0;
@@ -676,13 +687,18 @@ sub monster_initialize2
 	}
 
 	my @MONSTERNO = &load_ini($pop_enemy);
-	my $r_no = int(rand(@MONSTERNO));
-	my $mid = $MONSTERNO[$r_no];
 
 	for my $no (1 .. 5)
 	{
+		my $r_no = int(rand(@MONSTERNO));
+		my $mid = $MONSTERNO[$r_no];
 		my $m = &monster_load($mid);
 		$m_party->[$no - 1] = $m;
+
+		if ($no != 1)
+		{
+			$m_party->[$no - 1]->{名前} .= $no;
+		}
 	}
 
 	if($in{'c_name'}) { $kname = $in{'c_name'}; }
@@ -1268,7 +1284,7 @@ sub monster2
 			if (defined $eid && defined $pid)
 			{
 				&monster_stage_apply_select_player($data, $pid);
-				&monster_data_apply_select_monster($data, $eid);
+				&monster_stage_apply_select_monster($data, $eid);
 
 				my $res = &monster_step_run2($data); # 1...終了,0...継続
 				$khp = $khp_flg;
