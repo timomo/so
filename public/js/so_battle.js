@@ -264,8 +264,8 @@ jQuery(document).ready(() => {
 		sel.show();
 
 		// TODO: なぜか2回実行しないとうまく制御出来ない。。。
+		lazy_load(pointer, 1);
 		lazy_load(pointer, 5);
-		lazy_load(pointer, 100);
 
 		jQuery("span.page").text(pointer);
 
