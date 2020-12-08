@@ -1,0 +1,43 @@
+<%
+my $file = param("file");
+$file =~ s/\.json$//;
+my $path = File::Spec->catfile($FindBin::Bin, qw|public img enemy|, $file);
+my $realpath = File::Spec->catfile($FindBin::Bin, qw|public img enemy|, $file. ".gif");
+my $image = Image::Magick->new;
+$image->Read($realpath);
+my ($width, $height) = $image->Get("width", "height");
+%>
+{
+  "frames": {
+    "<%== $file %>.0.gif": { "frame": { "x": 0, "y": 0, "w": <%== $width %>, "h": <%== $height %> }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": <%== $width %>, "h": <%== $height %> }, "sourceSize": { "w": <%== $width %>, "h": <%== $height %> } }
+  },
+  "animations": {
+    "前進": ["<%== $file %>.0.gif"],
+    "突き": ["<%== $file %>.0.gif"],
+    "逃げる": ["<%== $file %>.0.gif"],
+    "通常待機": ["<%== $file %>.0.gif"],
+    "振り": ["<%== $file %>.0.gif"],
+    "勝利": ["<%== $file %>.0.gif"],
+    "詠唱待機": ["<%== $file %>.0.gif"],
+    "飛び道具": ["<%== $file %>.0.gif"],
+    "瀕死": ["<%== $file %>.0.gif"],
+    "防御": ["<%== $file %>.0.gif"],
+    "汎用スキル": ["<%== $file %>.0.gif"],
+    "状態異常": ["<%== $file %>.0.gif"],
+    "ダメージ": ["<%== $file %>.0.gif"],
+    "魔法": ["<%== $file %>.0.gif"],
+    "睡眠": ["<%== $file %>.0.gif"],
+    "回避": ["<%== $file %>.0.gif"],
+    "アイテム": ["<%== $file %>.0.gif"],
+    "戦闘不能": ["<%== $file %>.0.gif"]
+  },
+  "meta": {
+    "app": "http://ffa2.me/",
+    "version": "1.0",
+    "image": "/img/enemy/<%== $file %>.gif",
+    "format": "RGBA8888",
+    "size": {"w": <%== $width %>,"h": <%== $height %>},
+    "scale": "1",
+    "smartupdate": "$TexturePacker:SmartUpdate:9e3e5afd01ea8e418afabfbdcd724485$"
+  }
+}

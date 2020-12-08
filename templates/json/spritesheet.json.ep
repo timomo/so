@@ -1,0 +1,97 @@
+<%
+  my $file = param("file");
+  $file =~ s/\.json$//g;
+%>
+{
+  "frames": {
+    "<%== $file %>.0.png": { "frame": { "x": 0, "y": 0, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.1.png": { "frame": { "x": 64, "y": 0, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.2.png": { "frame": { "x": 128, "y": 0, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.3.png": { "frame": { "x": 192, "y": 0, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.4.png": { "frame": { "x": 256, "y": 0, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.5.png": { "frame": { "x": 320, "y": 0, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.6.png": { "frame": { "x": 384, "y": 0, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.7.png": { "frame": { "x": 448, "y": 0, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.8.png": { "frame": { "x": 512, "y": 0, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+
+    "<%== $file %>.9.png": { "frame": { "x": 0, "y": 64, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.10.png": { "frame": { "x": 64, "y": 64, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.11.png": { "frame": { "x": 128, "y": 64, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.12.png": { "frame": { "x": 192, "y": 64, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.13.png": { "frame": { "x": 256, "y": 64, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.14.png": { "frame": { "x": 320, "y": 64, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.15.png": { "frame": { "x": 384, "y": 64, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.16.png": { "frame": { "x": 448, "y": 64, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.17.png": { "frame": { "x": 512, "y": 64, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+
+    "<%== $file %>.18.png": { "frame": { "x": 0, "y": 128, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.19.png": { "frame": { "x": 64, "y": 128, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.20.png": { "frame": { "x": 128, "y": 128, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.21.png": { "frame": { "x": 192, "y": 128, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.22.png": { "frame": { "x": 256, "y": 128, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.23.png": { "frame": { "x": 320, "y": 128, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.24.png": { "frame": { "x": 384, "y": 128, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.25.png": { "frame": { "x": 448, "y": 128, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.26.png": { "frame": { "x": 512, "y": 128, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+
+    "<%== $file %>.27.png": { "frame": { "x": 0, "y": 192, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.28.png": { "frame": { "x": 64, "y": 192, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.29.png": { "frame": { "x": 128, "y": 192, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.30.png": { "frame": { "x": 192, "y": 192, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.31.png": { "frame": { "x": 256, "y": 192, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.32.png": { "frame": { "x": 320, "y": 192, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.33.png": { "frame": { "x": 384, "y": 192, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.34.png": { "frame": { "x": 448, "y": 192, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.35.png": { "frame": { "x": 512, "y": 192, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+
+    "<%== $file %>.36.png": { "frame": { "x": 0, "y": 256, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.37.png": { "frame": { "x": 64, "y": 256, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.38.png": { "frame": { "x": 128, "y": 256, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.39.png": { "frame": { "x": 192, "y": 256, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.40.png": { "frame": { "x": 256, "y": 256, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.41.png": { "frame": { "x": 320, "y": 256, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.42.png": { "frame": { "x": 384, "y": 256, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.43.png": { "frame": { "x": 448, "y": 256, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.44.png": { "frame": { "x": 512, "y": 256, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+
+    "<%== $file %>.45.png": { "frame": { "x": 0, "y": 320, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.46.png": { "frame": { "x": 64, "y": 320, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.47.png": { "frame": { "x": 128, "y": 320, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.48.png": { "frame": { "x": 192, "y": 320, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.49.png": { "frame": { "x": 256, "y": 320, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.50.png": { "frame": { "x": 320, "y": 320, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.51.png": { "frame": { "x": 384, "y": 320, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.52.png": { "frame": { "x": 448, "y": 320, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } },
+    "<%== $file %>.53.png": { "frame": { "x": 512, "y": 320, "w": 64, "h": 64 }, "rotated": false, "trimmed": false, "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 }, "sourceSize": { "w": 64, "h": 64 } }
+
+  },
+  "animations": {
+    "前進": ["<%== $file %>.0.png","<%== $file %>.1.png","<%== $file %>.2.png"],
+    "突き": ["<%== $file %>.3.png","<%== $file %>.4.png","<%== $file %>.5.png"],
+    "逃げる": ["<%== $file %>.6.png","<%== $file %>.7.png","<%== $file %>.8.png"],
+    "通常待機": ["<%== $file %>.9.png","<%== $file %>.10.png","<%== $file %>.11.png"],
+    "振り": ["<%== $file %>.12.png","<%== $file %>.13.png","<%== $file %>.14.png"],
+    "勝利": ["<%== $file %>.15.png","<%== $file %>.16.png","<%== $file %>.17.png"],
+    "詠唱待機": ["<%== $file %>.18.png","<%== $file %>.19.png","<%== $file %>.20.png"],
+    "飛び道具": ["<%== $file %>.21.png","<%== $file %>.22.png","<%== $file %>.23.png"],
+    "瀕死": ["<%== $file %>.24.png","<%== $file %>.25.png","<%== $file %>.26.png"],
+    "防御": ["<%== $file %>.27.png","<%== $file %>.28.png","<%== $file %>.29.png"],
+    "汎用スキル": ["<%== $file %>.30.png","<%== $file %>.31.png","<%== $file %>.32.png"],
+    "状態異常": ["<%== $file %>.33.png","<%== $file %>.34.png","<%== $file %>.35.png"],
+    "ダメージ": ["<%== $file %>.36.png","<%== $file %>.37.png","<%== $file %>.38.png"],
+    "魔法": ["<%== $file %>.39.png","<%== $file %>.40.png","<%== $file %>.41.png"],
+    "睡眠": ["<%== $file %>.42.png","<%== $file %>.43.png","<%== $file %>.44.png"],
+    "回避": ["<%== $file %>.45.png","<%== $file %>.46.png","<%== $file %>.47.png"],
+    "アイテム": ["<%== $file %>.48.png","<%== $file %>.49.png","<%== $file %>.50.png"],
+    "戦闘不能": ["<%== $file %>.51.png","<%== $file %>.52.png","<%== $file %>.53.png"]
+  },
+  "meta": {
+    "app": "http://ffa2.me/",
+    "version": "1.0",
+    "image": "/img/battle_use/<%== $file %>.png",
+    "format": "RGBA8888",
+    "size": {"w":576,"h":384},
+    "scale": "1",
+    "smartupdate": "$TexturePacker:SmartUpdate:9e3e5afd01ea8e418afabfbdcd724485$"
+  }
+}
