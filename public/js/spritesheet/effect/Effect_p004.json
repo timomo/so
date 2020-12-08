@@ -1,0 +1,183 @@
+{"frames": {
+  "Effect_p004.1.png": { "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 200,
+    "h": 200
+  },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 200,
+      "h": 200
+    },
+    "sourceSize": {
+      "w": 200,
+      "h": 200
+    }
+  },
+  "Effect_p004.2.png": {
+    "frame": {
+      "x": 200,
+      "y": 0,
+      "w": 200,
+      "h": 200
+    },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 200,
+      "h": 200
+    },
+    "sourceSize": {
+      "w": 200,
+      "h": 200
+    }
+  },
+  "Effect_p004.3.png": {
+    "frame": {
+      "x": 400,
+      "y": 0,
+      "w": 200,
+      "h": 200
+    },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 200,
+      "h": 200
+    },
+    "sourceSize": {
+      "w": 200,
+      "h": 200
+    }
+  },
+  "Effect_p004.4.png": {
+    "frame": {
+      "x": 600,
+      "y": 0,
+      "w": 200,
+      "h": 200
+    },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 200,
+      "h": 200
+    },
+    "sourceSize": {
+      "w": 200,
+      "h": 200
+    }
+  },
+  "Effect_p004.5.png": {
+    "frame": {
+      "x": 800,
+      "y": 0,
+      "w": 200,
+      "h": 200
+    },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 200,
+      "h": 200
+    },
+    "sourceSize": {
+      "w": 200,
+      "h": 200
+    }
+  },
+  "Effect_p004.6.png": {
+    "frame": {
+      "x": 1000,
+      "y": 0,
+      "w": 200,
+      "h": 200
+    },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 200,
+      "h": 200
+    },
+    "sourceSize": {
+      "w": 200,
+      "h": 200
+    }
+  },
+  "Effect_p004.7.png": {
+    "frame": {
+      "x": 1200,
+      "y": 0,
+      "w": 200,
+      "h": 200
+    },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 200,
+      "h": 200
+    },
+    "sourceSize": {
+      "w": 200,
+      "h": 200
+    }
+  },
+  "Effect_p004.8.png": {
+    "frame": {
+      "x": 1400,
+      "y": 0,
+      "w": 200,
+      "h": 200
+    },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 200,
+      "h": 200
+    },
+    "sourceSize": {
+      "w": 200,
+      "h": 200
+    }
+  }
+},
+  "animations": {
+    "default": [
+      "Effect_p004.1.png",
+      "Effect_p004.2.png",
+      "Effect_p004.3.png",
+      "Effect_p004.4.png",
+      "Effect_p004.5.png",
+      "Effect_p004.6.png",
+      "Effect_p004.7.png",
+      "Effect_p004.8.png"
+    ]
+  },
+  "meta": {
+    "app": "http://ffa2.me/",
+    "version": "1.0",
+    "image": "/img/effect/Effect_p004.png",
+    "format": "RGBA8888",
+    "size": {"w":1600,"h":200},
+    "scale": "1",
+    "smartupdate": "$TexturePacker:SmartUpdate:9e3e5afd01ea8e418afabfbdcd724485$"
+  }
+}

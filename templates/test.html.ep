@@ -1,0 +1,20 @@
+%= include "layouts/header"
+%= include "layouts/meta"
+%= include "layouts/javascript"
+%= include "layouts/javascript_default"
+%= include "layouts/sound"
+%= include "layouts/stylesheet"
+</head>
+<body>
+
+<script>
+const app = PIXI.Application({
+    height: 320,
+    width: 240,
+    resolution: window.devicePixelRatio || 1,
+    autoStart: true,
+    transparent: true,
+});
+</script>
+
+%= include "footer"

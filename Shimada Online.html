@@ -1,0 +1,6418 @@
+
+<!-- saved from url=(0026)http://127.0.0.1:3000/main -->
+<html><head>
+<title>Shimada Online</title>
+
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.1.3/howler.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+<script src="/js/third-party/jquery.jgrowl.js"></script>
+<script
+  src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"
+  integrity="sha256-T0Vest3yCU7pafRw9r+settMBX6JkKN06dqBnpQ8d30="
+  crossorigin="anonymous"></script>
+<script src="/js/third-party/pixi/pixi.js"></script>
+<script src="/js/third-party/pixi-spine/pixi-spine.js"></script>
+<script src="/js/third-party/pixi-projection/pixi-projection-spine.js"></script>
+
+<script>
+jQuery.jGrowl.defaults.position = "bottom-right";
+jQuery.jGrowl.defaults.theme = "so";
+</script>
+
+<script src="/js/sound.js"></script>
+<script>
+chara_config = {};
+chara_config["楽曲"] = "あり";
+chara_config["戦闘楽曲"] = "あり";
+chara_config["戦闘効果音"] = "あり";
+chara_config["音声"] = "あり";
+
+master_sound = [
+    {"id":1,"ファイル名":"NES-RPG-A02-2(Town1-Loop130).mp3","名称":"town1","ユニークid":"1","サウンド種別":"1"},
+    {"id":2,"ファイル名":"NES-RPG-B10-2(Dungeon2-Loop170).mp3","名称":"dungeon1","ユニークid":"2","サウンド種別":"1"},
+    {"id":3,"ファイル名":"GB-RPG-A12-2(Battle1-Loop157).mp3","名称":"battle1","ユニークid":"3","サウンド種別":"1"},
+    {"id":4,"ファイル名":"GB-RPG-A13-2(Battle2-Loop157).mp3","名称":"battle2","ユニークid":"4","サウンド種別":"1"},
+    {"id":5,"ファイル名":"se_maoudamashii_retro13.mp3","名称":"FF5","ユニークid":"5","サウンド種別":"1"},
+];
+</script>
+<script>
+	const info = ["","","","","","","","","",""];
+	const const_id = "tyomo88";
+</script>
+<script src="/js/so_town.js"></script>
+<style type="text/css">
+body {
+    color: #666666;
+    background-color: #FFFFFF;
+    background-image: url(http://www.ann.hi-ho.ne.jp/nakiri/image/bg.gif);
+}
+/*
+body,tr,td,th,table { font-size: 10.5pt; }
+ */
+a:hover   {
+    color: #FF0000;
+}
+a:link    {
+    color: #0000FF;
+}
+a:visited {
+    color: #800080;
+}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/so_common.css?time=1607388871" type="text/css" />
+<link rel="stylesheet" href="/css/blackboard.css" type="text/css" />
+<link rel="stylesheet" href="/css/third-party/jquery.jgrowl.css" type="text/css" />
+
+</head>
+<body>
+
+<div id="location" style="position: sticky; top: 0px; word-break: keep-all;"><div class="blackboard question" id="location_area">
+    <table border="0">
+        <tbody><tr>
+            <td class="b1">所持金</td>
+            <td>185</td>
+            <td class="b1">地名</td>
+            <td>マツシマ</td>
+            <td class="b1">場所</td>
+            <td>郊外</td>
+            <td id="td_logout">ログアウト</td>
+        </tr>
+        <tr>
+            <td rowspan="7">0:0:0:1</td>
+        </tr>
+    </tbody></table>
+</div>
+</div>
+
+<div id="stage"><a class="btn-first enable" href="javascript:void(0)">&lt;&lt;最初</a>&nbsp;&nbsp;<a class="btn-back enable" href="javascript:void(0)">&lt;戻る</a>
+<span class="page">14</span>
+<a class="btn-next" href="javascript:void(0)">次へ&gt;</a>&nbsp;&nbsp;<a class="btn-last" href="javascript:void(0)">最後&gt;&gt;</a>
+
+<div id="sel0" style="display: none;">
+<div class="blackboard question">
+    <br>
+    ちも は、マツラコーン に遭遇した！
+</div>
+</div>
+
+    
+    <div id="sel1" style="display: none;">
+<table border="0" class="layer_table">
+<tbody><tr>
+	<td class="b2" colspan="3" align="center">
+	1 ターン
+	</td>
+</tr>
+<tr>
+<td colspan="3">
+<div class="battle_stage">
+<div class="enemy">
+  	<div class="enemy1 non">
+    	<span class="name">マツラクダ</span>
+    	<span class="hp">HP: 28</span>
+    	<img src="/img/transparent.png" class="" width="104" height="128">
+    </div>
+  	<div class="enemy2 non">
+    	<span class="name">フライ2</span>
+    	<span class="hp">HP: 15</span>
+    	<img src="/img/transparent.png" class="" width="104" height="128">
+    </div>
+  	<div class="enemy3 non">
+    	<span class="name">フライ3</span>
+    	<span class="hp">HP: 19</span>
+    	<img src="/img/transparent.png" class="" width="104" height="128">
+    </div>
+  	<div class="enemy4 non">
+    	<span class="name">フライ4</span>
+    	<span class="hp">HP: 15</span>
+    	<img src="/img/transparent.png" class="" width="104" height="128">
+    </div>
+  	<div class="enemy5 non">
+    	<span class="name">マツラコーン5</span>
+    	<span class="hp">HP: 35</span>
+    	<img src="/img/transparent.png" class="" width="104" height="128">
+    </div>
+</div>
+<div class="player">
+	<div class="player1 non">
+		<span class="name">ちも</span>
+  		<span class="hp">HP: 172</span>
+  		<img src="/img/transparent.png" class="mini" width="48">
+  	</div>
+	<div class="player2 non">
+		<span class="name">ちも2</span>
+  		<span class="hp">HP: 172</span>
+  		<img src="/img/transparent.png" class="mini" width="48">
+  	</div>
+	<div class="player3 non">
+		<span class="name">ちも3</span>
+  		<span class="hp">HP: 172</span>
+  		<img src="/img/transparent.png" class="mini" width="48">
+  	</div>
+	<div class="player4 non">
+		<span class="name">ちも4</span>
+  		<span class="hp">HP: 172</span>
+  		<img src="/img/transparent.png" class="mini" width="48">
+  	</div>
+	<div class="player5 non">
+		<span class="name">ちも5</span>
+  		<span class="hp">HP: 172</span>
+  		<img src="/img/transparent.png" class="mini" width="48">
+  	</div>
+</div>
+<div class="battle_layer"></div>
+</div>
+</td>
+</tr>
+
+<tr>
+<td>
+
+<div class="blackboard question position-relative status-player1 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも</font>
+	</td>
+	<td>
+	172/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player2 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも2</font>
+	</td>
+	<td>
+	172/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player3 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも3</font>
+	</td>
+	<td>
+	172/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player4 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも4</font>
+	</td>
+	<td>
+	172/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player5 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも5</font>
+	</td>
+	<td>
+	172/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+
+</td>
+<td>
+<font color="#9999DD">VS</font>
+</td>
+<td>
+
+<div class="blackboard question position-relative status-enemy1 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	2
+	</td>
+	<td>
+	<font color="">マツラクダ</font>
+	</td>
+	<td>
+	28/28
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy2 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	1
+	</td>
+	<td>
+	<font color="">フライ2</font>
+	</td>
+	<td>
+	15/15
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy3 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	1
+	</td>
+	<td>
+	<font color="">フライ3</font>
+	</td>
+	<td>
+	19/19
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy4 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	1
+	</td>
+	<td>
+	<font color="">フライ4</font>
+	</td>
+	<td>
+	15/15
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy5 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	3
+	</td>
+	<td>
+	<font color="">マツラコーン5</font>
+	</td>
+	<td>
+	35/35
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+
+</td>
+</tr><tr>
+<td colspan="3">
+
+<div class="blackboard question">
+	<p>
+<font color="#666666">フライ2 は噛みついた！</font><br>  ちも5 は <font class="dmg"><b>1</b></font> のダメージ！</p><p><font color="#666666">ちも5 はトカレフ を構え、トリガーを引いた！<br></font> そして<b>1</b>回 ヒットし、 フライ2 に <font class="dmg"><b>1</b></font> のダメージ！ </p><p>スキル合計が限界に達した！</p><p>ちも5 は素早く次の散弾 を準備した！</p><p>スキル合計が限界に達した！</p><p></p>
+</div>
+
+	</td>
+</tr>
+</tbody></table>
+</div>
+
+    <div id="sel2" style="display: none;">
+<table border="0" class="layer_table">
+<tbody><tr>
+	<td class="b2" colspan="3" align="center">
+	1 ターン
+	</td>
+</tr>
+<tr>
+<td colspan="3">
+<div class="battle_stage">
+<div class="enemy">
+  	<div class="enemy1 non">
+    	<span class="name">マツラクダ</span>
+    	<span class="hp">HP: 28</span>
+    	<img src="/img/enemy/mon_129r.gif" class="">
+    </div>
+  	<div class="enemy2 non">
+    	<span class="name">フライ2</span>
+    	<span class="hp">HP: 14</span>
+    	<img src="/img/enemy/mon_281.gif" class="">
+    </div>
+  	<div class="enemy3 non">
+    	<span class="name">フライ3</span>
+    	<span class="hp">HP: 19</span>
+    	<img src="/img/enemy/mon_282.gif" class="">
+    </div>
+  	<div class="enemy4 non">
+    	<span class="name">フライ4</span>
+    	<span class="hp">HP: 15</span>
+    	<img src="/img/enemy/mon_283.gif" class="">
+    </div>
+  	<div class="enemy5 non">
+    	<span class="name">マツラコーン5</span>
+    	<span class="hp">HP: 35</span>
+    	<img src="/img/enemy/mon_284.gif" class="">
+    </div>
+</div>
+<div class="player">
+	<div class="player1 non">
+		<span class="name">ちも</span>
+  		<span class="hp">HP: 172</span>
+  		<img src="/img/face/1008010101.png" class="mini" width="48">
+  	</div>
+	<div class="player2 non">
+		<span class="name">ちも2</span>
+  		<span class="hp">HP: 172</span>
+  		<img src="/img/face/1009010101.png" class="mini" width="48">
+  	</div>
+	<div class="player3 non">
+		<span class="name">ちも3</span>
+  		<span class="hp">HP: 172</span>
+  		<img src="/img/face/1010010101.png" class="mini" width="48">
+  	</div>
+	<div class="player4 non">
+		<span class="name">ちも4</span>
+  		<span class="hp">HP: 172</span>
+  		<img src="/img/face/1011010101.png" class="mini" width="48">
+  	</div>
+	<div class="player5 non">
+		<span class="name">ちも5</span>
+  		<span class="hp">HP: 171</span>
+  		<img src="/img/face/1011010102.png" class="mini" width="48">
+  	</div>
+</div>
+<div class="battle_layer"></div>
+</div>
+</td>
+</tr>
+
+<tr>
+<td>
+
+<div class="blackboard question position-relative status-player1 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも</font>
+	</td>
+	<td>
+	172/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player2 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも2</font>
+	</td>
+	<td>
+	172/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player3 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも3</font>
+	</td>
+	<td>
+	172/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player4 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも4</font>
+	</td>
+	<td>
+	172/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player5 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも5</font>
+	</td>
+	<td>
+	171/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+
+</td>
+<td>
+<font color="#9999DD">VS</font>
+</td>
+<td>
+
+<div class="blackboard question position-relative status-enemy1 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	2
+	</td>
+	<td>
+	<font color="">マツラクダ</font>
+	</td>
+	<td>
+	28/28
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy2 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	1
+	</td>
+	<td>
+	<font color="">フライ2</font>
+	</td>
+	<td>
+	14/15
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy3 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	1
+	</td>
+	<td>
+	<font color="">フライ3</font>
+	</td>
+	<td>
+	19/19
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy4 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	1
+	</td>
+	<td>
+	<font color="">フライ4</font>
+	</td>
+	<td>
+	15/15
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy5 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	3
+	</td>
+	<td>
+	<font color="">マツラコーン5</font>
+	</td>
+	<td>
+	35/35
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+
+</td>
+</tr><tr>
+<td colspan="3">
+
+<div class="blackboard question">
+	<p>
+<font color="#666666">フライ2 は噛みついた！</font><br>  ちも は <font class="dmg"><b>4</b></font> のダメージ！</p><p><font color="#666666">ちも はトカレフ を構え、トリガーを引いた！<br></font> そして<b>1</b>回 ヒットし、 フライ2 に <font class="dmg"><b>1</b></font> のダメージ！ </p><p>スキル合計が限界に達した！</p><p>ちも は素早く次の散弾 を準備した！</p><p>スキル合計が限界に達した！</p><p></p>
+</div>
+
+	</td>
+</tr>
+</tbody></table>
+</div>
+
+    <div id="sel3" style="display: none;">
+<table border="0" class="layer_table">
+<tbody><tr>
+	<td class="b2" colspan="3" align="center">
+	1 ターン
+	</td>
+</tr>
+<tr>
+<td colspan="3">
+<div class="battle_stage">
+<div class="enemy">
+  	<div class="enemy1 non">
+    	<span class="name">マツラクダ</span>
+    	<span class="hp">HP: 28</span>
+    	<img src="./Shimada Online_files/mon_129r.gif" class="">
+    </div>
+  	<div class="enemy2 non">
+    	<span class="name">フライ2</span>
+    	<span class="hp">HP: 13</span>
+    	<img src="./Shimada Online_files/mon_281.gif" class="">
+    </div>
+  	<div class="enemy3 non">
+    	<span class="name">フライ3</span>
+    	<span class="hp">HP: 19</span>
+    	<img src="./Shimada Online_files/mon_282.gif" class="">
+    </div>
+  	<div class="enemy4 non">
+    	<span class="name">フライ4</span>
+    	<span class="hp">HP: 15</span>
+    	<img src="./Shimada Online_files/mon_283.gif" class="">
+    </div>
+  	<div class="enemy5 non">
+    	<span class="name">マツラコーン5</span>
+    	<span class="hp">HP: 35</span>
+    	<img src="./Shimada Online_files/mon_284.gif" class="">
+    </div>
+</div>
+<div class="player">
+	<div class="player1 non">
+		<span class="name">ちも</span>
+  		<span class="hp">HP: 167</span>
+  		<img src="./Shimada Online_files/1008010101.png" class="mini" width="48">
+  	</div>
+	<div class="player2 non">
+		<span class="name">ちも2</span>
+  		<span class="hp">HP: 172</span>
+  		<img src="./Shimada Online_files/1009010101.png" class="mini" width="48">
+  	</div>
+	<div class="player3 non">
+		<span class="name">ちも3</span>
+  		<span class="hp">HP: 172</span>
+  		<img src="./Shimada Online_files/1010010101.png" class="mini" width="48">
+  	</div>
+	<div class="player4 non">
+		<span class="name">ちも4</span>
+  		<span class="hp">HP: 172</span>
+  		<img src="./Shimada Online_files/1011010101.png" class="mini" width="48">
+  	</div>
+	<div class="player5 non">
+		<span class="name">ちも5</span>
+  		<span class="hp">HP: 171</span>
+  		<img src="./Shimada Online_files/1011010102.png" class="mini" width="48">
+  	</div>
+</div>
+<div class="battle_layer"></div>
+</div>
+</td>
+</tr>
+
+<tr>
+<td>
+
+<div class="blackboard question position-relative status-player1 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも</font>
+	</td>
+	<td>
+	167/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player2 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも2</font>
+	</td>
+	<td>
+	172/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player3 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも3</font>
+	</td>
+	<td>
+	172/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player4 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも4</font>
+	</td>
+	<td>
+	172/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player5 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも5</font>
+	</td>
+	<td>
+	171/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+
+</td>
+<td>
+<font color="#9999DD">VS</font>
+</td>
+<td>
+
+<div class="blackboard question position-relative status-enemy1 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	2
+	</td>
+	<td>
+	<font color="">マツラクダ</font>
+	</td>
+	<td>
+	28/28
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy2 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	1
+	</td>
+	<td>
+	<font color="">フライ2</font>
+	</td>
+	<td>
+	13/15
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy3 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	1
+	</td>
+	<td>
+	<font color="">フライ3</font>
+	</td>
+	<td>
+	19/19
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy4 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	1
+	</td>
+	<td>
+	<font color="">フライ4</font>
+	</td>
+	<td>
+	15/15
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy5 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	3
+	</td>
+	<td>
+	<font color="">マツラコーン5</font>
+	</td>
+	<td>
+	35/35
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+
+</td>
+</tr><tr>
+<td colspan="3">
+
+<div class="blackboard question">
+	<p>
+<font color="#666666">フライ4 は噛みついた！</font><br>  ちも4 は <font class="dmg"><b>1</b></font> のダメージ！</p><p><font color="#666666">ちも4 はトカレフ を構え、トリガーを引いた！<br></font> そして<b>1</b>回 ヒットし、 フライ4 に <font class="dmg"><b>1</b></font> のダメージ！ </p><p>スキル合計が限界に達した！</p><p>ちも4 は素早く次の散弾 を準備した！</p><p>スキル合計が限界に達した！</p><p></p>
+</div>
+
+	</td>
+</tr>
+</tbody></table>
+</div>
+
+    <div id="sel4" style="display: none;">
+<table border="0" class="layer_table">
+<tbody><tr>
+	<td class="b2" colspan="3" align="center">
+	1 ターン
+	</td>
+</tr>
+<tr>
+<td colspan="3">
+<div class="battle_stage">
+<div class="enemy">
+  	<div class="enemy1 non">
+    	<span class="name">マツラクダ</span>
+    	<span class="hp">HP: 28</span>
+    	<img src="./Shimada Online_files/mon_129r.gif" class="">
+    </div>
+  	<div class="enemy2 non">
+    	<span class="name">フライ2</span>
+    	<span class="hp">HP: 13</span>
+    	<img src="./Shimada Online_files/mon_281.gif" class="">
+    </div>
+  	<div class="enemy3 non">
+    	<span class="name">フライ3</span>
+    	<span class="hp">HP: 19</span>
+    	<img src="./Shimada Online_files/mon_282.gif" class="">
+    </div>
+  	<div class="enemy4 non">
+    	<span class="name">フライ4</span>
+    	<span class="hp">HP: 14</span>
+    	<img src="./Shimada Online_files/mon_283.gif" class="">
+    </div>
+  	<div class="enemy5 non">
+    	<span class="name">マツラコーン5</span>
+    	<span class="hp">HP: 35</span>
+    	<img src="./Shimada Online_files/mon_284.gif" class="">
+    </div>
+</div>
+<div class="player">
+	<div class="player1 non">
+		<span class="name">ちも</span>
+  		<span class="hp">HP: 167</span>
+  		<img src="./Shimada Online_files/1008010101.png" class="mini" width="48">
+  	</div>
+	<div class="player2 non">
+		<span class="name">ちも2</span>
+  		<span class="hp">HP: 172</span>
+  		<img src="./Shimada Online_files/1009010101.png" class="mini" width="48">
+  	</div>
+	<div class="player3 non">
+		<span class="name">ちも3</span>
+  		<span class="hp">HP: 172</span>
+  		<img src="./Shimada Online_files/1010010101.png" class="mini" width="48">
+  	</div>
+	<div class="player4 non">
+		<span class="name">ちも4</span>
+  		<span class="hp">HP: 166</span>
+  		<img src="./Shimada Online_files/1011010101.png" class="mini" width="48">
+  	</div>
+	<div class="player5 non">
+		<span class="name">ちも5</span>
+  		<span class="hp">HP: 171</span>
+  		<img src="./Shimada Online_files/1011010102.png" class="mini" width="48">
+  	</div>
+</div>
+<div class="battle_layer"></div>
+</div>
+</td>
+</tr>
+
+<tr>
+<td>
+
+<div class="blackboard question position-relative status-player1 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも</font>
+	</td>
+	<td>
+	167/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player2 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも2</font>
+	</td>
+	<td>
+	172/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player3 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも3</font>
+	</td>
+	<td>
+	172/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player4 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも4</font>
+	</td>
+	<td>
+	166/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player5 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも5</font>
+	</td>
+	<td>
+	171/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+
+</td>
+<td>
+<font color="#9999DD">VS</font>
+</td>
+<td>
+
+<div class="blackboard question position-relative status-enemy1 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	2
+	</td>
+	<td>
+	<font color="">マツラクダ</font>
+	</td>
+	<td>
+	28/28
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy2 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	1
+	</td>
+	<td>
+	<font color="">フライ2</font>
+	</td>
+	<td>
+	13/15
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy3 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	1
+	</td>
+	<td>
+	<font color="">フライ3</font>
+	</td>
+	<td>
+	19/19
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy4 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	1
+	</td>
+	<td>
+	<font color="">フライ4</font>
+	</td>
+	<td>
+	14/15
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy5 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	3
+	</td>
+	<td>
+	<font color="">マツラコーン5</font>
+	</td>
+	<td>
+	35/35
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+
+</td>
+</tr><tr>
+<td colspan="3">
+
+<div class="blackboard question">
+	<p>
+<font color="#666666">フライ2 は噛みついた！</font><br>  ちも4 は <font class="dmg"><b>1</b></font> のダメージ！</p><p><font color="#666666">ちも4 はトカレフ を構え、トリガーを引いた！<br></font> そして<b>1</b>回 ヒットし、 フライ2 に <font class="dmg"><b>18</b></font> のダメージ！ </p><p>スキル合計が限界に達した！</p><p>ちも4 は素早く次の散弾 を準備した！</p><p>スキル合計が限界に達した！</p><p></p>
+</div>
+
+	</td>
+</tr>
+</tbody></table>
+</div>
+
+    <div id="sel5" style="display: none;">
+<table border="0" class="layer_table">
+<tbody><tr>
+	<td class="b2" colspan="3" align="center">
+	1 ターン
+	</td>
+</tr>
+<tr>
+<td colspan="3">
+<div class="battle_stage">
+<div class="enemy">
+  	<div class="enemy1 non">
+    	<span class="name">マツラクダ</span>
+    	<span class="hp">HP: 28</span>
+    	<img src="./Shimada Online_files/mon_129r.gif" class="">
+    </div>
+  	<div class="enemy2 non">
+    	<span class="name">フライ2</span>
+    	<span class="hp">HP: 0</span>
+    	<img src="./Shimada Online_files/mon_281.gif" class="">
+    </div>
+  	<div class="enemy3 non">
+    	<span class="name">フライ3</span>
+    	<span class="hp">HP: 19</span>
+    	<img src="./Shimada Online_files/mon_282.gif" class="">
+    </div>
+  	<div class="enemy4 non">
+    	<span class="name">フライ4</span>
+    	<span class="hp">HP: 14</span>
+    	<img src="./Shimada Online_files/mon_283.gif" class="">
+    </div>
+  	<div class="enemy5 non">
+    	<span class="name">マツラコーン5</span>
+    	<span class="hp">HP: 35</span>
+    	<img src="./Shimada Online_files/mon_284.gif" class="">
+    </div>
+</div>
+<div class="player">
+	<div class="player1 non">
+		<span class="name">ちも</span>
+  		<span class="hp">HP: 167</span>
+  		<img src="./Shimada Online_files/1008010101.png" class="mini" width="48">
+  	</div>
+	<div class="player2 non">
+		<span class="name">ちも2</span>
+  		<span class="hp">HP: 172</span>
+  		<img src="./Shimada Online_files/1009010101.png" class="mini" width="48">
+  	</div>
+	<div class="player3 non">
+		<span class="name">ちも3</span>
+  		<span class="hp">HP: 172</span>
+  		<img src="./Shimada Online_files/1010010101.png" class="mini" width="48">
+  	</div>
+	<div class="player4 non">
+		<span class="name">ちも4</span>
+  		<span class="hp">HP: 165</span>
+  		<img src="./Shimada Online_files/1011010101.png" class="mini" width="48">
+  	</div>
+	<div class="player5 non">
+		<span class="name">ちも5</span>
+  		<span class="hp">HP: 171</span>
+  		<img src="./Shimada Online_files/1011010102.png" class="mini" width="48">
+  	</div>
+</div>
+<div class="battle_layer"></div>
+</div>
+</td>
+</tr>
+
+<tr>
+<td>
+
+<div class="blackboard question position-relative status-player1 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも</font>
+	</td>
+	<td>
+	167/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player2 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも2</font>
+	</td>
+	<td>
+	172/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player3 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも3</font>
+	</td>
+	<td>
+	172/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player4 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも4</font>
+	</td>
+	<td>
+	165/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player5 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも5</font>
+	</td>
+	<td>
+	171/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+
+</td>
+<td>
+<font color="#9999DD">VS</font>
+</td>
+<td>
+
+<div class="blackboard question position-relative status-enemy1 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	2
+	</td>
+	<td>
+	<font color="">マツラクダ</font>
+	</td>
+	<td>
+	28/28
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy2 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	1
+	</td>
+	<td>
+	<font color="">フライ2</font>
+	</td>
+	<td>
+	0/15
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy3 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	1
+	</td>
+	<td>
+	<font color="">フライ3</font>
+	</td>
+	<td>
+	19/19
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy4 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	1
+	</td>
+	<td>
+	<font color="">フライ4</font>
+	</td>
+	<td>
+	14/15
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy5 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	3
+	</td>
+	<td>
+	<font color="">マツラコーン5</font>
+	</td>
+	<td>
+	35/35
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+
+</td>
+</tr><tr>
+<td colspan="3">
+
+<div class="blackboard question">
+	<p>
+<font color="#666666">フライ4 は噛みついた！</font><br>  ちも2 は <font class="dmg"><b>4</b></font> のダメージ！</p><p><font color="#666666">ちも2 はトカレフ を構え、トリガーを引いた！<br></font> そして<b>1</b>回 ヒットし、 フライ4 に <font class="dmg"><b>1</b></font> のダメージ！ </p><p>スキル合計が限界に達した！</p><p>ちも2 は素早く次の散弾 を準備した！</p><p>スキル合計が限界に達した！</p><p></p>
+</div>
+
+	</td>
+</tr>
+</tbody></table>
+</div>
+
+    <div id="sel6" style="display: none;">
+<table border="0" class="layer_table">
+<tbody><tr>
+	<td class="b2" colspan="3" align="center">
+	1 ターン
+	</td>
+</tr>
+<tr>
+<td colspan="3">
+<div class="battle_stage">
+<div class="enemy">
+  	<div class="enemy1 non">
+    	<span class="name">マツラクダ</span>
+    	<span class="hp">HP: 28</span>
+    	<img src="./Shimada Online_files/mon_129r.gif" class="">
+    </div>
+  	<div class="enemy2 non">
+    	<span class="name">フライ2</span>
+    	<span class="hp">HP: 0</span>
+    	<img src="./Shimada Online_files/mon_281.gif" class="">
+    </div>
+  	<div class="enemy3 non">
+    	<span class="name">フライ3</span>
+    	<span class="hp">HP: 19</span>
+    	<img src="./Shimada Online_files/mon_282.gif" class="">
+    </div>
+  	<div class="enemy4 non">
+    	<span class="name">フライ4</span>
+    	<span class="hp">HP: 13</span>
+    	<img src="./Shimada Online_files/mon_283.gif" class="">
+    </div>
+  	<div class="enemy5 non">
+    	<span class="name">マツラコーン5</span>
+    	<span class="hp">HP: 35</span>
+    	<img src="./Shimada Online_files/mon_284.gif" class="">
+    </div>
+</div>
+<div class="player">
+	<div class="player1 non">
+		<span class="name">ちも</span>
+  		<span class="hp">HP: 167</span>
+  		<img src="./Shimada Online_files/1008010101.png" class="mini" width="48">
+  	</div>
+	<div class="player2 non">
+		<span class="name">ちも2</span>
+  		<span class="hp">HP: 161</span>
+  		<img src="./Shimada Online_files/1009010101.png" class="mini" width="48">
+  	</div>
+	<div class="player3 non">
+		<span class="name">ちも3</span>
+  		<span class="hp">HP: 172</span>
+  		<img src="./Shimada Online_files/1010010101.png" class="mini" width="48">
+  	</div>
+	<div class="player4 non">
+		<span class="name">ちも4</span>
+  		<span class="hp">HP: 165</span>
+  		<img src="./Shimada Online_files/1011010101.png" class="mini" width="48">
+  	</div>
+	<div class="player5 non">
+		<span class="name">ちも5</span>
+  		<span class="hp">HP: 171</span>
+  		<img src="./Shimada Online_files/1011010102.png" class="mini" width="48">
+  	</div>
+</div>
+<div class="battle_layer"></div>
+</div>
+</td>
+</tr>
+
+<tr>
+<td>
+
+<div class="blackboard question position-relative status-player1 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも</font>
+	</td>
+	<td>
+	167/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player2 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも2</font>
+	</td>
+	<td>
+	161/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player3 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも3</font>
+	</td>
+	<td>
+	172/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player4 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも4</font>
+	</td>
+	<td>
+	165/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player5 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも5</font>
+	</td>
+	<td>
+	171/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+
+</td>
+<td>
+<font color="#9999DD">VS</font>
+</td>
+<td>
+
+<div class="blackboard question position-relative status-enemy1 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	2
+	</td>
+	<td>
+	<font color="">マツラクダ</font>
+	</td>
+	<td>
+	28/28
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy2 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	1
+	</td>
+	<td>
+	<font color="">フライ2</font>
+	</td>
+	<td>
+	0/15
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy3 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	1
+	</td>
+	<td>
+	<font color="">フライ3</font>
+	</td>
+	<td>
+	19/19
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy4 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	1
+	</td>
+	<td>
+	<font color="">フライ4</font>
+	</td>
+	<td>
+	13/15
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy5 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	3
+	</td>
+	<td>
+	<font color="">マツラコーン5</font>
+	</td>
+	<td>
+	35/35
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+
+</td>
+</tr><tr>
+<td colspan="3">
+
+<div class="blackboard question">
+	<p>
+<font color="#666666">フライ4 は噛みついた！</font><br>  ちも3 は <font class="dmg"><b>4</b></font> のダメージ！</p><p><font color="#666666">ちも3 はトカレフ を構え、トリガーを引いた！<br></font> そして<b>1</b>回 ヒットし、 フライ4 に <font class="dmg"><b>1</b></font> のダメージ！ </p><p>スキル合計が限界に達した！</p><p>ちも3 は素早く次の散弾 を準備した！</p><p>スキル合計が限界に達した！</p><p></p>
+</div>
+
+	</td>
+</tr>
+</tbody></table>
+</div>
+
+    <div id="sel7" style="display: none;">
+<table border="0" class="layer_table">
+<tbody><tr>
+	<td class="b2" colspan="3" align="center">
+	1 ターン
+	</td>
+</tr>
+<tr>
+<td colspan="3">
+<div class="battle_stage">
+<div class="enemy">
+  	<div class="enemy1 non">
+    	<span class="name">マツラクダ</span>
+    	<span class="hp">HP: 28</span>
+    	<img src="./Shimada Online_files/mon_129r.gif" class="">
+    </div>
+  	<div class="enemy2 non">
+    	<span class="name">フライ2</span>
+    	<span class="hp">HP: 0</span>
+    	<img src="./Shimada Online_files/mon_281.gif" class="">
+    </div>
+  	<div class="enemy3 non">
+    	<span class="name">フライ3</span>
+    	<span class="hp">HP: 19</span>
+    	<img src="./Shimada Online_files/mon_282.gif" class="">
+    </div>
+  	<div class="enemy4 non">
+    	<span class="name">フライ4</span>
+    	<span class="hp">HP: 12</span>
+    	<img src="./Shimada Online_files/mon_283.gif" class="">
+    </div>
+  	<div class="enemy5 non">
+    	<span class="name">マツラコーン5</span>
+    	<span class="hp">HP: 35</span>
+    	<img src="./Shimada Online_files/mon_284.gif" class="">
+    </div>
+</div>
+<div class="player">
+	<div class="player1 non">
+		<span class="name">ちも</span>
+  		<span class="hp">HP: 167</span>
+  		<img src="./Shimada Online_files/1008010101.png" class="mini" width="48">
+  	</div>
+	<div class="player2 non">
+		<span class="name">ちも2</span>
+  		<span class="hp">HP: 161</span>
+  		<img src="./Shimada Online_files/1009010101.png" class="mini" width="48">
+  	</div>
+	<div class="player3 non">
+		<span class="name">ちも3</span>
+  		<span class="hp">HP: 157</span>
+  		<img src="./Shimada Online_files/1010010101.png" class="mini" width="48">
+  	</div>
+	<div class="player4 non">
+		<span class="name">ちも4</span>
+  		<span class="hp">HP: 165</span>
+  		<img src="./Shimada Online_files/1011010101.png" class="mini" width="48">
+  	</div>
+	<div class="player5 non">
+		<span class="name">ちも5</span>
+  		<span class="hp">HP: 171</span>
+  		<img src="./Shimada Online_files/1011010102.png" class="mini" width="48">
+  	</div>
+</div>
+<div class="battle_layer"></div>
+</div>
+</td>
+</tr>
+
+<tr>
+<td>
+
+<div class="blackboard question position-relative status-player1 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも</font>
+	</td>
+	<td>
+	167/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player2 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも2</font>
+	</td>
+	<td>
+	161/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player3 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも3</font>
+	</td>
+	<td>
+	157/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player4 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも4</font>
+	</td>
+	<td>
+	165/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player5 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも5</font>
+	</td>
+	<td>
+	171/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+
+</td>
+<td>
+<font color="#9999DD">VS</font>
+</td>
+<td>
+
+<div class="blackboard question position-relative status-enemy1 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	2
+	</td>
+	<td>
+	<font color="">マツラクダ</font>
+	</td>
+	<td>
+	28/28
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy2 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	1
+	</td>
+	<td>
+	<font color="">フライ2</font>
+	</td>
+	<td>
+	0/15
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy3 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	1
+	</td>
+	<td>
+	<font color="">フライ3</font>
+	</td>
+	<td>
+	19/19
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy4 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	1
+	</td>
+	<td>
+	<font color="">フライ4</font>
+	</td>
+	<td>
+	12/15
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy5 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	3
+	</td>
+	<td>
+	<font color="">マツラコーン5</font>
+	</td>
+	<td>
+	35/35
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+
+</td>
+</tr><tr>
+<td colspan="3">
+
+<div class="blackboard question">
+	<p>
+<font color="#666666">フライ3 は噛みついた！</font><br>  ちも4 は <font class="dmg"><b>1</b></font> のダメージ！</p><p><font color="#666666">ちも4 はトカレフ を構え、トリガーを引いた！<br></font> そして<b>1</b>回 ヒットし、 フライ3 に <font class="dmg"><b>18</b></font> のダメージ！ </p><p>スキル合計が限界に達した！</p><p>ちも4 は素早く次の散弾 を準備した！</p><p>スキル合計が限界に達した！</p><p></p>
+</div>
+
+	</td>
+</tr>
+</tbody></table>
+</div>
+
+    <div id="sel8" style="display: none;">
+<table border="0" class="layer_table">
+<tbody><tr>
+	<td class="b2" colspan="3" align="center">
+	1 ターン
+	</td>
+</tr>
+<tr>
+<td colspan="3">
+<div class="battle_stage">
+<div class="enemy">
+  	<div class="enemy1 non">
+    	<span class="name">マツラクダ</span>
+    	<span class="hp">HP: 28</span>
+    	<img src="./Shimada Online_files/mon_129r.gif" class="">
+    </div>
+  	<div class="enemy2 non">
+    	<span class="name">フライ2</span>
+    	<span class="hp">HP: 0</span>
+    	<img src="./Shimada Online_files/mon_281.gif" class="">
+    </div>
+  	<div class="enemy3 non">
+    	<span class="name">フライ3</span>
+    	<span class="hp">HP: 1</span>
+    	<img src="./Shimada Online_files/mon_282.gif" class="">
+    </div>
+  	<div class="enemy4 non">
+    	<span class="name">フライ4</span>
+    	<span class="hp">HP: 12</span>
+    	<img src="./Shimada Online_files/mon_283.gif" class="">
+    </div>
+  	<div class="enemy5 non">
+    	<span class="name">マツラコーン5</span>
+    	<span class="hp">HP: 35</span>
+    	<img src="./Shimada Online_files/mon_284.gif" class="">
+    </div>
+</div>
+<div class="player">
+	<div class="player1 non">
+		<span class="name">ちも</span>
+  		<span class="hp">HP: 167</span>
+  		<img src="./Shimada Online_files/1008010101.png" class="mini" width="48">
+  	</div>
+	<div class="player2 non">
+		<span class="name">ちも2</span>
+  		<span class="hp">HP: 161</span>
+  		<img src="./Shimada Online_files/1009010101.png" class="mini" width="48">
+  	</div>
+	<div class="player3 non">
+		<span class="name">ちも3</span>
+  		<span class="hp">HP: 157</span>
+  		<img src="./Shimada Online_files/1010010101.png" class="mini" width="48">
+  	</div>
+	<div class="player4 non">
+		<span class="name">ちも4</span>
+  		<span class="hp">HP: 156</span>
+  		<img src="./Shimada Online_files/1011010101.png" class="mini" width="48">
+  	</div>
+	<div class="player5 non">
+		<span class="name">ちも5</span>
+  		<span class="hp">HP: 171</span>
+  		<img src="./Shimada Online_files/1011010102.png" class="mini" width="48">
+  	</div>
+</div>
+<div class="battle_layer"></div>
+</div>
+</td>
+</tr>
+
+<tr>
+<td>
+
+<div class="blackboard question position-relative status-player1 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも</font>
+	</td>
+	<td>
+	167/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player2 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも2</font>
+	</td>
+	<td>
+	161/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player3 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも3</font>
+	</td>
+	<td>
+	157/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player4 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも4</font>
+	</td>
+	<td>
+	156/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player5 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも5</font>
+	</td>
+	<td>
+	171/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+
+</td>
+<td>
+<font color="#9999DD">VS</font>
+</td>
+<td>
+
+<div class="blackboard question position-relative status-enemy1 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	2
+	</td>
+	<td>
+	<font color="">マツラクダ</font>
+	</td>
+	<td>
+	28/28
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy2 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	1
+	</td>
+	<td>
+	<font color="">フライ2</font>
+	</td>
+	<td>
+	0/15
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy3 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	1
+	</td>
+	<td>
+	<font color="">フライ3</font>
+	</td>
+	<td>
+	1/19
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy4 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	1
+	</td>
+	<td>
+	<font color="">フライ4</font>
+	</td>
+	<td>
+	12/15
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy5 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	3
+	</td>
+	<td>
+	<font color="">マツラコーン5</font>
+	</td>
+	<td>
+	35/35
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+
+</td>
+</tr><tr>
+<td colspan="3">
+
+<div class="blackboard question">
+	<p>
+<font color="#666666">マツラコーン5 は引っかいた！</font><br>  ちも4 は <font class="dmg"><b>1</b></font> のダメージ！</p><p><font color="#666666">ちも4 はトカレフ を構え、トリガーを引いた！<br></font> そして<b>1</b>回 ヒットし、 マツラコーン5 に <font class="dmg"><b>18</b></font> のダメージ！ </p><p>スキル合計が限界に達した！</p><p>ちも4 は素早く次の散弾 を準備した！</p><p>スキル合計が限界に達した！</p><p></p>
+</div>
+
+	</td>
+</tr>
+</tbody></table>
+</div>
+
+    <div id="sel9" style="display: none;">
+<table border="0" class="layer_table">
+<tbody><tr>
+	<td class="b2" colspan="3" align="center">
+	1 ターン
+	</td>
+</tr>
+<tr>
+<td colspan="3">
+<div class="battle_stage">
+<div class="enemy">
+  	<div class="enemy1 non">
+    	<span class="name">マツラクダ</span>
+    	<span class="hp">HP: 28</span>
+    	<img src="./Shimada Online_files/mon_129r.gif" class="">
+    </div>
+  	<div class="enemy2 non">
+    	<span class="name">フライ2</span>
+    	<span class="hp">HP: 0</span>
+    	<img src="./Shimada Online_files/mon_281.gif" class="">
+    </div>
+  	<div class="enemy3 non">
+    	<span class="name">フライ3</span>
+    	<span class="hp">HP: 1</span>
+    	<img src="./Shimada Online_files/mon_282.gif" class="">
+    </div>
+  	<div class="enemy4 non">
+    	<span class="name">フライ4</span>
+    	<span class="hp">HP: 12</span>
+    	<img src="./Shimada Online_files/mon_283.gif" class="">
+    </div>
+  	<div class="enemy5 non">
+    	<span class="name">マツラコーン5</span>
+    	<span class="hp">HP: 17</span>
+    	<img src="./Shimada Online_files/mon_284.gif" class="">
+    </div>
+</div>
+<div class="player">
+	<div class="player1 non">
+		<span class="name">ちも</span>
+  		<span class="hp">HP: 167</span>
+  		<img src="./Shimada Online_files/1008010101.png" class="mini" width="48">
+  	</div>
+	<div class="player2 non">
+		<span class="name">ちも2</span>
+  		<span class="hp">HP: 161</span>
+  		<img src="./Shimada Online_files/1009010101.png" class="mini" width="48">
+  	</div>
+	<div class="player3 non">
+		<span class="name">ちも3</span>
+  		<span class="hp">HP: 157</span>
+  		<img src="./Shimada Online_files/1010010101.png" class="mini" width="48">
+  	</div>
+	<div class="player4 non">
+		<span class="name">ちも4</span>
+  		<span class="hp">HP: 155</span>
+  		<img src="./Shimada Online_files/1011010101.png" class="mini" width="48">
+  	</div>
+	<div class="player5 non">
+		<span class="name">ちも5</span>
+  		<span class="hp">HP: 171</span>
+  		<img src="./Shimada Online_files/1011010102.png" class="mini" width="48">
+  	</div>
+</div>
+<div class="battle_layer"></div>
+</div>
+</td>
+</tr>
+
+<tr>
+<td>
+
+<div class="blackboard question position-relative status-player1 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも</font>
+	</td>
+	<td>
+	167/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player2 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも2</font>
+	</td>
+	<td>
+	161/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player3 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも3</font>
+	</td>
+	<td>
+	157/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player4 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも4</font>
+	</td>
+	<td>
+	155/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player5 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも5</font>
+	</td>
+	<td>
+	171/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+
+</td>
+<td>
+<font color="#9999DD">VS</font>
+</td>
+<td>
+
+<div class="blackboard question position-relative status-enemy1 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	2
+	</td>
+	<td>
+	<font color="">マツラクダ</font>
+	</td>
+	<td>
+	28/28
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">0 %</font> / <font color="">0 %</font> / <font color="">0 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy2 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	1
+	</td>
+	<td>
+	<font color="">フライ2</font>
+	</td>
+	<td>
+	0/15
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy3 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	1
+	</td>
+	<td>
+	<font color="">フライ3</font>
+	</td>
+	<td>
+	1/19
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy4 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	1
+	</td>
+	<td>
+	<font color="">フライ4</font>
+	</td>
+	<td>
+	12/15
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy5 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	3
+	</td>
+	<td>
+	<font color="">マツラコーン5</font>
+	</td>
+	<td>
+	17/35
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+
+</td>
+</tr><tr>
+<td colspan="3">
+
+<div class="blackboard question">
+	<p>
+<font color="#666666">マツラクダ は引っかいた！</font><br>  ちも4 は <font class="dmg"><b>1</b></font> のダメージ！</p><p><font color="#666666">ちも4 はトカレフ を構え、トリガーを引いた！<br></font> そして<b>1</b>回 ヒットし、 マツラクダ に <font class="dmg"><b>18</b></font> のダメージ！ </p><p>スキル合計が限界に達した！</p><p>ちも4 は素早く次の散弾 を準備した！</p><p>スキル合計が限界に達した！</p><p></p>
+</div>
+
+	</td>
+</tr>
+</tbody></table>
+</div>
+
+    
+    <div id="sel10" style="display: none;">
+<table border="0" class="layer_table">
+<tbody><tr>
+	<td class="b2" colspan="3" align="center">
+	2 ターン
+	</td>
+</tr>
+<tr>
+<td colspan="3">
+<div class="battle_stage">
+<div class="enemy" style="height: 192px;">
+  	<div class="enemy1 non" style="display: block; position: absolute; z-index: 1; top: 125.391px; left: 0px; text-align: left; float: none;">
+    	<span class="name" style="width: 56px; top: 88px;">マツラクダ</span>
+    	<span class="hp" style="width: 56px; top: 98px;">HP: 10</span>
+    	<img src="./Shimada Online_files/mon_129r.gif" class="">
+    </div>
+  	<div class="enemy2 non" style="display: block; position: absolute; z-index: 1; top: 117.391px; left: 56px; text-align: left; float: none;">
+    	<span class="name" style="width: 64px; top: 96px;">フライ2</span>
+    	<span class="hp" style="width: 64px; top: 106px;">HP: 0</span>
+    	<img src="./Shimada Online_files/mon_281.gif" class="">
+    </div>
+  	<div class="enemy3 non" style="display: block; position: absolute; z-index: 1; top: 141.391px; left: 120px; text-align: left; float: none;">
+    	<span class="name" style="width: 24px; top: 72px;">フライ3</span>
+    	<span class="hp" style="width: 24px; top: 82px;">HP: 1</span>
+    	<img src="./Shimada Online_files/mon_282.gif" class="">
+    </div>
+  	<div class="enemy4 non" style="display: block; position: absolute; z-index: 1; top: 133.391px; left: 144px; text-align: left; float: none;">
+    	<span class="name" style="width: 56px; top: 80px;">フライ4</span>
+    	<span class="hp" style="width: 56px; top: 90px;">HP: 12</span>
+    	<img src="./Shimada Online_files/mon_283.gif" class="">
+    </div>
+  	<div class="enemy5 non" style="display: block; position: absolute; z-index: 1; top: 133.391px; left: 200px; text-align: left; float: none;">
+    	<span class="name" style="width: 40px; top: 80px;">マツラコーン5</span>
+    	<span class="hp" style="width: 40px; top: 90px;">HP: 17</span>
+    	<img src="./Shimada Online_files/mon_284.gif" class="">
+    </div>
+</div>
+<div class="player" style="height: 48px;">
+	<div class="player1 non" style="display: table-cell; position: absolute; z-index: 1; top: 309.391px; left: 272px; text-align: left;">
+		<span class="name" style="width: 48px; top: 28px;">ちも</span>
+  		<span class="hp" style="width: 48px; top: 38px;">HP: 167</span>
+  		<img src="./Shimada Online_files/1008010101.png" class="mini" width="48">
+  	</div>
+	<div class="player2 non" style="display: table-cell; position: absolute; z-index: 1; top: 309.391px; left: 224px; text-align: left;">
+		<span class="name" style="width: 48px; top: 28px;">ちも2</span>
+  		<span class="hp" style="width: 48px; top: 38px;">HP: 161</span>
+  		<img src="./Shimada Online_files/1009010101.png" class="mini" width="48">
+  	</div>
+	<div class="player3 non" style="display: table-cell; position: absolute; z-index: 1; top: 309.391px; left: 176px; text-align: left;">
+		<span class="name" style="width: 48px; top: 28px;">ちも3</span>
+  		<span class="hp" style="width: 48px; top: 38px;">HP: 157</span>
+  		<img src="./Shimada Online_files/1010010101.png" class="mini" width="48">
+  	</div>
+	<div class="player4 non" style="display: table-cell; position: absolute; z-index: 1; top: 309.391px; left: 128px; text-align: left;">
+		<span class="name" style="width: 48px; top: 28px;">ちも4</span>
+  		<span class="hp" style="width: 48px; top: 38px;">HP: 154</span>
+  		<img src="./Shimada Online_files/1011010101.png" class="mini" width="48">
+  	</div>
+	<div class="player5 non" style="display: table-cell; position: absolute; z-index: 1; top: 309.391px; left: 80px; text-align: left;">
+		<span class="name" style="width: 48px; top: 28px;">ちも5</span>
+  		<span class="hp" style="width: 48px; top: 38px;">HP: 171</span>
+  		<img src="./Shimada Online_files/1011010102.png" class="mini" width="48">
+  	</div>
+</div>
+<div class="battle_layer"></div>
+</div>
+</td>
+</tr>
+
+<tr>
+<td>
+
+<div class="blackboard question position-relative status-player1 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも</font>
+	</td>
+	<td>
+	167/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player2 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも2</font>
+	</td>
+	<td>
+	161/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player3 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも3</font>
+	</td>
+	<td>
+	157/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player4 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも4</font>
+	</td>
+	<td>
+	154/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player5 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも5</font>
+	</td>
+	<td>
+	171/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+
+</td>
+<td>
+<font color="#9999DD">VS</font>
+</td>
+<td>
+
+<div class="blackboard question position-relative status-enemy1 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	2
+	</td>
+	<td>
+	<font color="">マツラクダ</font>
+	</td>
+	<td>
+	10/28
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy2 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	1
+	</td>
+	<td>
+	<font color="">フライ2</font>
+	</td>
+	<td>
+	0/15
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy3 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	1
+	</td>
+	<td>
+	<font color="">フライ3</font>
+	</td>
+	<td>
+	1/19
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy4 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	1
+	</td>
+	<td>
+	<font color="">フライ4</font>
+	</td>
+	<td>
+	12/15
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy5 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	3
+	</td>
+	<td>
+	<font color="">マツラコーン5</font>
+	</td>
+	<td>
+	17/35
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+
+</td>
+</tr><tr>
+<td colspan="3">
+
+<div class="blackboard question">
+	<p>
+<font color="#666666">マツラクダ は引っかいた！</font><br>  ちも4 は <font class="dmg"><b>3</b></font> のダメージ！</p><p><font color="#666666">ちも4 はトカレフ を構え、トリガーを引いた！<br></font> そして<b>1</b>回 ヒットし、 マツラクダ に <font class="dmg"><b>19</b></font> のダメージ！ </p><p>スキル合計が限界に達した！</p><p>ちも4 は素早く次の散弾 を準備した！</p><p>スキル合計が限界に達した！</p><p></p>
+</div>
+
+	</td>
+</tr>
+</tbody></table>
+</div>
+
+    <div id="sel11" style="display: none;">
+<table border="0" class="layer_table">
+<tbody><tr>
+	<td class="b2" colspan="3" align="center">
+	2 ターン
+	</td>
+</tr>
+<tr>
+<td colspan="3">
+<div class="battle_stage">
+<div class="enemy" style="height: 192px;">
+  	<div class="enemy1 non" style="display: block; position: absolute; z-index: 1; top: 125.391px; left: 0px; text-align: left; float: none;">
+    	<span class="name" style="width: 56px; top: 88px;">マツラクダ</span>
+    	<span class="hp" style="width: 56px; top: 98px;">HP: 0</span>
+    	<img src="./Shimada Online_files/mon_129r.gif" class="">
+    </div>
+  	<div class="enemy2 non" style="display: block; position: absolute; z-index: 1; top: 117.391px; left: 56px; text-align: left; float: none;">
+    	<span class="name" style="width: 64px; top: 96px;">フライ2</span>
+    	<span class="hp" style="width: 64px; top: 106px;">HP: 0</span>
+    	<img src="./Shimada Online_files/mon_281.gif" class="">
+    </div>
+  	<div class="enemy3 non" style="display: block; position: absolute; z-index: 1; top: 141.391px; left: 120px; text-align: left; float: none;">
+    	<span class="name" style="width: 24px; top: 72px;">フライ3</span>
+    	<span class="hp" style="width: 24px; top: 82px;">HP: 1</span>
+    	<img src="./Shimada Online_files/mon_282.gif" class="">
+    </div>
+  	<div class="enemy4 non" style="display: block; position: absolute; z-index: 1; top: 133.391px; left: 144px; text-align: left; float: none;">
+    	<span class="name" style="width: 56px; top: 80px;">フライ4</span>
+    	<span class="hp" style="width: 56px; top: 90px;">HP: 12</span>
+    	<img src="./Shimada Online_files/mon_283.gif" class="">
+    </div>
+  	<div class="enemy5 non" style="display: block; position: absolute; z-index: 1; top: 133.391px; left: 200px; text-align: left; float: none;">
+    	<span class="name" style="width: 40px; top: 80px;">マツラコーン5</span>
+    	<span class="hp" style="width: 40px; top: 90px;">HP: 17</span>
+    	<img src="./Shimada Online_files/mon_284.gif" class="">
+    </div>
+</div>
+<div class="player" style="height: 48px;">
+	<div class="player1 non" style="display: table-cell; position: absolute; z-index: 1; top: 309.391px; left: 272px; text-align: left;">
+		<span class="name" style="width: 48px; top: 28px;">ちも</span>
+  		<span class="hp" style="width: 48px; top: 38px;">HP: 167</span>
+  		<img src="./Shimada Online_files/1008010101.png" class="mini" width="48">
+  	</div>
+	<div class="player2 non" style="display: table-cell; position: absolute; z-index: 1; top: 309.391px; left: 224px; text-align: left;">
+		<span class="name" style="width: 48px; top: 28px;">ちも2</span>
+  		<span class="hp" style="width: 48px; top: 38px;">HP: 161</span>
+  		<img src="./Shimada Online_files/1009010101.png" class="mini" width="48">
+  	</div>
+	<div class="player3 non" style="display: table-cell; position: absolute; z-index: 1; top: 309.391px; left: 176px; text-align: left;">
+		<span class="name" style="width: 48px; top: 28px;">ちも3</span>
+  		<span class="hp" style="width: 48px; top: 38px;">HP: 157</span>
+  		<img src="./Shimada Online_files/1010010101.png" class="mini" width="48">
+  	</div>
+	<div class="player4 non" style="display: table-cell; position: absolute; z-index: 1; top: 309.391px; left: 128px; text-align: left;">
+		<span class="name" style="width: 48px; top: 28px;">ちも4</span>
+  		<span class="hp" style="width: 48px; top: 38px;">HP: 151</span>
+  		<img src="./Shimada Online_files/1011010101.png" class="mini" width="48">
+  	</div>
+	<div class="player5 non" style="display: table-cell; position: absolute; z-index: 1; top: 309.391px; left: 80px; text-align: left;">
+		<span class="name" style="width: 48px; top: 28px;">ちも5</span>
+  		<span class="hp" style="width: 48px; top: 38px;">HP: 171</span>
+  		<img src="./Shimada Online_files/1011010102.png" class="mini" width="48">
+  	</div>
+</div>
+<div class="battle_layer"></div>
+</div>
+</td>
+</tr>
+
+<tr>
+<td>
+
+<div class="blackboard question position-relative status-player1 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも</font>
+	</td>
+	<td>
+	167/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player2 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも2</font>
+	</td>
+	<td>
+	161/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player3 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも3</font>
+	</td>
+	<td>
+	157/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player4 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも4</font>
+	</td>
+	<td>
+	151/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player5 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも5</font>
+	</td>
+	<td>
+	171/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+
+</td>
+<td>
+<font color="#9999DD">VS</font>
+</td>
+<td>
+
+<div class="blackboard question position-relative status-enemy1 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	2
+	</td>
+	<td>
+	<font color="">マツラクダ</font>
+	</td>
+	<td>
+	0/28
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy2 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	1
+	</td>
+	<td>
+	<font color="">フライ2</font>
+	</td>
+	<td>
+	0/15
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy3 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	1
+	</td>
+	<td>
+	<font color="">フライ3</font>
+	</td>
+	<td>
+	1/19
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy4 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	1
+	</td>
+	<td>
+	<font color="">フライ4</font>
+	</td>
+	<td>
+	12/15
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy5 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	3
+	</td>
+	<td>
+	<font color="">マツラコーン5</font>
+	</td>
+	<td>
+	17/35
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+
+</td>
+</tr><tr>
+<td colspan="3">
+
+<div class="blackboard question">
+	<p>
+<font color="#666666">マツラコーン5 は引っかいた！</font><br>  ちも は <font class="dmg"><b>4</b></font> のダメージ！</p><p><font color="#666666">ちも はトカレフ を構え、トリガーを引いた！<br></font> そして<b>1</b>回 ヒットし、 マツラコーン5 に <font class="dmg"><b>18</b></font> のダメージ！ </p><p>スキル合計が限界に達した！</p><p>ちも は素早く次の散弾 を準備した！</p><p>スキル合計が限界に達した！</p><p></p>
+</div>
+
+	</td>
+</tr>
+</tbody></table>
+</div>
+
+    <div id="sel12" style="display: none;">
+<table border="0" class="layer_table">
+<tbody><tr>
+	<td class="b2" colspan="3" align="center">
+	2 ターン
+	</td>
+</tr>
+<tr>
+<td colspan="3">
+<div class="battle_stage">
+<div class="enemy" style="height: 192px;">
+  	<div class="enemy1 non" style="display: block; position: absolute; z-index: 1; top: 125.391px; left: 0px; text-align: left; float: none;">
+    	<span class="name" style="width: 56px; top: 88px;">マツラクダ</span>
+    	<span class="hp" style="width: 56px; top: 98px;">HP: 0</span>
+    	<img src="./Shimada Online_files/mon_129r.gif" class="">
+    </div>
+  	<div class="enemy2 non" style="display: block; position: absolute; z-index: 1; top: 117.391px; left: 56px; text-align: left; float: none;">
+    	<span class="name" style="width: 64px; top: 96px;">フライ2</span>
+    	<span class="hp" style="width: 64px; top: 106px;">HP: 0</span>
+    	<img src="./Shimada Online_files/mon_281.gif" class="">
+    </div>
+  	<div class="enemy3 non" style="display: block; position: absolute; z-index: 1; top: 141.391px; left: 120px; text-align: left; float: none;">
+    	<span class="name" style="width: 24px; top: 72px;">フライ3</span>
+    	<span class="hp" style="width: 24px; top: 82px;">HP: 1</span>
+    	<img src="./Shimada Online_files/mon_282.gif" class="">
+    </div>
+  	<div class="enemy4 non" style="display: block; position: absolute; z-index: 1; top: 133.391px; left: 144px; text-align: left; float: none;">
+    	<span class="name" style="width: 56px; top: 80px;">フライ4</span>
+    	<span class="hp" style="width: 56px; top: 90px;">HP: 12</span>
+    	<img src="./Shimada Online_files/mon_283.gif" class="">
+    </div>
+  	<div class="enemy5 non" style="display: block; position: absolute; z-index: 1; top: 133.391px; left: 200px; text-align: left; float: none;">
+    	<span class="name" style="width: 40px; top: 80px;">マツラコーン5</span>
+    	<span class="hp" style="width: 40px; top: 90px;">HP: 0</span>
+    	<img src="./Shimada Online_files/mon_284.gif" class="">
+    </div>
+</div>
+<div class="player" style="height: 48px;">
+	<div class="player1 non" style="display: table-cell; position: absolute; z-index: 1; top: 309.391px; left: 272px; text-align: left;">
+		<span class="name" style="width: 48px; top: 28px;">ちも</span>
+  		<span class="hp" style="width: 48px; top: 38px;">HP: 147</span>
+  		<img src="./Shimada Online_files/1008010101.png" class="mini" width="48">
+  	</div>
+	<div class="player2 non" style="display: table-cell; position: absolute; z-index: 1; top: 309.391px; left: 224px; text-align: left;">
+		<span class="name" style="width: 48px; top: 28px;">ちも2</span>
+  		<span class="hp" style="width: 48px; top: 38px;">HP: 161</span>
+  		<img src="./Shimada Online_files/1009010101.png" class="mini" width="48">
+  	</div>
+	<div class="player3 non" style="display: table-cell; position: absolute; z-index: 1; top: 309.391px; left: 176px; text-align: left;">
+		<span class="name" style="width: 48px; top: 28px;">ちも3</span>
+  		<span class="hp" style="width: 48px; top: 38px;">HP: 157</span>
+  		<img src="./Shimada Online_files/1010010101.png" class="mini" width="48">
+  	</div>
+	<div class="player4 non" style="display: table-cell; position: absolute; z-index: 1; top: 309.391px; left: 128px; text-align: left;">
+		<span class="name" style="width: 48px; top: 28px;">ちも4</span>
+  		<span class="hp" style="width: 48px; top: 38px;">HP: 151</span>
+  		<img src="./Shimada Online_files/1011010101.png" class="mini" width="48">
+  	</div>
+	<div class="player5 non" style="display: table-cell; position: absolute; z-index: 1; top: 309.391px; left: 80px; text-align: left;">
+		<span class="name" style="width: 48px; top: 28px;">ちも5</span>
+  		<span class="hp" style="width: 48px; top: 38px;">HP: 171</span>
+  		<img src="./Shimada Online_files/1011010102.png" class="mini" width="48">
+  	</div>
+</div>
+<div class="battle_layer"></div>
+</div>
+</td>
+</tr>
+
+<tr>
+<td>
+
+<div class="blackboard question position-relative status-player1 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも</font>
+	</td>
+	<td>
+	147/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player2 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも2</font>
+	</td>
+	<td>
+	161/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player3 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも3</font>
+	</td>
+	<td>
+	157/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player4 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも4</font>
+	</td>
+	<td>
+	151/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player5 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも5</font>
+	</td>
+	<td>
+	171/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+
+</td>
+<td>
+<font color="#9999DD">VS</font>
+</td>
+<td>
+
+<div class="blackboard question position-relative status-enemy1 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	2
+	</td>
+	<td>
+	<font color="">マツラクダ</font>
+	</td>
+	<td>
+	0/28
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy2 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	1
+	</td>
+	<td>
+	<font color="">フライ2</font>
+	</td>
+	<td>
+	0/15
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy3 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	1
+	</td>
+	<td>
+	<font color="">フライ3</font>
+	</td>
+	<td>
+	1/19
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy4 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	1
+	</td>
+	<td>
+	<font color="">フライ4</font>
+	</td>
+	<td>
+	12/15
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy5 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	3
+	</td>
+	<td>
+	<font color="">マツラコーン5</font>
+	</td>
+	<td>
+	0/35
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+
+</td>
+</tr><tr>
+<td colspan="3">
+
+<div class="blackboard question">
+	<p>
+<font color="#666666">フライ4 は噛みついた！</font><br>  ちも は <font class="dmg"><b>2</b></font> のダメージ！</p><p><font color="#666666">ちも はトカレフ を構え、トリガーを引いた！<br></font> そして<b>1</b>回 ヒットし、 フライ4 に <font class="dmg"><b>19</b></font> のダメージ！ </p><p>スキル合計が限界に達した！</p><p>ちも は素早く次の散弾 を準備した！</p><p>スキル合計が限界に達した！</p><p></p>
+</div>
+
+	</td>
+</tr>
+</tbody></table>
+</div>
+
+    <div id="sel13" style="display: none;">
+<table border="0" class="layer_table">
+<tbody><tr>
+	<td class="b2" colspan="3" align="center">
+	2 ターン
+	</td>
+</tr>
+<tr>
+<td colspan="3">
+<div class="battle_stage">
+<div class="enemy" style="height: 192px;">
+  	<div class="enemy1 non" style="display: block; position: absolute; z-index: 1; top: 125.391px; left: 0px; text-align: left; float: none;">
+    	<span class="name" style="width: 56px; top: 88px;">マツラクダ</span>
+    	<span class="hp" style="width: 56px; top: 98px;">HP: 0</span>
+    	<img src="./Shimada Online_files/mon_129r.gif" class="">
+    </div>
+  	<div class="enemy2 non" style="display: block; position: absolute; z-index: 1; top: 117.391px; left: 56px; text-align: left; float: none;">
+    	<span class="name" style="width: 64px; top: 96px;">フライ2</span>
+    	<span class="hp" style="width: 64px; top: 106px;">HP: 0</span>
+    	<img src="./Shimada Online_files/mon_281.gif" class="">
+    </div>
+  	<div class="enemy3 non" style="display: block; position: absolute; z-index: 1; top: 141.391px; left: 120px; text-align: left; float: none;">
+    	<span class="name" style="width: 24px; top: 72px;">フライ3</span>
+    	<span class="hp" style="width: 24px; top: 82px;">HP: 1</span>
+    	<img src="./Shimada Online_files/mon_282.gif" class="">
+    </div>
+  	<div class="enemy4 non" style="display: block; position: absolute; z-index: 1; top: 133.391px; left: 144px; text-align: left; float: none;">
+    	<span class="name" style="width: 56px; top: 80px;">フライ4</span>
+    	<span class="hp" style="width: 56px; top: 90px;">HP: 0</span>
+    	<img src="./Shimada Online_files/mon_283.gif" class="">
+    </div>
+  	<div class="enemy5 non" style="display: block; position: absolute; z-index: 1; top: 133.391px; left: 200px; text-align: left; float: none;">
+    	<span class="name" style="width: 40px; top: 80px;">マツラコーン5</span>
+    	<span class="hp" style="width: 40px; top: 90px;">HP: 0</span>
+    	<img src="./Shimada Online_files/mon_284.gif" class="">
+    </div>
+</div>
+<div class="player" style="height: 48px;">
+	<div class="player1 non" style="display: table-cell; position: absolute; z-index: 1; top: 309.391px; left: 272px; text-align: left;">
+		<span class="name" style="width: 48px; top: 28px;">ちも</span>
+  		<span class="hp" style="width: 48px; top: 38px;">HP: 145</span>
+  		<img src="./Shimada Online_files/1008010101.png" class="mini" width="48">
+  	</div>
+	<div class="player2 non" style="display: table-cell; position: absolute; z-index: 1; top: 309.391px; left: 224px; text-align: left;">
+		<span class="name" style="width: 48px; top: 28px;">ちも2</span>
+  		<span class="hp" style="width: 48px; top: 38px;">HP: 161</span>
+  		<img src="./Shimada Online_files/1009010101.png" class="mini" width="48">
+  	</div>
+	<div class="player3 non" style="display: table-cell; position: absolute; z-index: 1; top: 309.391px; left: 176px; text-align: left;">
+		<span class="name" style="width: 48px; top: 28px;">ちも3</span>
+  		<span class="hp" style="width: 48px; top: 38px;">HP: 157</span>
+  		<img src="./Shimada Online_files/1010010101.png" class="mini" width="48">
+  	</div>
+	<div class="player4 non" style="display: table-cell; position: absolute; z-index: 1; top: 309.391px; left: 128px; text-align: left;">
+		<span class="name" style="width: 48px; top: 28px;">ちも4</span>
+  		<span class="hp" style="width: 48px; top: 38px;">HP: 151</span>
+  		<img src="./Shimada Online_files/1011010101.png" class="mini" width="48">
+  	</div>
+	<div class="player5 non" style="display: table-cell; position: absolute; z-index: 1; top: 309.391px; left: 80px; text-align: left;">
+		<span class="name" style="width: 48px; top: 28px;">ちも5</span>
+  		<span class="hp" style="width: 48px; top: 38px;">HP: 171</span>
+  		<img src="./Shimada Online_files/1011010102.png" class="mini" width="48">
+  	</div>
+</div>
+<div class="battle_layer"></div>
+</div>
+</td>
+</tr>
+
+<tr>
+<td>
+
+<div class="blackboard question position-relative status-player1 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも</font>
+	</td>
+	<td>
+	145/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player2 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも2</font>
+	</td>
+	<td>
+	161/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player3 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも3</font>
+	</td>
+	<td>
+	157/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player4 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも4</font>
+	</td>
+	<td>
+	151/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-player5 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	8
+	</td>
+	<td>
+	<font color="">ちも5</font>
+	</td>
+	<td>
+	171/172
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+
+</td>
+<td>
+<font color="#9999DD">VS</font>
+</td>
+<td>
+
+<div class="blackboard question position-relative status-enemy1 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	2
+	</td>
+	<td>
+	<font color="">マツラクダ</font>
+	</td>
+	<td>
+	0/28
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy2 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	1
+	</td>
+	<td>
+	<font color="">フライ2</font>
+	</td>
+	<td>
+	0/15
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy3 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	1
+	</td>
+	<td>
+	<font color="">フライ3</font>
+	</td>
+	<td>
+	1/19
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy4 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	1
+	</td>
+	<td>
+	<font color="">フライ4</font>
+	</td>
+	<td>
+	0/15
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+<div class="blackboard question position-relative status-enemy5 non">
+<div class="menu-close" style="float: right; cursor: pointer">×</div>
+		<table border="0">
+<tbody><tr>
+	<td class="b1">
+	LV
+	</td>
+	<td class="b1">
+	名前
+	</td>
+	<td class="b1">
+	HP
+	</td>
+</tr>
+<tr>
+	<td>
+	3
+	</td>
+	<td>
+	<font color="">マツラコーン5</font>
+	</td>
+	<td>
+	0/35
+	</td>
+</tr>
+<tr>
+	<td class="b1" colspan="3" align="center">
+	効果 攻/防/速
+	</td>
+</tr>
+<tr>
+	<td colspan="3" align="center">
+	<font color="">50 %</font> / <font color="">50 %</font> / <font color="">50 %</font> 
+	</td>
+</tr>
+</tbody></table>
+
+</div>
+
+</td>
+</tr><tr>
+<td colspan="3">
+
+<div class="blackboard question">
+	<p>
+<font color="#666666">フライ3 は噛みついた！</font><br>  ちも3 は <font class="dmg"><b>1</b></font> のダメージ！</p><p><font color="#666666">ちも3 はトカレフ を構え、トリガーを引いた！<br></font> そして<b>1</b>回 ヒットし、 フライ3 に <font class="dmg"><b>12</b></font> のダメージ！ </p><p>スキル合計が限界に達した！</p><p>ちも3 は素早く次の散弾 を準備した！</p><p>スキル合計が限界に達した！</p><p></p>
+</div>
+
+	</td>
+</tr>
+</tbody></table>
+</div>
+
+
+
+<div id="sel14" style="">
+<div class="blackboard question">
+
+<b>フライ3 は倒れた・・。</b><p></p><p><b>4%</b>の経験値を取得！<b>4</b>G入手！</p><p>
+
+</p></div>
+</div>
+
+<input type="button" value="戻る" class="button-cancel">
+
+
+<form name="command" method="post">
+<input type="hidden" name="command" value="">
+<input type="hidden" name="mode" value="monster">
+<input type="hidden" name="sel" value="0">
+
+
+</form>
+
+<form name="data">
+<input type="hidden" name="backid" value="0">
+<input type="hidden" name="nextid" value="1">
+<input type="hidden" name="lastid" value="16">
+</form>
+<script src="/js/test/so_battle.js" type="module"></script>
+</div>
+
+<div id="status" style="position: fixed; width: 85%; bottom: 0px; word-break: keep-all;"><div class="blackboard question" id="player_status_area">
+    <table border="0">
+        <tbody><tr>
+            <td rowspan="3">
+                <table border="0" style="width: 100%">
+                    <tbody><tr>
+                        <td rowspan="3" class="b2" style="white-space: nowrap; text-align: left; line-height: 20px; padding-right: 15px;">
+                            ちも<br>
+                            LV: 8<br>
+                            LP: 3 / 0
+                        </td>
+                        <td colspan="2" class="b2" style="text-align: left">HP: 144 / 172</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="b2" style="text-align: left">EXP: 84.9 %</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="b2" style="text-align: left">Risk: 0 %</td>
+                    </tr>
+                </tbody></table>
+            </td>
+            <td id="td_item">アイテム</td>
+            </tr>
+            <tr>
+            <td style="vertical-align: top" id="td_status">ステータス</td>
+        </tr>
+            <tr>
+            <td style="vertical-align: top" id="td_message">メッセージ</td>
+        </tr>
+    </tbody></table>
+</div>
+</div>
+
+<script>
+let spot = "pe";
+
+const player = new Vue({
+    data: {
+        spot: undefined,
+    },
+    watch: {
+        spot: function (newVal, oldVal)
+        {
+            const self = this;
+
+            if (newVal === oldVal)
+            {
+                return true;
+            }
+
+            if (newVal === "町の中") {
+			    music.request = "town1";
+		    }
+		    else if (newVal === "モンスター" || newVal === "デュエル") {
+			    music.request = "battle1";
+		    }
+		    else if (newVal === "PVP") {
+			    music.request = "battle2";
+		    }
+		    else {
+			    music.request = "dungeon1";
+		    }
+        },
+    },
+});
+
+player.spot = "町の中";
+
+jQuery.get("/current", {} , (data) => {
+   jQuery("#stage").html(data);
+});
+</script>
+<script>
+player.spot = "モンスター";
+sel = 10;
+</script>
+<div id="jGrowl" class="bottom-right jGrowl"><div class="jGrowl-notification"></div></div>
+  <div class="clearfix">
+<div class="blackboard answer float-l" id="neighbors"><p class="answer-menu">【近くにいるキャラ】</p></div>
+</div>
+
+
+<form action="http://127.0.0.1:3000/" method="post" style="display: none" class="non">
+<select id="default-select" name="mode" onchange="javascript:selectTown(this);">
+<option value="item_check">アイテム一覧</option>
+<option value="status_check">ステータス詳細</option>
+<option value="log_in">戻る</option>
+<option value="logout">ログアウト</option>
+</select>
+<input type="hidden" name="id" value="tyomo88">
+<input type="hidden" name="pass" value="*****">
+<input id="default-select-submit" type="submit" value="行動">
+</form>
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<hr size="0" width="100%">
+<div align="right" class="small">
+SO v0.2 by <a href="https://github.com/timomo/so">timomo</a><br>
+FF ADVENTURE v0.45 by <a href="http://www.interq.or.jp/sun/cumro/">D.Takamiya(CUMRO)</a><br>
+Character Image by <a href="http://www.aas.mtci.ne.jp/~hiji/9ff/9ff.html">9-FFいっしょにTALK</a><br>
+cooperation site by <a href="http://webooo.csidenet.com/asvyweb/">FFADV推奨委員会</a><br>
+Music by <a href="https://otologic.jp/">OtoLogic</a><br>
+背景素材 by <a href="http://teddy-plaza.sakura.ne.jp/">TEDDY-PLAZA</a><br>
+</div>
+
+
+
+
+</body></html>

@@ -7,6 +7,7 @@ use File::Spec;
 use FindBin;
 use Mojolicious::Lite;
 use Mojo::Server::PSGI;
+use Mojolicious::Types;
 use IO::Capture::Stdout;
 use Encode;
 use Data::Dumper;
@@ -14,6 +15,7 @@ use YAML::XS;
 use Mojo::JSON;
 use JSON;
 use DBIx::Custom;
+use Image::Magick;
 use lib File::Spec->catdir($FindBin::RealBin, 'lib');
 use SO::System;
 use SO::Town;
@@ -21,7 +23,7 @@ use SO::Town;
 push @{app->static->paths}, File::Spec->catdir($FindBin::Bin, qw|public js|);
 push @{app->static->paths}, File::Spec->catdir($FindBin::Bin, qw|public css|);
 push @{app->static->paths}, File::Spec->catdir($FindBin::Bin, qw|public sound|);
-push @{app->static->paths}, File::Spec->catdir($FindBin::Bin, qw|public img|);
+# push @{app->static->paths}, File::Spec->catdir($FindBin::Bin, qw|public img|);
 
 plugin Config => { file => "so.conf.pl" };
 plugin "Model" => {
@@ -343,6 +345,60 @@ get "/main" => sub
         kpass       => "*****",
         k           => $k,
     );
+};
+
+get "/js/battle/spritesheet/character/:file" => sub
+{
+    my $self = shift;
+    return $self->render(template => "json/spritesheet", format => "json");
+};
+
+get "/js/battle/spritesheet/monster/:file" => sub
+{
+    my $self = shift;
+    return $self->render(template => "json/spritesheet_mon", format => "json");
+};
+
+get "/js/battle/spritesheet/ikon/:file" => sub
+{
+    my $self = shift;
+    return $self->render(template => "json/spritesheet_ikon", format => "json");
+};
+
+get "/img/*file" => sub {
+    my $self = shift;
+    my $dir = "public/img";
+
+    # $self->res->headers->header("Access-Control-Allow-Origin" => "*");
+
+    if (my $asset = $self->app->static->file(File::Spec->catfile($FindBin::Bin, $dir, $self->param("file")))) {
+        my $regex_suffix = qr/\.[^\.]+$/;
+        my $suffix_txt = (fileparse($self->param("file"), $regex_suffix))[2];
+        $suffix_txt =~ s/^\.//;
+
+        # デフォルトは左向きとしたいので、右向きのキャラは反転させる
+        if ($self->param("file") =~ /^mon_.+?\.gif$/) {
+            my $image = Image::Magick->new();
+            $image->Read($asset->path);
+            $image->Flop;
+            my $file = Mojo::File::tempfile(DIR => File::Spec->catdir($FindBin::Bin, 'tmp'));
+            $image->Write($file->realpath . ".gif");
+            $asset = Mojo::Asset::File->new(path => $file->realpath . ".gif");
+        }
+
+        $self->res->headers->content_type("image/" . $suffix_txt);
+        return $self->reply->asset($asset);
+    }
+};
+
+get "/test" => sub
+{
+    my $self = shift;
+    my $path = File::Spec->catfile($FindBin::Bin, "Shimada Online.html");
+    my $file = Mojo::File->new($path);
+    my $contents = $file->slurp;
+    my $utf8 = Encode::decode_utf8($contents);
+    return $self->render(text => $utf8, format => "html");
 };
 
 any "/" => sub

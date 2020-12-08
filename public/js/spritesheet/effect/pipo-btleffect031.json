@@ -1,0 +1,34 @@
+{"frames": {
+  "pipo-btleffect031.1.png": {"frame": {"x": 0, "y": 0, "w": 640, "h": 240}, "rotated": false, "trimmed": false, "spriteSourceSize": {"x": 0, "y": 0, "w": 640, "h": 240}, "sourceSize": {"w": 640, "h": 240}},
+  "pipo-btleffect031.2.png": {"frame": {"x": 0, "y": 240, "w": 640, "h": 240}, "rotated": false, "trimmed": false, "spriteSourceSize": {"x": 0, "y": 0, "w": 640, "h": 240}, "sourceSize": {"w": 640, "h": 240}},
+  "pipo-btleffect031.3.png": {"frame": {"x": 0, "y": 480, "w": 640, "h": 240}, "rotated": false, "trimmed": false, "spriteSourceSize": {"x": 0, "y": 0, "w": 640, "h": 240}, "sourceSize": {"w": 640, "h": 240}},
+  "pipo-btleffect031.4.png": {"frame": {"x": 0, "y": 720, "w": 640, "h": 240}, "rotated": false, "trimmed": false, "spriteSourceSize": {"x": 0, "y": 0, "w": 640, "h": 240}, "sourceSize": {"w": 640, "h": 240}},
+  "pipo-btleffect031.5.png": {"frame": {"x": 0, "y": 960, "w": 640, "h": 240}, "rotated": false, "trimmed": false, "spriteSourceSize": {"x": 0, "y": 0, "w": 640, "h": 240}, "sourceSize": {"w": 640, "h": 240}},
+  "pipo-btleffect031.6.png": {"frame": {"x": 0, "y": 1200, "w": 640, "h": 240}, "rotated": false, "trimmed": false, "spriteSourceSize": {"x": 0, "y": 0, "w": 640, "h": 240}, "sourceSize": {"w": 640, "h": 240}},
+  "pipo-btleffect031.7.png": {"frame": {"x": 0, "y": 1440, "w": 640, "h": 240}, "rotated": false, "trimmed": false, "spriteSourceSize": {"x": 0, "y": 0, "w": 640, "h": 240}, "sourceSize": {"w": 640, "h": 240}},
+  "pipo-btleffect031.8.png": {"frame": {"x": 0, "y": 1680, "w": 640, "h": 240}, "rotated": false, "trimmed": false, "spriteSourceSize": {"x": 0, "y": 0, "w": 640, "h": 240}, "sourceSize": {"w": 640, "h": 240}},
+  "pipo-btleffect031.9.png": {"frame": {"x": 0, "y": 1920, "w": 640, "h": 240}, "rotated": false, "trimmed": false, "spriteSourceSize": {"x": 0, "y": 0, "w": 640, "h": 240}, "sourceSize": {"w": 640, "h": 240}}
+},
+  "animations": {
+    "default": [
+      "pipo-btleffect031.1.png",
+      "pipo-btleffect031.2.png",
+      "pipo-btleffect031.3.png",
+      "pipo-btleffect031.4.png",
+      "pipo-btleffect031.5.png",
+      "pipo-btleffect031.6.png",
+      "pipo-btleffect031.7.png",
+      "pipo-btleffect031.8.png",
+      "pipo-btleffect031.9.png"
+    ]
+  },
+  "meta": {
+    "app": "http://ffa2.me/",
+    "version": "1.0",
+    "image": "/img/effect/pipo-btleffect031.png",
+    "format": "RGBA8888",
+    "size": {"w":640,"h":2160},
+    "scale": "1",
+    "smartupdate": "$TexturePacker:SmartUpdate:9e3e5afd01ea8e418afabfbdcd724485$"
+  }
+}

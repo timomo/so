@@ -1,0 +1,330 @@
+{"frames": {
+  "pipo-btleffect109i.1.png": { "frame": {
+      "x": 0,
+      "y": 0,
+      "w": 120,
+      "h": 120
+    },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 120,
+      "h": 120
+    },
+    "sourceSize": {
+      "w": 120,
+      "h": 120
+    }
+  },
+  "pipo-btleffect109i.2.png": {
+    "frame": {
+      "x": 120,
+      "y": 0,
+      "w": 120,
+      "h": 120
+    },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 120,
+      "h": 120
+    },
+    "sourceSize": {
+      "w": 120,
+      "h": 120
+    }
+  },
+  "pipo-btleffect109i.3.png": {
+    "frame": {
+      "x": 240,
+      "y": 0,
+      "w": 120,
+      "h": 120
+    },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 120,
+      "h": 120
+    },
+    "sourceSize": {
+      "w": 120,
+      "h": 120
+    }
+  },
+  "pipo-btleffect109i.4.png": {
+    "frame": {
+      "x": 360,
+      "y": 0,
+      "w": 120,
+      "h": 120
+    },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 120,
+      "h": 120
+    },
+    "sourceSize": {
+      "w": 120,
+      "h": 120
+    }
+  },
+  "pipo-btleffect109i.5.png": {
+    "frame": {
+      "x": 480,
+      "y": 0,
+      "w": 120,
+      "h": 120
+    },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 120,
+      "h": 120
+    },
+    "sourceSize": {
+      "w": 120,
+      "h": 120
+    }
+  },
+  "pipo-btleffect109i.6.png": {
+    "frame": {
+      "x": 0,
+      "y": 120,
+      "w": 120,
+      "h": 120
+    },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 120,
+      "h": 120
+    },
+    "sourceSize": {
+      "w": 120,
+      "h": 120
+    }
+  },
+  "pipo-btleffect109i.7.png": {
+    "frame": {
+      "x": 120,
+      "y": 120,
+      "w": 120,
+      "h": 120
+    },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 120,
+      "h": 120
+    },
+    "sourceSize": {
+      "w": 120,
+      "h": 120
+    }
+  },
+  "pipo-btleffect109i.8.png": {
+    "frame": {
+      "x": 240,
+      "y": 120,
+      "w": 120,
+      "h": 120
+    },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 120,
+      "h": 120
+    },
+    "sourceSize": {
+      "w": 120,
+      "h": 120
+    }
+  },
+  "pipo-btleffect109i.9.png": {
+    "frame": {
+      "x": 360,
+      "y": 120,
+      "w": 120,
+      "h": 120
+    },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 120,
+      "h": 120
+    },
+    "sourceSize": {
+      "w": 120,
+      "h": 120
+    }
+  },
+  "pipo-btleffect109i.10.png": {
+    "frame": {
+      "x": 480,
+      "y": 120,
+      "w": 120,
+      "h": 120
+    },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 120,
+      "h": 120
+    },
+    "sourceSize": {
+      "w": 120,
+      "h": 120
+    }
+  },
+  "pipo-btleffect109i.11.png": {
+    "frame": {
+      "x": 0,
+      "y": 240,
+      "w": 120,
+      "h": 120
+    },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 120,
+      "h": 120
+    },
+    "sourceSize": {
+      "w": 120,
+      "h": 120
+    }
+  },
+  "pipo-btleffect109i.12.png": {
+    "frame": {
+      "x": 120,
+      "y": 240,
+      "w": 120,
+      "h": 120
+    },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 120,
+      "h": 120
+    },
+    "sourceSize": {
+      "w": 120,
+      "h": 120
+    }
+  },
+  "pipo-btleffect109i.13.png": {
+    "frame": {
+      "x": 240,
+      "y": 240,
+      "w": 120,
+      "h": 120
+    },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 120,
+      "h": 120
+    },
+    "sourceSize": {
+      "w": 120,
+      "h": 120
+    }
+  },
+  "pipo-btleffect109i.14.png": {
+    "frame": {
+      "x": 360,
+      "y": 240,
+      "w": 120,
+      "h": 120
+    },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 120,
+      "h": 120
+    },
+    "sourceSize": {
+      "w": 120,
+      "h": 120
+    }
+  },
+  "pipo-btleffect109i.15.png": {
+    "frame": {
+      "x": 480,
+      "y": 240,
+      "w": 120,
+      "h": 120
+    },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 120,
+      "h": 120
+    },
+    "sourceSize": {
+      "w": 120,
+      "h": 120
+    }
+  }
+},
+  "animations": {
+    "default": [
+      "pipo-btleffect109i.1.png",
+      "pipo-btleffect109i.2.png",
+      "pipo-btleffect109i.3.png",
+      "pipo-btleffect109i.4.png",
+      "pipo-btleffect109i.5.png",
+      "pipo-btleffect109i.6.png",
+      "pipo-btleffect109i.7.png",
+      "pipo-btleffect109i.8.png",
+      "pipo-btleffect109i.9.png",
+      "pipo-btleffect109i.10.png",
+      "pipo-btleffect109i.11.png",
+      "pipo-btleffect109i.12.png",
+      "pipo-btleffect109i.13.png",
+      "pipo-btleffect109i.14.png",
+      "pipo-btleffect109i.15.png"
+    ]
+  },
+  "meta": {
+    "app": "http://ffa2.me/",
+    "version": "1.0",
+    "image": "/img/effect/pipo-btleffect109i.png",
+    "format": "RGBA8888",
+    "size": {"w":600,"h":360},
+    "scale": "1",
+    "smartupdate": "$TexturePacker:SmartUpdate:9e3e5afd01ea8e418afabfbdcd724485$"
+  }
+}

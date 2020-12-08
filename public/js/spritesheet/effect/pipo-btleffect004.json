@@ -1,0 +1,29 @@
+{"frames": {
+  "pipo-btleffect004.1.png": {"frame": {"x": 0, "y": 0, "w": 240, "h": 240}, "rotated": false, "trimmed": false, "spriteSourceSize": {"x": 0, "y": 0, "w": 240, "h": 240}, "sourceSize": {"w": 240, "h": 240}},
+  "pipo-btleffect004.2.png": {"frame": {"x": 240, "y": 0, "w": 240, "h": 240}, "rotated": false, "trimmed": false, "spriteSourceSize": {"x": 0, "y": 0, "w": 240, "h": 240}, "sourceSize": {"w": 240, "h": 240}},
+  "pipo-btleffect004.3.png": {"frame": {"x": 480, "y": 0, "w": 240, "h": 240}, "rotated": false, "trimmed": false, "spriteSourceSize": {"x": 0, "y": 0, "w": 240, "h": 240}, "sourceSize": {"w": 240, "h": 240}},
+  "pipo-btleffect004.4.png": {"frame": {"x": 720, "y": 0, "w": 240, "h": 240}, "rotated": false, "trimmed": false, "spriteSourceSize": {"x": 0, "y": 0, "w": 240, "h": 240}, "sourceSize": {"w": 240, "h": 240}},
+  "pipo-btleffect004.5.png": {"frame": {"x": 960, "y": 0, "w": 240, "h": 240}, "rotated": false, "trimmed": false, "spriteSourceSize": {"x": 0, "y": 0, "w": 240, "h": 240}, "sourceSize": {"w": 240, "h": 240}},
+  "pipo-btleffect004.6.png": {"frame": {"x": 1200, "y": 0, "w": 240, "h": 240}, "rotated": false, "trimmed": false, "spriteSourceSize": {"x": 0, "y": 0, "w": 240, "h": 240}, "sourceSize": {"w": 240, "h": 240}},
+  "pipo-btleffect004.7.png": {"frame": {"x": 1440, "y": 0, "w": 240, "h": 240}, "rotated": false, "trimmed": false, "spriteSourceSize": {"x": 0, "y": 0, "w": 240, "h": 240}, "sourceSize": {"w": 240, "h": 240}}
+},
+  "animations": {
+    "default": [
+      "pipo-btleffect004.1.png",
+      "pipo-btleffect004.2.png",
+      "pipo-btleffect004.3.png",
+      "pipo-btleffect004.4.png",
+      "pipo-btleffect004.5.png",
+      "pipo-btleffect004.6.png"
+    ]
+  },
+  "meta": {
+    "app": "http://ffa2.me/",
+    "version": "1.0",
+    "image": "/img/effect/pipo-btleffect004.png",
+    "format": "RGBA8888",
+    "size": {"w":1680,"h":240},
+    "scale": "1",
+    "smartupdate": "$TexturePacker:SmartUpdate:9e3e5afd01ea8e418afabfbdcd724485$"
+  }
+}
