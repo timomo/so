@@ -121,7 +121,7 @@ sub monster_step_run2
 		"mon_015.json" => {
 			spreadsheet => "/js/battle/spritesheet/monster/mon_015.json",
 			chara_status => { "" => { 1 => { パーティー内番号 => 1, パーティーid => 2, 名前 => $data->{"エネミー:1"}->{名前} } } },
-			constitution => { "" => { 1 => { 参戦フラグ => 1, 蘇生フラグ => 0, 死亡フラグ => 0 } } },
+			constitution => { "" => { 1 => { 参戦フラグ => 1, 蘇生フラグ => 0, 死亡フラグ => 0, キャラ種別 => "m" } } },
 			x => 50,
 			y => 130,
 			alpha => 1,
@@ -129,7 +129,7 @@ sub monster_step_run2
 		"mon_028.json" => {
 			spreadsheet => "/js/battle/spritesheet/monster/mon_028.json",
 			chara_status => { "" => { 1 => { パーティー内番号 => 2, パーティーid => 2, 名前 => $data->{"エネミー:2"}->{名前} } } },
-			constitution => { "" => { 1 => { 参戦フラグ => 1, 蘇生フラグ => 0, 死亡フラグ => 0 } } },
+			constitution => { "" => { 1 => { 参戦フラグ => 1, 蘇生フラグ => 0, 死亡フラグ => 0, キャラ種別 => "m" } } },
 			x => 100,
 			y => 130,
 			alpha => 1,
@@ -137,7 +137,7 @@ sub monster_step_run2
 		"ikon_m_m.json" => {
 			spreadsheet => "/js/battle/spritesheet/ikon/ikon_m_m.json",
 			chara_status => { "" => { 1 => { パーティー内番号 => 3, パーティーid => 2, 名前 => $data->{"エネミー:3"}->{名前} } } },
-			constitution => { "" => { 1 => { 参戦フラグ => 1, 蘇生フラグ => 0, 死亡フラグ => 0 } } },
+			constitution => { "" => { 1 => { 参戦フラグ => 1, 蘇生フラグ => 0, 死亡フラグ => 0, キャラ種別 => "m" } } },
 			x => 150,
 			y => 130,
 			alpha => 1,
@@ -145,7 +145,7 @@ sub monster_step_run2
 		"ikon_m_v.json" => {
 			spreadsheet => "/js/battle/spritesheet/ikon/ikon_m_v.json",
 			chara_status => { "" => { 1 => { パーティー内番号 => 4, パーティーid => 2, 名前 => $data->{"エネミー:4"}->{名前} } } },
-			constitution => { "" => { 1 => { 参戦フラグ => 1, 蘇生フラグ => 0, 死亡フラグ => 0 } } },
+			constitution => { "" => { 1 => { 参戦フラグ => 1, 蘇生フラグ => 0, 死亡フラグ => 0, キャラ種別 => "m" } } },
 			x => 200,
 			y => 130,
 			alpha => 1,
@@ -153,7 +153,7 @@ sub monster_step_run2
 		"mon_034.json" => {
 			spreadsheet => "/js/battle/spritesheet/monster/mon_034.json",
 			chara_status => { "" => { 1 => { パーティー内番号 => 5, パーティーid => 2, 名前 => $data->{"エネミー:5"}->{名前} } } },
-			constitution => { "" => { 1 => { 参戦フラグ => 1, 蘇生フラグ => 0, 死亡フラグ => 0 } } },
+			constitution => { "" => { 1 => { 参戦フラグ => 1, 蘇生フラグ => 0, 死亡フラグ => 0, キャラ種別 => "m" } } },
 			x => 250,
 			y => 130,
 			alpha => 1,
@@ -161,7 +161,7 @@ sub monster_step_run2
 		"1053010302.json" => {
 			spreadsheet  => "/js/battle/spritesheet/character/1053010302.json",
 			chara_status => { "" => { 1 => { パーティー内番号 => 1, パーティーid => 1, 名前 => $data->{"プレイヤー:1"}->{名前} } } },
-			constitution => { "" => { 1 => { 参戦フラグ => 1, 蘇生フラグ => 0, 死亡フラグ => 0 } } },
+			constitution => { "" => { 1 => { 参戦フラグ => 1, 蘇生フラグ => 0, 死亡フラグ => 0, キャラ種別 => "k" } } },
 			x            => 80 + 24,
 			y            => 220,
 			alpha        => 0,
@@ -178,7 +178,7 @@ sub monster_step_run2
 		"1044010301.json" => {
 			spreadsheet  => "/js/battle/spritesheet/character/1044010301.json",
 			chara_status => { "" => { 1 => { パーティー内番号 => 2, パーティーid => 1, 名前 => $data->{"プレイヤー:2"}->{名前} } } },
-			constitution => { "" => { 1 => { 参戦フラグ => 1, 蘇生フラグ => 0, 死亡フラグ => 0 } } },
+			constitution => { "" => { 1 => { 参戦フラグ => 1, 蘇生フラグ => 0, 死亡フラグ => 0, キャラ種別 => "k" } } },
 			x            => 130 + 24,
 			y            => 220,
 			alpha        => 0,
@@ -195,7 +195,7 @@ sub monster_step_run2
 		"1008010303.json" => {
 			spreadsheet  => "/js/battle/spritesheet/character/1008010303.json",
 			chara_status => { "" => { 1 => { パーティー内番号 => 3, パーティーid => 1, 名前 => $data->{"プレイヤー:3"}->{名前} } } },
-			constitution => { "" => { 1 => { 参戦フラグ => 1, 蘇生フラグ => 0, 死亡フラグ => 0 } } },
+			constitution => { "" => { 1 => { 参戦フラグ => 1, 蘇生フラグ => 0, 死亡フラグ => 0, キャラ種別 => "k" } } },
 			x            => 180 + 24,
 			y            => 220,
 			alpha        => 0,
@@ -212,7 +212,7 @@ sub monster_step_run2
 		"1013010302.json" => {
 			spreadsheet  => "/js/battle/spritesheet/character/1013010302.json",
 			chara_status => { "" => { 1 => { パーティー内番号 => 4, パーティーid => 1, 名前 => $data->{"プレイヤー:4"}->{名前} } } },
-			constitution => { "" => { 1 => { 参戦フラグ => 1, 蘇生フラグ => 0, 死亡フラグ => 0 } } },
+			constitution => { "" => { 1 => { 参戦フラグ => 1, 蘇生フラグ => 0, 死亡フラグ => 0, キャラ種別 => "k" } } },
 			x            => 230 + 24,
 			y            => 220,
 			alpha        => 0,
@@ -229,7 +229,7 @@ sub monster_step_run2
 		"1017010302.json" => {
 			spreadsheet  => "/js/battle/spritesheet/character/1017010302.json",
 			chara_status => { "" => { 1 => { パーティー内番号 => 5, パーティーid => 1, 名前 => $data->{"プレイヤー:5"}->{名前} } } },
-			constitution => { "" => { 1 => { 参戦フラグ => 1, 蘇生フラグ => 0, 死亡フラグ => 0 } } },
+			constitution => { "" => { 1 => { 参戦フラグ => 1, 蘇生フラグ => 0, 死亡フラグ => 0, キャラ種別 => "k" } } },
 			x            => 280 + 24,
 			y            => 220,
 			alpha        => 0,
@@ -429,7 +429,7 @@ EOM
 			my $unit_no = &monster_get_party_no($data, $mname);
 			push(@jobs, { target => $kname, command => { md5 => "", command => "fade_in", args => undef } });
 			push(@jobs, { target => $kname, command => { md5 => "", command => "move_to", args => $unit_no } }); # TODO: 仮
-			push(@jobs, { target => $kname, command => { md5 => "", command => "effect", args => ["pipo-btleffect085.json", {}] } }); # 剣
+			push(@jobs, { target => $mname, command => { md5 => "", command => "effect", args => ["pipo-btleffect085.json", {}] } }); # 剣
 
 			if($efct1[1]){
 				$dmg1 = $dmg1 - int($mdef * $mbuff[1] * (1 - $efct1[1] / 4) );
@@ -595,7 +595,7 @@ EOM
 			my $unit_no = &monster_get_party_no($data, $kname);
 			push(@jobs, { target => $mname, command => { md5 => "", command => "fade_in", args => undef } });
 			push(@jobs, { target => $mname, command => { md5 => "", command => "move_to", args => $unit_no } }); # TODO: 仮
-			push(@jobs, { target => $mname, command => { md5 => "", command => "effect", args => ["pipo-btleffect085.json", {}] } }); # 剣
+			push(@jobs, { target => $kname, command => { md5 => "", command => "effect", args => ["pipo-btleffect085.json", {}] } }); # 剣
 
 			($mwatc,$mwclt,$mwelm,$mwefct,$mwmsg) = split(/<>/,$enemy_msg[$mtype][int(rand(3))]);
 			$com2 = "<font color=$elmcolor[$mwelm]>$mname は$mwmsg</font><br>";

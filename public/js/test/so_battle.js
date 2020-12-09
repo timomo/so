@@ -67,15 +67,6 @@ function set_battle_layer_animation(pointer)
 
 	currentApp = historyApp[page_no];
 
-	currentApp.stage.children.forEach((child) => {
-		if (child.constructor.name !== "BattleChara")
-		{
-			return false;
-		}
-		child.clearCommand();
-		child.clearState();
-	});
-
 	reset_battle_layer(pointer, currentApp);
 
 	pointer.find("div.battle_layer").css({
@@ -90,11 +81,61 @@ function set_battle_layer_animation(pointer)
 function reset_battle_layer(pointer, currentApp)
 {
 	currentApp.stage.children.forEach((child) => {
+		if (child.constructor.name !== "BattleChara")
+		{
+			return false;
+		}
+		child.clearCommand();
+		child.clearState();
+	});
+
+	currentApp.stage.children.forEach((child) => {
 		if (child.constructor.name === "BattleChara")
 		{
 			child.resetPosition();
 		}
 	});
+
+	const sort_no = {
+		"BattleChara": 2,
+		"BattleFace": 1,
+	};
+	const sort_type = {
+		"m": 1,
+		"k": 2,
+	};
+
+	const compare = (a, b) => {
+		const a_no = sort_no[a.constructor.name];
+		const b_no = sort_no[b.constructor.name];
+
+		if (a_no !== b_no)
+		{
+			return a_no - b_no;
+		}
+		else if (a_no === 0)
+		{
+			return a_no - b_no;
+		}
+		else if (a_no === 1)
+		{
+			const a_const = a.constitution;
+			const b_const = b.constitution;
+			const a_type = a_const["キャラ種別"];
+			const b_type = b_const["キャラ種別"];
+
+			if (a_type === b_type)
+			{
+				return 0;
+			}
+			else
+			{
+				return sort_type[a_type] - sort_type[b_type];
+			}
+		}
+	};
+
+	currentApp.stage.children.sort(compare);
 }
 
 function set_battle_layer(pointer)
@@ -205,10 +246,6 @@ function set_battle_layer(pointer)
 	const jobs = JSON.parse(string);
 	const string2 = pointer.find("pre.data").text();
 	const data = JSON.parse(string2);
-	const sort_no = {
-		"BattleChara": 1,
-		"BattleFace": 0,
-	};
 
 	const LoadPlayer = (resources) => {
 		for (let key in data) {
@@ -256,12 +293,6 @@ function set_battle_layer(pointer)
 					k.face = face;
 				}
 			}
-
-			const compare = (a, b) => {
-				return sort_no[a.constructor.name] - sort_no[b.constructor.name];
-			};
-
-			app.stage.children.sort(compare);
 		});
 	};
 
@@ -448,6 +479,7 @@ function discard_battle_layer(pointer)
 {
 	for (const key in historyApp) {
 		const i = Number(key);
+		/*
 		if (i === pointer)
 		{
 			continue;
@@ -456,6 +488,8 @@ function discard_battle_layer(pointer)
 		{
 			continue;
 		}
+
+		 */
 		if (historyApp[i] !== undefined)
 		{
 			const app = historyApp[i];
