@@ -115,6 +115,136 @@ sub monster_step_run2
 	$kefv = "<font color=$efcolor[0]>$katcv %</font> / <font color=$efcolor[1]>$kdefv %</font> / <font color=$efcolor[2]>$kspdv %</font> $kstpv";
 	$mefv = "<font color=$efcolor[0]>$matcv %</font> / <font color=$efcolor[1]>$mdefv %</font> / <font color=$efcolor[2]>$mspdv %</font> $mstpv";
 
+	my @jobs;
+
+	my $unit = {
+		"mon_015.json" => {
+			spreadsheet => "/js/battle/spritesheet/monster/mon_015.json",
+			chara_status => { "" => { 1 => { パーティー内番号 => 1, パーティーid => 2, 名前 => $data->{"エネミー:1"}->{名前} } } },
+			constitution => { "" => { 1 => { 参戦フラグ => 1, 蘇生フラグ => 0, 死亡フラグ => 0 } } },
+			x => 50,
+			y => 130,
+			alpha => 1,
+		},
+		"mon_028.json" => {
+			spreadsheet => "/js/battle/spritesheet/monster/mon_028.json",
+			chara_status => { "" => { 1 => { パーティー内番号 => 2, パーティーid => 2, 名前 => $data->{"エネミー:2"}->{名前} } } },
+			constitution => { "" => { 1 => { 参戦フラグ => 1, 蘇生フラグ => 0, 死亡フラグ => 0 } } },
+			x => 100,
+			y => 130,
+			alpha => 1,
+		},
+		"ikon_m_m.json" => {
+			spreadsheet => "/js/battle/spritesheet/ikon/ikon_m_m.json",
+			chara_status => { "" => { 1 => { パーティー内番号 => 3, パーティーid => 2, 名前 => $data->{"エネミー:3"}->{名前} } } },
+			constitution => { "" => { 1 => { 参戦フラグ => 1, 蘇生フラグ => 0, 死亡フラグ => 0 } } },
+			x => 150,
+			y => 130,
+			alpha => 1,
+		},
+		"ikon_m_v.json" => {
+			spreadsheet => "/js/battle/spritesheet/ikon/ikon_m_v.json",
+			chara_status => { "" => { 1 => { パーティー内番号 => 4, パーティーid => 2, 名前 => $data->{"エネミー:4"}->{名前} } } },
+			constitution => { "" => { 1 => { 参戦フラグ => 1, 蘇生フラグ => 0, 死亡フラグ => 0 } } },
+			x => 200,
+			y => 130,
+			alpha => 1,
+		},
+		"mon_034.json" => {
+			spreadsheet => "/js/battle/spritesheet/monster/mon_034.json",
+			chara_status => { "" => { 1 => { パーティー内番号 => 5, パーティーid => 2, 名前 => $data->{"エネミー:5"}->{名前} } } },
+			constitution => { "" => { 1 => { 参戦フラグ => 1, 蘇生フラグ => 0, 死亡フラグ => 0 } } },
+			x => 250,
+			y => 130,
+			alpha => 1,
+		},
+		"1053010302.json" => {
+			spreadsheet  => "/js/battle/spritesheet/character/1053010302.json",
+			chara_status => { "" => { 1 => { パーティー内番号 => 1, パーティーid => 1, 名前 => $data->{"プレイヤー:1"}->{名前} } } },
+			constitution => { "" => { 1 => { 参戦フラグ => 1, 蘇生フラグ => 0, 死亡フラグ => 0 } } },
+			x            => 80 + 24,
+			y            => 220,
+			alpha        => 0,
+			face         => {
+				path     => "/img/face/raku_cw287a1.png",
+				scale => {
+					x => 0.5,
+					y => 0.5,
+				},
+				x => 80,
+				y => 175,
+			},
+		},
+		"1044010301.json" => {
+			spreadsheet  => "/js/battle/spritesheet/character/1044010301.json",
+			chara_status => { "" => { 1 => { パーティー内番号 => 2, パーティーid => 1, 名前 => $data->{"プレイヤー:2"}->{名前} } } },
+			constitution => { "" => { 1 => { 参戦フラグ => 1, 蘇生フラグ => 0, 死亡フラグ => 0 } } },
+			x            => 130 + 24,
+			y            => 220,
+			alpha        => 0,
+			face         => {
+				path     => "/img/face/1010010101.png",
+				scale => {
+					x => 0.3,
+					y => 0.3,
+				},
+				x => 130,
+				y => 175,
+			},
+		},
+		"1008010303.json" => {
+			spreadsheet  => "/js/battle/spritesheet/character/1008010303.json",
+			chara_status => { "" => { 1 => { パーティー内番号 => 3, パーティーid => 1, 名前 => $data->{"プレイヤー:3"}->{名前} } } },
+			constitution => { "" => { 1 => { 参戦フラグ => 1, 蘇生フラグ => 0, 死亡フラグ => 0 } } },
+			x            => 180 + 24,
+			y            => 220,
+			alpha        => 0,
+			face         => {
+				path     => "/img/face/1009010101.png",
+				scale => {
+					x => 0.3,
+					y => 0.3,
+				},
+				x => 180,
+				y => 175,
+			},
+		},
+		"1013010302.json" => {
+			spreadsheet  => "/js/battle/spritesheet/character/1013010302.json",
+			chara_status => { "" => { 1 => { パーティー内番号 => 4, パーティーid => 1, 名前 => $data->{"プレイヤー:4"}->{名前} } } },
+			constitution => { "" => { 1 => { 参戦フラグ => 1, 蘇生フラグ => 0, 死亡フラグ => 0 } } },
+			x            => 230 + 24,
+			y            => 220,
+			alpha        => 0,
+			face         => {
+				path     => "/img/face/1011010101.png",
+				scale => {
+					x => 0.3,
+					y => 0.3,
+				},
+				x => 230,
+				y => 175,
+			},
+		},
+		"1017010302.json" => {
+			spreadsheet  => "/js/battle/spritesheet/character/1017010302.json",
+			chara_status => { "" => { 1 => { パーティー内番号 => 5, パーティーid => 1, 名前 => $data->{"プレイヤー:5"}->{名前} } } },
+			constitution => { "" => { 1 => { 参戦フラグ => 1, 蘇生フラグ => 0, 死亡フラグ => 0 } } },
+			x            => 280 + 24,
+			y            => 220,
+			alpha        => 0,
+			face         => {
+				path     => "/img/face/1008010101.png",
+				scale => {
+					x => 0.3,
+					y => 0.3,
+				},
+				x => 280,
+				y => 175,
+			},
+		},
+	};
+
 	my $party1 = &display_monster_player_status($data->{"プレイヤー:1"});
 	my $party2 = &display_monster_player_status($data->{"プレイヤー:2"});
 	my $party3 = &display_monster_player_status($data->{"プレイヤー:3"});
@@ -139,56 +269,57 @@ sub monster_step_run2
   	<div class="enemy1 non">
     	<span class="name">$data->{"エネミー:1"}->{名前}</span>
     	<span class="hp">HP: $data->{"エネミー:1"}->{HP}</span>
-    	<img src="/img/enemy/mon_129r.gif" class="">
+    	<img src="/img/transparent.png" class="" width="104" height="128">
     </div>
   	<div class="enemy2 non">
     	<span class="name">$data->{"エネミー:2"}->{名前}</span>
     	<span class="hp">HP: $data->{"エネミー:2"}->{HP}</span>
-    	<img src="/img/enemy/mon_281.gif" class="">
+    	<img src="/img/transparent.png" class="" width="104" height="128">
     </div>
   	<div class="enemy3 non">
     	<span class="name">$data->{"エネミー:3"}->{名前}</span>
     	<span class="hp">HP: $data->{"エネミー:3"}->{HP}</span>
-    	<img src="/img/enemy/mon_282.gif" class="">
+    	<img src="/img/transparent.png" class="" width="104" height="128">
     </div>
   	<div class="enemy4 non">
     	<span class="name">$data->{"エネミー:4"}->{名前}</span>
     	<span class="hp">HP: $data->{"エネミー:4"}->{HP}</span>
-    	<img src="/img/enemy/mon_283.gif" class="">
+    	<img src="/img/transparent.png" class="" width="104" height="128">
     </div>
   	<div class="enemy5 non">
     	<span class="name">$data->{"エネミー:5"}->{名前}</span>
     	<span class="hp">HP: $data->{"エネミー:5"}->{HP}</span>
-    	<img src="/img/enemy/mon_284.gif" class="">
+    	<img src="/img/transparent.png" class="" width="104" height="128">
     </div>
 </div>
 <div class="player">
 	<div class="player1 non">
 		<span class="name">$data->{"プレイヤー:1"}->{名前}</span>
   		<span class="hp">HP: $data->{"プレイヤー:1"}->{HP}</span>
-  		<img src="/img/face/1008010101.png" class="mini" width="48">
+  		<img src="/img/transparent.png" class="mini" width="48">
   	</div>
 	<div class="player2 non">
 		<span class="name">$data->{"プレイヤー:2"}->{名前}</span>
   		<span class="hp">HP: $data->{"プレイヤー:2"}->{HP}</span>
-  		<img src="/img/face/1009010101.png" class="mini" width="48">
+  		<img src="/img/transparent.png" class="mini" width="48">
   	</div>
 	<div class="player3 non">
 		<span class="name">$data->{"プレイヤー:3"}->{名前}</span>
   		<span class="hp">HP: $data->{"プレイヤー:3"}->{HP}</span>
-  		<img src="/img/face/1010010101.png" class="mini" width="48">
+  		<img src="/img/transparent.png" class="mini" width="48">
   	</div>
 	<div class="player4 non">
 		<span class="name">$data->{"プレイヤー:4"}->{名前}</span>
   		<span class="hp">HP: $data->{"プレイヤー:4"}->{HP}</span>
-  		<img src="/img/face/1011010101.png" class="mini" width="48">
+  		<img src="/img/transparent.png" class="mini" width="48">
   	</div>
 	<div class="player5 non">
 		<span class="name">$data->{"プレイヤー:5"}->{名前}</span>
   		<span class="hp">HP: $data->{"プレイヤー:5"}->{HP}</span>
-  		<img src="/img/face/1011010102.png" class="mini" width="48">
+  		<img src="/img/transparent.png" class="mini" width="48">
   	</div>
 </div>
+<div class="battle_layer"></div>
 </div>
 </td>
 </tr>
@@ -295,6 +426,11 @@ EOM
 	foreach(1..2) {
 
 		if(($fst_flg > 15 && $turnflg == 0) ||($fst_flg <= 15 && $turnflg == 1)){
+			my $unit_no = &monster_get_party_no($data, $mname);
+			push(@jobs, { target => $kname, command => { md5 => "", command => "fade_in", args => undef } });
+			push(@jobs, { target => $kname, command => { md5 => "", command => "move_to", args => $unit_no } }); # TODO: 仮
+			push(@jobs, { target => $kname, command => { md5 => "", command => "effect", args => ["pipo-btleffect085.json", {}] } }); # 剣
+
 			if($efct1[1]){
 				$dmg1 = $dmg1 - int($mdef * $mbuff[1] * (1 - $efct1[1] / 4) );
 			} else {
@@ -446,9 +582,21 @@ EOM
 				$battle_date[$j] .= "$com1<p>";
 			}
 			$mhp = $mhp - $dmg1;
+
+			push(@jobs, { target => $mname, command => { md5 => "", command => "damage", args => $dmg1 } });
+			push(@jobs, { target => $kname, command => { md5 => "", command => "backward", args => undef } });
+			push(@jobs, { target => $kname, command => { md5 => "", command => "fade_out", args => undef } });
+
 			if($mhp <= 0 || $md_flg) { $win = 1; last; }
 
-		} else {
+		}
+		else
+		{
+			my $unit_no = &monster_get_party_no($data, $kname);
+			push(@jobs, { target => $mname, command => { md5 => "", command => "fade_in", args => undef } });
+			push(@jobs, { target => $mname, command => { md5 => "", command => "move_to", args => $unit_no } }); # TODO: 仮
+			push(@jobs, { target => $mname, command => { md5 => "", command => "effect", args => ["pipo-btleffect085.json", {}] } }); # 剣
+
 			($mwatc,$mwclt,$mwelm,$mwefct,$mwmsg) = split(/<>/,$enemy_msg[$mtype][int(rand(3))]);
 			$com2 = "<font color=$elmcolor[$mwelm]>$mname は$mwmsg</font><br>";
 
@@ -566,6 +714,11 @@ EOM
 				$battle_date[$j] .= "$com2<p>";
 			}
 			$khp_flg = $khp_flg - $dmg2;
+
+			push(@jobs, { target => $kname, command => { md5 => "", command => "damage", args => $dmg2 } });
+			push(@jobs, { target => $mname, command => { md5 => "", command => "backward", args => undef } });
+			# push(@jobs, { target => $mname, command => { md5 => "", command => "fade_out", args => undef } });
+
 			if($khp_flg <= 0 || $kd_flg) { $win = 2; last; }
 
 		}
@@ -576,6 +729,11 @@ EOM
 
 	my $sel_no = &monster_get_sel_number(\@battle_date);
 
+	my $jobs = JSON->new->utf8->pretty->encode(\@jobs);
+	my $utf8 = Encode::decode_utf8($jobs);
+	my $unit_string = JSON->new->utf8->pretty->encode($unit);
+	my $utf82 = Encode::decode_utf8($unit_string);
+
 	$battle_date[$j] = <<"EOM";
 <DIV id="sel$sel_no">
 <TABLE BORDER=0 class="layer_table">
@@ -583,6 +741,12 @@ $battle_date[$j]
 	</TD>
 </TR>
 </TABLE>
+<pre class="jobs non">
+$utf8
+</pre>
+<pre class="data non">
+$utf82
+</pre>
 </DIV>
 EOM
 
@@ -593,6 +757,32 @@ EOM
 	if($win > 0)
 	{
 		return 1;
+	}
+
+	return 0;
+}
+
+sub monster_get_party_no
+{
+	my $data = shift;
+	my $name = shift;
+
+	for my $key (keys %$data)
+	{
+		my $tmp = $data->{$key};
+		if ($tmp->{名前} ne $name)
+		{
+			next;
+		}
+		if ($key =~ /^(プレイヤー|エネミー):(\d+)$/)
+		{
+			my $no = int($2);
+			if ($1 eq "プレイヤー")
+			{
+				$no += 5;
+			}
+			return $no;
+		}
 	}
 
 	return 0;

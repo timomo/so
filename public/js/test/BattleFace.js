@@ -45,28 +45,12 @@ gl_FragColor = originalColor + shadowColor * (1.0 - originalColor.a);
 }
 `;
 
-const damageStyle = new PIXI.TextStyle({
-    fontFamily: 'Kosugi Maru',
-    fontSize: 28,
-    // fontStyle: 'italic',
-    // fontWeight: 'bold',
-    fill: ['#ffffff', '#ffffff'], // gradient
-    stroke: '#4a1850',
-    strokeThickness: 5,
-    dropShadow: true,
-    dropShadowColor: '#000000',
-    dropShadowBlur: 1,
-    dropShadowAngle: Math.PI / 6,
-    dropShadowDistance: 1,
-    wordWrap: true,
-    wordWrapWidth: 440,
-});
-
-export class BattleChara extends PIXI.AnimatedSprite
+export class BattleFace extends PIXI.Sprite
 {
     constructor(props)
     {
-        super(props.textures, props.autoUpdate);
+        const texture = PIXI.Texture.from(props.path);
+        super(texture);
         const self = this;
 
         self["移動量"] = {};
@@ -436,19 +420,6 @@ export class BattleChara extends PIXI.AnimatedSprite
         return self.chara_status["パーティー内番号"];
     }
 
-    resetPosition()
-    {
-        const self = this;
-        self.x = self.ffa2.default.x;
-        self.y = self.ffa2.default.y;
-        self.scale.x = self.ffa2.default.scale.x;
-        self.scale.y = self.ffa2.default.scale.y;
-        self.height = self.ffa2.default.height;
-        self.width = self.ffa2.default.width;
-        self.anchor.x = self.ffa2.default.anchor.x;
-        self.anchor.y = self.ffa2.default.anchor.y;
-    }
-
     setDefaultPosition()
     {
         const self = this;
@@ -650,7 +621,7 @@ export class BattleChara extends PIXI.AnimatedSprite
             self.addChildKey(key, richText);
         }
 
-        pos = self.toFixedGlobal("stage", "temp", self.ffa2.default);
+        pos = self.toFixedGlobal("plane", "chara.default", self.ffa2.default);
 
         if (self.scale.x < 0) {
             pos.x += self.ffa2.default.width * self.ffa2.default.anchor.x;
@@ -1309,7 +1280,6 @@ export class BattleChara extends PIXI.AnimatedSprite
     damage(dmg)
     {
         const self = this;
-        /*
         let hp_gauge = self.getChildAtKey("HPゲージ", 0);
         let namae = self.getChildAtKey("名前", 0);
 
@@ -1329,11 +1299,9 @@ export class BattleChara extends PIXI.AnimatedSprite
         hp_gauge_frame.alpha = 1;
         namae.alpha = 1;
 
-
-         */
         self.popNumber("damage", dmg);
 
-        // self.playVoice("damage");
+        self.playVoice("damage");
         self.chara_status["HP"] -= dmg;
         self.clearCommand();
         self.clearState();
@@ -1356,12 +1324,12 @@ export class BattleChara extends PIXI.AnimatedSprite
                 self.ffa2.flag[type][len] = 0;
                 self.ffa2[type][len] = key;
 
-                const damageText = new PIXI.Text(values[i], damageStyle);
+                const damageText = new PIXI.Text(values[i], self.ui.damageStyle);
                 self.addChildKey(key, damageText);
 
-                const pos = self.toFixedGlobal("stage", "temp", self.ffa2.default);
+                const pos = self.toFixedGlobal("plane", "chara.default", self.ffa2.default);
 
-                pos.y -= self.height * self.ffa2.default.anchor.y + 50;
+                pos.y -= self.height * self.ffa2.default.anchor.y;
                 damageText.x = pos.x + presetX;
                 damageText.y = pos.y + presetY;
                 presetX += damageText.width;
@@ -1939,4 +1907,4 @@ export class BattleChara extends PIXI.AnimatedSprite
     }
 }
 
-export default { BattleChara };
+export default { BattleFace };

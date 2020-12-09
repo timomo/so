@@ -1,4 +1,5 @@
 import Chara from "./BattleChara.js";
+import Face from "./BattleFace.js";
 
 function page(type){
 	let i,
@@ -44,7 +45,57 @@ function page(type){
 	}
 }
 
+let historyApp = {};
 let currentApp;
+let auto = -1;
+
+function set_battle_layer_animation(pointer)
+{
+	const string = pointer.find("pre.jobs").text();
+	const jobs = JSON.parse(string);
+	const string2 = pointer.find("pre.data").text();
+	const data = JSON.parse(string2);
+
+	for (const key in historyApp) {
+		if (historyApp[key] && historyApp[key].ticker !== undefined)
+		{
+			historyApp[key].ticker.stop();
+		}
+	}
+
+	const page_no = Number(pointer.attr("id").split("sel")[1]);
+
+	currentApp = historyApp[page_no];
+
+	currentApp.stage.children.forEach((child) => {
+		if (child.constructor.name !== "BattleChara")
+		{
+			return false;
+		}
+		child.clearCommand();
+		child.clearState();
+	});
+
+	reset_battle_layer(pointer, currentApp);
+
+	pointer.find("div.battle_layer").css({
+		position: "absolute",
+		top: pointer.find("div.battle_stage").offset().top,
+		left: pointer.find("div.battle_stage").offset().left,
+		zIndex: 9999,
+	});
+	currentApp.ticker.start();
+}
+
+function reset_battle_layer(pointer, currentApp)
+{
+	currentApp.stage.children.forEach((child) => {
+		if (child.constructor.name === "BattleChara")
+		{
+			child.resetPosition();
+		}
+	});
+}
 
 function set_battle_layer(pointer)
 {
@@ -54,113 +105,112 @@ function set_battle_layer(pointer)
         return false;
     }
 
-    if (currentApp !== undefined)
-    {
-        currentApp.ticker.stop();
-        currentApp.destroy(true, { children: true, texture: true, baseTexture: true });
-        currentApp = undefined;
-    }
+	const page_no = Number(pointer.attr("id").split("sel")[1]);
 
-    currentApp = new PIXI.Application({
-        height: 240,
-        width: 320,
-        // TODO: resolutionを指定すると「しちゅれい！」になる
-        // resolution: window.devicePixelRatio || 1,
-        autoStart: true,
-        transparent: true,
-    });
+	if (historyApp[page_no] !== undefined)
+	{
+		return true;
+	}
 
-    pointer.find("div.battle_layer").html(currentApp.view).css({
-        position: "absolute",
-        top: pointer.find("div.battle_stage").offset().top,
-        left: pointer.find("div.battle_stage").offset().left,
-        zIndex: 9999,
-    });
+	const app = new PIXI.Application({
+		height: 240,
+		width: 320,
+		// TODO: resolutionを指定すると「しちゅれい！」になる
+		// resolution: window.devicePixelRatio || 1,
+		transparent: true,
+		ticker: new PIXI.Ticker(),
+	});
 
-    const data = {
-		"mon_015.json": {
-			spreadsheet: "/js/battle/spritesheet/monster/mon_015.json",
-			chara_status: { "": { 1: { パーティー内番号: 1, パーティーid: 2, 名前: "敵1" } } },
-			constitution: { "": { 1: { 参戦フラグ: 1, 蘇生フラグ: 0, 死亡フラグ: 0 } } },
-			x: 50,
-			y: 130,
-			alpha: 1,
-		},
-		"mon_028.json": {
-			spreadsheet: "/js/battle/spritesheet/monster/mon_028.json",
-			chara_status: { "": { 1: { パーティー内番号: 2, パーティーid: 2, 名前: "敵2" } } },
-			constitution: { "": { 1: { 参戦フラグ: 1, 蘇生フラグ: 0, 死亡フラグ: 0 } } },
-			x: 100,
-			y: 130,
-			alpha: 1,
-		},
-		"ikon_m_m.json": {
-			spreadsheet: "/js/battle/spritesheet/ikon/ikon_m_m.json",
-			chara_status: { "": { 1: { パーティー内番号: 3, パーティーid: 2, 名前: "敵3" } } },
-			constitution: { "": { 1: { 参戦フラグ: 1, 蘇生フラグ: 0, 死亡フラグ: 0 } } },
-			x: 150,
-			y: 130,
-			alpha: 1,
-		},
-		"ikon_m_v.json": {
-			spreadsheet: "/js/battle/spritesheet/ikon/ikon_m_v.json",
-			chara_status: { "": { 1: { パーティー内番号: 4, パーティーid: 2, 名前: "敵4" } } },
-			constitution: { "": { 1: { 参戦フラグ: 1, 蘇生フラグ: 0, 死亡フラグ: 0 } } },
-			x: 200,
-			y: 130,
-			alpha: 1,
-		},
-		"mon_034.json": {
-			spreadsheet: "/js/battle/spritesheet/monster/mon_034.json",
-			chara_status: { "": { 1: { パーティー内番号: 5, パーティーid: 2, 名前: "敵5" } } },
-			constitution: { "": { 1: { 参戦フラグ: 1, 蘇生フラグ: 0, 死亡フラグ: 0 } } },
-			x: 250,
-			y: 130,
-			alpha: 1,
-		},
-		"1053010302.json": {
-			spreadsheet: "/js/battle/spritesheet/character/1053010302.json",
-			chara_status: { "": { 1: { パーティー内番号: 1, パーティーid: 1, 名前: "ちも" } } },
-			constitution: { "": { 1: { 参戦フラグ: 1, 蘇生フラグ: 0, 死亡フラグ: 0 } } },
-			x: 80 + 24,
-			y: 220,
-			alpha: 0,
-		},
-		"1044010301.json": {
-			spreadsheet: "/js/battle/spritesheet/character/1044010301.json",
-			chara_status: { "": { 1: { パーティー内番号: 2, パーティーid: 1, 名前: "ちも2" } } },
-			constitution: { "": { 1: { 参戦フラグ: 1, 蘇生フラグ: 0, 死亡フラグ: 0 } } },
-			x: 130 + 24,
-			y: 220,
-			alpha: 0,
-		},
-		"1008010303.json": {
-			spreadsheet: "/js/battle/spritesheet/character/1008010303.json",
-			chara_status: { "": { 1: { パーティー内番号: 3, パーティーid: 1, 名前: "ちも3" } } },
-			constitution: { "": { 1: { 参戦フラグ: 1, 蘇生フラグ: 0, 死亡フラグ: 0 } } },
-			x: 180 + 24,
-			y: 220,
-			alpha: 0,
-		},
-		"1013010302.json": {
-			spreadsheet: "/js/battle/spritesheet/character/1013010302.json",
-			chara_status: { "": { 1: { パーティー内番号: 4, パーティーid: 1, 名前: "ちも4" } } },
-			constitution: { "": { 1: { 参戦フラグ: 1, 蘇生フラグ: 0, 死亡フラグ: 0 } } },
-			x: 230 + 24,
-			y: 220,
-			alpha: 0,
-		},
-		"1017010302.json": {
-			spreadsheet: "/js/battle/spritesheet/character/1017010302.json",
-			chara_status: { "": { 1: { パーティー内番号: 5, パーティーid: 1, 名前: "ちも5" } } },
-			constitution: { "": { 1: { 参戦フラグ: 1, 蘇生フラグ: 0, 死亡フラグ: 0 } } },
-			x: 280 + 24,
-			y: 220,
-			alpha: 0,
-		},
+	app.ticker.autoStart = false;
+	app.ticker.stop();
+
+	const checkInAction = () => {
+		for (let i = 0; i < app.stage.children.length; i++)
+		{
+			const child = app.stage.children[i];
+			if (child.constructor.name !== "BattleChara")
+			{
+				continue;
+			}
+			const command = child.command;
+			if (command !== undefined)
+			{
+				return false;
+			}
+		}
+		return true;
 	};
 
-    const LoadPlayer = (resources) => {
+	const getChara = (name) => {
+		for (let i = 0; i < app.stage.children.length; i++)
+		{
+			const child = app.stage.children[i];
+			if (child.constructor.name !== "BattleChara")
+			{
+				continue;
+			}
+			if (child.chara_status["名前"] === name)
+			{
+				return child;
+			}
+		}
+	};
+
+	app.ticker.add((delta) => {
+		app.stage.children.forEach((child) => {
+			if (child.constructor.name === "BattleChara")
+			{
+				child.updateFake();
+			}
+		});
+
+		if (checkInAction() === false)
+		{
+			return true;
+		}
+		const job = jobs[0];
+
+		if (job === undefined)
+		{
+			if (auto !== -1)
+			{
+				const next = jQuery("a.btn-next");
+				if (next.hasClass("enable"))
+				{
+					next.trigger("click");
+				}
+				else
+				{
+					const stop = jQuery("a.btn-stop");
+					stop.trigger("click");
+				}
+			}
+			return true;
+		}
+
+		const k = getChara(job.target);
+
+		if (k !== undefined)
+		{
+			k.setCommand(job.command, () => {});
+			jobs.shift();
+		}
+	});
+
+	historyApp[page_no] = app;
+
+	pointer.find("div.battle_layer").html(historyApp[page_no].view);
+
+	const string = pointer.find("pre.jobs").text();
+	const jobs = JSON.parse(string);
+	const string2 = pointer.find("pre.data").text();
+	const data = JSON.parse(string2);
+	const sort_no = {
+		"BattleChara": 1,
+		"BattleFace": 0,
+	};
+
+	const LoadPlayer = (resources) => {
 		for (let key in data) {
 			loader.add(key, data[key].spreadsheet);
 		}
@@ -174,161 +224,66 @@ function set_battle_layer(pointer)
 				opts.chara_status = data[key].chara_status;
 				opts.constitution = data[key].constitution;
 				opts.turn_no = 1;
-				opts.app = currentApp;
+				opts.app = app;
 				opts.fade_in = false;
 				opts.const_id = "dummy";
 				opts.resources = resources;
 				const k = new Chara.BattleChara(opts);
-				currentApp.stage.addChild(k);
+				app.stage.addChild(k);
 				k.alpha = data[key].alpha;
 				k.gotoAndNext("通常待機");
 				k.setPosition(data[key].x, data[key].y);
 				k.setDefaultPosition();
 				k.ffa2.direction = "left";
+
+				if (data[key].hasOwnProperty("face"))
+				{
+					const face = data[key].face;
+
+					face.md5 = "";
+					face.chara_status = data[key].chara_status;
+					face.constitution = data[key].constitution;
+					face.turn_no = 1;
+
+					const player1 = new Face.BattleFace(face);
+
+					app.stage.addChild(player1);
+					player1.scale.x = face.scale.x;
+					player1.scale.y = face.scale.y;
+					player1.x = face.x;
+					player1.y = face.y;
+
+					k.face = face;
+				}
 			}
+
+			const compare = (a, b) => {
+				return sort_no[a.constructor.name] - sort_no[b.constructor.name];
+			};
+
+			app.stage.children.sort(compare);
 		});
+	};
 
-		const player1 = PIXI.Sprite.from("/img/face/1008010101.png");
-		currentApp.stage.addChild(player1);
-		player1.scale.x = 0.3;
-		player1.scale.y = 0.3;
-		player1.x = 80;
-		player1.y = 175;
-		const player2 = PIXI.Sprite.from("/img/face/1009010101.png");
-		currentApp.stage.addChild(player2);
-		player2.scale.x = 0.3;
-		player2.scale.y = 0.3;
-		player2.x = 130;
-		player2.y = 175;
-		const player3 = PIXI.Sprite.from("/img/face/1010010101.png");
-		currentApp.stage.addChild(player3);
-		player3.scale.x = 0.3;
-		player3.scale.y = 0.3;
-		player3.x = 180;
-		player3.y = 175;
-		const player4 = PIXI.Sprite.from("/img/face/1011010101.png");
-		currentApp.stage.addChild(player4);
-		player4.scale.x = 0.3;
-		player4.scale.y = 0.3;
-		player4.x = 230;
-		player4.y = 175;
-		const player5 = PIXI.Sprite.from("/img/face/raku_cw287a1.png");
-		currentApp.stage.addChild(player5);
-		player5.scale.x = 0.5;
-		player5.scale.y = 0.5;
-		player5.x = 280;
-		player5.y = 175;
-    };
-
-    const loader = new PIXI.Loader();
+	const loader = new PIXI.Loader();
 
 	loader.add("pipo-btleffect004.json", "/js/spritesheet/effect/pipo-btleffect004.json");
 	loader.add("pipo-btleffect102a.json", "/js/spritesheet/effect/pipo-btleffect102a.json");
 	loader.add("pipo-btleffect085.json", "/js/spritesheet/effect/pipo-btleffect085.json");
-    loader.add("pipo-btleffect031.json", "/js/spritesheet/effect/pipo-btleffect031.json");
-    loader.add("pipo-btleffect034.json", "/js/spritesheet/effect/pipo-btleffect034.json");
-    loader.add("pipo-btleffect109i.json", "/js/spritesheet/effect/pipo-btleffect109i.json");
-    loader.add("Effect_p004.json", "/js/spritesheet/effect/Effect_p004.json");
-    loader.add("pipo-mapeffect013a-2.json", "/js/spritesheet/effect/pipo-mapeffect013a-2.json");
+	loader.add("pipo-btleffect031.json", "/js/spritesheet/effect/pipo-btleffect031.json");
+	loader.add("pipo-btleffect034.json", "/js/spritesheet/effect/pipo-btleffect034.json");
+	loader.add("pipo-btleffect109i.json", "/js/spritesheet/effect/pipo-btleffect109i.json");
+	loader.add("Effect_p004.json", "/js/spritesheet/effect/Effect_p004.json");
+	loader.add("pipo-mapeffect013a-2.json", "/js/spritesheet/effect/pipo-mapeffect013a-2.json");
 
-    loader.load((loader, resources) => {
-    	LoadPlayer(resources);
-    });
+	loader.load((loader, resources) => {
+		LoadPlayer(resources);
+	});
 
-    const jobs = [
-		{ target: "ちも", command: { md5: "", command: "fade_in", args: undefined, } },
-        { target: "ちも", command: { md5: "", command: "move_to", args: 3, } },
-        { target: "ちも", command: { md5: "", command: "effect", args: ["pipo-btleffect031.json", {fullscreen: 1, repetition: 3}], } },
-        { target: "ちも", command: { md5: "", command: "backward", args: undefined, } },
-		{ target: "ちも", command: { md5: "", command: "fade_out", args: undefined, } },
-
-		{ target: "ちも2", command: { md5: "", command: "fade_in", args: undefined, } },
-        { target: "ちも2", command: { md5: "", command: "move_to", args: 1, } },
-        { target: "ちも2", command: { md5: "", command: "effect", args: ["pipo-btleffect085.json", {}], } }, // 剣
-        { target: "ちも2", command: { md5: "", command: "backward", args: undefined, } },
-		{ target: "ちも2", command: { md5: "", command: "fade_out", args: undefined, } },
-
-		{ target: "ちも3", command: { md5: "", command: "fade_in", args: undefined, } },
-		{ target: "ちも3", command: { md5: "", command: "move_to", args: 2, } },
-		{ target: "ちも3", command: { md5: "", command: "effect", args: ["pipo-btleffect102a.json", {}], } },
-		{ target: "ちも3", command: { md5: "", command: "backward", args: undefined, } },
-		{ target: "ちも3", command: { md5: "", command: "fade_out", args: undefined, } },
-
-		{ target: "ちも4", command: { md5: "", command: "fade_in", args: undefined, } },
-		{ target: "ちも4", command: { md5: "", command: "move_to", args: 4, } },
-		{ target: "ちも4", command: { md5: "", command: "effect", args: ["pipo-btleffect004.json", {repetition: 3}], } },
-		{ target: "ちも4", command: { md5: "", command: "backward", args: undefined, } },
-		{ target: "ちも4", command: { md5: "", command: "fade_out", args: undefined, } },
-
-		{ target: "ちも5", command: { md5: "", command: "fade_in", args: undefined, } },
-		{ target: "ちも5", command: { md5: "", command: "move_to", args: 5, } },
-		{ target: "ちも5", command: { md5: "", command: "effect", args: ["Effect_p004.json", {}], } },
-		{ target: "ちも5", command: { md5: "", command: "backward", args: undefined, } },
-		{ target: "ちも5", command: { md5: "", command: "fade_out", args: undefined, } },
-    ];
-
-    const checkInAction = () => {
-        for (let i = 0; i < currentApp.stage.children.length; i++)
-        {
-            const child = currentApp.stage.children[i];
-            if (child.constructor.name !== "BattleChara")
-            {
-                continue;
-            }
-            const command = child.command;
-            if (command !== undefined)
-            {
-                return false;
-            }
-        }
-        return true;
-    };
-
-    const getChara = (name) => {
-        for (let i = 0; i < currentApp.stage.children.length; i++)
-        {
-            const child = currentApp.stage.children[i];
-            if (child.constructor.name !== "BattleChara")
-            {
-                continue;
-            }
-            if (child.chara_status["名前"] === name)
-            {
-                return child;
-            }
-        }
-    };
-
-    currentApp.ticker.add((delta) => {
-        currentApp.stage.children.forEach((child) => {
-            if (child.constructor.name === "BattleChara")
-            {
-                child.updateFake();
-            }
-        });
-
-        if (checkInAction() === false)
-        {
-            return true;
-        }
-        const job = jobs[0];
-
-        if (job === undefined)
-        {
-            return true;
-        }
-
-        const k = getChara(job.target);
-
-        if (k !== undefined)
-        {
-            k.setCommand(job.command, () => {});
-            jobs.shift();
-        }
-    });
+	app.ticker.update();
 }
 
-function set_position(pointer, timer) {
+function set_position(pointer, timer, mode) {
 	const keys = ["player1","player2","player3","player4","player5"];
 	const offset2 = pointer.find("div.player").offset();
 
@@ -337,7 +292,8 @@ function set_position(pointer, timer) {
 		return true;
 	}
 	let top = offset2.top;
-	let left = pointer.find("div.player").width();
+	// let left = pointer.find("div.player").width();
+	let left = pointer.find("div.player").width() - (64 * 4);
 
 	const battle_stage = pointer.find("div.battle_stage");
 	const height = 48;
@@ -380,6 +336,7 @@ function set_position(pointer, timer) {
 
 	const command = jQuery("div.command-window");
 
+	/*
 	if (command.length !== 0)
 	{
 		command.css({ position: "absolute" });
@@ -387,12 +344,12 @@ function set_position(pointer, timer) {
 		offset3.top = pointer.find("div.player").offset().top + pointer.find("div.player").height() - command.height();
 		command.offset(offset3);
 	}
+	 */
 
 	/* コマンドウインドウ設定終了 */
 
 	keys.forEach((key) => {
 		const p = pointer.find("div." + key);
-		left -= p.find("img").width();
 		p.show();
 		p.css({
 			position: "absolute",
@@ -406,6 +363,7 @@ function set_position(pointer, timer) {
 			 */
 			display: "table-cell",
 		});
+		left += p.find("img").width();
 
 		p.unbind("click");
 		p.click((event) => {
@@ -474,16 +432,46 @@ function set_position(pointer, timer) {
 			status.draggable();
 		});
 	});
-    if (timer === 1)
+    if (timer !== 1)
     {
-        return true;
+    	set_battle_layer(pointer);
+
+		if (mode === "current")
+		{
+			console.error(mode, timer);
+			set_battle_layer_animation(pointer);
+		}
     }
-    set_battle_layer(pointer);
 }
 
+function discard_battle_layer(pointer)
+{
+	for (const key in historyApp) {
+		const i = Number(key);
+		if (i === pointer)
+		{
+			continue;
+		}
+		if (i === pointer + 1)
+		{
+			continue;
+		}
+		if (historyApp[i] !== undefined)
+		{
+			const app = historyApp[i];
+			app.ticker.stop();
+			app.destroy(true, true);
+
+			const sel = jQuery("div#sel" + (i));
+			sel.find("div.battle_layer").empty();
+
+			delete historyApp[i];
+		}
+	}
+}
 
 jQuery(document).ready(() => {
-	jQuery("div[id^='sel']").hide();
+	jQuery("div[id^='sel']").css("display", "block");
 
 	let min = 99999;
 	let max = 0;
@@ -493,11 +481,27 @@ jQuery(document).ready(() => {
 	const back = jQuery("a.btn-back");
 	const next = jQuery("a.btn-next");
 	const last = jQuery("a.btn-last");
+	const play = jQuery("a.btn-play");
+	const stop = jQuery("a.btn-stop");
 
 	first.attr("href", "javascript:void(0)");
 	back.attr("href", "javascript:void(0)");
 	next.attr("href", "javascript:void(0)");
 	last.attr("href", "javascript:void(0)");
+	play.attr("href", "javascript:void(0)");
+	stop.attr("href", "javascript:void(0)");
+
+	play.click(() => {
+		auto = pointer;
+		play.addClass("enable");
+		stop.removeClass("enable");
+	});
+
+	stop.click(() => {
+		auto = -1;
+		stop.addClass("enable");
+		play.removeClass("enable");
+	});
 
 	jQuery("div[id^='sel']").each((idx, elem) => {
 		const obj = jQuery(elem);
@@ -508,11 +512,11 @@ jQuery(document).ready(() => {
 		if (no <= min) min = no;
 	});
 
-	const lazy_load = (pointer, timer) => {
+	const lazy_load = (pointer, timer, mode) => {
 		const sel = jQuery("div#sel" + pointer);
 
 		setTimeout(() => {
-			set_position(sel, timer);
+			set_position(sel, timer, mode);
 		}, timer);
 	};
 
@@ -551,14 +555,22 @@ jQuery(document).ready(() => {
 
 		check(pointer);
 
+		jQuery("div[id^='sel']").addClass("non-page");
 		const sel = jQuery("div#sel" + pointer);
+		sel.removeClass("non-page");
 
-		jQuery("div[id^='sel']").hide();
-		sel.show();
+		if (next.hasClass("enable"))
+		{
+			// const tmp = jQuery("div#sel" + (pointer + 1));
+			// tmp.removeClass("non-page");
+
+			lazy_load(pointer + 1, 1, "preload");
+			lazy_load(pointer + 1, 5, "preload");
+		}
 
 		// TODO: なぜか2回実行しないとうまく制御出来ない。。。
-		lazy_load(pointer, 1);
-		lazy_load(pointer, 5);
+		lazy_load(pointer, 1, "current");
+		lazy_load(pointer, 5, "current");
 
 		jQuery("span.page").text(pointer);
 
@@ -566,8 +578,14 @@ jQuery(document).ready(() => {
 	};
 
 	next.bind("click", func.bind(next, "next"));
-	back.bind("click", func.bind(back, "back"));
-	first.bind("click", func.bind(first, "first"));
+	back.bind("click", () => {
+		func("back");
+		discard_battle_layer(pointer);
+	});
+	first.bind("click", () => {
+		func("first");
+		discard_battle_layer(pointer);
+	});
 	last.bind("click", func.bind(last, "last"));
 
 	check(pointer);

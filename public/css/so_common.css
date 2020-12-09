@@ -188,3 +188,10 @@ table
     white-space: nowrap;
     overflow:hidden
 }
+
+.non-page
+{
+    visibility: hidden;
+    display: block;
+    height: 0;
+}

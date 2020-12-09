@@ -1,5 +1,7 @@
 <a class="btn-first" href="javascript:page(1)">&lt;&lt;最初</a>&nbsp;&nbsp;<a class="btn-back" href="javascript:page(2)">&lt;戻る</a>
 <span class="page">1</span>
+<a class="btn-stop" href="javascript:page(1)">停止</a>
+<a class="btn-play" href="javascript:page(1)">再生</a>
 <a class="btn-next" href="javascript:page(3)">次へ&gt;</a>&nbsp;&nbsp;<a class="btn-last" href="javascript:page(4)">最後&gt;&gt;</a>
 
 <DIV id="sel0" style="display: none;">
@@ -60,4 +62,4 @@
 player.spot = "<%= $spot %>";
 sel = <%= $sel + 1 %>;
 </script>
-<script src="/js/so_battle.js?time=<%= time %>"></script>
+<script type="module" src="/js/test/so_battle.js?time=<%= time %>"></script>
