@@ -108,7 +108,8 @@ table
 
 .mini
 {
-    width: 48px;
+    max-height: 48px;
+    width: auto;
 }
 
 .player
@@ -177,16 +178,28 @@ table
 .hp,
 .name
 {
+    bottom: 0;
+    /*
     position: absolute;
+
+     */
     font-size: 0.6rem;
     text-align: right;
     text-shadow: 1px 2px 3px #000;
+    color: #FFF;
 }
 
 .name
 {
     white-space: nowrap;
-    overflow:hidden
+    overflow:hidden;
+    bottom: 10px;
+    text-align: left;
+}
+
+.hp
+{
+    text-align: left;
 }
 
 .non-page
@@ -194,4 +207,56 @@ table
     visibility: hidden;
     display: block;
     height: 0;
+}
+
+.explore_stage
+{
+    /*
+    background-image: url(/img/9e2fddd53bd9e1155791e2c64868eb1a.png);
+     */
+    background-image: url(/img/158e35945dfb441ed15105ed7c0e7849.png);
+
+    background-size: cover;
+    width: 320px;
+    height: 240px;
+}
+
+.player
+{
+    display: table-cell;
+    vertical-align: bottom;
+    height: 240px;
+    position: relative;
+    left: 80px;
+}
+
+.enemy
+{
+    display: table;
+
+}
+
+.enemy1,
+.enemy2,
+.enemy3,
+.enemy4,
+.enemy5
+{
+    display: table-cell;
+}
+
+.player1,
+.player2,
+.player3,
+.player4,
+.player5
+{
+    width: 48px;
+    height: 72px;
+    display: table-cell;
+    /*
+    background-color: rgba(0, 0, 0, 0.5);
+
+     */
+    text-align: left;
 }

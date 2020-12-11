@@ -1,6 +1,36 @@
 %== include "window/description"
 <b><span color="#FF9933"><%= $error_string %></span></b>
 
+<div class="explore_stage">
+<div class="player">
+	<div class="player1">
+  		<img src="/img/face/raku_cw287a1.png" class="mini" width="48"><br />
+		<span class="name"><%== $kname %></span><br />
+  		<span class="hp">HP: <%== $khp %></span>
+  	</div>
+  	<div class="player2">
+  		<img src="/img/face/1010010101.png" class="mini" width="48"><br />
+		<span class="name">ちも2</span><br />
+  		<span class="hp">HP: 100</span>
+  	</div>
+  	<div class="player3">
+  		<img src="/img/face/1009010101.png" class="mini" width="48"><br />
+		<span class="name">ちも3</span><br />
+  		<span class="hp">HP: 100</span>
+  	</div>
+  	<div class="player4">
+  		<img src="/img/face/1011010101.png" class="mini" width="48"><br />
+		<span class="name">ちも4</span><br />
+  		<span class="hp">HP: 100</span>
+  	</div>
+  	<div class="player5">
+  		<img src="/img/face/1008010101.png" class="mini" width="48"><br />
+		<span class="name">ちも5</span><br />
+  		<span class="hp">HP: 100</span>
+  	</div>
+</div>
+</div>
+
 % if($kspot == 4 && $kpst == 0) {
     %= include "window/facilities"
 % } else {
@@ -22,4 +52,14 @@
 
 <script>
 player.spot = "<%== $spot %>";
+
+/*
+setInterval(() => {
+    let bgPosition = 0;
+    const stage = jQuery(".explore_stage");
+    stage.css("background-position", 'center left -'+ bgPosition + 'px');
+    bgPosition += 0.5;
+}, 50);
+
+ */
 </script>

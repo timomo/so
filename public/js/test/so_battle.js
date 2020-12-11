@@ -87,13 +87,7 @@ function reset_battle_layer(pointer, currentApp)
 		}
 		child.clearCommand();
 		child.clearState();
-	});
-
-	currentApp.stage.children.forEach((child) => {
-		if (child.constructor.name === "BattleChara")
-		{
-			child.resetPosition();
-		}
+		child.resetPosition();
 	});
 
 	const sort_no = {
@@ -141,6 +135,7 @@ function reset_battle_layer(pointer, currentApp)
 function set_battle_layer(pointer)
 {
     const layer = pointer.find("div.battle_layer");
+
     if (layer.length === 0)
     {
         return false;
@@ -268,10 +263,18 @@ function set_battle_layer(pointer)
 				const k = new Chara.BattleChara(opts);
 				app.stage.addChild(k);
 				k.alpha = data[key].alpha;
-				k.gotoAndNext("通常待機");
 				k.setPosition(data[key].x, data[key].y);
 				k.setDefaultPosition();
 				k.ffa2.direction = "left";
+
+				if (k.isDead())
+				{
+					k.gotoAndNext("戦闘不能");
+				}
+				else
+				{
+					k.gotoAndNext("通常待機");
+				}
 
 				if (data[key].hasOwnProperty("face"))
 				{
@@ -331,6 +334,8 @@ function set_position(pointer, timer, mode) {
 
 	pointer.find("div.player").css({
 		height: height,
+		bottom: 24,
+		display: "table",
 	});
 	pointer.find("div.enemy").css({
 		height: battle_stage.height() - height,
@@ -342,25 +347,41 @@ function set_position(pointer, timer, mode) {
 		const img = hp.siblings("img");
 		hp.css({
 			width: img.width(),
-			top: img.height() - hp.height(),
+			position: "initial",
 		});
 		name.css({
 			width: img.width(),
-			top: img.height() - hp.height() - name.height(),
 		});
 	});
+
+	let row = 0;
+
 	pointer.find("div.enemy .hp").each((index, elm) => {
 		const hp = jQuery(elm);
 		const name = hp.siblings("span.name");
 		const img = hp.siblings("img");
+
+		let width = img.width() / 2;
+		let height1 = img.height();
+		let height2 = img.height() + name.height();
+
+		if (row % 2 === 0)
+		{
+			img.attr("height", img.height() + 8);
+		}
+
 		name.css({
-			width: img.width() / 2,
-			top: img.height(),
+			width: width,
+			top: height1,
+			position: "initial",
 		});
 		hp.css({
-			width: img.width() / 2,
-			top: img.height() + name.height(),
+			width: width,
+			top: height2,
+			position: "initial",
 		});
+
+		row += 1;
 	});
 
 	/* コマンドウインドウ設定開始 */
@@ -383,7 +404,7 @@ function set_position(pointer, timer, mode) {
 		const p = pointer.find("div." + key);
 		p.show();
 		p.css({
-			position: "absolute",
+			position: "initial",
 			zIndex: 10000,
 			top: top,
 			left: left,
@@ -438,9 +459,12 @@ function set_position(pointer, timer, mode) {
 		p.css({
 			position: "absolute",
 			zIndex: 10000,
+			/*
 			top: top2,
+
+			 */
 			left: left,
-			textAlign: "left",
+			textAlign: "center",
 			float: "none",
 		});
 		left += (p.find("img").width() / 3) * 1.5;
