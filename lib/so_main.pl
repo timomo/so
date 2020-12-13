@@ -103,7 +103,7 @@ sub log_in
 	else
 	{
 		push(@select_menu, qw|<p class="answer-menu">【キャンプ】</p>|);
-		push(@select_menu, qw|<p id="mode_camp-select_rest" class="blink-before select-menu">休憩する</p>|);
+		push(@select_menu, qw|<p id="mode_camp-select_rest" class="blink-before select-menu">野宿</p>|);
 		push(@select_menu, qw|<p id="mode_camp-select_monster" class="select-menu">キャンピング</p>|);
 	}
 
