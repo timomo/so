@@ -137,7 +137,16 @@ function setup_select_menu()
 
 	jQuery("body").on("mouseenter", ".select-menu", (event) =>
 	{
-		const id = jQuery(event.target).attr("id");
+		let id;
+		if (jQuery(event.target).get(0).tagName === "P")
+		{
+			id = jQuery(event.target).attr("id");
+		}
+		else
+		{
+			id = jQuery(event.target).closest("div.card").attr("id");
+		}
+
 		const ary = id.split("_");
 		const name = ary.splice(0, 1)[0];
 		const select_id = ary.splice(0, 1)[0];
@@ -164,7 +173,15 @@ function setup_select_menu()
 
 	jQuery("body").on("click", ".select-menu", (event) =>
 	{
-		const id = jQuery(event.target).attr("id");
+		let id;
+		if (jQuery(event.target).get(0).tagName === "P")
+		{
+			id = jQuery(event.target).attr("id");
+		}
+		else
+		{
+			id = jQuery(event.target).closest("div.card").attr("id");
+		}
 		const ary = id.split("_");
 		const name = ary.splice(0, 1)[0];
 		const select_id = ary.splice(0, 1)[0];
@@ -465,6 +482,29 @@ function fixed_bottom_player_status_area() {
 	player_status.css({ position: "fixed", width: "85%",  bottom: 0, zIndex: player_status.zIndex + 1, "word-break": "keep-all" });
 }
 
+function setup_event_card()
+{
+	jQuery(document).on("click", "div.event div[class^='card']", (event) => {
+		const div = jQuery(event.target).closest("div.card");
+
+		div.stop().animate({ opacity: 0 }, {duration: 200, complete: () => {
+			const backend = div.find("div.card-backend");
+			const frontend = div.find("div.card-frontend");
+			if (backend.is(":visible"))
+			{
+				backend.hide();
+				frontend.show();
+			}
+			else
+			{
+				backend.show();
+				frontend.hide();
+			}
+			div.animate({opacity: 1}, {duration: 200});
+		}});
+	});
+}
+
 jQuery(document).ready(() => {
 	jQuery("body").on("click", "div.menu-close", (event) => {
 		jQuery(event.target).closest("div.blackboard").closest("div.ui-draggable").remove();
@@ -492,6 +532,7 @@ jQuery(document).ready(() => {
 	setup_take_control_form();
 	setup_select_menu();
 	setup_message();
+	setup_event_card();
 	fixed_bottom_location_area();
 	fixed_bottom_player_status_area();
 

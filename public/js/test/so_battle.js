@@ -367,7 +367,11 @@ function set_position(pointer, timer, mode) {
 
 		if (row % 2 === 0)
 		{
-			img.attr("height", 128 + 16);
+			img.attr("height", 32 + 16);
+		}
+		else
+		{
+			img.attr("height", 32);
 		}
 
 		name.css({

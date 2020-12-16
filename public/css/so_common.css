@@ -112,17 +112,6 @@ table
     width: auto;
 }
 
-.player
-{
-    height: 48px;
-    text-align: right;
-}
-
-.enemy
-{
-    height: 192px;
-}
-
 .battle_stage
 {
     width: 320px;
@@ -176,7 +165,8 @@ table
 }
 
 .hp,
-.name
+.name,
+.card-name
 {
     bottom: 0;
     /*
@@ -187,6 +177,14 @@ table
     text-align: right;
     text-shadow: 1px 2px 3px #000;
     color: #FFF;
+}
+
+.card-name
+{
+    text-shadow: 1px 2px 3px #FFF;
+    color: darkslategray;
+    overflow-wrap: break-word;
+    padding-left: 7px;
 }
 
 .name
@@ -211,29 +209,78 @@ table
 
 .explore_stage
 {
-    /*
-    background-image: url(/img/9e2fddd53bd9e1155791e2c64868eb1a.png);
-     */
     background-image: url(/img/158e35945dfb441ed15105ed7c0e7849.png);
-
     background-size: cover;
     width: 320px;
     height: 240px;
 }
 
+.explore_stage.town
+{
+    background-image: url(/img/a1a38e84d6891d632929ec34499e216c.png);
+}
+
 .player
 {
-    display: table-cell;
     vertical-align: bottom;
-    height: 240px;
-    position: relative;
     left: 80px;
+    position: relative;
+    bottom: 14px;
+    height: 48px;
+    text-align: right;
 }
 
 .enemy
 {
-    display: table;
+    position: relative;
+    bottom: -90px;
+}
 
+.event
+{
+    position: relative;
+    top: 2px;
+    border-spacing: 2px;
+    height: 186px;
+}
+
+.event-row
+{
+    display: table-row;
+}
+
+.card
+{
+    border: 1px solid white;
+    display: table-cell;
+    height: 86px;
+    width: 57px;
+    border-radius: 3px;
+    vertical-align: middle;
+    text-align: center;
+    cursor: pointer;
+}
+
+.card:hover
+{
+    transform: scale(1.1, 1.1);
+}
+
+.card-frontend
+{
+    background-image: url(/img/975067-2.jpg);
+    background-size: cover;
+    height: 86px;
+    width: 57px;
+}
+
+.card-backend
+{
+    background-image: url(/img/146839.png);
+    background-size: cover;
+    height: 86px;
+    width: 57px;
+    display: none;
 }
 
 .enemy1,

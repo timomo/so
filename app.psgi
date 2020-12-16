@@ -370,6 +370,7 @@ get "/img/*file" => sub {
     my $dir = "public/img";
 
     # $self->res->headers->header("Access-Control-Allow-Origin" => "*");
+    warn "---------->". $self->param("file");
 
     if (my $asset = $self->app->static->file(File::Spec->catfile($FindBin::Bin, $dir, $self->param("file")))) {
         my $regex_suffix = qr/\.[^\.]+$/;
