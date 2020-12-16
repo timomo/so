@@ -88,4 +88,8 @@ setInterval(() => {
 }, 50);
 
  */
+
+jQuery("div.event div.card").each((index, elem) => {
+    animate_event_card(index + 1);
+});
 </script>

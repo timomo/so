@@ -272,6 +272,7 @@ table
     background-size: cover;
     height: 86px;
     width: 57px;
+    display: none;
 }
 
 .card-backend
@@ -280,7 +281,6 @@ table
     background-size: cover;
     height: 86px;
     width: 57px;
-    display: none;
 }
 
 .enemy1,

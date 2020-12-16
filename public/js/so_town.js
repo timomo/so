@@ -484,25 +484,29 @@ function fixed_bottom_player_status_area() {
 
 function setup_event_card()
 {
-	jQuery(document).on("click", "div.event div[class^='card']", (event) => {
-		const div = jQuery(event.target).closest("div.card");
 
-		div.stop().animate({ opacity: 0 }, {duration: 200, complete: () => {
-			const backend = div.find("div.card-backend");
-			const frontend = div.find("div.card-frontend");
-			if (backend.is(":visible"))
-			{
-				backend.hide();
-				frontend.show();
-			}
-			else
-			{
-				backend.show();
-				frontend.hide();
-			}
-			div.animate({opacity: 1}, {duration: 200});
-		}});
-	});
+}
+
+function animate_event_card(number)
+{
+	const div = jQuery("div.event div.card:nth-child(" + number + ")");
+
+	div.stop().css("transform", "scale(1)").animate({ scale: 0.01 }, {duration: 200, complete: () => {
+		const backend = div.find("div.card-backend");
+		const frontend = div.find("div.card-frontend");
+
+		if (backend.is(":visible"))
+		{
+			backend.hide();
+			frontend.show();
+		}
+		else
+		{
+			backend.show();
+			frontend.hide();
+		}
+		div.animate({ scale: 1 }, {duration: 200});
+	}});
 }
 
 jQuery(document).ready(() => {
