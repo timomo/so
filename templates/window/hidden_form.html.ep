@@ -1,4 +1,3 @@
-<hr size=0>
 <form id="check_form" action="<%= $script %>" method="post" class="non">
 <select id="status-select" name="mode" onchange="javascript:selectTown(this);">
 <option value="item_check">アイテム一覧</option>

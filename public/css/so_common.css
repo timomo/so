@@ -228,6 +228,7 @@ table
     bottom: 14px;
     height: 48px;
     text-align: right;
+    width: 240px;
 }
 
 .enemy
@@ -301,4 +302,11 @@ table
 
      */
     text-align: left;
+}
+
+#td_item,
+#td_status,
+#td_message
+{
+    font-size: 1.2rem;
 }

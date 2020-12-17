@@ -1,4 +1,4 @@
-<div class="blackboard question">
+<div class="blackboard question description">
 
 % for my $mes (@$message) {
     <%== $mes %>
