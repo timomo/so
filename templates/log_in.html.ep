@@ -66,8 +66,9 @@
 <div id="town_text" class="text_detail non">&nbsp;</div>
 
 %= include "window/move"
+<!--
 %= include "window/select_menu"
-
+-->
 % if($kspot == 0 && $kpst == 0) {
 
     %= include "window/shadow_duel"
@@ -90,6 +91,6 @@ setInterval(() => {
  */
 
 jQuery("div.event div.card").each((index, elem) => {
-    animate_event_card(index + 1);
+    animate_event_card(elem);
 });
 </script>

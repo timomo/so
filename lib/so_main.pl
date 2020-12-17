@@ -153,7 +153,7 @@ sub log_in
 		["/img/cardwirth/romance.raindrop.jp/gell4.png", "キャンピング", "mode_camp-select_monster"],
 		["/img/cardwirth/romance.raindrop.jp/047.png", "郊外を探索", "mode_monster-select_explore"],
 		["/img/cardwirth/romance.raindrop.jp/047.png", "先へ進む", "mode_monster-select_forward"],
-		["/img/cardwirth/romance.raindrop.jp/047.png", "街へ帰還", "mode_monster-select_town"],
+		["/img/cardwirth/romance.raindrop.jp/house.gif", "街へ帰還", "mode_monster-select_town"],
 #		["/img/cardwirth/romance.raindrop.jp/dawn.gif", "壁紙を見る"],
 #		["/img/cardwirth/romance.raindrop.jp/items.png", "荷物袋"],
 #		["/img/cardwirth/romance.raindrop.jp/sky-f.gif", "パーティ情報"],

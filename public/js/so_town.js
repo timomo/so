@@ -487,9 +487,9 @@ function setup_event_card()
 
 }
 
-function animate_event_card(number)
+function animate_event_card(elem)
 {
-	const div = jQuery("div.event div.card:nth-child(" + number + ")");
+	const div = jQuery(elem);
 
 	div.stop().css("transform", "scale(1)").animate({ scale: 0.01 }, {duration: 200, complete: () => {
 		const backend = div.find("div.card-backend");
