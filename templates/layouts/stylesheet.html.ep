@@ -21,3 +21,4 @@ a:visited {
 <link rel="stylesheet" href="/css/so_common.css?time=<%= time %>" type="text/css" />
 <link rel="stylesheet" href="/css/blackboard.css" type="text/css" />
 <link rel="stylesheet" href="/css/third-party/jquery.jgrowl.css" type="text/css" />
+<link rel="stylesheet" href="https://code.jquery.com/mobile/1.5.0-rc1/jquery.mobile-1.5.0-rc1.min.css" type="text/css" />

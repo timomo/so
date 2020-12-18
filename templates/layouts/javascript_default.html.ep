@@ -1,4 +1,6 @@
 <script>
 jQuery.jGrowl.defaults.position = "bottom-right";
 jQuery.jGrowl.defaults.theme = "so";
+jQuery("a").attr("data-ajax", "false");
+jQuery("form").attr("data-ajax", "false");
 </script>

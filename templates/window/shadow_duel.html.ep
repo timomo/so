@@ -3,6 +3,7 @@
 <input type="hidden" name="mode" value="battle" />
 <input type="hidden" name="id" value="<%= $kid %>" />
 <input type="hidden" name="pass" value="<%= $kpass %>" />
+
 <select name="rid">
 <option value="">挑戦相手を選択(強さ)</option>
 %== join("\n", @$rid);

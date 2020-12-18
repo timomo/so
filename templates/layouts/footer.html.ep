@@ -22,5 +22,8 @@ Music by <a href="https://otologic.jp/">OtoLogic</a><br />
 カード素材 by <a href="http://romance.raindrop.jp/wirth/">siuil a run</a><br />
 カード背景素材 by <a href='https://ja.pngtree.com/free-backgrounds'>からの無料の背景写真 ja.pngtree.com</a><br />
 </div>
+
+%= include "layouts/javascript_default"
+
 </body>
 </html>

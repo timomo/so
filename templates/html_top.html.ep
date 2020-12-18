@@ -1,7 +1,6 @@
 %= include "layouts/header"
 %= include "layouts/meta"
 %= include "layouts/javascript"
-%= include "layouts/javascript_default"
 %= include "layouts/sound"
 %= include "layouts/stylesheet"
 </head>
