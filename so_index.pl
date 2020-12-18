@@ -162,7 +162,10 @@ elsif($mode eq 'make_end') { &make_end; }
 elsif($mode eq 'regist') { &regist; }
 elsif($mode eq 'battle') { &battle; }
 elsif($mode eq 'pvp') { &pvp; }
-elsif($mode eq 'monster') { &monster2; }
+elsif($mode eq 'monster') {
+	# &move;
+	&monster2;
+}
 elsif($mode eq 'rest') { &rest; }
 elsif($mode eq 'yado') { $spot = "宿屋"; &yado; }
 elsif($mode eq 'yado_in') { $spot = "宿屋"; &yado_in; }

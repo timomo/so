@@ -1,5 +1,3 @@
-import Card from "./BattleCard.js";
-
 // That's default v4 vertex shader, just in case
 
 const myVertex = `
@@ -47,14 +45,13 @@ gl_FragColor = originalColor + shadowColor * (1.0 - originalColor.a);
 }
 `;
 
-export class BattleFace extends PIXI.Sprite
+export class BattleCard extends PIXI.Sprite
 {
     constructor(props)
     {
-        const texture = PIXI.Texture.from(props.path);
+        const texture = PIXI.Texture.from(props.background);
         super(texture);
         const self = this;
-        const sprite_background = new Card.BattleCard(props);
 
         self["移動量"] = {};
         self["移動量"]["前進"] = 0.2;
@@ -230,14 +227,12 @@ export class BattleFace extends PIXI.Sprite
         self.resources = props.resources;
         self.face = props.face;
 
+        /*
         self.addChildKey("background", sprite_background);
         self.background = sprite_background;
 
-        /*
-        sprite_background.gotoAndNext("通常待機");
-        self.gotoAndNext("通常待機");
-         */
 
+         */
         self.ffa2.constitution[self.md5].current = self.ffa2.constitution[self.md5][self.turn_no];
         self.ffa2.chara_status[self.md5].current = self.ffa2.chara_status[self.md5][self.turn_no];
 
@@ -1921,4 +1916,4 @@ export class BattleFace extends PIXI.Sprite
     }
 }
 
-export default { BattleFace };
+export default { BattleCard };

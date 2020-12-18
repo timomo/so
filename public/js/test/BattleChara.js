@@ -995,23 +995,23 @@ export class BattleChara extends PIXI.AnimatedSprite
         }
         else if (constKey === 6) // プレイヤー:1
         {
-            return { x: 80 - 32, y: 220, ffa2: { width: 64, height: 64 } };
+            return { x: 20 - 32, y: 250, ffa2: { width: 64, height: 64 } };
         }
         else if (constKey === 7)
         {
-            return { x: 130 - 32, y: 220, ffa2: { width: 64, height: 64 } };
+            return { x: 70 - 32, y: 250, ffa2: { width: 64, height: 64 } };
         }
         else if (constKey === 8)
         {
-            return { x: 180 - 32, y: 220, ffa2: { width: 64, height: 64 } };
+            return { x: 120 - 32, y: 250, ffa2: { width: 64, height: 64 } };
         }
         else if (constKey === 9)
         {
-            return { x: 230 - 24, y: 220, ffa2: { width: 64, height: 64 } };
+            return { x: 170 - 24, y: 250, ffa2: { width: 64, height: 64 } };
         }
         else if (constKey === 10)
         {
-            return { x: 280 - 32, y: 220, ffa2: { width: 64, height: 64 } };
+            return { x: 220 - 32, y: 250, ffa2: { width: 64, height: 64 } };
         }
 
         /*

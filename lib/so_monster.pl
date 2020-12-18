@@ -583,7 +583,7 @@ sub monster_initialize
 	@kbuff = ($rbuf[0],$rbuf[1],$rbuf[2],0);
 	@mbuff = (1,1,1,0);
 
-	&move;
+	# &move;
 
 	# モンスター読み出し
 

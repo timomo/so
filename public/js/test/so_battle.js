@@ -91,8 +91,9 @@ function reset_battle_layer(pointer, currentApp)
 	});
 
 	const sort_no = {
-		"BattleChara": 2,
-		"BattleFace": 1,
+		"BattleChara": 3,
+		"BattleFace": 2,
+		"BattleCard": 1,
 	};
 	const sort_type = {
 		"m": 1,
@@ -149,7 +150,8 @@ function set_battle_layer(pointer)
 	}
 
 	const app = new PIXI.Application({
-		height: 240,
+		// height: 240,
+		height: 320,
 		width: 320,
 		// TODO: resolutionを指定すると「しちゅれい！」になる
 		// resolution: window.devicePixelRatio || 1,
@@ -194,7 +196,7 @@ function set_battle_layer(pointer)
 
 	app.ticker.add((delta) => {
 		app.stage.children.forEach((child) => {
-			if (child.constructor.name === "BattleChara")
+			if (child.constructor.name.startsWith("Battle"))
 			{
 				child.updateFake();
 			}
@@ -284,6 +286,7 @@ function set_battle_layer(pointer)
 					face.chara_status = data[key].chara_status;
 					face.constitution = data[key].constitution;
 					face.turn_no = 1;
+					face.app = app;
 
 					const player1 = new Face.BattleFace(face);
 
@@ -292,6 +295,11 @@ function set_battle_layer(pointer)
 					player1.scale.y = face.scale.y;
 					player1.x = face.x;
 					player1.y = face.y;
+
+					player1.background.x = player1.x - 10;
+					player1.background.y = player1.y - 16;
+
+					player1.gotoAndNext("通常待機");
 
 					k.face = face;
 				}
@@ -336,6 +344,9 @@ function set_position(pointer, timer, mode) {
 		height: height,
 		bottom: 24,
 		display: "table",
+		zIndex: 10000,
+		width: 57 * 5,
+		left: 5,
 	});
 	pointer.find("div.enemy").css({
 		height: battle_stage.height() - height,
@@ -346,11 +357,11 @@ function set_position(pointer, timer, mode) {
 		const name = hp.siblings("span.name");
 		const img = hp.siblings("img");
 		hp.css({
-			width: img.width(),
 			position: "initial",
+			textAlign: "center",
 		});
 		name.css({
-			width: img.width(),
+			textAlign: "center",
 		});
 	});
 
@@ -409,18 +420,21 @@ function set_position(pointer, timer, mode) {
 		p.show();
 		p.css({
 			position: "initial",
-			zIndex: 10000,
+			zIndex: 10001,
 			top: top,
 			left: left,
 			// backgroundColor: "rgba(0, 0, 0, 0.1)",
-			textAlign: "left",
+			textAlign: "center",
 			/*
 			float: "none",
 			 */
 			display: "table-cell",
+			width: 57,
 		});
-		left += p.find("img").width();
+		left += 57 + 1;
+		// left += p.find("img").width();
 
+		/*
 		p.unbind("click");
 		p.click((event) => {
 			const offset = jQuery(event.target).offset();
@@ -438,6 +452,8 @@ function set_position(pointer, timer, mode) {
 			status.offset(offset);
 			status.draggable();
 		});
+
+		 */
 	});
 
 	const keys2 = ["enemy1","enemy2","enemy3","enemy4","enemy5"];
@@ -462,7 +478,7 @@ function set_position(pointer, timer, mode) {
 		const top2 = top + max_height - p.height();
 		p.css({
 			position: "absolute",
-			zIndex: 10000,
+			zIndex: 10001,
 			/*
 			top: top2,
 
@@ -473,6 +489,7 @@ function set_position(pointer, timer, mode) {
 		});
 		left += (p.find("img").width() / 3) * 1.5;
 
+		/*
 		p.unbind("click");
 		p.click((event) => {
 			const offset = jQuery(event.target).offset();
@@ -490,6 +507,8 @@ function set_position(pointer, timer, mode) {
 			status.offset(offset);
 			status.draggable();
 		});
+
+		 */
 	});
     if (timer !== 1)
     {

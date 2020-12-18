@@ -89,6 +89,7 @@ sub log_in
 	}
 
 	my $error_string = Encode::decode_utf8($error) if (! utf8::is_utf8($error));
+	my @card;
 
 	$error = "";
 
@@ -99,12 +100,21 @@ sub log_in
 		push(@select_menu, sprintf('<p id="mode_town-select_%s" class="select-menu">%s</p>', "item_shop", "ショップ：".$data->{current}->{shop}));
 		push(@select_menu, sprintf('<p id="mode_town-select_%s" class="select-menu">%s</p>', "user_shop", "市場：チュパフリマ：". $data->{current}->{地名}));
 		push(@select_menu, sprintf('<p id="mode_town-select_%s" class="select-menu">%s</p>', "bank", "銀行：シマダ国営銀行（". $data->{current}->{地名}. "店）"));
+
+		push(@card, ["/img/cardwirth/romance.raindrop.jp/house.gif", "宿屋", "mode_town-select_yado"]);
+		push(@card, ["/img/cardwirth/romance.raindrop.jp/house.gif", "ショップ", "mode_town-select_item_shop"]);
+		push(@card, ["/img/cardwirth/romance.raindrop.jp/house.gif", "市場", "mode_town-select_user_shop"]);
+		push(@card, ["/img/cardwirth/romance.raindrop.jp/house.gif", "銀行", "mode_town-select_bank"]);
 	}
 	else
 	{
 		push(@select_menu, qw|<p class="answer-menu">【キャンプ】</p>|);
 		push(@select_menu, qw|<p id="mode_camp-select_rest" class="blink-before select-menu">野宿</p>|);
 		push(@select_menu, qw|<p id="mode_camp-select_monster" class="select-menu">キャンピング</p>|);
+
+		push(@card, ["/img/cardwirth/romance.raindrop.jp/camp.gif", "野宿", "mode_camp-select_rest"]);
+		push(@card, ["/img/cardwirth/romance.raindrop.jp/gell4.png", "キャンピング", "mode_camp-select_monster"]);
+
 	}
 
 	my ( $label, $optionHTML ) = ( "", "" );
@@ -115,6 +125,8 @@ sub log_in
 	if ($k->{スポット} == 0 && $k->{距離} == 0)
 	{
 		push( @options, [ "explore", sprintf( "%s郊外を探索する", $data->{current}->{地名} ) ] );
+		push(@card, ["/img/cardwirth/romance.raindrop.jp/047.png", "郊外を探索", "mode_monster-select_explore"]);
+
 	}
 	if ($k->{スポット} == 4 && $k->{距離} == 0)
 	{
@@ -123,14 +135,19 @@ sub log_in
 		push( @options, [ "field", sprintf( "%sへ向かう(距離 %s)", $data->{current}->{場所}, $data->{current}->{距離} ) ] );
 		push( @options, [ "next", sprintf( "%s方面へ(距離 %s)", $data->{next}->{地名}, $data->{next}->{距離} ) ] );
 		push( @options, [ "previous", sprintf( "%s方面へ(距離 %s)", $data->{previous}->{地名}, $data->{previous}->{距離} ) ] );
+
+		push(@card, ["/img/cardwirth/romance.raindrop.jp/047.png", "郊外を探索", "mode_monster-select_explore"]);
+		push(@card, ["/img/cardwirth/romance.raindrop.jp/047.png", "外へ", "mode_monster-select_field"]);
 	}
 
 	$label = "【行動】";
 	push( @options, [ "forward", "先へ進む" ] );
+	push(@card, ["/img/cardwirth/romance.raindrop.jp/047.png", "先へ進む", "mode_monster-select_forward"]);
 
 	if ($k->{距離} == 0)
 	{
 		push( @options, [ "town", sprintf( "%sへ帰還する", $data->{current}->{地名} ) ] );
+		push(@card, ["/img/cardwirth/romance.raindrop.jp/house.gif", "街へ帰還", "mode_monster-select_town"]);
 	}
 
 	push(@select_menu, qq|<p class="answer-menu">|. $label. qq|</p>|);
@@ -138,6 +155,7 @@ sub log_in
 	if ($k->{距離} != 0)
 	{
 		push( @options, [ "backward", "引き返す" ] );
+		push(@card, ["/img/cardwirth/romance.raindrop.jp/047.png", "引き返す", "mode_monster-select_backward"]);
 	}
 
 	for (@options)
@@ -147,20 +165,6 @@ sub log_in
 	}
 
 	my @rid;
-
-	my @card = (
-		["/img/cardwirth/romance.raindrop.jp/camp.gif", "野宿", "mode_camp-select_rest"],
-		["/img/cardwirth/romance.raindrop.jp/gell4.png", "キャンピング", "mode_camp-select_monster"],
-		["/img/cardwirth/romance.raindrop.jp/047.png", "郊外を探索", "mode_monster-select_explore"],
-		["/img/cardwirth/romance.raindrop.jp/047.png", "先へ進む", "mode_monster-select_forward"],
-		["/img/cardwirth/romance.raindrop.jp/house.gif", "街へ帰還", "mode_monster-select_town"],
-#		["/img/cardwirth/romance.raindrop.jp/dawn.gif", "壁紙を見る"],
-#		["/img/cardwirth/romance.raindrop.jp/items.png", "荷物袋"],
-#		["/img/cardwirth/romance.raindrop.jp/sky-f.gif", "パーティ情報"],
-#		["/img/cardwirth/romance.raindrop.jp/turn.gif", "セーブ"],
-#		["/img/cardwirth/romance.raindrop.jp/weapons.png", "冒険の中断"],
-	);
-
 	my $html = $controller->render_to_string(
 		template     => "log_in",
 		script       => $script,

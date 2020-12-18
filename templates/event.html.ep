@@ -1,19 +1,57 @@
-<div class="blackboard question">
-<p>
-%== $event->{id}
-</p>
-<p>
-%== $event->{メッセージ}
-</p>
-</div>
-<div class="clearfix">
-	<div class="blackboard answer float-l">
+<div class="explore_stage">
 
-	% for my $command (@{ $event->{選択肢} }) {
-        <p class="select-command"><%== $command %></p>
+    <div class="event">
+        <div class="event-row">
+            <div class="carda card">
+                <div class="card-frontend">
+                    <br />
+                    <img src="/img/face/raku_cw287a1.png" class="mini" width="48"><br />
+                    <span class="card-name">登場人物A</span><br />
+                </div>
+                <div class="card-backend"></div>
+            </div>
+            <div class="cardb card">
+                <div class="card-frontend">
+                    <br />
+                    <img src="/img/face/raku_cw287a1.png" class="mini" width="48"><br />
+                    <span class="card-name">登場人物B</span><br />
+                </div>
+                <div class="card-backend"></div>
+            </div>
+            % if ($event->{メッセージ} ne "&nbsp;") {
+                <div class="blackboard mini">
+                    <p>
+                        %== $event->{メッセージ}
+                    </p>
+                </div>
+            % }
+        </div>
+        <div class="event-row">
+
+% for my $no (0 .. $#{ $event->{選択肢} }) {
+    % my $command = $event->{選択肢}->[$no];
+    % if ($no != 0 && $no % 5 == 0) {
+        </div>
+        <div class="event-row">
     % }
-	</div>
+
+            <div class="card<%= $no + 1 %> card select-command">
+                <div class="card-frontend">
+                    <br />
+                    <img src="/img/cardwirth/romance.raindrop.jp/047.png" class="mini" width="48"><br />
+                    <span class="card-name"><%= $command %></span><br />
+                </div>
+                <div class="card-backend"></div>
+            </div>
+% }
+
 </div>
+</div>
+
+%= include "window/party"
+
+</div>
+
 <script>
 jQuery(".select-command").bind("mouseenter", (event) => {
     jQuery(".select-command").removeClass("blink-before");
@@ -25,5 +63,8 @@ jQuery(".select-command").bind("click", (event) => {
     jQuery.post("/event/<%= $event->{id} %>", query, (data) => {
         jQuery("#stage").html(data);
     });
+});
+jQuery("div.event div.card, div.player div.card").each((index, elem) => {
+    animate_event_card(elem);
 });
 </script>

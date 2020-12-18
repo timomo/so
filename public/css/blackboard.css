@@ -92,3 +92,10 @@ see https://fantastech.net/dragon-quest-text
 {
     font-size: 0.8rem;
 }
+
+.blackboard.mini
+{
+    margin: 0 auto auto;
+    font-size: 0.7rem;
+    box-shadow: 0 0 0 2px #fff inset;
+}

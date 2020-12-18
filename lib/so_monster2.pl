@@ -162,85 +162,90 @@ sub monster_step_run2
 			spreadsheet  => "/js/battle/spritesheet/character/1053010302.json",
 			chara_status => { "" => { 1 => { パーティー内番号 => 1, パーティーid => 1, 名前 => $data->{"プレイヤー:1"}->{名前} } } },
 			constitution => { "" => { 1 => { 参戦フラグ => 1, 蘇生フラグ => 0, 死亡フラグ => 0, キャラ種別 => "k" } } },
-			x            => 80 + 24,
-			y            => 220,
+			x            => 0,
+			y            => 0,
 			alpha        => 0,
 			face         => {
 				path     => "/img/face/raku_cw287a1.png",
+				background => "/img/975067-2.jpg",
 				scale => {
 					x => 0.5,
 					y => 0.5,
 				},
-				x => 80,
-				y => 170,
+				x => 15,
+				y => 250,
 			},
 		},
 		"プレイヤー:2" => {
 			spreadsheet  => "/js/battle/spritesheet/character/1044010301.json",
 			chara_status => { "" => { 1 => { パーティー内番号 => 2, パーティーid => 1, 名前 => $data->{"プレイヤー:2"}->{名前} } } },
 			constitution => { "" => { 1 => { 参戦フラグ => 1, 蘇生フラグ => 0, 死亡フラグ => 0, キャラ種別 => "k" } } },
-			x            => 130 + 24,
-			y            => 220,
+			x            => 0,
+			y            => 0,
 			alpha        => 0,
 			face         => {
 				path     => "/img/face/1010010101.png",
+				background => "/img/975067-2.jpg",
 				scale => {
 					x => 0.3,
 					y => 0.3,
 				},
-				x => 130,
-				y => 170,
+				x => 73,
+				y => 250,
 			},
 		},
 		"プレイヤー:3" => {
 			spreadsheet  => "/js/battle/spritesheet/character/1008010303.json",
 			chara_status => { "" => { 1 => { パーティー内番号 => 3, パーティーid => 1, 名前 => $data->{"プレイヤー:3"}->{名前} } } },
 			constitution => { "" => { 1 => { 参戦フラグ => 1, 蘇生フラグ => 0, 死亡フラグ => 0, キャラ種別 => "k" } } },
-			x            => 180 + 24,
-			y            => 220,
+			x            => 0,
+			y            => 0,
 			alpha        => 0,
 			face         => {
 				path     => "/img/face/1009010101.png",
+				background => "/img/975067-2.jpg",
 				scale => {
 					x => 0.3,
 					y => 0.3,
 				},
-				x => 180,
-				y => 170,
+				x => 131,
+				y => 250,
 			},
 		},
 		"プレイヤー:4" => {
 			spreadsheet  => "/js/battle/spritesheet/character/1013010302.json",
 			chara_status => { "" => { 1 => { パーティー内番号 => 4, パーティーid => 1, 名前 => $data->{"プレイヤー:4"}->{名前} } } },
 			constitution => { "" => { 1 => { 参戦フラグ => 1, 蘇生フラグ => 0, 死亡フラグ => 0, キャラ種別 => "k" } } },
-			x            => 230 + 24,
-			y            => 220,
+			x            => 0,
+			y            => 0,
 			alpha        => 0,
 			face         => {
 				path     => "/img/face/1011010101.png",
+				background => "/img/975067-2.jpg",
 				scale => {
 					x => 0.3,
 					y => 0.3,
 				},
-				x => 230,
-				y => 170,
+				x => 188,
+				y => 250,
 			},
 		},
 		"プレイヤー:5" => {
 			spreadsheet  => "/js/battle/spritesheet/character/1017010302.json",
 			chara_status => { "" => { 1 => { パーティー内番号 => 5, パーティーid => 1, 名前 => $data->{"プレイヤー:5"}->{名前} } } },
 			constitution => { "" => { 1 => { 参戦フラグ => 1, 蘇生フラグ => 0, 死亡フラグ => 0, キャラ種別 => "k" } } },
-			x            => 280 + 24,
-			y            => 220,
+			x            => 0,
+			y            => 0,
 			alpha        => 0,
 			face         => {
 				path     => "/img/face/1008010101.png",
+				background => "/img/975067-2.jpg",
 				scale => {
 					x => 0.3,
 					y => 0.3,
 				},
-				x => 280,
-				y => 170,
+				x => 246,
+				y => 250,
 			},
 		},
 	};
@@ -249,6 +254,12 @@ sub monster_step_run2
 	{
 		my $tmp = $unit->{$key};
 		my $tmp2 = $data->{$key};
+
+		if (exists $tmp->{face})
+		{
+			$tmp->{x} = $tmp->{face}->{x} + 24;
+			$tmp->{y} = $tmp->{face}->{y};
+		}
 
 		if ($tmp2->{HP} <= 0)
 		{
@@ -305,27 +316,27 @@ sub monster_step_run2
 </div>
 <div class="player">
 	<div class="player1">
-  		<img src="/img/transparent.png" class="mini" width="48"><br />
+  		<img src="/img/transparent.png" class="mini" width="57"><br />
 		<span class="name">$data->{"プレイヤー:1"}->{名前}</span><br />
   		<span class="hp">HP: $data->{"プレイヤー:1"}->{HP}</span>
   	</div>
 	<div class="player2">
-  		<img src="/img/transparent.png" class="mini" width="48"><br />
+  		<img src="/img/transparent.png" class="mini" width="57"><br />
 		<span class="name">$data->{"プレイヤー:2"}->{名前}</span><br />
   		<span class="hp">HP: $data->{"プレイヤー:2"}->{HP}</span>
   	</div>
 	<div class="player3">
-  		<img src="/img/transparent.png" class="mini" width="48"><br />
+  		<img src="/img/transparent.png" class="mini" width="57"><br />
 		<span class="name">$data->{"プレイヤー:3"}->{名前}</span><br />
   		<span class="hp">HP: $data->{"プレイヤー:3"}->{HP}</span>
   	</div>
 	<div class="player4">
-  		<img src="/img/transparent.png" class="mini" width="48"><br />
+  		<img src="/img/transparent.png" class="mini" width="57"><br />
 		<span class="name">$data->{"プレイヤー:4"}->{名前}</span><br />
   		<span class="hp">HP: $data->{"プレイヤー:4"}->{HP}</span>
   	</div>
 	<div class="player5">
-  		<img src="/img/transparent.png" class="mini" width="48"><br />
+  		<img src="/img/transparent.png" class="mini" width="57"><br />
 		<span class="name">$data->{"プレイヤー:5"}->{名前}</span><br />
   		<span class="hp">HP: $data->{"プレイヤー:5"}->{HP}</span>
   	</div>

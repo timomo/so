@@ -104,7 +104,7 @@ sub render_to_string
         }
 
         my $controller = $self->app->build_controller;
-        $controller->stash(event => $row);
+        $controller->stash(event => $row, khp => $self->data->{HP}, kname => $self->data->{名前});
         my $html = $controller->render_to_string("event");
 
         return Encode::encode_utf8($html);

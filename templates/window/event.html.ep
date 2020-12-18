@@ -1,0 +1,24 @@
+    <div class="event">
+        <div class="event-row">
+
+% for my $no (0 .. $#$card) {
+
+% my $ary = $card->[$no];
+
+% if ($no != 0 && $no % 5 == 0) {
+</div>
+<div class="event-row">
+% }
+
+<div class="card<%= $no + 1 %> card select-menu" id="<%= $ary->[2] %>">
+                <div class="card-frontend">
+                    <br />
+                    <img src="<%= $ary->[0] %>" class="mini" width="48"><br />
+                    <span class="card-name"><%= $ary->[1] %></span><br />
+                </div>
+                <div class="card-backend"></div>
+            </div>
+% }
+
+</div>
+</div>
