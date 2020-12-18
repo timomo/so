@@ -194,7 +194,9 @@ table
 .card-name
 {
     overflow-wrap: break-word;
+    /*
     padding-left: 7px;
+     */
 }
 
 .name
