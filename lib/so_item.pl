@@ -342,7 +342,7 @@ sub item_regist
 		$line =~ s/(?:\r\n|\r|\n)$//g;
 		my @tmp = split("<>", $line);
 		my $item = {};
-		@$item{@{$controller->config->{キャラ所持品}}} = @tmp;
+		@$item{@{$mojo->config->{キャラ所持品}}} = @tmp;
 		push(@items, $item);
 	}
 
@@ -359,7 +359,7 @@ sub item_load
 
 	for my $row (@$rows)
 	{
-		my @tmp = @$row{@{$controller->config->{キャラ所持品}}};
+		my @tmp = @$row{@{$mojo->config->{キャラ所持品}}};
 		push(@items, \@tmp);
 	}
 
@@ -470,7 +470,7 @@ sub item_db_save
 		$line =~ s/(?:\r\n|\r|\n)$//g;
 		my @tmp = split("<>", $line);
 		my $item = {};
-		@$item{@{$controller->config->{キャラ所持品}}} = @tmp;
+		@$item{@{$mojo->config->{キャラ所持品}}} = @tmp;
 		push(@items, $item);
 	}
 
@@ -667,7 +667,7 @@ sub item_sell
 		}
 
 		my $row = {};
-		@$row{@{$controller->config->{キャラ所持品}}} = @$ary;
+		@$row{@{$mojo->config->{キャラ所持品}}} = @$ary;
 
 		if ($row->{所持数} < $use_item)
 		{
@@ -740,7 +740,7 @@ sub user_sell
 		}
 
 		my $row = {};
-		@$row{@{$controller->config->{キャラ所持品}}} = @$ary;
+		@$row{@{$mojo->config->{キャラ所持品}}} = @$ary;
 
 		if ($row->{所持数} < $use_item)
 		{
@@ -1130,7 +1130,7 @@ sub item_delete
 		}
 
 		my $row = {};
-		@$row{@{$controller->config->{キャラ所持品}}} = @$ary;
+		@$row{@{$mojo->config->{キャラ所持品}}} = @$ary;
 		$row->{所持数} -= 1;
 		$use = $row;
 		$system->save_item_db($kid, [ $row ]);

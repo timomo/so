@@ -42,9 +42,9 @@ sub skill_regist
 		$kmx[22] = 5000;
 	}
 
-	@{$skills->{キャラスキル現状値}}{@{$controller->config->{キャラスキル現状値}}} = @ksk;
-	@{$skills->{キャラスキル設定値}}{@{$controller->config->{キャラスキル設定値}}} = @kmg;
-	@{$skills->{キャラスキル最大値}}{@{$controller->config->{キャラスキル最大値}}} = (@kmx, $kmax);
+	@{$skills->{キャラスキル現状値}}{@{$mojo->config->{キャラスキル現状値}}} = @ksk;
+	@{$skills->{キャラスキル設定値}}{@{$mojo->config->{キャラスキル設定値}}} = @kmg;
+	@{$skills->{キャラスキル最大値}}{@{$mojo->config->{キャラスキル最大値}}} = (@kmx, $kmax);
 
 	$system->save_skill_db($kid, $skills);
 
@@ -71,9 +71,9 @@ sub skill_load
 	}
 	else
 	{
-		@ksk = @{$skills->{キャラスキル現状値}}{@{$controller->config->{キャラスキル現状値}}};
-		@kmg = @{$skills->{キャラスキル設定値}}{@{$controller->config->{キャラスキル設定値}}};
-		(@kmx, $kmax) = @{$skills->{キャラスキル最大値}}{@{$controller->config->{キャラスキル最大値}}};
+		@ksk = @{$skills->{キャラスキル現状値}}{@{$mojo->config->{キャラスキル現状値}}};
+		@kmg = @{$skills->{キャラスキル設定値}}{@{$mojo->config->{キャラスキル設定値}}};
+		(@kmx, $kmax) = @{$skills->{キャラスキル最大値}}{@{$mojo->config->{キャラスキル最大値}}};
 	}
 }
 

@@ -28,14 +28,14 @@ sub read_buff
 	}
 	else
 	{
-		our ($rrsk, @rbuf) = @$buff{@{$controller->config->{キャラバフ}}};
+		our ($rrsk, @rbuf) = @$buff{@{$mojo->config->{キャラバフ}}};
 	}
 }
 
 sub regist_buff
 {
 	my $buff = {};
-	@$buff{@{$controller->config->{キャラバフ}}} = ($krsk, @kbuf);
+	@$buff{@{$mojo->config->{キャラバフ}}} = ($krsk, @kbuf);
 	$system->save_buff_db($kid, $buff);
 }
 

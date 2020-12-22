@@ -47,7 +47,7 @@ sub item_shop
 		if($hit == 0) { next; }
 		$i++;
 
-		my ($iid,$ino,$iname,$idmg,$igold,$imode,$iuelm,$ieelm,$ihand,$idef,$ireq,$iqlt,$imake,$irest) = @$item{@{$controller->config->{マスタデータ_アイテム}}};
+		my ($iid,$ino,$iname,$idmg,$igold,$imode,$iuelm,$ieelm,$ihand,$idef,$ireq,$iqlt,$imake,$irest) = @$item{@{$mojo->config->{マスタデータ_アイテム}}};
 
 		$igold = int($igold * $cut);
 		&check_limit;
@@ -180,7 +180,7 @@ sub user_shop
 
 	for my $exhibit (@$exhibits)
 	{
-		my ($id, $iarea, $ino,$iname,$idmg,$igold,$imode,$iuelm,$ieelm,$ihand,$idef,$ireq,$iqlt,$imake,$irest,$iid) = @$exhibit{@{$controller->config->{出品データ}}};
+		my ($id, $iarea, $ino,$iname,$idmg,$igold,$imode,$iuelm,$ieelm,$ihand,$idef,$ireq,$iqlt,$imake,$irest,$iid) = @$exhibit{@{$mojo->config->{出品データ}}};
 		# アイテム種別により処理変更
 		&check_limit;
 		if ($imode == 01) {
@@ -302,7 +302,7 @@ sub bank
 
 	foreach(@bank_item)
 	{
-		my ($iid,$ino,$iname,$idmg,$igold,$imode,$iuelm,$ieelm,$ihand,$idef,$ireq,$iqlt,$imake,$irest) = @$_{@{$controller->config->{銀行貸し金庫}}};
+		my ($iid,$ino,$iname,$idmg,$igold,$imode,$iuelm,$ieelm,$ihand,$idef,$ireq,$iqlt,$imake,$irest) = @$_{@{$mojo->config->{銀行貸し金庫}}};
 		$igold = int($igold * $plus / 2);
 		&check_limit;
 		# アイテム種別により処理変更
@@ -553,7 +553,7 @@ sub user_buy
 		if ($key eq $tmp_key)
 		{
 			$hit = 1;
-			@$item{@{$controller->config->{キャラ所持品}}} = @$sell{@{$controller->config->{キャラ所持品}}};
+			@$item{@{$mojo->config->{キャラ所持品}}} = @$sell{@{$mojo->config->{キャラ所持品}}};
 			$item->{所持数} = $item_cnt;
 			$item->{キャラid} = $kid;
 			$item->{装備} ||= 0;
@@ -564,7 +564,7 @@ sub user_buy
 	if ($hit == 0)
 	{
 		my $item = {};
-		@$item{@{$controller->config->{キャラ所持品}}} = @$sell{@{$controller->config->{キャラ所持品}}};
+		@$item{@{$mojo->config->{キャラ所持品}}} = @$sell{@{$mojo->config->{キャラ所持品}}};
 		$item->{所持数} = $item_cnt;
 		$item->{キャラid} = $kid;
 		$item->{装備} ||= 0;
