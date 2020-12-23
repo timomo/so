@@ -105,7 +105,8 @@ table
 #td_logout,
 #td_item,
 #td_status,
-#td_message
+#td_message,
+#td_reload
 {
     cursor: pointer;
 }
@@ -248,9 +249,10 @@ table
     bottom: 14px;
 
      */
+    bottom: 3px;
     height: 48px;
     text-align: right;
-    width: 240px;
+    width: 300px;
 }
 
 .enemy
@@ -331,7 +333,8 @@ table
 
 #td_item,
 #td_status,
-#td_message
+#td_message,
+#td_reload
 {
     font-size: 1.2rem;
 }

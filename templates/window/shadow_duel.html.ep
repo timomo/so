@@ -1,13 +1,21 @@
+<div class="blackboard question">
+
 <form action="<%= $script %>" method="post">
 【Shadow Duel 管理局】<br>
 <input type="hidden" name="mode" value="battle" />
 <input type="hidden" name="id" value="<%= $kid %>" />
 <input type="hidden" name="pass" value="<%= $kpass %>" />
 
-<select name="rid">
-<option value="">挑戦相手を選択(強さ)</option>
-%== join("\n", @$rid);
-</select>
-<input type="submit" value="決闘" />
-<div class="text_detail">自分の分身と他人の分身を戦わせることができます。</div>
+<div class="input-group mb-3">
+    <select name="rid" class="custom-select">
+        <option value="">挑戦相手を選択(強さ)</option>
+        %== join("\n", @$rid);
+    </select>
+    <div class="input-group-append">
+        <input type="submit" value="決闘" class="btn btn-secondary" />
+    </div>
+</div>
+    <div class="text_detail">自分の分身と他人の分身を戦わせることができます。</div>
 </form>
+
+</div>

@@ -182,6 +182,7 @@ function setup_select_menu()
 		{
 			id = jQuery(event.target).closest("div.card").attr("id");
 		}
+
 		const ary = id.split("_");
 		const name = ary.splice(0, 1)[0];
 		const select_id = ary.splice(0, 1)[0];
@@ -523,6 +524,16 @@ jQuery(document).ready(() => {
 		else {
 			confirm_window(".select-shop-menu", event);
 		}
+	});
+
+	// WebSocketリロードボタン用意
+	jQuery("body").on("click", "#td_reload", (event) => {
+		if (ws !== undefined)
+		{
+			ws.close();
+			ws = undefined;
+		}
+		setup_websocket();
 	});
 
 	if (typeof const_id !== "undefined") {

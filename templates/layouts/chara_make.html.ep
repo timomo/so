@@ -2,7 +2,7 @@
 [<B><FONT COLOR="#FF9933">入国管理室</FONT></B>]<BR>
 右手の入り口より入国手続きを行います。（新キャラ登録）&nbsp
 <input type="hidden" name="mode" value="chara_make" />
-<input type="submit" value="入国手続き" />
+<input type="submit" value="入国手続き" class="btn btn-secondary btn-lg btn-block" />
 </form>
 </td>
 </tr>

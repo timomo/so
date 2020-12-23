@@ -25,4 +25,3 @@
 %== include 'layouts/ranking'
 %== include 'layouts/chara_make'
 %== include 'layouts/footer'
-

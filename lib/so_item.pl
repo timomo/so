@@ -67,12 +67,47 @@ sub item_check_tr
 
 		if ($type == 1)
 		{
-			my $mes = "<tr><td align=center>$item_eqp[$ieqp]</td><td align=center>$item_mode[$imode]</td><td class=iname>$iname<input type=hidden name=item_no value=\"$iid\"></td><td align=center>$idmg</td><td align=center>$igold G</td><td align=center>$item_hand[$ihand]</td><td align=center>$ireq</td><td align=center><font color=$elmcolor[$ieelm]>$item_eelm[$ieelm]</font></td><td align=center>$item_def[$idef]</td><td align=center>$item_qlt[$iqlt]</td><td align=center>$imake</td><td align=center>$irest 個</td></tr>\n";
+			my $mes = <<EOF;
+	<tr>
+		<td align="center">$item_eqp[$ieqp]</td>
+		<td align="center">$item_mode[$imode]</td>
+		<td class="iname">$iname<input type="hidden" name="item_no" value="$iid"></td>
+		<td align="center">$idmg</td>
+		<td align="center">$igold G</td>
+		<td align="center">$item_hand[$ihand]</td>
+		<td align="center">$ireq</td>
+		<td align="center"><font color=$elmcolor[$ieelm]>$item_eelm[$ieelm]</font></td>
+		<td align="center">$item_def[$idef]</td>
+		<td align="center">$item_qlt[$iqlt]</td>
+		<td align="center">$imake</td>
+		<td align="center">$irest 個</td>
+	</tr>
+EOF
 			push(@items, $mes);
 		}
 		else
 		{
-			my $mes = "<tr><td><input type=radio name=item_no value=\"$iid\"></td><td align=center>$item_eqp[$ieqp]</td><td align=center>$item_mode[$imode]</td><td class=iname>$iname</td><td align=center>$idmg</td><td align=center>$igold G</td><td align=center>$item_hand[$ihand]</td><td align=center>$ireq</td><td align=center><font color=$elmcolor[$ieelm]>$item_eelm[$ieelm]</font></td><td align=center>$item_def[$idef]</td><td align=center>$item_qlt[$iqlt]</td><td align=center>$imake</td><td align=center>$irest 個</td></tr>\n";
+			my $mes = <<EOF;
+	<tr>
+		<td>
+			<div class="input-group-text">
+				<input type="radio" name="item_no" value="$iid">
+			</div>
+		</td>
+		<td align="center">$item_eqp[$ieqp]</td>
+		<td align="center">$item_mode[$imode]</td>
+		<td class="iname">$iname</td>
+		<td align="center">$idmg</td>
+		<td align="center">$igold G</td>
+		<td align="center">$item_hand[$ihand]</td>
+		<td align="center">$ireq</td>
+		<td align="center"><font color="$elmcolor[$ieelm]">$item_eelm[$ieelm]</font></td>
+		<td align="center">$item_def[$idef]</td>
+		<td align="center">$item_qlt[$iqlt]</td>
+		<td align="center">$imake</td>
+		<td align="center">$irest 個</td>
+	</tr>
+EOF
 			push(@items, $mes);
 		}
 	}

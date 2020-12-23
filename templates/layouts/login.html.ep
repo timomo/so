@@ -1,11 +1,21 @@
 <div class="blackboard question">
 
-	    冒険中の方はこちら<br />
+	    <p>冒険中の方はこちら</p>
 
-        <label for="id">入国ＩＤ</label>
-        <input type="text" size="" name="id" value="" />
-        <label for="pass">パスワード</label>
-        <input type="password" size="" name="pass" value="" />
-        <input type="submit" value="旅の続き" />
+<div class="input-group mb-3">
+    <div class="input-group-prepend">
+        <span class="input-group-text">入国ＩＤ</span>
+    </div>
+    <input type="text" size="" name="id" value="" class="form-control" />
+</div>
+
+<div class="input-group mb-3">
+    <div class="input-group-prepend">
+        <span class="input-group-text">パスワード</span>
+    </div>
+    <input type="password" size="" name="pass" value="" class="form-control" />
+</div>
+
+        <input type="submit" value="旅の続き" class="btn btn-secondary btn-lg btn-block" />
 
 </div>

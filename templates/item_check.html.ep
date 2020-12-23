@@ -27,7 +27,7 @@
 <form action="<%== $script %>" method="post">
 <div class="menu-close" style="float: right; cursor: pointer">×</div>
 <input type="hidden" name="id" value="<%= $kid %>">
-<select name="mode">
+<select name="mode" class="custom-select">
 <option value="item_use">使うor装備or装備解除</option>
 <option value="item_battle">薬・治療アイテムを戦闘用に携帯</option>
 
@@ -48,7 +48,7 @@
 </select>
 </p>
 <p>
-<select name="sendid">
+<select name="sendid" class="custom-select">
 <option value="">送る相手を選択
 
 %== join("", @$send_id);
@@ -56,17 +56,23 @@
 </select>
 </p>
 <p>
-<input type=button value="OK" class="item-submit">
+<input type=button value="OK" class="item-submit btn btn-secondary btn-block">
 <input type=hidden name=item_no value="" />
 </p>
 <p>
-個数&nbsp;
-<select name="item">
 
+<div class="input-group mb-3">
+    <div class="input-group-prepend">個数&nbsp;</div>
+    <select name="item" class="custom-select">
 %== join("", @$item_count);
-
-</select>&nbsp;個
-&nbsp;金額&nbsp;<input type=text name=gold  size="11" value="">&nbsp;G&nbsp;/&nbsp;<%= $kgold %>&nbsp;G
+    </select>
+    <div class="input-group-append">&nbsp;個</div>
+</div>
+<div class="input-group mb-3">
+    <div class="input-group-prepend">金額&nbsp;</div>
+    <input type=text name=gold size="11" value="" class="form-control" />
+    <div class="input-group-append">&nbsp;G&nbsp;/&nbsp;<%= $kgold %>&nbsp;G</div>
+</div>
 </p>
 <p>
 <small>

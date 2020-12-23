@@ -1,17 +1,3 @@
-<br />
-<br />
-<br />
-<br />
-<br />
-<br />
-<br />
-<br />
-<br />
-<br />
-<br />
-<br />
-<br />
-<br />
 <div align="right" class="small">
 SO v0.2 by <a href="https://github.com/timomo/so">timomo</a><br />
 FF ADVENTURE v0.45 by <a href="http://www.interq.or.jp/sun/cumro/">D.Takamiya(CUMRO)</a><br />
@@ -24,6 +10,21 @@ Music by <a href="https://otologic.jp/">OtoLogic</a><br />
 </div>
 
 %= include "layouts/javascript_default"
+
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
 
 </body>
 </html>

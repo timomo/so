@@ -280,7 +280,7 @@ post '/login' => sub
         return $self->redirect_to('/');
     }
     $self->flash(confirmation => 'ログインに成功しました');
-    $self->redirect_to('/main');
+    $self->redirect_to('/');
 };
 
 get '/logout' => sub {
@@ -408,7 +408,34 @@ any "/" => sub
     my $k = $self->current_user;
     my $mode = $self->param("mode");
 
-    return $self->redirect_to("/main") if ($k);
+    if (defined $k)
+    {
+        return $self->render(
+            template    => "log_in_frame",
+            kgold       => $k->{所持金},
+            area        => $self->config->{街}->[$k->{エリア}],
+            spot        => $self->get_spot_name($k),
+            klv         => $k->{レベル},
+            klp         => $k->{LP},
+            max_lp      => 0,
+            khp         => $k->{HP},
+            kmaxhp      => $k->{最大HP},
+            kex         => $k->{経験値},
+            rrsk        => $k->{リスク},
+            kid         => $k->{id},
+            kname       => $k->{名前},
+            const_id    => $k->{id},
+            mode        => "log_in",
+            info_array  => [
+                "", "", "", "", "",
+                "", "", "", "", "",
+            ],
+            select_menu => [],
+            script      => "./",
+            kpass       => "*****",
+            k           => $k,
+        );
+    }
 
     my $env = $self->tx->req->env;
     $env->{"psgi.input"} ||= *STDIN;

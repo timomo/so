@@ -8,7 +8,7 @@
 <body>
 
 <b>入国手続き</b>
-<hr size=0>
+<br />
 <i>受付嬢「シマダ共和国にご入国でしょうか？こちらにご記入願います。」</i>
 <form action="<%= $script %>" method="post">
 <input type="hidden" name="mode" value="make_end">
@@ -57,7 +57,7 @@
 </td>
 </tr>
 <tr>
-<td colspan="2" align="center"><input type="submit" value="これで登録"></td>
+<td colspan="2" align="center"><input type="submit" value="これで登録" class="btn btn-secondary btn-lg btn-block"></td>
 </tr>
 </table>
 <input type="hidden" name=point value="<%= $point %>">
