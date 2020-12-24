@@ -1,16 +1,30 @@
 <div align="right" class="small">
+<ul class="list-group list-group-flush"><li class="list-group-item">
 SO v0.2 by <a href="https://github.com/timomo/so">timomo</a><br />
+</li><li class="list-group-item">
 FF ADVENTURE v0.45 by <a href="http://www.interq.or.jp/sun/cumro/">D.Takamiya(CUMRO)</a><br />
+</li><li class="list-group-item">
 Character Image by <a href="http://www.aas.mtci.ne.jp/~hiji/9ff/9ff.html">9-FFいっしょにTALK</a><br />
+</li><li class="list-group-item">
 cooperation site by <a href="http://webooo.csidenet.com/asvyweb/">FFADV推奨委員会</a><br />
+</li><li class="list-group-item">
 Music by <a href="https://otologic.jp/">OtoLogic</a><br />
+</li><li class="list-group-item">
 背景素材 by <a href="http://teddy-plaza.sakura.ne.jp/">TEDDY-PLAZA</a><br />
+</li><li class="list-group-item">
 カード素材 by <a href="http://romance.raindrop.jp/wirth/">siuil a run</a><br />
+</li><li class="list-group-item">
 カード背景素材 by <a href='https://ja.pngtree.com/free-backgrounds'>からの無料の背景写真 ja.pngtree.com</a><br />
+</li></ul>
 </div>
 
 %= include "layouts/javascript_default"
 
+<br />
+<br />
+<br />
+<br />
+<br />
 <br />
 <br />
 <br />

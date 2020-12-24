@@ -1,5 +1,5 @@
 <div class="blackboard question" id="player_status_area">
-    <table border="0">
+    <table border="0" style="width: 100%">
         <tr>
             <td rowspan="4">
                 <table border="0" style="width: 100%">

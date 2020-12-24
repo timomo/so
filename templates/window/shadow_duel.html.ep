@@ -6,7 +6,7 @@
 <input type="hidden" name="id" value="<%= $kid %>" />
 <input type="hidden" name="pass" value="<%= $kpass %>" />
 
-<div class="input-group mb-3">
+<div class="input-group mb-1">
     <select name="rid" class="custom-select">
         <option value="">挑戦相手を選択(強さ)</option>
         %== join("\n", @$rid);

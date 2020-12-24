@@ -478,7 +478,7 @@ function fixed_bottom_player_status_area() {
 		return true;
 	}
 
-	player_status.css({ position: "fixed", width: "85%",  bottom: 0, zIndex: player_status.zIndex + 1, "word-break": "keep-all" });
+	player_status.css({ position: "fixed", width: "100%",  bottom: 0, zIndex: player_status.zIndex + 1, "word-break": "keep-all" });
 }
 
 function setup_event_card()

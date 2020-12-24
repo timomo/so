@@ -6,11 +6,16 @@
 <input type="hidden" name="name" value="<%= $kname %>" />
 <input type="hidden" name="pass" value="<%= $kpass %>" />
 <input type="hidden" name="mode" value="message" />
-<select name="mesid" class="custom-select">
-<option value="">送る相手を選択</option>
-%== join("\n", @$mesid);
-</select>
-<input type="button" value="送信" id="send_message" class="form-control" /><br>
+
+<div class="input-group mb-1">
+    <select name="mesid" class="custom-select">
+        <option value="">送る相手を選択</option>
+        %== join("\n", @$mesid);
+    </select>
+    <div class="input-group-append">
+        <input type="button" value="送信" id="send_message" class="btn btn-secondary" />
+    </div>
+</div>
 <input type="text" name="mes" autocomplete="off" placeholder="メッセージ" class="form-control" />
 <div class="text_detail">他のキャラクターへメッセージを送ることができます。</div>
 </form>

@@ -1,18 +1,21 @@
 <div class="blackboard question" id="location_area">
-    <table border="0">
+    <table border="0" style="width: 100%;">
         <tr>
-            <td class="b1">所持金</td>
+            <td>所持金</td>
             <td><%== $kgold %></td>
-            <td class="b1">地名</td>
+            <td>地名</td>
             <td><%== $area %></td>
-            <td class="b1">場所</td>
+            <td>場所</td>
             <td><%== $spot %></td>
-            <td>
-                <input type="button" id="td_logout" value="ログアウト" class="btn btn-secondary btn-block" />
-            </td>
         </tr>
         <tr>
-            <td rowspan="7"><%= $k->{エリア} %>:<%= $k->{スポット} %>:<%= $k->{距離} %>:<%= $k->{階数} %></td>
+            <td>座標データ</td>
+            <td colspan="5"><%= $k->{エリア} %>:<%= $k->{スポット} %>:<%= $k->{距離} %>:<%= $k->{階数} %></td>
+        </tr>
+        <tr>
+            <td colspan="6">
+                <input type="button" id="td_logout" value="ログアウト" class="btn btn-secondary btn-block" />
+            </td>
         </tr>
     </table>
 </div>
