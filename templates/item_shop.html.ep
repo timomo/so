@@ -36,7 +36,7 @@
 <input type="button" value="街へ戻る" class="button-cancel">
 </form>
 </div>
-<script src="/js/so_shop.js"></script>
+<script src="/js/so_shop.js?time=<%= time %>"></script>
 <script>
 player.spot = "<%= $spot %>";
 jQuery("td.iname").bind("click", (event) => {

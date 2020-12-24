@@ -20,7 +20,7 @@ function confirm_window(name, event)
     }
 
     menu.zIndex = input.zIndex + 1;
-    menu.offset(offset);
+    menu.offset({ top: offset.top });
 
     div.find("input:hidden[name='item_no']").val(input.val());
     menu.find("div.menu-close").bind("click", (event) => {

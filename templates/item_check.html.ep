@@ -81,9 +81,10 @@
 　現在の貸し金庫の手数料は「価値」の<b> <%= $space_price %> </b>% です。
 </small>
 </p>
-</div>
 </form>
-<script src="/js/so_shop.js"></script>
+</div>
+
+<script src="/js/so_shop.js?time=<%= time %>"></script>
 <script>
 jQuery("td.iname").bind("click", (event) => {
     const td = jQuery(event.target);
