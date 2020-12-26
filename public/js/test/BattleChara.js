@@ -73,7 +73,7 @@ export class BattleChara extends PIXI.AnimatedSprite
         self["移動量"]["前進"] = 0.2;
         self["移動量"]["後退"] = 0.2;
         self["移動量"]["振動"] = 8;
-        self["移動量"]["移動"] = 0.2;
+        self["移動量"]["移動"] = 0.4;
         self["移動量"]["フレーム"] = 0.1;
         self["速度"] = {};
         self["速度"]["前進"] = 0.5;
@@ -975,23 +975,23 @@ export class BattleChara extends PIXI.AnimatedSprite
 
         if (constKey === 1)
         {
-            return { x: 0, y: 150, ffa2: { width: 64, height: 64 } };
+            return { x: 0, y: 180, ffa2: { width: 64, height: 64 } };
         }
         else if (constKey === 2)
         {
-            return { x: 50, y: 150, ffa2: { width: 64, height: 64 } };
+            return { x: 50, y: 180, ffa2: { width: 64, height: 64 } };
         }
         else if (constKey === 3)
         {
-            return { x: 100, y: 150, ffa2: { width: 64, height: 64 } };
+            return { x: 100, y: 180, ffa2: { width: 64, height: 64 } };
         }
         else if (constKey === 4)
         {
-            return { x: 150, y: 150, ffa2: { width: 64, height: 64 } };
+            return { x: 150, y: 180, ffa2: { width: 64, height: 64 } };
         }
         else if (constKey === 5) // エネミー:5
         {
-            return { x: 200, y: 150, ffa2: { width: 64, height: 64 } };
+            return { x: 200, y: 180, ffa2: { width: 64, height: 64 } };
         }
         else if (constKey === 6) // プレイヤー:1
         {
@@ -1403,7 +1403,7 @@ export class BattleChara extends PIXI.AnimatedSprite
         const key = "fadeOut";
         if (self.ffa2.state !== "stop" && self.ffa2.state !== key) return true;
 
-        self.alpha -= 0.04;
+        self.alpha -= 0.08;
         if (self.alpha <= 0)
         {
             self.alpha = 0;
@@ -1420,7 +1420,7 @@ export class BattleChara extends PIXI.AnimatedSprite
         const key = "fadeIn";
         if (self.ffa2.state !== "stop" && self.ffa2.state !== key) return true;
 
-        self.alpha += 0.04;
+        self.alpha += 0.08;
         if (self.alpha >= 1)
         {
             self.alpha = 1;

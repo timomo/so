@@ -78,6 +78,58 @@ function set_battle_layer_animation(pointer)
 	currentApp.ticker.start();
 }
 
+function sort_battle_layer(pointer, currentApp, currentPlayer) {
+	const sort_no = {
+		"BattleChara": 3,
+		"BattleFace": 2,
+		"BattleCard": 1,
+	};
+	const sort_type = {
+		"m": 1,
+		"k": 2,
+	};
+
+	const compare = (a, b) => {
+		if (currentPlayer === a) {
+			return -1;
+		}
+		if (currentPlayer === b) {
+			return 1;
+		}
+
+		const a_no = sort_no[a.constructor.name];
+		const b_no = sort_no[b.constructor.name];
+
+		if (a_no !== b_no) {
+			return a_no - b_no;
+		} else if (a_no === 0) {
+			return a_no - b_no;
+		} else if (a_no === 1) {
+			const a_const = a.constitution;
+			const b_const = b.constitution;
+			const a_type = a_const["キャラ種別"];
+			const b_type = b_const["キャラ種別"];
+
+			if (a_type === b_type) {
+				return 0;
+			} else {
+				return sort_type[a_type] - sort_type[b_type];
+			}
+		}
+	};
+	currentApp.stage.children.sort(compare);
+
+	let zIndex = 0;
+
+	for (let i = 0; i < currentApp.stage.children.length; i++) {
+		currentApp.stage.children[i].zIndex = zIndex++;
+	}
+
+	currentApp.stage.sortChildren();
+
+	// console.error(currentApp.stage.children);
+}
+
 function reset_battle_layer(pointer, currentApp)
 {
 	currentApp.stage.children.forEach((child) => {
@@ -159,6 +211,7 @@ function set_battle_layer(pointer)
 		ticker: new PIXI.Ticker(),
 	});
 
+	app.stage.sortableChildren = true;
 	app.ticker.autoStart = false;
 	app.ticker.stop();
 
@@ -232,6 +285,8 @@ function set_battle_layer(pointer)
 		{
 			k.setCommand(job.command, () => {});
 			jobs.shift();
+
+			sort_battle_layer(pointer, app, k);
 		}
 	});
 

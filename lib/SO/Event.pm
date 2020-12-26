@@ -139,7 +139,7 @@ sub encounter
     my $system = $self->app->entity("system");
     my $rand0 = $system->range_rand(0, 100);
 
-    if ($rand0 <= 30)
+    if ($rand0 <= 5)
     {
         my $rand1 = $system->range_rand(0, 100);
 

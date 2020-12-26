@@ -163,7 +163,7 @@ elsif($mode eq 'regist') { &regist; }
 elsif($mode eq 'battle') { &battle; }
 elsif($mode eq 'pvp') { &pvp; }
 elsif($mode eq 'monster') {
-	# &move;
+	&move;
 	&monster2;
 }
 elsif($mode eq 'rest') { &rest; }
