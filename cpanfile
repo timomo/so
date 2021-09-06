@@ -1,0 +1,10 @@
+requires 'Plack';
+requires 'CGI::Emulate::PSGI';
+requires 'CGI::Compile';
+requires 'IO::Capture::Stdout';
+requires 'DBIx::Custom';
+requires 'MojoX::Model';
+requires 'DateTime::HiRes';
+requires 'Mojolicious::Plugin::Authentication';
+requires 'String::Random';
+requires 'UNIVERSAL::require';

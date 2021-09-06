@@ -1,3 +1,6 @@
+/intermediate_data1.pl
+/intermediate_data_tidy.pl
+/cpanfile.snapshot
 /file.lock*
 /save/*.cgi
 /save/chara.db

@@ -263,30 +263,21 @@ get "/current" => sub
 
     if (exists $json->{accept} && ($json->{accept} || "") ne "")
     {
-        my $hit = $results->first(sub { return $_->{id} eq $id && $_->{accept} eq $json->{accept} });
+        my $path = File::Spec->catfile($FindBin::Bin, qw|save archive|, $json->{accept}. ".command.html");
 
-        if (! defined $hit) # 更新結果がメモリ上にない場合
+        if (! -f $path)
         {
-            my $path = File::Spec->catfile($FindBin::Bin, qw|save archive|, $json->{accept}. ".command.html");
-
-            if (! -f $path)
-            {
-                return $self->render("no_result");
-            }
-
-            my $file = Mojo::File->new($path);
-            my $utf8 = $file->slurp;
-
-            if (defined $utf8)
-            {
-                my $enc = Encode::decode_utf8($utf8);
-                return $self->render(text => $enc, format => "html");
-            }
+            return $self->render("no_result");
         }
 
-        my $enc = Encode::decode_utf8($hit->{content});
+        my $file = Mojo::File->new($path);
+        my $utf8 = $file->slurp;
 
-        return $self->render(text => $enc, format => "html");
+        if (defined $utf8)
+        {
+            my $enc = Encode::decode_utf8($utf8);
+            return $self->render(text => $enc, format => "html");
+        }
     }
 
     my $mode = $self->location($id);

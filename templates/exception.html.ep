@@ -11,8 +11,12 @@
 %== include "layouts/title"
 <div class="blackboard question">
 <p>エラーが起きました。リダイレクトします。</p>
-% if (defined $confirmation) {
-<p><%== $confirmation %></p>
+% if (my $confirmation = flash 'confirmation') {
+    <p><%== $confirmation %></p>
+% }
+
+% if (my $confirmation = stash 'confirmation') {
+    <p><%== $confirmation %></p>
 % }
 </div>
 <BR>
