@@ -1,10 +1,14 @@
 #!/usr/bin/perl
 
+use File::Spec;
+use FindBin;
+use lib File::Spec->catdir($FindBin::RealBin, qw|local lib perl5|);
+use lib File::Spec->catdir($FindBin::RealBin, 'lib');
+
+use Imager;
 use Plack::Builder;
 use Plack::App::WrapCGI;
 use Plack::App::Directory;
-use File::Spec;
-use FindBin;
 use Mojolicious::Lite;
 use Mojo::Server::PSGI;
 use Mojolicious::Types;
@@ -15,8 +19,7 @@ use YAML::XS;
 use Mojo::JSON;
 use JSON;
 use DBIx::Custom;
-use Image::Magick;
-use lib File::Spec->catdir($FindBin::RealBin, 'lib');
+# use Image::Magick;
 use SO::System;
 use SO::Town;
 
@@ -379,11 +382,13 @@ get "/img/*file" => sub {
 
         # デフォルトは左向きとしたいので、右向きのキャラは反転させる
         if ($self->param("file") =~ /^mon_.+?\.gif$/) {
-            my $image = Image::Magick->new();
-            $image->Read($asset->path);
-            $image->Flop;
+            my $image = Imager->new();
             my $file = Mojo::File::tempfile(DIR => File::Spec->catdir($FindBin::Bin, 'tmp'));
-            $image->Write($file->realpath . ".gif");
+
+            $image->read(file => $asset->path,type => 'gif') or die $image->errstr();
+            $image->flip(dir => 'h');
+            $image->write(file => $file->realpath . ".gif") or die $image->errstr();
+
             $asset = Mojo::Asset::File->new(path => $file->realpath . ".gif");
         }
 

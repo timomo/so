@@ -1,0 +1,31 @@
+version: "3.4"
+services:
+  base:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      target: mojobase
+    image: "takaya030/mojobase"
+    volumes:
+      - ./app:/home/appuser/app
+  app:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      target: mojoapp
+    image: "takaya030/mojoapp"
+    volumes:
+      - ./app:/home/appuser/app
+    ports:
+      - "3000:8080"
+  back_end:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      target: mojoapp
+    image: "takaya030/mojoapp"
+    volumes:
+      - ./app:/home/appuser/app
+    ports:
+      - "3001:8080"
+    command: ["carton","exec","plackup","-p","8080","world_backend.pl"]

@@ -1,9 +1,12 @@
 #!/usr/bin/env perl
 
-package main;
-
 use File::Spec;
 use FindBin;
+use lib File::Spec->catdir($FindBin::RealBin, qw|local lib perl5|);
+use lib File::Spec->catdir($FindBin::RealBin, 'lib');
+
+package main;
+
 # use lib File::Spec->catdir($FindBin::Bin, "lib");
 use Mojolicious::Lite;
 use Data::Dumper;

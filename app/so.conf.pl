@@ -11,7 +11,7 @@
         log_level           => "debug",
         log_level_index     => "warn",
         number_of_npc       => 10,
-        url_of_world_server => "127.0.0.1:3001",
+        url_of_world_server => "back_end:8080",
         chara_file          => "./save/chara.dat",
         append_file         => "./save/append.dat",
         detach_history      => {
